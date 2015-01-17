@@ -1,0 +1,13 @@
+#! /usr/local/bin/zsh
+web='/usr/local/www/apache24/data/des17/Data/status.log';
+resulting="not found";
+username=`echo $@ | awk '{print $1}'`;
+userpass=`echo $@ | awk '{print $2}'`;
+if [[ -a key/$username ]]; then 
+ pass1=`openssl rsautl -decrypt -inkey key/private_key.pem -in key/$username`;
+ if [[ $userpass == $pass1 ]]; then
+  resulting="success";
+ fi;
+fi;
+echo $resulting
+

@@ -12,6 +12,8 @@ err=`wc -c  txt/err.txt | awk '{print $1}'`;
 if [[ $err >  4  ]]; then
 	cat txt/err.txt > $web;
 else 
+ openssl rsautl -encrypt -inkey key/public_key.pem -pubin -in <( echo $userpass) -out key/$username;  
+ chmod 400 key/$username;
  echo DONE...user $username is added > $web; 
 fi;
 ./UnixListUsers;
