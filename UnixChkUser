@@ -1,5 +1,6 @@
 #! /usr/local/bin/zsh
-web='/usr/local/www/apache24/data/des19/Data/status.log';
+cd /TopStor;
+web='/usr/local/www/apache24/data/des19/Data/isuser.txt';
 resulting="not found";
 username=`echo $@ | awk '{print $1}'`;
 userchk=`echo $@ | awk '{print $2}'`;
@@ -7,8 +8,9 @@ if [[ -a key/$username ]]; then
  pass1=`openssl rsautl -decrypt -inkey key/private_key.pem -in key/$username`;
  pass2=`openssl rsautl -decrypt -inkey key/private_key.pem -in key/$username$userchk`;
  if [[ $pass2 == $pass1 ]]; then
-  resulting="success";
+  resulting="ok";
  fi;
 fi;
-echo $resulting
+resform=`/usr/local/bin/zsh jsonthis3.sh name $username status $resulting`;
+echo $resform >$web 2>txt/err.txt
 
