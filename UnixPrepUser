@@ -1,0 +1,7 @@
+#! /usr/local/bin/zsh
+web='/usr/local/www/apache24/data/des19/Data/status.log';
+resulting="not found";
+username=`echo $@ | awk '{print $1}'`;
+userpass=`echo $@ | awk '{print $2}'`;
+ openssl rsautl -encrypt -inkey key/public_key.pem -pubin -in <(echo $userpass) -out key/$username;
+chmod 400 key/$username;

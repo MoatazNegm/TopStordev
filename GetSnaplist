@@ -1,6 +1,6 @@
 #! /usr/local/bin/zsh
 cd /TopStor/;
-websnaps='/usr/local/www/apache24/data/des17/Data/listsnaps.txt';
+websnaps='/usr/local/www/apache24/data/des19/Data/listsnaps.txt';
 namearray=`/sbin/zfs list -t snapshot -H -o name,creation | grep Data | awk -F/ '{print $2}' |  awk '{$NF="";$1=$1"_"; print $0}' | sed 's/ /_/g' | sed 's/:/;/g'`; 
 nameforjson=`echo $namearray | awk '{$NF=$NF" ";print $0}' | tr -d '\n' | sed 's/@/ /g' ` ;
 jsonname=`./jsonthis2.sh $nameforjson`;

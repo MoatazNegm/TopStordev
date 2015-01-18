@@ -1,5 +1,5 @@
 #! /usr/local/bin/zsh
-web="/usr/local/www/apache24/data/des17/Data/status.log";
+web="/usr/local/www/apache24/data/des19/Data/status.log";
 echo "creating Pool $1...." > $web
 if [[ $1 == "mirror" ]]; then
 	zpool create Data mirror ada1 ada2 mirror ada3 ada4  2>txt/err.txt	
