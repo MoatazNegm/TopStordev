@@ -35,5 +35,5 @@ err=`wc -c  txt/err.txt | awk '{print $1}'`;
 if [[ $err >  4  ]]; then
 	cat txt/err.txt > $web;
 else 
- echo DONE...user $username is added > $web; 
+ echo DONE...Domain $doms is joined > $web; 
 fi;
