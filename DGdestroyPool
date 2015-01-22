@@ -1,0 +1,9 @@
+#! /usr/local/bin/zsh
+web="/usr/local/www/apache24/data/des19/Data/status.log";
+zpool destroy Data 2>txt/err.txt
+err=`wc -c txt/err.txt | awk '{print $1}'`;
+if [[ err -ge 3 ]]; then
+	cat txt/err.txt > $web;
+else
+	echo pool Data is removed with all containing data > $web;
+fi 
