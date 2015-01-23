@@ -1,0 +1,8 @@
+#! /usr/local/bin/zsh
+web='/usr/local/www/apache24/data/des19/Data/Hostprop.txt';
+hostn=`/bin/hostname`;
+hostip=`ifconfig em1 | grep "inet " | awk '{print $2}'`;
+hostrout=`netstat -rn | grep default | awk '{print $2}'`;
+hostdns=` cat /etc/resolv.conf | grep nameserver | awk '{print $2}'`;
+jsonips=`/usr/local/bin/zsh jsonthis3.sh name $hostn addr $hostip rout $hostrout dns $hostdns`;
+echo $jsonips > $web; 
