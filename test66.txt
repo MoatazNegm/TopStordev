@@ -1,0 +1,9 @@
+[test66]
+path = /Data/test66
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes

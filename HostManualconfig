@@ -1,4 +1,4 @@
-#! /usr/local/bin/zsh
+#! /bin/sh
 web='/usr/local/www/apache24/data/des19/Data/status.log';
 rm txt/err; 
 hostn=`echo $@ | awk '{ print $1 }' `;
