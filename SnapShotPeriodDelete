@@ -1,0 +1,3 @@
+#! /usr/local/bin/zsh
+cd /TopStor
+/usr/bin/crontab -l | grep -v "$@" | /usr/bin/crontab -
