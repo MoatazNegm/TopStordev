@@ -1,0 +1,4 @@
+4 */3 * * * /TopStor/Snapshotnow High/test5 hourly.4.3.5.na
+00 19 * * Sun /TopStor/Snapshotnow High/test5 Weekly.19.00.Sun.2
+59 18 * * Sun /TopStor/Snapshotnow High/test5 Weekly.18.59.Sun.2
+*/15 * * * * /TopStor/Snapshotnow High/test5 Minutely.15.5.na.na
