@@ -1,7 +1,15 @@
 #! /usr/local/bin/zsh
 cd /TopStor/;
 websnaps='/usr/local/www/apache24/data/des19/Data/listsnaps.txt';
-namearray=`/sbin/zfs list -t snapshot -H -o name,creation | grep Data | awk -F/ '{print $2}' |  awk '{$NF="";$1=$1"_"; print $0}' | sed 's/ /_/g' | sed 's/:/;/g'`; 
+namearray=`/sbin/zfs list -t snapshot -H -o name,creation`; 
+echo "$namearray" | while read -r line 
+do
+ onlyname=` echo $line | awk '{print $1}' | awk -F@ '{print $2}'`;
+ name=`echo $line | awk '{print $1}'`;
+ creat=` echo $line  | rev | awk  '{print $1" " $2"  " $3" " $4" " $5}' | rev `;
+ creatform=`date -f %c $creat +%m/%d/%y`; 
+ zsh jsonthis3.sh name $name onlyname $onlyname creation $creatform; 
+done
 nameforjson=`echo $namearray | awk '{$NF=$NF" ";print $0}' | tr -d '\n' | sed 's/@/ /g' ` ;
 jsonname=`./jsonthis2.sh $nameforjson`;
 echo $jsonname;

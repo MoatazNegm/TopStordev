@@ -6,6 +6,7 @@ name=`echo $@ | awk '{print $2}'`;
 DG=`echo $@ | awk '{print $1}'`;
 quota=`echo $@ | awk '{print $3}'`;
 /sbin/zfs create -o quota=$quota -o dedup=on -o compression=on  $DG/$name 2> txt/err.txt 
+/sbin/zfs set prot:kind=CIFS $DG/$name
 sed -e "s/NAMECIFS/$name/g" sharecifs.txt > $name.txt;
 cat $name.txt >> smb4.conf;
 cp smb4.conf /usr/local/etc/
