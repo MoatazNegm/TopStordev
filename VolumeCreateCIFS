@@ -17,4 +17,4 @@ if [[ $err >  4  ]]; then
 else 
  echo DONE...Volume $DG/$name is created > $web; 
 fi;
-
+./GetPoolVollist

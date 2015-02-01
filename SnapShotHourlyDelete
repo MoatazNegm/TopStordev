@@ -14,5 +14,4 @@ if [[ $err >  4  ]]; then
 else 
  echo DONE...Snapshot $snapsched is deleted > $web; 
 fi;
-sleep 2;
-./GetPoolHourlylist >> $web
+

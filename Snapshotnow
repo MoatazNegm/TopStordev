@@ -1,24 +1,35 @@
 #! /usr/local/bin/zsh
 cd /TopStor
 web='/usr/local/www/apache24/data/des19/Data/statusglobal.log';
+cronout='txt/cronoutput.log'
 echo creating Snapshot $@.... > $web;
 oper=$@; 
+echo oper=$oper > $cronout
 oper1=`echo $oper | awk '{print $1}'`;
 oper2=`echo $oper | awk '{print $2}'`;
 stamp=`date +%s`;
-keep=`echo $oper | awk -F. '{print $NF}'`;
+echo stamp=$stamp >> $cronout
+keep=`echo $oper2 | awk -F. '{print $2}'`;
+echo keep=$keep >> $cronout
 currentsnaps=`/sbin/zfs list -t snapshot | grep Data | grep "$oper2" | awk '{print $1}'`;
+echo currentsnaps=$currentstanps >> $cronout
 oldsnap=`echo $currentsnaps | sort | head -n 1` ;
-countsnap=`echo $currentsnaps | wc -l | awk '{print $1}'`;
+echo oldsnap=$oldsnap >> $cronout
+countsnap=`echo $currentnaps | wc -l | awk '{print $1}'`;
+echo countsnap=$countsnap >> $cronout 
 countsnap=$(($countsnap+1));
+echo countsnapplus=$countsnap >> $cronout
 keep=$(($keep+0));
+echo keeppluszero=$keep >> $cronout
 timenow=`date`;
 if (( $countsnap >  $keep )); then 
 	echo $timenow: have to delete $oldsnap >> $web;
 	/sbin/zfs destroy $oldsnap 2>txt/err.txt
 fi
 newsnap2=`echo $oper2.$stamp`;
+echo newsnap2=$newsnap2 >> $cronout
 newsnap=`echo $oper1@$newsnap2`;
+echo newsnap=$newsnap >> $cronout
 /sbin/zfs snapshot $newsnap 2>> txt/err.txt
 err=`wc -c  txt/err.txt | awk '{print $1}'`;
 if [[ $err >  4  ]]; then
@@ -28,4 +39,6 @@ timenow=`date`
 echo $timenow: DONE...Snapshot $@ is created >> $web; 
 fi;
 sleep 2;
+tmpl=`date`;
+echo $tmpl >> txt/cronoutput.txt
 ./GetSnaplist

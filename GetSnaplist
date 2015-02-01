@@ -1,6 +1,7 @@
 #! /usr/local/bin/zsh
 cd /TopStor/;
 websnaps='/usr/local/www/apache24/data/des19/Data/listsnaps.txt';
+resweb='/usr/local/www/apache24/data/des19/Data/listsnaps.txtupdated';
 namearray=`/sbin/zfs list -t snapshot -H -o name,creation`; 
 result='[';
 echo "$namearray" | while read -r line 
@@ -9,11 +10,14 @@ do
  onlyname=` echo $name | awk -F@ '{print $2}'`;
  father2=` echo $name | awk -F@ '{print $1}' | awk -F/ '{print $2}'`;
  creat=` echo $line | awk '{print $2" "$3" "$4"  "$5" "$6}'`; 
- creall=`/bin/date -f %c $creat +%m/%d/%y_%X`;
+ creall=`/bin/date -f %c $creat +%m/%d/%y_%R`;
  creatform=` echo $creall | awk -F_ '{print $1}'`;
  time2=` echo $creall | awk -F_ '{print $2}'`;
  subres=`/usr/local/bin/zsh jsonthis3.sh name $name onlyname $onlyname father $father2 creation $creatform time $time2; `;
  result=$result$subres,;
 done
  result=`echo $result | rev | cut -c 2- | rev`];
-echo $result >$websnaps
+echo $result >$websnaps;
+resdate=`date +%s`;
+res=` ./jsonthis3.sh updated $resdate`;
+echo $res > $resweb;
