@@ -7,15 +7,18 @@ oper=$@;
 echo oper=$oper > $cronout
 oper1=`echo $oper | awk '{print $1}'`;
 oper2=`echo $oper | awk '{print $2}'`;
+echo oper1=$oper1 >> $cronout;
+echo oper2=$oper2 >> $cronout;
 stamp=`date +%s`;
 echo stamp=$stamp >> $cronout
 keep=`echo $oper2 | awk -F. '{print $2}'`;
 echo keep=$keep >> $cronout
 currentsnaps=`/sbin/zfs list -t snapshot | grep Data | grep "$oper2" | awk '{print $1}'`;
-echo currentsnaps=$currentstanps >> $cronout
+echo currentsnaps=$currentsnaps >> $cronout
 oldsnap=`echo $currentsnaps | sort | head -n 1` ;
 echo oldsnap=$oldsnap >> $cronout
-countsnap=`echo $currentnaps | wc -l | awk '{print $1}'`;
+count=0
+countsnap=`echo  "$currentsnaps" | wc -l `;
 echo countsnap=$countsnap >> $cronout 
 countsnap=$(($countsnap+1));
 echo countsnapplus=$countsnap >> $cronout
@@ -38,7 +41,4 @@ else
 timenow=`date`
 echo $timenow: DONE...Snapshot $@ is created >> $web; 
 fi;
-sleep 2;
-tmpl=`date`;
-echo $tmpl >> txt/cronoutput.txt
 ./GetSnaplist

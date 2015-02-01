@@ -1,0 +1,13 @@
+oper=Data/test5 hourly.4.2.4.na
+oper1=Data/test5
+oper2=hourly.4.2.4.na
+stamp=1422756103
+keep=4
+currentsnaps=Data/test5@hourly.4.2.4.na.1422756094
+Data/test5@hourly.4.2.4.na.1422756109
+oldsnap=Data/test5@hourly.4.2.4.na.1422756094
+countsnap=       2
+countsnapplus=3
+keeppluszero=4
+newsnap2=hourly.4.2.4.na.1422756103
+newsnap=Data/test5@hourly.4.2.4.na.1422756103
