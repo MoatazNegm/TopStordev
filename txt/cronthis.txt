@@ -1,2 +1,0 @@
-2 */4 * * * /TopStor/Snapshotnow Data/test5 hourly.4.2.4.na
-*/5 * * * * /TopStor/Snapshotnow Data/lastmez Minutely.3.5.na.na

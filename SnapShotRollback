@@ -1,0 +1,12 @@
+#! /usr/local/bin/zsh
+cd /TopStor
+web='/usr/local/www/apache24/data/des19/Data/status.log';
+echo Rollback Snapshot $@.... > $web;
+/sbin/zfs rollback -r  $@  2>txt/err.txt;
+err=`wc -c  txt/err.txt | awk '{print $1}'`;
+if [[ $err >  4  ]]; then
+	cat txt/err.txt > $web;
+else 
+ echo DONE...Snapshot $@ is rolledback > $web; 
+fi;
+./GetSnaplist

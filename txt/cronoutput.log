@@ -1,13 +1,14 @@
-oper=Data/test5 hourly.4.2.4.na
-oper1=Data/test5
-oper2=hourly.4.2.4.na
-stamp=1422756103
-keep=4
-currentsnaps=Data/test5@hourly.4.2.4.na.1422756094
-Data/test5@hourly.4.2.4.na.1422756109
-oldsnap=Data/test5@hourly.4.2.4.na.1422756094
-countsnap=       2
-countsnapplus=3
-keeppluszero=4
-newsnap2=hourly.4.2.4.na.1422756103
-newsnap=Data/test5@hourly.4.2.4.na.1422756103
+oper=Data/lastmez Minutely.3.5.na.na
+oper1=Data/lastmez
+oper2=Minutely.3.5.na.na
+stamp=1422756587
+keep=3
+currentsnaps=Data/lastmez@Minutely.3.5.na.na.1422756900
+Data/lastmez@Minutely.3.5.na.na.1423105761
+Data/lastmez@Minutely.3.5.na.na.1422756252
+oldsnap=Data/lastmez@Minutely.3.5.na.na.1422756252
+countsnap=       3
+countsnapplus=4
+keeppluszero=3
+newsnap2=Minutely.3.5.na.na.1422756587
+newsnap=Data/lastmez@Minutely.3.5.na.na.1422756587
