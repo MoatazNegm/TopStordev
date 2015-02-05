@@ -1,7 +1,13 @@
 #!/usr/local/bin/zsh
 web="/usr/local/www/apache24/data/des19/Data/status.log";
-username=$1;
+logging="/usr/local/www/apache24/data/des19/Data/currentinfo2.log";
+username=`echo $@ | awk '{print $1}'`;
+userreq=`echo $@ | awk '{print $2}'`;
 echo Deleting user $username...> $web;
+datenow=`date +%m/%d/%Y`;timenow=`date +%T`;
+logdata='Deleting_user:'$username;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq`;
+oldlog=`cat $logging | sed 's/]//g' `; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 /usr/local/bin/smbpasswd -d $username;
 pw user del $username -r  2>txt/err.txt;
 rm -R  /Data/Common/$username;
@@ -10,6 +16,11 @@ echo DONE..user $username is deleted > $web;
 err=`wc -c txt/err.txt | awk '{print $1}'`;
 if [[ $err -ge 3 ]]; then
 	cat txt/err.txt > $web;
+ 	logdata='failed_deleting_user:'$username	;
+else
+	logdata='success_deleting_user:'$username;
 fi;
-
-
+datenow=`date +%m/%d/%Y`;timenow=`date +%T`;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq`;
+oldlog=`cat $logging | sed 's/]//g' `; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+./UnisListUsers;
