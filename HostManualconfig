@@ -1,11 +1,17 @@
 #! /bin/sh
 web='/usr/local/www/apache24/data/des19/Data/status.log';
+logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log';
 rm txt/err; 
 hostn=`echo $@ | awk '{ print $1 }' `;
 hostip=`echo $@ | awk '{ print $2 }'`;
 hostrout=`echo $@ | awk '{ print $3 }'`;
 hostdns=` echo $@ | awk '{ print $4 }'`
+userreq=` echo $@ | awk '{ print $5 }'`;
 echo changing box name and ips.... > $web;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logdata='changing_box_to:'$hostn'_'$hostip'_'$hostrout'_'$hostdns;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
 echo name_servers=\"$hostdns\" > txt/resolvconf.conf
 sed -e "s/HOSTNAME/$hostn/g" -e "s/IPADD/$hostip/g" -e "s/ROUTE/$hostrout/g" rc.conf > txt/rc.conf
 cp txt/resolvconf.conf /etc/
@@ -16,3 +22,7 @@ resolvconf -u
 route delete default;
 route add default $hostrout
 echo changes are done.. some moments and will see them > $web
+logdata='success_changing_box_to:'$hostn'_'$hostip'_'$hostrout'_'$hostdns;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
