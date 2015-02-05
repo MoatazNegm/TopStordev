@@ -1,5 +1,6 @@
 #! /bin/sh
 web='/usr/local/www/apache24/data/des19/Data/status.log';
+logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log';
 rm txt/err; 
 domain=`echo $@ | awk '{ print $1 }' `;
 domc=`echo $domain | tr '[:lower:]' '[:upper:]'`;
@@ -8,12 +9,17 @@ domshort=` echo $domc | awk -F. '{ print $1 }'`;
 admin=`echo $@ | awk '{ print $2 }'`;
 pass=`echo $@ | awk '{ print $3 }'`;
 domcont=` echo $@ | awk '{ print $4 }'`
+userreq=` echo $@ | awk '{ print $5 }'`;
 domcontip=` host $domcont.$doms | awk '{print $NF}'`
 ip1=` echo $domcontip | awk -F. '{print $1}'`;
 ip2=` echo $domcontip | awk -F. '{print $2}'`;
 ip3=` echo $domcontip | awk -F. '{print $3}'`;
 ip4=` echo $domcontip | awk -F. '{print $4}'`;
 echo changing Domain to $domain.... > $web;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logdata='Domain_change:'$domain;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq`;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 echo $pass > txt/pass;
 hostn=`hostname | awk -F. '{print $1}'`;
 sed "1s/.*/hostname=\"$hostn\.$doms\"/" /etc/rc.conf > txt/rc.conf;
@@ -40,6 +46,11 @@ service ntpdate restart;
 err=`wc -c  txt/err.txt | awk '{print $1}'`;
 if [[ $err >  4  ]]; then
 	cat txt/err.txt > $web;
+	logdata='failed_changing_domain:'$domain;
 else 
  echo DONE...Domain $doms is joined > $web; 
+ logdata='success_changing_domain:'$domain;
 fi;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq`;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;

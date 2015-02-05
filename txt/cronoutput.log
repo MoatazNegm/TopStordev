@@ -1,14 +1,14 @@
 oper=Data/lastmez Minutely.3.5.na.na
 oper1=Data/lastmez
 oper2=Minutely.3.5.na.na
-stamp=1423147178
+stamp=1423148087
 keep=3
-currentsnaps=Data/lastmez@Minutely.3.5.na.na.1423146300
-Data/lastmez@Minutely.3.5.na.na.1423146578
-Data/lastmez@Minutely.3.5.na.na.1423146852
-oldsnap=Data/lastmez@Minutely.3.5.na.na.1423146300
+currentsnaps=Data/lastmez@Minutely.3.5.na.na.1423147178
+Data/lastmez@Minutely.3.5.na.na.1423147487
+Data/lastmez@Minutely.3.5.na.na.1423147787
+oldsnap=Data/lastmez@Minutely.3.5.na.na.1423147178
 countsnap=       3
 countsnapplus=4
 keeppluszero=3
-newsnap2=Minutely.3.5.na.na.1423147178
-newsnap=Data/lastmez@Minutely.3.5.na.na.1423147178
+newsnap2=Minutely.3.5.na.na.1423148087
+newsnap=Data/lastmez@Minutely.3.5.na.na.1423148087
