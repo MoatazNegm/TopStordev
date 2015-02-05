@@ -10,7 +10,7 @@ do
  onlyname=` echo $name | awk -F@ '{print $2}'`;
  father2=` echo $name | awk -F@ '{print $1}' | awk -F/ '{print $2}'`;
  creat=` echo $line | awk '{print $2" "$3" "$4"  "$5" "$6}'`; 
- creall=`/bin/date -f %c $creat +%m/%d/%y_%R`;
+ creall=`/bin/date -j -f %c $creat +%m/%d/%y_%R`;
  creatform=` echo $creall | awk -F_ '{print $1}'`;
  time2=` echo $creall | awk -F_ '{print $2}'`;
  subres=`/usr/local/bin/zsh jsonthis3.sh name $name onlyname $onlyname father $father2 creation $creatform time $time2; `;
