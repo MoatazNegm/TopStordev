@@ -141,6 +141,7 @@ admin users = administrator
 writeable - Yes
 nt acl support - yes
 inherit acls = Yes
+#err
 [eer]
 path = /Data/eer
 read only = no
@@ -150,6 +151,8 @@ admin users = administrator
 writeable - Yes
 nt acl support - yes
 inherit acls = Yes
+#err
+#testlog
 [testlog]
 path = /Data/testlog
 read only = no
@@ -159,21 +162,4 @@ admin users = administrator
 writeable - Yes
 nt acl support - yes
 inherit acls = Yes
-[testlog]
-path = /Data/testlog
-read only = no
-browsable = yes
-write list = @everyone
-admin users = administrator
-writeable - Yes
-nt acl support - yes
-inherit acls = Yes
-[testlog]
-path = /Data/testlog
-read only = no
-browsable = yes
-write list = @everyone
-admin users = administrator
-writeable - Yes
-nt acl support - yes
-inherit acls = Yes
+#testlog

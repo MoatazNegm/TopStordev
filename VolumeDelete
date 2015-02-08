@@ -4,7 +4,6 @@ web='/usr/local/www/apache24/data/des19/Data/status.log';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 echo Deleteing  $@.... > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-echo started > txt/VollCreate.txt
 rm txt/err2.txt;
 volname=`echo $@ | awk '{print $2}'`;
 DG=`echo $@ | awk '{print $1}'`;

@@ -1,6 +1,7 @@
 #! /usr/local/bin/zsh
 cd /TopStor
 web='/usr/local/www/apache24/data/des19/Data/statusglobal.log';
+logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 cronout='txt/cronoutput.log'
 echo creating Snapshot $@.... > $web;
 oper=$@; 
@@ -25,6 +26,8 @@ echo countsnapplus=$countsnap >> $cronout
 keep=$(($keep+0));
 echo keeppluszero=$keep >> $cronout
 timenow=`date`;
+userreq='System';
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 if (( $countsnap >  $keep )); then 
 	echo $timenow: have to delete $oldsnap >> $web;
 	/sbin/zfs destroy $oldsnap 2>txt/err.txt
@@ -33,12 +36,22 @@ newsnap2=`echo $oper2.$stamp`;
 echo newsnap2=$newsnap2 >> $cronout
 newsnap=`echo $oper1@$newsnap2`;
 echo newsnap=$newsnap >> $cronout
-/sbin/zfs snapshot $newsnap 2>> txt/err.txt
-err=`wc -c  txt/err.txt | awk '{print $1}'`;
-if [[ $err >  4  ]]; then
-	cat txt/err.txt >> $web;
+logdata='Creating_Snapshot:'$newsnap;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+/sbin/zfs snapshot $newsnap 2>> txt/$0$userreq.txt
+err=`wc -c  txt/$0$userreq.txt | awk '{print $1}'`;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+if [[ $err -ge  4  ]]; then
+	cat txt/$0$userreq.txt >> $web;
+	logdata='Failed_Creating_Snapshot:'$newsnap;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
 else 
 timenow=`date`
-echo $timenow: DONE...Snapshot $@ is created >> $web; 
+	echo $timenow: DONE...Snapshot $@ is created >> $web; 
+	logdata='Success_Creating_Snapshot:'$newsnap;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 fi;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+rm txt/$0$userreq.txt
 ./GetSnaplist

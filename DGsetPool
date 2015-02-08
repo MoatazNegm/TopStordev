@@ -1,16 +1,30 @@
 #! /usr/local/bin/zsh
 web="/usr/local/www/apache24/data/des19/Data/status.log";
+logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 raid=` echo $@ | awk '{print $2}'`;
 result=` echo $@ | awk '{print $1}'`;
+userreq=` echo $@ | awk '{print $3}'`;
 echo "creating Pool $1...." > $web
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logdata='Creating_Pool:Data_with_RAID_'$raid;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 if [[ $raid == "mirror" ]]; then
- zpool create Data mirror da0 da1 mirror da2 da3 2>txt/err.txt 	
+ zpool create Data mirror da0 da1 mirror da2 da3 2>txt/$0$userreq.txt 	
 else
-	zpool create Data $raid da0 da1 da2 da3  2>txt/err.txt
+	zpool create Data $raid da0 da1 da2 da3  2>txt/$0$userreq.txt
 fi
-err=`wc -c txt/err.txt | awk '{print $1}'`;
+err=`wc -c txt/$0$userreq.txt | awk '{print $1}'`;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 if [[ err -ge 3 ]]; then
-	cat txt/err.txt > $web;
+	cat txt/$0$userreq.txt > $web;
+	logdata='Failed_Creating_Pool:Data_with_RAID_'$raid;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
+	
 else
-	echo pool Data of $result is created. > $web;
+	echo Success creating Data with Raid $raid > $web;
+	logdata='Success_Creating_Pool:Data_with_RAID_'$raid;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 fi 
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+rm txt/$0$userreq.txt
