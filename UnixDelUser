@@ -3,6 +3,10 @@ web="/usr/local/www/apache24/data/des19/Data/status.log";
 logging="/usr/local/www/apache24/data/des19/Data/currentinfo2.log";
 username=`echo $@ | awk '{print $1}'`;
 userreq=`echo $@ | awk '{print $2}'`;
+privilege="Box_Users";
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
 echo Deleting user $username...> $web;
 datenow=`date +%m/%d/%Y`;timenow=`date +%T`;
 logdata='Deleting_user:'$username;
@@ -24,3 +28,4 @@ datenow=`date +%m/%d/%Y`;timenow=`date +%T`;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq`;
 oldlog=`cat $logging | sed 's/]//g' `; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 ./UnisListUsers;
+fi

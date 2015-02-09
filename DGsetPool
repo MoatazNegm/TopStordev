@@ -4,6 +4,10 @@ logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 raid=` echo $@ | awk '{print $2}'`;
 result=` echo $@ | awk '{print $1}'`;
 userreq=` echo $@ | awk '{print $3}'`;
+privilege="DISK_Groups"
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
 echo "creating Pool $1...." > $web
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Creating_Pool:Data_with_RAID_'$raid;
@@ -28,3 +32,4 @@ else
 fi 
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 rm txt/$0$userreq.txt
+fi

@@ -2,7 +2,6 @@
 web='/usr/local/www/apache24/data/des19/Data/status.log';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 rm txt/cronthis.txt
-echo Adding snapshot schedule.... > $web;
 stime=`echo $@ | awk '{print $1}'`;
 hr=`echo $stime | awk -F: '{print $1}'`;
 min=`echo $stime | awk -F: '{print $2}'`;
@@ -11,6 +10,11 @@ k=0; keep=`echo $@ | awk '{print $3}'`; keep=$(($keep+$k)); if (($keep < 1)); th
 DG=` echo $@ | awk '{print $4}'`; 
 FileS=` echo $@ | awk '{print $5}'`;
 userreq=` echo $@ | awk '{print $6}'`;
+privilege="SnapShots";
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
+echo Adding snapshot schedule.... > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Creating_WeeklyPreiod:'$DG/$FileS;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
@@ -32,3 +36,4 @@ fi;
 rm txt/$0$userreq.txt
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 ./GetPoolperiodlist 
+fi

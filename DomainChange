@@ -10,6 +10,10 @@ admin=`echo $@ | awk '{ print $2 }'`;
 pass=`echo $@ | awk '{ print $3 }'`;
 domcont=` echo $@ | awk '{ print $4 }'`
 userreq=` echo $@ | awk '{ print $5 }'`;
+privilege="Active_Directory";
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
 domcontip=` host $domcont.$doms | awk '{print $NF}'`
 ip1=` echo $domcontip | awk -F. '{print $1}'`;
 ip2=` echo $domcontip | awk -F. '{print $2}'`;
@@ -54,3 +58,4 @@ fi;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+fi

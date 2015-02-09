@@ -6,6 +6,10 @@ name=`echo $@ | awk '{print $2}'`;
 DG=`echo $@ | awk '{print $1}'`;
 quota=`echo $@ | awk '{print $3}'`;
 userreq=` echo $@ | awk '{print $4}'`;
+privilege="CIFS";
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Creating_Volume:'$DG/$name;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
@@ -30,3 +34,4 @@ fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
 rm txt/$0$userreq.txt
 ./GetPoolVollist
+fi
