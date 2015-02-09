@@ -29,4 +29,4 @@ else
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data "$logdata"`;
 fi 
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
-rm txt/$0$userreq;
+rm txt/$0$userreq.txt;
