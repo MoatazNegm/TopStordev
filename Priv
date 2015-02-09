@@ -1,0 +1,43 @@
+#! /usr/local/bin/zsh
+cd /TopStor
+echo $@ > txt/Priv.txt
+privilege="User_Priv";
+contrun="false";
+userreq=` echo $@ | awk '{print $NF}'`;
+contrun=` ./privthis.sh $privilege $userreq ` ;
+if [[ $contrun == 'true' ]] 
+then
+web='/usr/local/www/apache24/data/des19/Data/status.log';
+userpriv='/usr/local/www/apache24/data/des19/Data/userpriv.txt';
+resweb='/usr/local/www/apache24/data/des19/Data/userprivdate.txt';
+logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
+jsonthis=`./jsonthis3.sh $@`;
+echo $jsonthis >> txt/Priv.txt
+userchange=` echo $@ | awk '{print $2}'`;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logdata='changing_Privileges_of_user:'$userchange;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+result="[";
+olduserpriv=`cat txt/userpriv.txt | grep -v "$userchange"`;
+wold=` echo $olduserpriv | wc -c `;
+if [[ $wold -ge 5 ]] 
+then 
+echo $olduserpriv > txt/userpriv.txt
+echo $jsonthis >> txt/userpriv.txt
+else
+ echo $jsonthis > txt/userpriv.txt
+fi
+cat txt/userpriv.txt | while read -r line
+do 
+result=$result$line,;
+done
+result=`echo $result | rev | cut -c 2- | rev`];
+echo $result > $userpriv;
+logdata='Success_changing_UserPrivileges:'$userchange;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+resdate=`date +%s`;
+res=`./jsonthis3.sh updated $resdate`;
+echo $res > $resweb ;
+fi

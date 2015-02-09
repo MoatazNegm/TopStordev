@@ -1,0 +1,2 @@
+user cifsuser Active_Directory true Box_Users true Error true Service_Charts false Logs false CIFS false NFS false ISCSI false DISK_Groups false SnapShots false User_Priv false Colourize false administrator admin
+{"user":"cifsuser","Active_Directory":"true","Box_Users":"true","Error":"true","Service_Charts":"false","Logs":"false","CIFS":"false","NFS":"false","ISCSI":"false","DISK_Groups":"false","SnapShots":"false","User_Priv":"false","Colourize":"false","administrator":"admin"}
