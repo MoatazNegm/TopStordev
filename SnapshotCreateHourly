@@ -9,7 +9,7 @@ DG=` echo $@ | awk '{print $4}'`;
 FileS=` echo $@ | awk '{print $5}'`;
 userreq=` echo $@ | awk '{print $6}'`;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-logdata='Creating_Snapshot:'$DG/$FileS@$name;
+logdata='Creating_HourlyPeriod:'$DG/$FileS@$name;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 crontab -l > txt/cronthis.txt
@@ -19,11 +19,11 @@ err=`wc -c  txt/$0$userreq.txt | awk '{print $1}'`;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 if [[ $err -ge  4  ]]; then
 	cat txt/$0$userreq.txt > $web;
-	logdata='Failed_Creating_Snapshot:'$DG/$FileS@$name;
+	logdata='Failed_Creating_HourlyPeriod:'$DG/$FileS@$name;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
 else 
  	echo DONE...Snapshot hourly.$min.$every.$keep is added > $web; 
-	logdata='Success_Creating_Snapshot:'$DG/$FileS@$name;
+	logdata='Success_Creating_HourlyPeriod:'$DG/$FileS@$name;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 fi
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;

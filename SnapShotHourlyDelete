@@ -1,17 +1,29 @@
 #! /usr/local/bin/zsh
 cd /TopStor
 web='/usr/local/www/apache24/data/des19/Data/status.log';
+logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 echo Deleteing Snapshot schedule.... > $web;
-rm txt/err.txt;
 rm txt/cronthis.txt;
+oper1=` echo $@ | awk '{print $1}'`;
+userreq=` echo $@ | awk '{print $2}'`;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logdata='Creating_HourlyPeriod:'$oper1;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 crontab -l > txt/cronthis.txt;
-snapsched=`echo $@ | awk -F@ '{print $2}'`;
+snapsched=`echo $oper1 | awk -F@ '{print $2}'`;
 cat txt/cronthis.txt | grep -v $snapsched > txt/cronthis.txt
-crontab txt/cronthis.txt 2>txt/err.txt;
-err=`wc -c  txt/err.txt | awk '{print $1}'`;
-if [[ $err >  4  ]]; then
-	cat txt/err.txt > $web;
+crontab txt/cronthis.txt 2>txt/$0$userreq.txt;
+err=`wc -c  txt/$0$userreq.txt | awk '{print $1}'`;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+if [[ $err -ge  4  ]]; then
+	cat txt/$0$userreq.txt > $web;
+	logdata='Failed_Creating_HourlyPeriod:'$oper1;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
 else 
- echo DONE...Snapshot $snapsched is deleted > $web; 
+ 	echo DONE...Snapshot $snapsched is deleted > $web; 
+	logdata='Success_Creating_HourlyPeriod:'$oper1;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 fi;
-
+rm txt/$0$userreq.txt
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;

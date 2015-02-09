@@ -1,12 +1,17 @@
-oper=Data/lastmez Minutely.3.5.na.na
-oper1=Data/lastmez
-oper2=Minutely.3.5.na.na
-stamp=1423433995
-keep=3
-currentsnaps=
-oldsnap=
-countsnap=       1
-countsnapplus=2
-keeppluszero=3
-newsnap2=Minutely.3.5.na.na.1423433995
-newsnap=Data/lastmez@Minutely.3.5.na.na.1423433995
+oper=Data/mezo2 Minutely.4.5.na.na
+oper1=Data/mezo2
+oper2=Minutely.4.5.na.na
+stamp=1423443587
+keep=4
+currentsnaps=Data/mezo2@Minutely.4.5.na.na.1423441705
+Data/mezo2@Minutely.4.5.na.na.1423441892
+Data/mezo2@Minutely.4.5.na.na.1423442742
+Data/mezo2@Minutely.4.5.na.na.1423442890
+oldsnap=Data/mezo2@Minutely.4.5.na.na.1423441705
+countsnap=       4
+countsnapplus=5
+keeppluszero=4
+{"Date":"02/09/2015","time":"02:59:47","msg":"info","user":"System","data":"Success_Deleting_Snapshot:"}
+newsnap2=Minutely.4.5.na.na.1423443587
+newsnap=Data/mezo2@Minutely.4.5.na.na.1423443587
+{"Date":"02/09/2015","time":"02:59:47","msg":"info","user":"System","data":"Success_Creating_Snapshot:Data/mezo2@Minutely.4.5.na.na.1423443587"}
