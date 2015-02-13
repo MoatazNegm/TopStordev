@@ -1,4 +1,0 @@
-5 */1 * * * /TopStor/Snapshotnow Data/mezo2 hourly.3.5.1.na
-*/5 * * * * /TopStor/Snapshotnow Data/mezo2 Minutely.4.5.na.na
-33 22 * * Sun /TopStor/Snapshotnow Data/mezo2 Weekly.2.22.33.Sun
-37 4 * * Tue /TopStor/Snapshotnow Data/mezo2 Weekly.2.4.37.Tue

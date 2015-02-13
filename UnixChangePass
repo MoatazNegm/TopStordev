@@ -1,6 +1,7 @@
 #! /usr/local/bin/zsh
 web='/usr/local/www/apache24/data/des19/Data/status.log';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log';
+resweb='/usr/local/www/apache24/data/des19/Data/userpass.txtupdated';
 echo Changing user password by $username > $web
 userpass=`echo $@ | awk '{print $1}'`;
 username=`echo $@ | awk '{print $2}'`;
@@ -10,7 +11,11 @@ logdata='user_change_password_by:'$username;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 cp txt/logthis.log $logging; rm txt/logthis.log;
+if [[ $username == "admin" ]]; then
+( echo $userpass | pw usermod  $username -m -h 0 -c "BoxAdmin" -s /usr/sbin/nologin) 2> txt/$0$userreq.txt;
+else
 ( echo $userpass | pw usermod  $username -m -h 0 -c "TopStor" -s /usr/sbin/nologin) 2> txt/$0$userreq.txt;
+fi
 ( echo $userpass; echo $userpass) | /usr/local/bin/smbpasswd -s -a $username 2>> txt/$0$userreq.txt;
 cat txt/$0userreq.txt >> txt/passchange
 err=`wc -c  txt/$0$userreq.txt | awk '{print $1}'`;
@@ -30,3 +35,6 @@ else
 fi 
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 rm txt/$0$userreq.txt;
+resdate=`date +%s`;
+resjson=`./jsonthis3.sh updated $resdate`;
+echo $resjson > $resweb;
