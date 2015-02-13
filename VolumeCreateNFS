@@ -15,11 +15,10 @@ logdata='Creating_Volume:'$DG/$name;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
 /sbin/zfs create -o quota=$quota -o dedup=on -o compression=on  $DG/$name 2> txt/$0$userreq.txt 
-/sbin/zfs set prot:kind=CIFS $DG/$name
-sed -e "s/NAMECIFS/$name/g" sharecifs.txt > $name.txt;
-cat $name.txt >> smb4.conf;
-cp smb4.conf /usr/local/etc/
-service samba_server reload;
+/sbin/zfs set prot:kind=NFS $DG/$name
+echo /$DG/$name >> /etc/exports
+service mountd restart > txt/$0$userreq.txt 
+service nfsd restart >> txt/$0$userreq.txt
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 err=`wc -c  txt/$0$userreq.txt | awk '{print $1}'`;
 if [[ $err -ge  4  ]]; then
