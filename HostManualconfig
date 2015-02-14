@@ -9,7 +9,7 @@ hostdns=` echo $@ | awk '{ print $4 }'`
 userreq=` echo $@ | awk '{ print $5 }'`;
 privilege="Error";
 contrun=`./privthis.sh $privilege $userreq`;
-if [[ $contrun == 'true' ]]
+if [ $contrun == 'true' ]
 then
 echo changing box name and ips.... > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;

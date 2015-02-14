@@ -1,1 +1,1 @@
-VolumeCreateNFS Data newfsnas 30G admin
+Snapshotnow Data/nfsnas Minutely.4.2.na.na

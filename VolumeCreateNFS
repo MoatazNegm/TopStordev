@@ -14,7 +14,7 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Creating_Volume:'$DG/$name;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
-/sbin/zfs create -o quota=$quota -o dedup=on -o compression=on  $DG/$name 2> txt/$0$userreq.txt 
+/sbin/zfs create -o quota=$quota -o dedup=on -o compression=lz4  $DG/$name 2> txt/$0$userreq.txt 
 /sbin/zfs set prot:kind=NFS $DG/$name
 echo /$DG/$name >> /etc/exports
 service mountd restart > txt/$0$userreq.txt 

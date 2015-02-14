@@ -12,8 +12,9 @@ domcont=` echo $@ | awk '{ print $4 }'`
 userreq=` echo $@ | awk '{ print $5 }'`;
 privilege="Active_Directory";
 contrun=`./privthis.sh $privilege $userreq`;
-if [[ $contrun == 'true' ]]
+if [ $contrun == "true" ]
 then
+echo contrun $contrun
 domcontip=` host $domcont.$doms | awk '{print $NF}'`
 ip1=` echo $domcontip | awk -F. '{print $1}'`;
 ip2=` echo $domcontip | awk -F. '{print $2}'`;
@@ -48,7 +49,7 @@ service ntpd stop;
 service ntpdate restart;
 /usr/local/bin/net ads join  -U $admin%$pass
 err=`wc -c  txt/err.txt | awk '{print $1}'`;
-if [[ $err >  4  ]]; then
+if [ $err -ge  4  ]; then
 	cat txt/err.txt > $web;
 	logdata='failed_changing_domain:'$domain;
 else 

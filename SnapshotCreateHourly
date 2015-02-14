@@ -17,7 +17,7 @@ logdata='Creating_HourlyPeriod:'$DG/$FileS@$name;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 crontab -l > txt/cronthis.txt
-echo $min  "*"/$every "*" "*" "*"  /TopStor/Snapshotnow $DG/$FileS hourly.$keep.$min.$every.na 2> txt/err.txt >> txt/cronthis.txt
+echo $min  "*"/$every "*" "*" "*"  /TopStor/pump.sh Snapshotnow $DG/$FileS hourly.$keep.$min.$every.na 2> txt/err.txt >> txt/cronthis.txt
 crontab txt/cronthis.txt 2>>txt/$0$userreq.txt
 err=`wc -c  txt/$0$userreq.txt | awk '{print $1}'`;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
