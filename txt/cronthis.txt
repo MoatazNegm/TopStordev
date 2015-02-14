@@ -1,0 +1,5 @@
+*/2 * * * * /TopStor/pump.sh Snapshotnow Data/nfsnas Minutely.4.2.na.na 
+3 */2 * * * /TopStor/pump.sh Snapshotnow Data/nfsnas hourly.3.3.2.na
+*/3 * * * * /TopStor/pump.sh Snapshotnow Data/nfsnas Minutely.2.3.na.na
+10 17 * * Tue /TopStor/pump.sh Snapshotnow Data/nfsnas Weekly.4.17.10.Tue
+*/5 * * * * /TopStor/pump.sh Snapshotnow Data/forAbdo Minutely.3.5.na.na

@@ -56,7 +56,7 @@ echo newsnap=$newsnap >> $cronout
 logdata='Creating_Snapshot:'$newsnap;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-/sbin/zfs snapshot $newsnap > txt/$0$userreq.txt$stamp
+/sbin/zfs snapshot $newsnap &> txt/$0$userreq.txt$stamp
 echo snapshotresult : >> $cronout
 cat txt/$0$userreq.txt$stamp >> $cronout 
 echo filenameis=txt/$0$userreq.txt$stamp >> $cronout
