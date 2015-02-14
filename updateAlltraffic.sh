@@ -1,7 +1,7 @@
 #! /usr/local/bin/zsh
-cd /TopStor/
-traf='txt/currenttraffic2.log'
-disks=`sysctl kern.disks | awk '{$1=$2=$3=""; print}'`
+cd /TopStor
+traf='/usr/local/www/apache24/data/des19/Data/currenttraffic.log'
+disks=`/sbin/sysctl kern.disks | awk '{$1=$2=$3=""; print}'`
 noofdisks=`echo $disks | wc -w `;
 traffic=`cat $traf`;
 s=0

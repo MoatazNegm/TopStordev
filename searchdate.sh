@@ -3,8 +3,8 @@ device=$1
 date=$2
 search1=`./searchdevice.sh $device $3`
 search1=`echo $search1 | awk 'NR==2{printf"%s",$1}'`
-dates=`echo $search1 | jq -c '.[]'| awk 'NR==2{printf"%s",$1}'|jq -c '.[]|.[]|.[]|.Date'| sed 's:"::' | sed 's:"::'`
-json=`echo $search1 | jq -c '.[]'| awk 'NR==2{printf"%s",$1}'|jq -c '.[]|.[]|.[]'`
+dates=`echo $search1 | /usr/local/bin/jq -c '.[]'| awk 'NR==2{printf"%s",$1}'| /usr/local/bin/jq -c '.[]|.[]|.[]|.Date'| sed 's:"::' | sed 's:"::'`
+json=`echo $search1 | /usr/local/bin/jq -c '.[]'| awk 'NR==2{printf"%s",$1}'| /usr/local/bin/jq -c '.[]|.[]|.[]'`
 echo $dates | grep $date > /dev/null 2>&1
 if [ $? -ne 1 ]
 then

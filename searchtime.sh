@@ -4,7 +4,7 @@ date=$2
 Time=$3
 search2=`./searchdate.sh $device $date`
 search2=`echo $search2 | awk 'NR==2{printf"%s",$1}'`
-json=`echo $search2 | jq -c '.[]'| awk 'NR==2{printf"%s",$1}'|jq -c '.[]'`
+json=`echo $search2 | /usr/local/bin/jq -c '.[]'| awk 'NR==2{printf"%s",$1}'| /usr/local/bin/jq -c '.[]'`
 echo $json | grep $Time > /dev/null 2>&1
 if [ $? -ne 1 ]
 then

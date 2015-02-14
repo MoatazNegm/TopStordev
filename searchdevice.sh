@@ -2,9 +2,9 @@
 device=$1
 device=`echo $device`
 logs=$2
-devices=`echo $logs | jq '.[]|.[] | .name'| sed 's:"::' | sed 's:"::'`
-json=`echo $logs | jq  -c '.[]'`
-json1=`echo $json | jq -c '.[]'`
+devices=`echo $logs | /usr/local/bin/jq '.[]|.[] | .name'| sed 's:"::' | sed 's:"::'`
+json=`echo $logs | /usr/local/bin/jq  -c '.[]'`
+json1=`echo $json | /usr/local/bin/jq -c '.[]'`
 json2=`echo "{\"device\":[\n"$json1"\n]}"`
 echo $devices | grep $device  > /dev/null 2>&1 
 if [ $? -ne 1 ]

@@ -7,7 +7,7 @@ searchdate1=`./searchdate.sh $device $date $4`
 pre=`echo $searchdate1 | awk 'NR==1{printf"%s",$1}'`
 post=`echo $searchdate1 | awk 'NR==3{printf"%s",$1}'`
 search=`echo $searchdate1 | awk 'NR==2{printf"%s",$1}'`
-search1=`echo $search | jq -c '.[]' |awk 'NR==2{printf"%s",$1}'|jq -c '.[]'`
+search1=`echo $search | /usr/local/bin/jq -c '.[]' |awk 'NR==2{printf"%s",$1}'| /usr/local/bin/jq -c '.[]'`
 echo $search1 | grep time > /dev/null 2>&1
 if [ $? -ne 1 ]
 then
