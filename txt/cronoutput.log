@@ -1,19 +1,19 @@
 oper=Data/nfsnas Minutely.4.2.na.na
 oper1=Data/nfsnas
 oper2=Minutely.4.2.na.na
-stamp=1423909650
+stamp=1423929814
 keep=4
-currentsnaps=Data/nfsnas@Minutely.4.2.na.na.1423908960
-Data/nfsnas@Minutely.4.2.na.na.1423909200
-Data/nfsnas@Minutely.4.2.na.na.1423909255
-Data/nfsnas@Minutely.4.2.na.na.1423909470
-oldsnap=Data/nfsnas@Minutely.4.2.na.na.1423908960
+currentsnaps=Data/nfsnas@Minutely.4.2.na.na.1423929094
+Data/nfsnas@Minutely.4.2.na.na.1423929334
+Data/nfsnas@Minutely.4.2.na.na.1423929454
+Data/nfsnas@Minutely.4.2.na.na.1423929694
+oldsnap=Data/nfsnas@Minutely.4.2.na.na.1423929094
 countsnap=       4
 countsnapplus=5
 keeppluszero=4
-{"Date":"02/14/2015","time":"12:27:30","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/nfsnas@Minutely.4.2.na.na.1423908960"}
-newsnap2=Minutely.4.2.na.na.1423909650
-newsnap=Data/nfsnas@Minutely.4.2.na.na.1423909650
+{"Date":"02/14/2015","time":"18:03:34","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/nfsnas@Minutely.4.2.na.na.1423929094"}
+newsnap2=Minutely.4.2.na.na.1423929814
+newsnap=Data/nfsnas@Minutely.4.2.na.na.1423929814
 snapshotresult :
-filenameis=txt/./SnapshotnowSystem.txt1423909650
-{"Date":"02/14/2015","time":"12:27:30","msg":"info","user":"System","data":"Success_Creating_Snapshot:Data/nfsnas@Minutely.4.2.na.na.1423909650"}
+filenameis=txt/./SnapshotnowSystem.txt1423929814
+{"Date":"02/14/2015","time":"18:03:34","msg":"info","user":"System","data":"Success_Creating_Snapshot:Data/nfsnas@Minutely.4.2.na.na.1423929814"}
