@@ -1,7 +1,8 @@
 #!/usr/local/bin/zsh
-device=$1
-date=$2
-search1=`./searchdevice.sh $device $3`
+device=` echo $@ | awk '{print $1}'`;
+date=` echo $@ | awk '{print $2}'`;
+traf=` echo $@ | awk '{print $3}'`;
+search1=`./searchdevice.sh $device $traf`
 search1=`echo $search1 | awk 'NR==2{printf"%s",$1}'`
 dates=`echo $search1 | /usr/local/bin/jq -c '.[]'| awk 'NR==2{printf"%s",$1}'| /usr/local/bin/jq -c '.[]|.[]|.[]|.Date'| sed 's:"::' | sed 's:"::'`
 json=`echo $search1 | /usr/local/bin/jq -c '.[]'| awk 'NR==2{printf"%s",$1}'| /usr/local/bin/jq -c '.[]|.[]|.[]'`

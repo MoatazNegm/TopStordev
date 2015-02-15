@@ -1,9 +1,8 @@
 #!/usr/local/bin/zsh
-device=$1
-device=`echo $device`
-logs=$2
-devices=`echo $logs | /usr/local/bin/jq '.[]|.[] | .name'| sed 's:"::' | sed 's:"::'`
-json=`echo $logs | /usr/local/bin/jq  -c '.[]'`
+device=`echo $@ | awk '{print $1}' `;
+logs=`echo $@ | awk '{ print $2}'`;
+devices=`cat $logs | /usr/local/bin/jq '.[]|.[] | .name'| sed 's:"::' | sed 's:"::'`
+json=`cat $logs | /usr/local/bin/jq  -c '.[]'`
 json1=`echo $json | /usr/local/bin/jq -c '.[]'`
 json2=`echo "{\"device\":[\n"$json1"\n]}"`
 echo $devices | grep $device  > /dev/null 2>&1 

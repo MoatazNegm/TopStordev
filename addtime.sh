@@ -1,9 +1,9 @@
 #!/usr/local/bin/zsh
-traffic=$4
-device=$1
-date=$2
-oper=$3
-searchdate1=`./searchdate.sh $device $date $4`
+traf=` echo $@ | awk '{print $4}'`;
+device=` echo $@ | awk '{print $1}'`;
+date=` echo $@ | awk '{print $2}'`;
+oper=` echo $@ | awk '{print $3}'`;
+searchdate1=`./searchdate.sh $device $date $traf`
 pre=`echo $searchdate1 | awk 'NR==1{printf"%s",$1}'`
 post=`echo $searchdate1 | awk 'NR==3{printf"%s",$1}'`
 search=`echo $searchdate1 | awk 'NR==2{printf"%s",$1}'`
@@ -13,7 +13,7 @@ if [ $? -ne 1 ]
 then
 search=`echo $search | sed "s/]}/,$oper]}/"`
 afteradd=`echo -n $pre ; echo -n $search ; echo $post;`
-searchdevice=`./searchdevice.sh $device $4`
+searchdevice=`./searchdevice.sh $device $traf`
 pre=`echo $searchdevice | awk 'NR==1{printf"%s",$1}'`
 post=`echo $searchdevice | awk 'NR==3{printf"%s",$1}'`
 search=`echo $afteradd`
@@ -23,7 +23,7 @@ echo $end
 else
 search=`echo $search | sed "s/]}/$oper]}/"`
 afteradd=`echo -n $pre ; echo -n $search ; echo $post;`
-searchdevice=`./searchdevice.sh $device $4`
+searchdevice=`./searchdevice.sh $device $traf`
 pre=`echo $searchdevice | awk 'NR==1{printf"%s",$1}'`
 post=`echo $searchdevice | awk 'NR==3{printf"%s",$1}'`
 search=`echo $afteradd`
