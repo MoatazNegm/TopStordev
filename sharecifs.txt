@@ -1,4 +1,4 @@
-################################### startNAMECIFS
+;;;;;;;;         startNAMECIFS
 [NAMECIFS]
 path = /Data/NAMECIFS
 read only = no
@@ -8,4 +8,4 @@ admin users = administrator
 writeable - Yes
 nt acl support - yes
 inherit acls = Yes
-############################## stopNAMECIFS
+;;;;;;;;;;;;;;;;;;;;   stopNAMECIFS

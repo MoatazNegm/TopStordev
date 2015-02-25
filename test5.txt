@@ -1,9 +1,0 @@
-[test5]
-path = /Data/test5
-read only = no
-browsable = yes
-write list = @everyone
-admin users = administrator
-writeable - Yes
-nt acl support - yes
-inherit acls = Yes

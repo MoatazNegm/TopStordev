@@ -1,9 +1,0 @@
-[mez2]
-path = /Data/mez2
-read only = no
-browsable = yes
-write list = @everyone
-admin users = administrator
-writeable - Yes
-nt acl support - yes
-inherit acls = Yes

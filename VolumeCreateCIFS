@@ -14,12 +14,20 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Creating_Volume:'$DG/$name;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
+g=`cat smb4.confcurrent | grep $name | wc -c`; if [[ g -ge 4 ]];
+then
+ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+ logdata='Creating_Volume_already_there:'$DG/$name ;
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata`;
+ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
+else
 /sbin/zfs create -o quota=$quota -o dedup=on -o compression=lz4  $DG/$name 2> txt/$0$userreq.txt 
 /sbin/zfs set prot:kind=CIFS $DG/$name
-cp /usr/local/etc/smb4.conf smb4.confcurrent
+cp /usr/local/etc/smb4.conf smb4.confcurrent;
+sleep 1;
 sed -e "s/NAMECIFS/$name/g" sharecifs.txt > $name.txt;
 cat $name.txt >> smb4.confcurrent;
-cp smb4.confcurrent /usr/local/etc/
+cat $name.txt >> /usr/local/etc/smb4.conf ;
 service samba_server restart;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 err=`wc -c  txt/$0$userreq.txt | awk '{print $1}'`;
@@ -35,4 +43,5 @@ fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
 rm txt/$0$userreq.txt
 ./GetPoolVollist
+fi
 fi
