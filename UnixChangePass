@@ -5,7 +5,7 @@ resweb='/usr/local/www/apache24/data/des19/Data/userpass.txtupdated';
 echo Changing user password by $username > $web
 userpass=`echo $@ | awk '{print $1}'`;
 username=`echo $@ | awk '{print $2}'`;
-userreq=`echo $@  | awk '{print $2}'`;
+userreq=`echo $@  | awk '{print $3}'`;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='user_change_password_by:'$username;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;

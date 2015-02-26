@@ -1,9 +1,18 @@
-oper=Data/nfsnas Minutely.4.2.na.na
-oper1=Data/nfsnas
-oper2=Minutely.4.2.na.na
-stamp=1424922120
-keep=4
-currentsnaps=Data/nfsnas@Minutely.4.2.na.na.1424919715
-Data/nfsnas@Minutely.4.2.na.na.1424919837
-Data/nfsnas@Minutely.4.2.na.na.1424921880
-Data/nfsnas@Minutely.4.2.na.na.1424921935
+oper=Data/forAbdo Minutely.3.5.na.na
+oper1=Data/forAbdo
+oper2=Minutely.3.5.na.na
+stamp=1424929174
+keep=3
+currentsnaps=Data/forAbdo@Minutely.3.5.na.na.1424928274
+Data/forAbdo@Minutely.3.5.na.na.1424928574
+Data/forAbdo@Minutely.3.5.na.na.1424928874
+oldsnap=Data/forAbdo@Minutely.3.5.na.na.1424928274
+countsnap=       3
+countsnapplus=4
+keeppluszero=3
+{"Date":"02/26/2015","time":"07:39:37","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/forAbdo@Minutely.3.5.na.na.1424928274"}
+newsnap2=Minutely.3.5.na.na.1424929174
+newsnap=Data/forAbdo@Minutely.3.5.na.na.1424929174
+snapshotresult :
+filenameis=txt/./SnapshotnowSystem.txt1424929174
+{"Date":"02/26/2015","time":"07:39:41","msg":"info","user":"System","data":"Success_Creating_Snapshot:Data/forAbdo@Minutely.3.5.na.na.1424929174"}
