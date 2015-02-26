@@ -14,7 +14,7 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Creating_Volume:'$DG/$name;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
-g=`cat smb4.confcurrent | grep $name | wc -c`; if [[ g -ge 4 ]];
+g=`cat smb4.confcurrent | grep ${name}_only | wc -c`; if [[ g -ge 4 ]];
 then
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
  logdata='Creating_Volume_already_there:'$DG/$name ;

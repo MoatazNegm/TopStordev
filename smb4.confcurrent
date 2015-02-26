@@ -53,7 +53,7 @@ map archive = yes
 inherit acls = Yes
 ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;; startforAbdo
+;;;;;;;;;; startforAbdo_only
 [forAbdo]
 path = /Data/forAbdo
 read only = no
@@ -63,5 +63,5 @@ admin users = administrator
 writeable - Yes
 nt acl support - yes
 inherit acls = Yes
-;;;;;;;;;;;;;;;;    stopforAbdo
+;;;;;;;;;;;;;;;;    stopforAbdo_only
 

@@ -26,11 +26,8 @@ if [[ $err -ge  4  ]]; then
 	logdata='failed_deleting_volume:'$DG/$volname;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
 else 
-cp /usr/local/etc/smb4.conf smb4.confcurrent;
- rm $volname.txt;
- ./delblock.sh start${volname}_only stop${volname}_only smb4.confcurrent  ;
- cp smb4.confcurrent /usr/local/etc/smb4.conf;
- service samba_server restart;
+ ./delblock.sh start${volname}_only stop${volname}_only /etc/exports  ;
+ service nfsd restart;
  echo DONE...volume $volname is deleted > $web; 
  logdata='success_deleting_volume'$DG/$volname;
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
