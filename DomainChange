@@ -38,11 +38,12 @@ echo name_servers=\"$domcontip\" >> txt/resolvconf.conf
 #cat /etc/resolv.conf >> txt/resolv.conf;
 cp txt/resolvconf.conf /etc/resolvconf.conf;
 resolvconf -u;
-sed -e "s/CONT/$domcont/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMC/$domc/g" -e "s/DOMSH/$domshort/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" smb4.conf > txt/smb4.conf 2>txt/err.txt
-cp txt/smb4.conf /usr/local/etc/smb4.conf
-sed -e "s/DOMC/$domc/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMSH/$domshort/g" -e "s/CONT/$domcont/g" krb5.conf > txt/krb5.conf
-cp txt/krb5.conf /etc/
-sed -e "s/CONT/$domcont\.$doms/g" -e "s/DOMSMALL/$doms/g" ntp.conf > txt/ntp.conf
+sed -e "s/CONT/$domcont/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMC/$domc/g" -e "s/DOMSH/$domshort/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" smb4.conf > txt/smb4.conf 2>txt/err.txt ; 
+cat CIFSshares.txt >> txt/smb4.conf;
+cp txt/smb4.conf /usr/local/etc/smb4.conf;
+sed -e "s/DOMC/$domc/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMSH/$domshort/g" -e "s/CONT/$domcont/g" krb5.conf > txt/krb5.conf;
+cp txt/krb5.conf /etc/ ;
+sed -e "s/CONT/$domcont\.$doms/g" -e "s/DOMSMALL/$doms/g" ntp.conf > txt/ntp.conf ;
 service samba_server restart;
 cp txt/ntp.conf /etc/
 service ntpd stop;

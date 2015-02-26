@@ -29,6 +29,7 @@ else
 cp /usr/local/etc/smb4.conf smb4.confcurrent;
  rm $volname.txt;
  ./delblock.sh start${volname}_only stop${volname}_only smb4.confcurrent  ;
+ ./delblock.sh start${volname}_only stop${volname}_only CIFSshares.txt  ;
  cp smb4.confcurrent /usr/local/etc/smb4.conf;
  service samba_server restart;
  echo DONE...volume $volname is deleted > $web; 
