@@ -14,19 +14,20 @@ dedup=`/sbin/zfs get -t filesystem -Hp dedup | grep Data/ | awk '{print $1" "$3}
 CIFSshare=`/sbin/zfs get -t filesystem prot:kind  | grep Data/ | grep CIFS  | awk '{print $1" "$3}'`;
 NFSshare=`/sbin/zfs get -t filesystem  prot:kind | grep Data/ | grep NFS | awk '{print $1" "$3}'`;
 nameof=`/sbin/zfs get -t filesystem -Hp name | grep Data/ | awk -F/ '{print $2}' | awk '{print $1}'`;
+
 result="[";
 echo $nameof | while read -r line; do
-	q=` echo $quota | grep "$line" | awk '{print $2}'`;
-	lo=`echo $logicalused | grep "$line" | awk '{print $2}'`;
-	av=`echo $avail | grep "$line" | awk '{print $2}'`;
-	usd=`echo $useddata | grep "$line" | awk '{print $2}'`;
-	uss=`echo $usedsnaps | grep "$line" | awk '{print $2}'`;
-	cr=`echo $creation | grep "$line" | awk '{print $2}'`;
-	co=`echo $compressratio | grep "$line" | awk '{print $2}'`;
-	de=`echo $dedup | grep "$line" | awk '{print $2}'`;
-	nf=`echo $NFSshare | grep "$line" | awk '{print $2}'`;
-	ci=`echo $CIFSshare | grep "$line" | awk '{print $2}'`;
-	qu=`echo $quota | grep "$line" | awk '{print $2}'`;
+	q=` echo $quota | grep -w "$line" | awk '{print $2}'`;
+	lo=`echo $logicalused | grep -w "$line" | awk '{print $2}'`;
+	av=`echo $avail | grep -w "$line" | awk '{print $2}'`;
+	usd=`echo $useddata | grep -w  "$line" | awk '{print $2}'`;
+	uss=`echo $usedsnaps | grep -w  "$line" | awk '{print $2}'`;
+	cr=`echo $creation | grep -w "$line" | awk '{print $2}'`;
+	co=`echo $compressratio | grep -w "$line" | awk '{print $2}'`;
+	de=`echo $dedup | grep -w  "$line" | awk '{print $2}'`;
+	nf=`echo $NFSshare | grep -w "$line" | awk '{print $2}'`;
+	ci=`echo $CIFSshare | grep -w "$line" | awk '{print $2}'`;
+	qu=`echo $quota | grep -w "$line" | awk '{print $2}'`;
 	subres=`./jsonthis3.sh Pool Data name $line volsize $q volact $lo available $av useddata $usd usedsnaps $uss crdate $cr compress $co dedup $de quota $qu protocol $ci$nf` ;
 	result=$result$subres,
 done;

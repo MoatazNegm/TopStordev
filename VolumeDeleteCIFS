@@ -1,6 +1,6 @@
 #! /usr/local/bin/zsh
 cd /TopStor
-web='/usr/local/www/apache24/data/des19/Data/status.log';
+web='/usr/local/www/apache24/data/des19/Data/CIFSstatus.log';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 echo Deleteing  $@.... > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
@@ -40,3 +40,5 @@ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $
 ./GetPoolVollist
 rm txt/$0$userreq.txt
 fi
+bb=`cat $web`;
+echo $datenow $timenow :$bb > ${logging}2
