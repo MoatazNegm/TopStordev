@@ -1,6 +1,6 @@
 #! /usr/local/bin/zsh
 cd /TopStor
-web='/usr/local/www/apache24/data/des19/Data/status.log'
+web='/usr/local/www/apache24/data/des19/Data/Snapsstatus.log'
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 periodel=` echo $@ | awk '{print $1}'`;
 userreq=` echo $@ | awk '{print $2}'`;
@@ -29,3 +29,5 @@ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $
 rm txt/$0$userreq.txt
 ./GetPoolperiodlist
 fi
+bb=`cat $web`;
+echo $datenow $timenow :$bb > ${logging}2

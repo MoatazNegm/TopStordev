@@ -1,5 +1,5 @@
 #! /usr/local/bin/zsh
-web='/usr/local/www/apache24/data/des19/Data/status.log';
+web='/usr/local/www/apache24/data/des19/Data/Snapsstatus.log';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 min=`echo $@ | awk '{print $1}'` ;
 every=0; ev=`echo $@ | awk '{print $2}'`; every=$(($every+$ev)); if (($every < 1)); then every=1; fi
@@ -34,3 +34,5 @@ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $
 rm txt/$0$userreq.txt
 ./GetPoolperiodlist
 fi
+bb=`cat $web`;
+echo $datenow $timenow :$bb > ${logging}2
