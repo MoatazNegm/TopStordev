@@ -1,4 +1,5 @@
 #! /usr/local/bin/zsh
+cd /TopStor
 web='/usr/local/www/apache24/data/des19/Data/Snapsstatus.log';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 rm txt/cronthis.txt
@@ -35,4 +36,5 @@ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $
 ./GetPoolperiodlist
 fi
 bb=`cat $web`;
-echo $datenow $timenow :$bb > ${logging}2
+echo ${datenow} ${timenow} :${bb} > ${logging}2
+echo ${datenow} ${timenow} > txt/tmpm
