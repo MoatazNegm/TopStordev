@@ -1,5 +1,5 @@
 #! /usr/local/bin/zsh
-web='/usr/local/www/apache24/data/des19/Data/status.log';
+web='/usr/local/www/apache24/data/des19/Data/Usersstatus.log';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log';
 resweb='/usr/local/www/apache24/data/des19/Data/userpass.txtupdated';
 echo Changing user password by $username > $web
@@ -38,3 +38,5 @@ rm txt/$0$userreq.txt;
 resdate=`date +%s`;
 resjson=`./jsonthis3.sh updated $resdate`;
 echo $resjson > $resweb;
+bb=`cat $web`;
+echo $datenow $timenow :$bb > ${logging}2

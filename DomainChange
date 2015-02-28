@@ -1,7 +1,6 @@
 #! /bin/sh
-web='/usr/local/www/apache24/data/des19/Data/status.log';
+web='/usr/local/www/apache24/data/des19/Data/'$0'status.log';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log';
-rm txt/err; 
 domain=`echo $@ | awk '{ print $1 }' `;
 domc=`echo $domain | tr '[:lower:]' '[:upper:]'`;
 doms=`echo $domain | tr '[:upper:]' '[:lower:]'`;
@@ -32,12 +31,12 @@ hostname $hostn.$doms;
 cp txt/rc.conf /etc/rc.conf;
 /usr/bin/sed -e "s/DOMSMALL/${doms}/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" dhclient.conf > txt/dhclient.conf 2>txt/err.txt
 cp txt/dhclient.conf /etc/dhclient.conf
-echo search_domains=\"$doms\" > txt/resolvconf.conf
+#echo search_domains=\"$doms\" > txt/resolvconf.conf
 #echo "domain $doms" >> txt/resolvconf.conf
-echo name_servers=\"$domcontip\" >> txt/resolvconf.conf
+#echo name_servers=\"$domcontip\" >> txt/resolvconf.conf
 #cat /etc/resolv.conf >> txt/resolv.conf;
-cp txt/resolvconf.conf /etc/resolvconf.conf;
-resolvconf -u;
+#cp txt/resolvconf.conf /etc/resolvconf.conf;
+#resolvconf -u;
 sed -e "s/CONT/$domcont/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMC/$domc/g" -e "s/DOMSH/$domshort/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" smb4.conf > txt/smb4.conf 2>txt/err.txt ; 
 cat CIFSshares.txt >> txt/smb4.conf;
 cp txt/smb4.conf /usr/local/etc/smb4.conf;
@@ -48,10 +47,10 @@ service samba_server restart;
 cp txt/ntp.conf /etc/
 service ntpd stop;
 service ntpdate restart;
-/usr/local/bin/net ads join  -U $admin%$pass
-err=`wc -c  txt/err.txt | awk '{print $1}'`;
+/usr/local/bin/net ads join  -U $admin%$pass > txt/$0$userreq.txt ;
+err=`cat  txt/$0$userreq.txt | grep Failed | wc -c `;
 if [ $err -ge  4  ]; then
-	cat txt/err.txt > $web;
+	cat txt/$0$userreq.txt > $web;
 	logdata='failed_changing_domain:'$domain;
 else 
  echo DONE...Domain $doms is joined > $web; 
@@ -61,3 +60,5 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 fi
+bb=`cat $web`;
+echo $datenow $timenow :$bb > ${logging}2 

@@ -1,0 +1,2 @@
+Using short domain name -- UPQST
+Joined 'QSTOR' to dns domain 'upqst.local'
