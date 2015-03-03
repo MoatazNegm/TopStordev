@@ -7,7 +7,7 @@ mkfifo -m 600 /tmp/msgremotefile;
 ./Topstorremoteack.sh > /tmp/msgrack &
 chgrp moataz /tmp/msgfile; 
 chown www /tmp/msgfile; 
-rm /TopStor/txt/*
+#rm /TopStor/txt/*
 ClearExit() {
 	echo got a signal > /TopStor/txt/sigstatus.txt
 	rm /tmp/msgfile
