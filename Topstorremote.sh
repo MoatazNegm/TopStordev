@@ -22,7 +22,7 @@ reqparam=`echo $line | cut -d " " -f2-`;
 echo trusted ;
 echo reqparam:$reqparam 
 echo Authorized:$reqparam $searsource $request | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 
-echo $reqparam > /tmp/msgfile;
+./pump.sh $reqparam ;
 echo $reqparam > msgfiletmp
 sleep 1;
 #echo done | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 & ;
