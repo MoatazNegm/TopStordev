@@ -2,21 +2,30 @@
 cd /TopStor
 ClearExit() {
 	echo got a signal > /TopStor/txt/sigstatusremote.txt
+	kill -9 `ps -ef | grep nc  | awk '{print $1}'`
 	exit 0;
 }
 trap ClearExit HUP
 while true; do 
 {
-read line < /tmp/msgfiletmp
+echo listening
+nc -l 2234 | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD > /tmp/msgremotefile & 
+read line < /tmp/msgremotefile;
+echo newdata;
 echo $line > /TopStor/tmplineremote
 request=`echo $line | awk '{print $1}'`
-searsource=` cat txt/partners.txt | grep "$reqeust"`; 
-ispartner=`echo searsource | wc -c `
-if [[ $ispartner -ge 3 ]]; then
+searsource=` cat partners.txt | grep "$reqeust"`; 
+ispartner=`echo $searsource | wc -c `
+#echo $line $searsource | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 & 
+if [[ $searsource == $request ]]; then
 reqparam=`echo $line | cut -d " " -f2-`;
-echo $reqparam | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 & 
+echo trusted ;
+echo reqparam:$reqparam 
+echo $reqparam $searsource $request | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 
 echo $reqparam > /tmp/msgfile;
-echo done | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 & ;
+echo $reqparam > msgfiletmp
+sleep 1;
+#echo done | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 & ;
 else
 echo Not Authorized:$line | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 & ;
 fi

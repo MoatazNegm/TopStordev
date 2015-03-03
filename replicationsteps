@@ -1,0 +1,17 @@
+make pipe tmp/msgfiletmp
+add to the Topstor.sh hook to port 2234 > tmp/msgfiletmp  limit it to 50 byte (Topstor.sh) 
+check message source ip if he is trusted or not. (Topstorremote.sh)
+if trusted send ack to 2235 and send to  tmp/msgfiletmp. i(Topstorremote.sh)
+sending to port 2235 for replies,  port 2234 for requests
+message requests from other parties
+1. any needed php pump
+2. ask if the specific volume is there
+3. ask if the specific snapshot is there
+4. ask to send a snapshot
+5. ask to resync totally
+
+
+message ack to other parties 
+1. reply result to any needed ask and pump as above.
+2. reply final result of replication
+
