@@ -21,7 +21,7 @@ if [[ $searsource == $request ]]; then
 reqparam=`echo $line | cut -d " " -f2-`;
 echo trusted ;
 echo reqparam:$reqparam 
-echo $reqparam $searsource $request | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 
+echo Authorized:$reqparam $searsource $request | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 
 echo $reqparam > /tmp/msgfile;
 echo $reqparam > msgfiletmp
 sleep 1;
