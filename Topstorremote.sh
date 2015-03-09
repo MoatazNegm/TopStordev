@@ -6,21 +6,24 @@ ClearExit() {
 	exit 0;
 }
 trap ClearExit HUP
-while true; do 
+ 
+while true; do
 {
 nc -l 2234 | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD > /tmp/msgremotefile & 
 read line < /tmp/msgremotefile;
 echo $line > /TopStor/tmplineremote
 stamp=`echo $line | awk '{print $2}'`
 request=`echo $line | awk '{print $1}'`
-searsource=` cat partners.txt | grep "$reqeust"`; 
+searsource=` cat partners.txt | grep "$request"`; 
 ispartner=`echo $searsource | wc -c `
 #echo $line $searsource | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 & 
 if [[ $searsource == $request ]]; then
 stamp=`echo $line | awk '{print $2}'`;
 reqparam=`echo $line | awk '{$1=$2=""; print substr($0,3) }'`;
-echo $stamp Authorized $reqparam $searsource $request | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 ;
-./dummy.sh $reqparam > /tmp/msgfile; 
+instr=`echo $reqparam | awk '{print $1}'`;
+oper=`echo $reqparam | awk '{$1=""; print substr($0,2) }'`;
+res=`./$instr $oper`;
+echo $stamp Authorized $res | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 ;
 echo $reqparam > msgfiletmp;
 sleep 1;
 #echo done | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 & ;
