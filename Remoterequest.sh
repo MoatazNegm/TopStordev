@@ -13,8 +13,7 @@ echo $so $stamp $msg | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -
 read -t 3 line < /tmp/msgrack ;
 stampreply=`echo $line | awk '{print $1}'`;
 flagcount=$((flagcount+1));
-echo flagcount=$flagcount ;
-if [[ $stampreply == $stamp ]]; then lineflag=$line; fi 
+if [[ $stampreply == $stamp ]]; then lineflag=`echo $line | awk '{$1=""; print substr($0,2)}'`; fi 
 }
 done;
-echo line=$lineflag
+echo $lineflag
