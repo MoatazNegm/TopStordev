@@ -1,23 +1,19 @@
-oper=Data/forAbdo Minutely.3.5.na.na
-oper1=Data/forAbdo
-oper2=Minutely.3.5.na.na
-stamp=1425936895
-keep=3
-currentsnaps=Data/forAbdo@Minutely.3.5.na.na.1425932961
-Data/forAbdo@Minutely.3.5.na.na.1425933261
-Data/forAbdo@Minutely.3.5.na.na.1425933561
-Data/forAbdo@Minutely.3.5.na.na.1425933861
-Data/forAbdo@Minutely.3.5.na.na.1425934800
-Data/forAbdo@Minutely.3.5.na.na.1425935100
-Data/forAbdo@Minutely.3.5.na.na.1425936000
-Data/forAbdo@Minutely.3.5.na.na.1425936535
-oldsnap=Data/forAbdo@Minutely.3.5.na.na.1425932961
-countsnap=       8
-countsnapplus=9
-keeppluszero=3
-{"Date":"03/09/2015","time":"23:34:58","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/forAbdo@Minutely.3.5.na.na.1425932961"}
-newsnap2=Minutely.3.5.na.na.1425936895
-newsnap=Data/forAbdo@Minutely.3.5.na.na.1425936895
+oper=Data/nfsnas Minutely.4.2.na.na
+oper1=Data/nfsnas
+oper2=Minutely.4.2.na.na
+stamp=1425937195
+keep=4
+currentsnaps=Data/nfsnas@Minutely.4.2.na.na.1425936480
+Data/nfsnas@Minutely.4.2.na.na.1425936720
+Data/nfsnas@Minutely.4.2.na.na.1425936840
+Data/nfsnas@Minutely.4.2.na.na.1425937080
+oldsnap=Data/nfsnas@Minutely.4.2.na.na.1425936480
+countsnap=       4
+countsnapplus=5
+keeppluszero=4
+{"Date":"03/09/2015","time":"23:39:55","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/nfsnas@Minutely.4.2.na.na.1425936480"}
+newsnap2=Minutely.4.2.na.na.1425937195
+newsnap=Data/nfsnas@Minutely.4.2.na.na.1425937195
 snapshotresult :
-filenameis=txt/./SnapshotnowSystem.txt1425936895
-{"Date":"03/09/2015","time":"23:35:01","msg":"info","user":"System","data":"Success_Creating_Snapshot:Data/forAbdo@Minutely.3.5.na.na.1425936895"}
+filenameis=txt/./SnapshotnowSystem.txt1425937195
+{"Date":"03/09/2015","time":"23:39:56","msg":"info","user":"System","data":"Success_Creating_Snapshot:Data/nfsnas@Minutely.4.2.na.na.1425937195"}
