@@ -4,9 +4,9 @@ check message source ip if he is trusted or not. (Topstorremote.sh)
 if trusted send ack to 2235 and send to  tmp/msgfiletmp. i(Topstorremote.sh)
 sending to port 2235 for replies,  port 2234 for requests
 message requests from other parties
-1. any needed php pump
-2. ask if the specific volume is there
-3. ask if the specific snapshot is there
+1. any needed php pump done
+2. ask if the specific volume is there done;
+3. ask if the specific snapshot is there done;
 4. ask to send a snapshot
 5. ask to resync totally
 
