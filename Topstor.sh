@@ -3,7 +3,7 @@ cd /TopStor
 mkfifo -m 660 /tmp/msgfile
 mkfifo -m 600 /tmp/msgrack;
 mkfifo -m 600 /tmp/msgremotefile;
-#./Topstorremote.sh &
+./Topstorremote.sh &
 ./Topstorremoteack.sh > /tmp/msgrack &
 chgrp moataz /tmp/msgfile; 
 chown www /tmp/msgfile; 
