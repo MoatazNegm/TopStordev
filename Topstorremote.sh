@@ -19,11 +19,18 @@ ispartner=`echo $searsource | wc -c `
 #echo $line $searsource | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 & 
 if [[ $searsource == $request ]]; then
 stamp=`echo $line | awk '{print $2}'`;
-reqparam=`echo $line | awk '{$1=$2=""; print substr($0,3) }'`;
-instr=`echo $reqparam | awk '{print $1}'`;
+reply=`echo $line | awk '{print $3}'`;
+reqparam=`echo $line | awk '{$1=$2=$3=""; print substr($0,4) }'`;
+instr=`echo $reqparam | awk '{print $1 }'`;
 oper=`echo $reqparam | awk '{$1=""; print substr($0,2) }'`;
+if [[ $reply == "rep" ]];
+then 
 res=`./$instr $oper`;
 echo $stamp Authorized $res | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 ;
+else
+./$instr $oper;
+echo $stamp Authorized received | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 ;
+fi
 echo $reqparam > msgfiletmp;
 sleep 1;
 #echo done | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 & ;
