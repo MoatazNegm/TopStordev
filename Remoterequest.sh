@@ -7,7 +7,7 @@ msg=`echo $@ | awk '{$1=$2=$3=""; print substr($0,4)}'`
 lineflag="failed"
 stamp=`date +%s`
 flagcount=0;
-while [[ $lineflag == "failed" && flagcount -le 5 ]]; do
+while [[ $lineflag == "failed" && flagcount -le 10 ]]; do
 {
 
 echo $so $stamp $reply $msg | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $dst  2234

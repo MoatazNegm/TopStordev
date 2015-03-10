@@ -18,16 +18,27 @@ then
  ./Remoterequest.sh $so $dst nop VolumeCreate$prot $pool $vol ${size}M admin; 
  ./Remoterequest.sh $so $dst nop repli.sh $pp $pool ;
  zfs send -D $pool/$vol@$snap  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $dst $pp ;
- ./Remoterequest.sh $so $dst nop GetSnaplist hi ;
 else if [[ $volfound == "found" ]];
 then
-echo replicating;
-./Remoterequest.sh $so $dst nop repli.sh $pp $pool 
-echo sent zfs receive
-sleep 2;
+oldsnaps=`./Remoterequest.sh $so $dst rep RemoteGetSnaplist $vol`;
+localsnaps=`./RemoteGetSnaplist $vol`;
+echo local=$localsnaps
+ll=`echo $oldsnaps | awk '{$1=""; print substr ($0,2)}'`;
+ll=${ll}' spot';
+lineupsnaps=`echo $ll | tr ' ' '\n' `
+initialsnap="";
+echo $lineupsnaps | while read -r line  
+do
+ echo $snap  vs $line;
+ if [[ ${localsnaps/$line} == $localsnaps ]]; then echo notthis; else initialsnap=$line; echo found; break; fi;
+done;
+echo initial=$initialsnap;
 echo $pool/$vol@$snap
-sleep 2;
-zfs send -R $pool/$vol@$snap  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $dst $pp
+targetsnap=$pool/$vol@$snap;
+if [[ $initialsnap == $targetsnap ]]; then echo up-to-date ; else 
+ ./Remoterequest.sh $so $dst nop repli.sh $pp $pool ;
+ zfs send -R -I $initialsnap  $targetsnap  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $dst $pp
 fi
 fi
-
+fi
+ ./Remoterequest.sh $so $dst nop GetSnaplist hi & 
