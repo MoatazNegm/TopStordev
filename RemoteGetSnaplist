@@ -1,0 +1,12 @@
+#!/usr/local/bin/zsh
+cd /TopStor
+instr=`echo $@ | awk '{print $1}'`;
+lines=`zfs list -H -t snapshot -o name -S creation | grep -w "$instr"  `;
+wlines=`echo $lines | wc -l`; 
+wlines=$((wlines+0));
+if [[ $wlines -ge 2 ]]; 
+then
+echo $lines  |  sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/ /g'  ;
+else 
+echo $lines;
+fi
