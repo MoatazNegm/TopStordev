@@ -3,7 +3,7 @@ cd /TopStor
 web='/usr/local/www/apache24/data/des19/Data/currentinfo2.log2';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 stamp=`date +%s`;
-cronout='txt/cronoutput.log';
+cronout='txt/replicronoutput.log';
 #echo System is creating Snapshot $@.... > $web;
 oper=$@; 
 echo oper=$oper > $cronout
@@ -15,13 +15,13 @@ if [[ $isallowed == "DualWay" ||  $isallowed == "receiver" ]];
 then
 hostn=`hostname | awk -F. '{print $1}'`;
 hostip=`ifconfig em1 | grep "inet " | awk '{print $2}'`;
-hostp=`echo $oper2 | awk -F. '{print $1}'`;
+hostp=`echo $oper2 `;
 echo oper1=$oper1 >> $cronout;
 echo oper2=$oper2 >> $cronout;
 echo stamp=$stamp >> $cronout
 keep=`echo $oper2 | awk -F. '{print $2}'`;
 echo keep=$keep >> $cronout
-currentsnaps=`/sbin/zfs list -t snapshot | grep Data | grep "$oper2" | awk '{print $1}'`;
+currentsnaps=`/sbin/zfs list -t snapshot | grep "$oper1" | grep "$oper2" | awk '{print $1}'`;
 echo currentsnaps=$currentsnaps >> $cronout
 oldsnap=`echo $currentsnaps | sort | head -n 1` ;
 echo oldsnap=$oldsnap >> $cronout
@@ -56,10 +56,9 @@ if (( $countsnap >  $keep )); then
 	fi;
 	oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 fi
-newsnap2=`echo $hostn.$hostp.$stamp`;
+newsnap2='Repli.'$hostp'.'$stamp;
 pool=`echo $oper1 | awk -F/ '{print $1}'`;
 vol=`echo $oper1 | awk -F/ '{print $2}'`;
-
 echo newsnap2=$newsnap2 >> $cronout
 newsnap=`echo $oper1@$newsnap2`;
 echo newsnap=$newsnap >> $cronout
@@ -67,8 +66,11 @@ logdata='Creating_Snapshot:'$newsnap;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 /sbin/zfs snapshot $newsnap &> txt/$0$userreq.txt$stamp;
+/sbin/zfs set repli:sender=$hostip $newsnap;
+/sbin/zfs set repli:receiver=$oper3 $newsnap;
 echo $hostip $oper3 $newsnap2 $pool $vol 
 ./Replicate $hostip $oper3 $newsnap2 $pool $vol;
+echo donereplicating
 echo snapshotresult : >> $cronout
 cat txt/$0$userreq.txt$stamp >> $cronout 
 echo filenameis=txt/$0$userreq.txt$stamp >> $cronout
