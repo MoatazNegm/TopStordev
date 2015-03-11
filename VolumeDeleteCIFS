@@ -22,7 +22,7 @@ err=`wc -c  txt/$0$userreq.txt | awk '{print $1}'`;
 err=$((err+1));
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 if [[ $err -ge  4  ]]; then
-	cat txt/err2.txt > $web;
+	cat txt/$0$userreq.txt > $web;
 	logdata='failed_deleting_volume:'$DG/$volname;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
 else 
