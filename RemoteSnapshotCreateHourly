@@ -8,7 +8,7 @@ DG=` echo $@ | awk '{print $4}'`;
 FileS=` echo $@ | awk '{print $5}'`;
 partner=` echo $@ | awk '{print $6}'`;
 userreq=` echo $@ | awk '{print $7}'`;
-privilege="SnapShots";
+privilege="Replication";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
 then
