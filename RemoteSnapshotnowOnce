@@ -15,6 +15,5 @@ echo $newsnap
 /sbin/zfs snapshot $newsnap; 
 /sbin/zfs set repli:sender=$hostip $newsnap;
 /sbin/zfs set repli:receiver=$oper3 $newsnap;
-echo $hostip $oper3 $newsnap2 $pool $vol
+echo ./Replicate $hostip $oper3 $newsnap2 $pool $vol;
 ./Replicate $hostip $oper3 $newsnap2 $pool $vol;
-err=`wc -c  txt/$0$userreq.txt$stamp | awk '{print $1}'`;
