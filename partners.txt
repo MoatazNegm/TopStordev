@@ -1,2 +1,2 @@
-10.3.2.8 receiver
-10.3.2.7 DualWay
+10.3.2.8 DualWay
+10.3.2.7 receiver
