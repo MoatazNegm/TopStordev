@@ -89,5 +89,4 @@ else
 fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 rm txt/$0$userreq.txt$stamp
-./GetSnaplist
 fi

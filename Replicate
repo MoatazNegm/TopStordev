@@ -35,8 +35,16 @@ done;
 targetsnap=$pool/$vol@$snap;
 if [[ $initialsnap == $targetsnap ]]; then echo up-to-date ; else 
  ./Remoterequest.sh $so $dst nop repli.sh $pp $pool ;
+ echo ./Remoterequest.sh $so $dst nop repli.sh $pp $pool ;
+ if [[ $initialsnap == "" ]]; then 
+ 
+ echo zfs send -R   $targetsnap  \| openssl enc -a -A -aes-256-cbc -k SuperSecretPWD \| gzip -cf \| nc -N  $dst $pp;
+ zfs send -R   $targetsnap  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $dst $pp;
+ else
  zfs send -R -I $initialsnap  $targetsnap  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $dst $pp;
 fi
 fi
 fi
+fi
+./GetSnaplist &
  ./Remoterequest.sh $so $dst nop GetSnaplist hi & 

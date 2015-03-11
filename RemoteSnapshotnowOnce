@@ -1,0 +1,20 @@
+#! /usr/local/bin/zsh
+cd /TopStor
+web='/usr/local/www/apache24/data/des19/Data/statusglobal.log';
+oper=$@; 
+oper1=`echo $oper | awk '{print $1}'`;
+oper2=`echo $oper | awk '{print $2}'`;
+oper3=`echo $oper | awk '{print $3}'`;
+hostip=`ifconfig em1 | grep "inet " | awk '{print $2}'`;
+pool=`echo $oper1 | awk -F/ '{print $1}'`;
+vol=`echo $oper1 | awk -F/ '{print $2}'`;
+stamp=`date +%s`;
+newsnap2=`echo $oper2.$stamp`;
+newsnap=`echo $oper1@$newsnap2`;
+echo $newsnap
+/sbin/zfs snapshot $newsnap; 
+/sbin/zfs set repli:sender=$hostip $newsnap;
+/sbin/zfs set repli:receiver=$oper3 $newsnap;
+echo $hostip $oper3 $newsnap2 $pool $vol
+./Replicate $hostip $oper3 $newsnap2 $pool $vol;
+err=`wc -c  txt/$0$userreq.txt$stamp | awk '{print $1}'`;

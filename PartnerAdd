@@ -25,7 +25,10 @@ logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq da
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 else
 partnerlist=`cat partners.txt `;
+istherpartners=` echo $partnerlist | wc -c`;
+if [[ $istherepartners -ge 2 ]]; then
 echo $partnerlist | grep -v "$Partnername" > partners.txt
+fi
 newtype=$type;
 oldtype=`echo $partnerlist | grep "$Partnername" | awk '{print $2}'`;
 if [[ $oldtype == "sender" && $type == "receiver" ]]; then newtype="DualWay";fi
