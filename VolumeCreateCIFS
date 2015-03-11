@@ -11,7 +11,7 @@ contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
 then
 oldname=` zfs list | grep -w "$name" | wc -c `;
-if [[ oldname -ge 4 ]];
+if [[ $oldname -ge 4 ]];
 then 
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Creating_Volume:'$DG/$name'already_there';

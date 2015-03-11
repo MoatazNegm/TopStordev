@@ -1,1 +1,1 @@
-repli.sh 3880 Data
+VolumeCreateCIFS Data repcifs 1024M admin
