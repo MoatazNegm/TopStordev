@@ -9,6 +9,10 @@ oper=$@;
 echo oper=$oper > $cronout
 oper1=`echo $oper | awk '{print $1}'`;
 oper2=`echo $oper | awk '{print $2}'`;
+oper3=`echo $oper | awk '{print $3}'`;
+hostn=`hostname | awk -F. '{print $1}'`;
+hostip=`ifconfig em1 | grep "inet " | awk '{print $2}'`;
+hostp=`echo $oper2 | awk -F. '{print $1}'`;
 echo oper1=$oper1 >> $cronout;
 echo oper2=$oper2 >> $cronout;
 echo stamp=$stamp >> $cronout
@@ -49,14 +53,19 @@ if (( $countsnap >  $keep )); then
 	fi;
 	oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 fi
-newsnap2=`echo $oper2.$stamp`;
+newsnap2=`echo $hostn.$hostp.$stamp`;
+pool=`echo $oper1 | awk -F/ '{print $1}'`;
+vol=`echo $oper1 | awk -F/ '{print $2}'`;
+
 echo newsnap2=$newsnap2 >> $cronout
 newsnap=`echo $oper1@$newsnap2`;
 echo newsnap=$newsnap >> $cronout
 logdata='Creating_Snapshot:'$newsnap;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-/sbin/zfs snapshot $newsnap &> txt/$0$userreq.txt$stamp
+/sbin/zfs snapshot $newsnap &> txt/$0$userreq.txt$stamp;
+echo $hostip $oper3 $newsnap2 $pool $vol 
+./Replicate $hostip $oper3 $newsnap2 $pool $vol;
 echo snapshotresult : >> $cronout
 cat txt/$0$userreq.txt$stamp >> $cronout 
 echo filenameis=txt/$0$userreq.txt$stamp >> $cronout
