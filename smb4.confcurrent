@@ -63,3 +63,15 @@ writeable - Yes
 nt acl support - yes
 inherit acls = Yes
 ;;;;;;;;;;;;;;;;    stopforAbdo_only
+
+;;;;;;;;         startrepcifs_only
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+;;;;;;;;;;;;;;;;;;;;   stoprepcifs_only
