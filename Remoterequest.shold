@@ -20,3 +20,8 @@ if [[ $stampreply == $stamp ]]; then echo line=$line >> txt/tmprequest; lineflag
 echo loopline=$lineflag >> txt/tmprequest
 }
 done;
+echo request=$REMOTE >> txt/tmprequest
+RR="hiremote"
+REMOTE=$lineflag;
+echo afterrequest=$REMOTE >> txt/tmprequest
+echo $lineflag;

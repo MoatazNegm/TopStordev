@@ -1,0 +1,88 @@
+cannot open '/': invalid dataset name
+usage:
+	snapshot [-r] [-o property=value] ... <filesystem@snapname|volume@snapname> ...
+
+For the property list, run: zfs set|get
+
+For the delegated permission list, run: zfs allow|unallow
+cannot open '/@..1426082295': invalid dataset name
+missing value in property=value argument
+usage:
+	set <property=value> <filesystem|volume|snapshot> ...
+
+The following properties are supported:
+
+	PROPERTY       EDIT  INHERIT   VALUES
+
+	available        NO       NO   <size>
+	clones           NO       NO   <dataset>[,...]
+	compressratio    NO       NO   <1.00x or higher if compressed>
+	creation         NO       NO   <date>
+	defer_destroy    NO       NO   yes | no
+	logicalreferenced  NO       NO   <size>
+	logicalused      NO       NO   <size>
+	mounted          NO       NO   yes | no
+	origin           NO       NO   <snapshot>
+	refcompressratio  NO       NO   <1.00x or higher if compressed>
+	referenced       NO       NO   <size>
+	type             NO       NO   filesystem | volume | snapshot
+	used             NO       NO   <size>
+	usedbychildren   NO       NO   <size>
+	usedbydataset    NO       NO   <size>
+	usedbyrefreservation  NO       NO   <size>
+	usedbysnapshots  NO       NO   <size>
+	userrefs         NO       NO   <count>
+	written          NO       NO   <size>
+	aclinherit      YES      YES   discard | noallow | restricted | passthrough | passthrough-x
+	aclmode         YES      YES   discard | groupmask | passthrough | restricted
+	atime           YES      YES   on | off
+	canmount        YES       NO   on | off | noauto
+	casesensitivity  NO      YES   sensitive | insensitive | mixed
+	checksum        YES      YES   on | off | fletcher2 | fletcher4 | sha256
+	compression     YES      YES   on | off | lzjb | gzip | gzip-[1-9] | zle | lz4
+	copies          YES      YES   1 | 2 | 3
+	dedup           YES      YES   on | off | verify | sha256[,verify]
+	devices         YES      YES   on | off
+	exec            YES      YES   on | off
+	jailed          YES      YES   on | off
+	logbias         YES      YES   latency | throughput
+	mlslabel        YES      YES   <sensitivity label>
+	mountpoint      YES      YES   <path> | legacy | none
+	nbmand          YES      YES   on | off
+	normalization    NO      YES   none | formC | formD | formKC | formKD
+	primarycache    YES      YES   all | none | metadata
+	quota           YES       NO   <size> | none
+	readonly        YES      YES   on | off
+	recordsize      YES      YES   512 to 128k, power of 2
+	refquota        YES       NO   <size> | none
+	refreservation  YES       NO   <size> | none
+	reservation     YES       NO   <size> | none
+	secondarycache  YES      YES   all | none | metadata
+	setuid          YES      YES   on | off
+	sharenfs        YES      YES   on | off | share(1M) options
+	sharesmb        YES      YES   on | off | sharemgr(1M) options
+	snapdir         YES      YES   hidden | visible
+	sync            YES      YES   standard | always | disabled
+	utf8only         NO      YES   on | off
+	version         YES       NO   1 | 2 | 3 | 4 | 5 | current
+	volblocksize     NO      YES   512 to 128k, power of 2
+	volsize         YES       NO   <size>
+	vscan           YES      YES   on | off
+	xattr           YES      YES   on | off
+	userused@...     NO       NO   <size>
+	groupused@...    NO       NO   <size>
+	userquota@...   YES       NO   <size> | none
+	groupquota@...  YES       NO   <size> | none
+	written@<snap>   NO       NO   <size>
+
+Sizes are specified in bytes with standard units such as K, M, G, etc.
+
+User-defined properties can be specified by using a name containing a colon (:).
+
+The {user|group}{used|quota}@ properties must be appended with
+a user or group specifier of one of these forms:
+    POSIX name      (eg: "matt")
+    POSIX id        (eg: "126829")
+    SMB name@domain (eg: "matt@sun")
+    SMB SID         (eg: "S-1-234-567-89")
+nc: getaddrinfo: hostname nor servname provided, or not known

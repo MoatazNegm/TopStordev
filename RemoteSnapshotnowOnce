@@ -11,9 +11,8 @@ vol=`echo $oper1 | awk -F/ '{print $2}'`;
 stamp=`date +%s`;
 newsnap2=`echo $oper2.$stamp`;
 newsnap=`echo $oper1@$newsnap2`;
-echo $newsnap
 /sbin/zfs snapshot $newsnap; 
 /sbin/zfs set repli:sender=$hostip $newsnap;
 /sbin/zfs set repli:receiver=$oper3 $newsnap;
-echo ./Replicate $hostip $oper3 $newsnap2 $pool $vol;
+#echo ./Replicate $hostip $oper3 $newsnap2 $pool $vol;
 ./Replicate $hostip $oper3 $newsnap2 $pool $vol;
