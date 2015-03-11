@@ -10,6 +10,9 @@ echo oper=$oper > $cronout
 oper1=`echo $oper | awk '{print $1}'`;
 oper2=`echo $oper | awk '{print $2}'`;
 oper3=`echo $oper | awk '{print $3}'`;
+isallowed=`cat partners.txt | grep $oper3 | awk '{print $2}'`;
+if [[ $isallowed == "DualWay" ||  $isallowed == "receiver" ]];
+then
 hostn=`hostname | awk -F. '{print $1}'`;
 hostip=`ifconfig em1 | grep "inet " | awk '{print $2}'`;
 hostp=`echo $oper2 | awk -F. '{print $1}'`;
@@ -85,3 +88,4 @@ fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 rm txt/$0$userreq.txt$stamp
 ./GetSnaplist
+fi

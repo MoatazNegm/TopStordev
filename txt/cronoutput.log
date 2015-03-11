@@ -1,12 +1,17 @@
-currentsnaps=Data/nemsh@hourly.2.1.4.na.1425924060
-Data/nemsh@hourly.2.1.4.na.1426010460
-oldsnap=Data/nemsh@hourly.2.1.4.na.1425924060
+oper=Data/nfsnas Minutely.2.3.na.na
+oper1=Data/nfsnas
+oper2=Minutely.2.3.na.na
+stamp=1426056454
+keep=2
+currentsnaps=Data/nfsnas@Minutely.2.3.na.na.1426056094
+Data/nfsnas@Minutely.2.3.na.na.1426056274
+oldsnap=Data/nfsnas@Minutely.2.3.na.na.1426056094
 countsnap=       2
 countsnapplus=3
 keeppluszero=2
-{"Date":"03/11/2015","time":"04:00:40","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/nemsh@hourly.2.1.4.na.1425924060"}
-newsnap2=hourly.2.1.4.na.1426039234
-newsnap=Data/nemsh@hourly.2.1.4.na.1426039234
+{"Date":"03/11/2015","time":"08:47:40","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/nfsnas@Minutely.2.3.na.na.1426056094"}
+newsnap2=Minutely.2.3.na.na.1426056454
+newsnap=Data/nfsnas@Minutely.2.3.na.na.1426056454
 snapshotresult :
-filenameis=txt/./SnapshotnowSystem.txt1426039234
-{"Date":"03/11/2015","time":"04:00:44","msg":"info","user":"System","data":"Success_Creating_Snapshot:Data/nemsh@hourly.2.1.4.na.1426039234"}
+filenameis=txt/./SnapshotnowSystem.txt1426056454
+{"Date":"03/11/2015","time":"08:47:43","msg":"info","user":"System","data":"Success_Creating_Snapshot:Data/nfsnas@Minutely.2.3.na.na.1426056454"}

@@ -18,16 +18,16 @@ echo changing_Privileges_of_user:$userchange  > $web
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 result="[";
-olduserpriv=`cat txt/userpriv.txt | grep -v "$userchange"`;
+olduserpriv=`cat userpriv.txt | grep -v "$userchange"`;
 wold=` echo $olduserpriv | wc -c `;
 if [[ $wold -ge 5 ]] 
 then 
-echo $olduserpriv > txt/userpriv.txt
-echo $jsonthis >> txt/userpriv.txt
+echo $olduserpriv > userpriv.txt
+echo $jsonthis >> userpriv.txt
 else
- echo $jsonthis > txt/userpriv.txt
+ echo $jsonthis > userpriv.txt
 fi
-cat txt/userpriv.txt | while read -r line
+cat userpriv.txt | while read -r line
 do 
 result=$result$line,;
 done

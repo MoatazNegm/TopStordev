@@ -7,7 +7,7 @@ if [[ $superuser == $userreq ]];
 then
   echo true;
 else
-userpriv=` cat txt/userpriv.txt | grep $userreq`;
+userpriv=` cat userpriv.txt | grep "$userreq"`;
 rr=$modpriv\":\";
 priv=`echo ${userpriv##*"$rr"} | awk -F\" '{print $1}'`;
 echo $priv;

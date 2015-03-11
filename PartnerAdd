@@ -1,0 +1,53 @@
+#! /usr/local/bin/zsh
+webpartner='/usr/local/www/apache24/data/des19/Data/Partnerslist.txt';
+resweb='/usr/local/www/apache24/data/des19/Data/Partnerslist.txtupdated'
+web='/usr/local/www/apache24/data/des19/Data/Partnersstatus.log';
+logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log';
+Partnername=`echo $@ | awk '{print $1}'`;
+type=`echo $@ | awk '{print $2}'`;
+userreq=`echo $@  | awk '{print $3}'`;
+privilege="Replication";
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
+echo Adding partner $Partnername.... > $web;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logdata='adding_'$type'_partner:'$Partnername;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
+isthere=`cat partners.txt | grep "$Partnername $type" | wc -c `
+isthere=$((isthere+0));
+if [[ $isthere -ge 2 ]]; then
+echo Adding partner..Already there.... > $web;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logdata='adding_'$type'_partner_already_there:'$Partnername;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata`;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
+else
+partnerlist=`cat partners.txt `;
+echo $partnerlist | grep -v "$Partnername" > partners.txt
+newtype=$type;
+oldtype=`echo $partnerlist | grep "$Partnername" | awk '{print $2}'`;
+if [[ $oldtype == "sender" && $type == "receiver" ]]; then newtype="DualWay";fi
+if [[ $oldtype == "receiver" && $type == "sender" ]]; then newtype="DualWay";fi
+echo $Partnername $newtype >> partners.txt
+result="[";
+cat partners.txt | while read -r line ; do
+  n=` echo $line | awk '{print $1}'`;  t=`echo $line | awk '{print $2}'`;
+  subres=`./jsonthis3.sh name $n type $t`;
+  result=$result$subres,
+done;
+result=`echo $result | rev | cut -c 2- | rev`];
+echo $result >$webpartner;
+resdate=`date +%s`;
+res=` ./jsonthis3.sh updated $resdate`;
+echo $res > $resweb;
+echo Success Adding $newtype partner $Partnername > $web;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logdata='success_adding_'$type'_partner:'$Partnername;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
+fi
+bb=`cat $web`;
+echo $datenow $timenow :$bb > ${logging}2
+fi

@@ -1,7 +1,6 @@
 #! /usr/local/bin/zsh
 web='/usr/local/www/apache24/data/des19/Data/Usersstatus.log';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log';
-rm txt/err; 
 echo Adding user.... > $web;
 username=`echo $@ | awk '{print $1}'`;
 userpass=`echo $@ | awk '{print $2}'`;
@@ -14,7 +13,6 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='adding_user:'$username;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
-cp txt/logthis.log $logging; rm txt/logthis.log;
 ( echo $userpass | pw useradd  $username -m -h 0 -c "TopStor" -s /usr/sbin/nologin) 2> txt/$0$userreq.txt;
 ( echo $userpass; echo $userpass) | /usr/local/bin/smbpasswd -s -a $username 2>> txt/$0$userreq.txt;
 mkdir /Data/Common/$username;
