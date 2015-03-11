@@ -14,7 +14,8 @@ read line < /tmp/msgremotefile;
 echo $line > /TopStor/tmplineremote
 stamp=`echo $line | awk '{print $2}'`
 request=`echo $line | awk '{print $1}'`
-searsource=` cat partners.txt | grep "$request"`; 
+searsource=` cat partners.txt | grep "$request" | awk '{print $1}'`; 
+echo $request $searcsource > txt/tmpreq
 ispartner=`echo $searsource | wc -c `
 #echo $line $searsource | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 & 
 if [[ $searsource == $request ]]; then
