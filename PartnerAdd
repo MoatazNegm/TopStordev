@@ -26,7 +26,8 @@ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $
 else
 partnerlist=`cat partners.txt `;
 istherpartners=` echo $partnerlist | wc -c`;
-if [[ $istherepartners -ge 2 ]]; then
+istherpartners=$((istherpartners+0));
+if [[ $istherpartners -ge 2 ]]; then
 echo $partnerlist | grep -v "$Partnername" > partners.txt
 fi
 newtype=$type;
