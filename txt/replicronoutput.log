@@ -1,17 +1,17 @@
 oper=Data/repcifs Minutely.2.2.na.na 10.3.2.7
 oper1=Data/repcifs
 oper2=Minutely.2.2.na.na
-stamp=1426114495
+stamp=1426445160
 keep=2
-currentsnaps=Data/repcifs@Repli.Minutely.2.2.na.na.1426114315
-Data/repcifs@Repli.Minutely.2.2.na.na.1426114440
-oldsnap=Data/repcifs@Repli.Minutely.2.2.na.na.1426114315
+currentsnaps=Data/repcifs@Repli.Minutely.2.2.na.na.1426444920
+Data/repcifs@Repli.Minutely.2.2.na.na.1426445035
+oldsnap=Data/repcifs@Repli.Minutely.2.2.na.na.1426444920
 countsnap=       2
 countsnapplus=3
 keeppluszero=2
-{"Date":"03/12/2015","time":"00:55:00","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/repcifs@Repli.Minutely.2.2.na.na.1426114315"}
-newsnap2=Repli.Minutely.2.2.na.na.1426114495
-newsnap=Data/repcifs@Repli.Minutely.2.2.na.na.1426114495
+{"Date":"03/15/2015","time":"20:46:00","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/repcifs@Repli.Minutely.2.2.na.na.1426444920"}
+newsnap2=Repli.Minutely.2.2.na.na.1426445160
+newsnap=Data/repcifs@Repli.Minutely.2.2.na.na.1426445160
 snapshotresult :
-filenameis=txt/./RemoteSnapshotnowSystem.txt1426114495
-{"Date":"03/12/2015","time":"00:55:30","msg":"info","user":"System","data":"Success_Creating_Snapshot:Data/repcifs@Repli.Minutely.2.2.na.na.1426114495"}
+filenameis=txt/./RemoteSnapshotnowSystem.txt1426445160
+{"Date":"03/15/2015","time":"20:46:22","msg":"info","user":"System","data":"Success_Creating_Snapshot:Data/repcifs@Repli.Minutely.2.2.na.na.1426445160"}
