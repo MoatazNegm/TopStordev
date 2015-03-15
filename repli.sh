@@ -10,3 +10,4 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Receiving_new_snapshot_for:'$vol'_from:'$partner;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $partner data $logdata`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+echo $datenow $timenow :$logdata > ${logging}2
