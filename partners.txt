@@ -1,8 +1,2 @@
-<<<<<<< HEAD
-10.3.2.8 receiver
-10.3.2.7 DualWay
-1.2.3.4 DualWay
-=======
-10.3.2.8 DualWay
+10.3.2.8 sender
 10.3.2.7 receiver
->>>>>>> 5221ab1f713b2dc13ca3e23a1ab269b676cca317

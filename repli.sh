@@ -1,5 +1,4 @@
 #! /bin/sh
-#! /bin/sh
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 pp=`echo $@ | awk '{print $1}'`;
 pool=`echo $@ | awk '{print $2 }'`;
