@@ -69,7 +69,7 @@ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $
 /sbin/zfs set repli:sender=$hostip $newsnap;
 /sbin/zfs set repli:receiver=$oper3 $newsnap;
 echo $hostip $oper3 $newsnap2 $pool $vol 
-./Replicate $hostip $oper3 $newsnap2 $pool $vol 2>> txt/$0$userreq.txt$stamp ;
+./Replicate $hostip $oper3 txt/$0$userreq.txt$stamp $newsnap2 $pool $vol  ;
 echo donereplicating
 echo snapshotresult : >> $cronout
 cat txt/$0$userreq.txt$stamp >> $cronout 
@@ -82,11 +82,12 @@ if [[ $err -ge  4  ]]; then
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
 	echo $logthis >> $cronout
 else 
-	echo $datenow $timenow: DONE...Snapshot $@ is created > $web; 
-	logdata='Success_Creating_Snapshot:'$newsnap;
+	echo $datenow $timenow: DONE...Replication $@ is created > $web; 
+	logdata='Success_Replicating_Snapshot:'$newsnap;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 	echo $logthis >> $cronout
 fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 rm txt/$0$userreq.txt$stamp
 fi
+echo $datenow $timenow :$logdata > ${logging}2

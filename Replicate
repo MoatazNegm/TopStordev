@@ -29,14 +29,16 @@ echo afterrequest=$RR >> txt/tmprequest
 ###############################################################################
 so=`echo $@ | awk '{print $1}'`;
 dst=`echo $@ | awk '{print $2}'`;
-snap=`echo $@ | awk '{print $3}'`
-pool=`echo $@ | awk '{print $4}'`;
-vol=`echo $@ | awk '{print $5}'`;
+filelog=`echo $@ | awk '{print $3}'`;
+snap=`echo $@ | awk '{print $4}'`
+pool=`echo $@ | awk '{print $5}'`;
+vol=`echo $@ | awk '{print $6}'`;
 pp=$(( 3000+( $(od -An -N2 -i /dev/random) )%(4000-1024+1) ))
 echo Replicate=$REMOTE >> txt/tmprequest
 Remoterequest $so $dst rep RemoteVolSearch $vol;
 volfound=$RR;
 echo volfound=$volfound >> txt/tmprequest
+if [[ $volfound != 'no' && $volfound != 'found' ]]; then echo not $volfound >> $filelog; exit 1 ; fi
 if [[ $volfound == "no" ]];
 then
  echo no >> txt/tmprequest
