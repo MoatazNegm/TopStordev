@@ -88,6 +88,6 @@ else
 	echo $logthis >> $cronout
 fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-rm txt/$0$userreq.txt$stamp
 fi
 echo $datenow $timenow :$logdata > ${logging}2
+rm txt/$0$userreq.txt$stamp
