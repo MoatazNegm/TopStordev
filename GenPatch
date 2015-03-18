@@ -2,7 +2,7 @@
 #cd /root/scripts
 webfile='/usr/local/www/apache24/data/des19/Data';
 #gitloc=`echo $@ | awk '{print $1}'`;
-gitloc='/TopStorrun';
+gitloc='/TopStor';
 filen=`echo $@ | awk '{print $1}'`;
 filever=`echo $filen | awk -F_ '{print $2}'`;
 cd $gitloc  

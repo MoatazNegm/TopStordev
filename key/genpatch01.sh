@@ -1,12 +1,20 @@
 #!/usr/local/bin/zsh
+#  run as follows: patch <<GIT directory>> <<version number>> 
 #cd /root/scripts
+here=`pwd`;
 gitloc=`echo $@ | awk '{print $1}'`;
 filever=`echo $@ | awk '{print $2}'`;
 cd $gitloc 
+git add --all
+currentver=`cat ver`;
+msg='preparing currentver ver'$currentver;
+git commit -am $msg; 
 edite=`git diff --name-only master`
 echo $filever > ver
 tar -cvf /TopStor_${filever}_.tar ver
-echo $edite
+echo $currentver > ver;
+#echo $edite
+cd $here
 for n in `echo $edite`
 do
 #cp "$n" /test/
