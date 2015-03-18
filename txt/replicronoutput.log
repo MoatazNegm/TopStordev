@@ -12,3 +12,6 @@ keeppluszero=2
 {"Date":"03/18/2015","time":"12:42:01","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/repcifs@Repli.Minutely.2.2.na.na.1426675075"}
 newsnap2=Repli.Minutely.2.2.na.na.1426675315
 newsnap=Data/repcifs@Repli.Minutely.2.2.na.na.1426675315
+snapshotresult :
+filenameis=txt/./RemoteSnapshotnowSystem.txt1426675315
+{"Date":"03/18/2015","time":"12:42:35","msg":"info","user":"System","data":"Success_Replicating_Snapshot:Data/repcifs@Repli.Minutely.2.2.na.na.1426675315"}
