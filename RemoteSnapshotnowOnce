@@ -14,5 +14,5 @@ newsnap=`echo $oper1@$newsnap2`;
 /sbin/zfs snapshot $newsnap; 
 /sbin/zfs set repli:sender=$hostip $newsnap;
 /sbin/zfs set repli:receiver=$oper3 $newsnap;
-#echo ./Replicate $hostip $oper3 $newsnap2 $pool $vol;
-./Replicate $hostip $oper3 $newsnap2 $pool $vol;
+echo ./Replicate $hostip $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol >> txt/tmprequest
+./Replicate $hostip $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol;

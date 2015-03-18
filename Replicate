@@ -34,7 +34,8 @@ snap=`echo $@ | awk '{print $4}'`
 pool=`echo $@ | awk '{print $5}'`;
 vol=`echo $@ | awk '{print $6}'`;
 pp=$(( 3000+( $(od -An -N2 -i /dev/random) )%(4000-1024+1) ))
-echo Replicate=$REMOTE >> txt/tmprequest
+echo Replicate=$RR >> txt/tmprequest
+echo Roperands=$@ >> txt/tmprequest;
 Remoterequest $so $dst rep RemoteVolSearch $vol;
 volfound=$RR;
 echo volfound=$volfound >> txt/tmprequest
