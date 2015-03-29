@@ -1,11 +1,11 @@
-#!/usr/local/bin/zsh
+#! /usr/local/bin/zsh
 cd /TopStor
 mkfifo -m 660 /tmp/msgfile
 mkfifo -m 600 /tmp/msgrack;
 mkfifo -m 600 /tmp/msgremotefile;
 export REMOTE=Topstor
 ./Topstorremote.sh &
-./Topstorremoteack.sh > /tmp/msgrack &
+./Topstorremoteack.sh &
 chgrp moataz /tmp/msgfile; 
 chown www /tmp/msgfile; 
 #rm /TopStor/txt/*

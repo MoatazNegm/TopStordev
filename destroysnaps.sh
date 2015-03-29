@@ -5,4 +5,4 @@ for snapshot in `zfs list -H -t snapshot | grep -w "$instr" | cut -f 1`
 do
 zfs destroy $snapshot
 done
-echo done;
+echo ready;

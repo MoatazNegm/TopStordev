@@ -36,4 +36,4 @@ echo $result > $websnaps 2>txt/err.txt
 tstamp=`date +%s`;
 res=` ./jsonthis3.sh updated $tstamp `;
 echo $res > $resweb;
-
+echo ready;
