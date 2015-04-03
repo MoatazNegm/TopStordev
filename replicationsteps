@@ -1,3 +1,24 @@
+open session with this with the my name
+using lk and in out pipes
+in receiver read the out pipe and process line by line
+in sender send a command and loop with waiting message
+in sender use -N and out pipe to send commands and received response.
+close session delete all in and  out and kill     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 make pipe tmp/msgfiletmp
 add to the Topstor.sh hook to port 2234 > tmp/msgfiletmp  limit it to 50 byte (Topstor.sh) 
 check message source ip if he is trusted or not. (Topstorremote.sh)

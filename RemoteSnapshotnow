@@ -70,7 +70,6 @@ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $
 /sbin/zfs set repli:receiver=$oper3 $newsnap;
 echo $hostip $oper3 $newsnap2 $pool $vol 
 ./Replicate $hostip $oper3 txt/$0$userreq.txt$stamp $newsnap2 $pool $vol  ;
-echo Replicating:./Replicate $hostip $oper3 txt/$0$userreq.txt$stamp $newsnap2 $pool $vol  >> txt/tmprequest ;
 echo donereplicating
 echo snapshotresult : >> $cronout
 cat txt/$0$userreq.txt$stamp >> $cronout 

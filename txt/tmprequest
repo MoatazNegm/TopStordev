@@ -1,265 +1,187 @@
-./Replicate 10.3.2.8 10.3.2.7 txt//TopStor/RemoteSnapshotnowOnce.txt1426702773 oncenow..1426702773 Data repcifs
 Replicate=
-Roperands=10.3.2.8 10.3.2.7 oncenow..1426702773 Data repcifs
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426702776 rep RemoteVolSearch | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426702776 Authorized no
-loopline=no
-afterrequest=no
+Roperands=10.3.2.8 10.3.2.7 txt/./RemoteSnapshotnowSystem.txt1427612872 Repli.hourly.4.3.12.na.1427612872 Data repcifs
+initxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+echo 10.3.2.8 1427612872 nop ReInit.sh 4384 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
+line=1427612872 Authorized received
+initloopline=received
+initafterrequest=waiting
+pp=4384 while POR=waiting
+RemoteAsk 10.3.2.7 RemoteVolSearch repcifs
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag=no linen=       3 count=1
+afterAsk=no
 volfound=no
 no
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426702780 nop VolumeCreateCIFS repcifs 1024M admin | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426702780 nop VolumeCreateCIFS repcifs 1024M admin | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426702780 Authorized received
-loopline=received
-afterrequest=received
-/Remoterequest.sh 10.3.2.8 10.3.2.7 nop VolumeCreateCIFS repcifs 1024M admin
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426702792 nop repli.sh 4789 repcifs 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426702792 nop repli.sh 4789 repcifs 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426653720 rep RemoteVolSearch repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426702792 nop repli.sh 4789 repcifs 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426702792 nop repli.sh 4789 repcifs 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426653720 rep RemoteVolSearch repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426653720 rep RemoteVolSearch repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426653720 Authorized found
-loopline=found
-afterrequest=found
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426702832 rep RemoteGetSnaplist repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426702832 Authorized Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Minutely.3.31.na.na.1426696251 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524
-loopline=Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Minutely.3.31.na.na.1426696251 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524
-afterrequest=Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Minutely.3.31.na.na.1426696251 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524
-ll=Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Minutely.3.31.na.na.1426696251 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524 spot
-targetsnap=Data/repcifs@Repli.Minutely.2.2.na.na.1426653720
-initialsnap=Data/repcifs@Repli.hourly.4.3.12.na.1426701726
-Remoterequest.sh 10.3.2.8 10.3.2.7 nop repli.sh 5760 Data 10.3.2.8 repcifs
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426702841 nop repli.sh 5760 Data 10.3.2.8 repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426702792 nop repli.sh 4789 repcifs 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426702792 nop repli.sh 4789 repcifs 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-afterrequest=failed
-loopline=failed
-echo 10.3.2.8 1426702841 nop repli.sh 5760 Data 10.3.2.8 repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426702857 nop GetPoolVollist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426702857 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426702857 nop GetPoolVollist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426702857 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426702857 nop GetPoolVollist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426702857 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426702841 nop repli.sh 5760 Data 10.3.2.8 repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426702841 nop repli.sh 5760 Data 10.3.2.8 repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426702841 Authorized received
-loopline=received
-afterrequest=received
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426702897 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426702897 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426702897 Authorized received
-loopline=received
-afterrequest=received
-./Replicate 10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1426702999 oncenow2..1426702999 Data repcifs
+RemoteAsk 10.3.2.7 VolumeCreate Data repcifs M admin
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag=ready linen=       6 count=1
+afterAsk=ready
+RemoteAsk 10.3.2.7 repli.sh 4385 Data 10.3.2.8 repcifs
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag= linen=       1 count=2
+lineflag=ready linen=       6 count=3
+afterAsk=ready
+zfs send -D Data/repcifs@Repli.hourly.4.3.12.na.1427612872 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 4385
+RemoteAsk 10.3.2.7 GetSnaplist hi
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag=ready linen=       6 count=2
+afterAsk=ready
+POR=4384 RemoteAsk 10.3.2.7 done
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag= linen=       1 count=2
+lineflag= linen=       1 count=3
+lineflag= linen=       1 count=4
+lineflag= linen=       1 count=5
+lineflag= linen=       1 count=6
+lineflag= linen=       1 count=7
+lineflag= linen=       1 count=8
+lineflag= linen=       1 count=9
+lineflag= linen=       1 count=10
+lineflag= linen=       1 count=11
+lineflag= linen=       1 count=12
+lineflag= linen=       1 count=13
+lineflag= linen=       1 count=14
+lineflag= linen=       1 count=15
+lineflag= linen=       1 count=16
+lineflag= linen=       1 count=17
+lineflag= linen=       1 count=18
+lineflag= linen=       1 count=19
+lineflag= linen=       1 count=20
+lineflag= linen=       1 count=21
+afterAsk=
+Replicating:./Replicate 10.3.2.8 10.3.2.7 txt/./RemoteSnapshotnowSystem.txt1427612872 Repli.hourly.4.3.12.na.1427612872 Data repcifs
 Replicate=
-Roperands=10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1426702999 oncenow2..1426702999 Data repcifs
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426703002 rep RemoteVolSearch repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426702857 nop GetPoolVollist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426702857 nop GetPoolVollist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426702857 nop GetPoolVollist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-afterrequest=failed
-line=1426702857 Authorized received
-loopline=received
-afterrequest=received
-./Replicate 10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1426703322 oncenow2..1426703322 Data repcifs
+Roperands=10.3.2.8 10.3.2.7 txt/./RemoteSnapshotnowSystem.txt1427613025 Repli.hourly.4.3.12.na.1427613025 Data repcifs
+initxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+echo 10.3.2.8 1427613034 nop ReInit.sh 4452 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
+initloopline=failed
+echo 10.3.2.8 1427613034 nop ReInit.sh 4452 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
+initloopline=failed
+echo 10.3.2.8 1427613034 nop ReInit.sh 4452 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
+line=1427613034 Authorized received
+initloopline=received
+initafterrequest=waiting
+pp=4452 while POR=waiting
+RemoteAsk 10.3.2.7 RemoteVolSearch repcifs
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag=no linen=       3 count=1
+afterAsk=no
+volfound=no
+no
+RemoteAsk 10.3.2.7 VolumeCreateCIFS Data repcifs 1024M admin
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag= linen=       1 count=2
+lineflag= linen=       1 count=3
+lineflag= linen=       1 count=4
+lineflag= linen=       1 count=5
+lineflag= linen=       1 count=6
+lineflag= linen=       1 count=7
+lineflag=Performing sanity check on Samba configuration: OK
+Stopping winbindd.
+Waiting for PIDS: 47603.
+Stopping smbd.
+Stopping nmbd.
+Waiting for PIDS: 47505.
+Performing sanity check on Samba configuration: OK
+Starting nmbd.
+Starting smbd.
+Starting winbindd. linen=     250 count=8
+afterAsk=Performing sanity check on Samba configuration: OK
+Stopping winbindd.
+Waiting for PIDS: 47603.
+Stopping smbd.
+Stopping nmbd.
+Waiting for PIDS: 47505.
+Performing sanity check on Samba configuration: OK
+Starting nmbd.
+Starting smbd.
+Starting winbindd.
+RemoteAsk 10.3.2.7 repli.sh 4453 Data 10.3.2.8 repcifs
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag=ready
+ready linen=      12 count=0
+afterAsk=ready
+ready
+zfs send -D Data/repcifs@Repli.hourly.4.3.12.na.1427613025 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 4453
+RemoteAsk 10.3.2.7 GetSnaplist hi
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag=ready linen=       6 count=0
+afterAsk=ready
+POR=4452 RemoteAsk 10.3.2.7 done
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag=ready linen=       6 count=0
+afterAsk=ready
+Replicating:./Replicate 10.3.2.8 10.3.2.7 txt/./RemoteSnapshotnowSystem.txt1427613025 Repli.hourly.4.3.12.na.1427613025 Data repcifs
 Replicate=
-Roperands=10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1426703322 oncenow2..1426703322 Data repcifs
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426703326 rep RemoteVolSearch repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426703326 Authorized found
-loopline=found
-afterrequest=found
+Roperands=10.3.2.8 10.3.2.7 txt/./RemoteSnapshotnowSystem.txt1427613115 Repli.hourly.4.3.12.na.1427613115 Data repcifs
+initxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+echo 10.3.2.8 1427613116 nop ReInit.sh 5088 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
+initloopline=failed
+echo 10.3.2.8 1427613116 nop ReInit.sh 5088 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
+line=1427613116 Authorized received
+initloopline=received
+initafterrequest=waiting
+pp=5088 while POR=waiting
+RemoteAsk 10.3.2.7 RemoteVolSearch repcifs
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag=found linen=       6 count=1
+afterAsk=found
 volfound=found
 foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426703333 rep RemoteGetSnaplist repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426703333 Authorized Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Minutely.3.31.na.na.1426696251 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524
-loopline=Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Minutely.3.31.na.na.1426696251 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524
-afterrequest=Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Minutely.3.31.na.na.1426696251 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524
-ll=Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Minutely.3.31.na.na.1426696251 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524 spot
-targetsnap=Data/repcifs@oncenow2..1426703322
-initialsnap=Data/repcifs@Repli.hourly.4.3.12.na.1426701726
-Remoterequest.sh 10.3.2.8 10.3.2.7 nop repli.sh 3298 Data 10.3.2.8 repcifs
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426703345 nop repli.sh 3298 Data 10.3.2.8 repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426703345 Authorized received
-loopline=received
-afterrequest=received
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426703359 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426703359 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426703359 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426703359 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426703359 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426703359 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-afterrequest=failed
-loopline=failed
-echo 10.3.2.8 1426703002 rep RemoteVolSearch repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426703002 rep RemoteVolSearch repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426703002 Authorized found
-loopline=found
-afterrequest=found
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426703415 rep RemoteGetSnaplist repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426703415 Authorized Data/repcifs@oncenow2..1426703322 Data/repcifs@oncenow2..1426702999 Data/repcifs@oncenow..1426702773 Data/repcifs@oncenow..1426702578 Data/repcifs@Repli.hourly.4.3.12.na.1426702054 Data/repcifs@Repli.hourly.4.3.12.na.1426701759 Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Minutely.3.31.na.na.1426696251 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524
-loopline=Data/repcifs@oncenow2..1426703322 Data/repcifs@oncenow2..1426702999 Data/repcifs@oncenow..1426702773 Data/repcifs@oncenow..1426702578 Data/repcifs@Repli.hourly.4.3.12.na.1426702054 Data/repcifs@Repli.hourly.4.3.12.na.1426701759 Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Minutely.3.31.na.na.1426696251 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524
-afterrequest=Data/repcifs@oncenow2..1426703322 Data/repcifs@oncenow2..1426702999 Data/repcifs@oncenow..1426702773 Data/repcifs@oncenow..1426702578 Data/repcifs@Repli.hourly.4.3.12.na.1426702054 Data/repcifs@Repli.hourly.4.3.12.na.1426701759 Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Minutely.3.31.na.na.1426696251 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524
-ll=Data/repcifs@oncenow2..1426703322 Data/repcifs@oncenow2..1426702999 Data/repcifs@oncenow..1426702773 Data/repcifs@oncenow..1426702578 Data/repcifs@Repli.hourly.4.3.12.na.1426702054 Data/repcifs@Repli.hourly.4.3.12.na.1426701759 Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Minutely.3.31.na.na.1426696251 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524 spot
-targetsnap=Data/repcifs@oncenow2..1426702999
-initialsnap=Data/repcifs@oncenow2..1426703322
-Remoterequest.sh 10.3.2.8 10.3.2.7 nop repli.sh 5531 Data 10.3.2.8 repcifs
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426703427 nop repli.sh 5531 Data 10.3.2.8 repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426703427 Authorized received
-loopline=received
-afterrequest=received
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426703439 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426703439 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426703439 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426703439 Authorized received
-loopline=received
-afterrequest=received
-./Replicate 10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1426703489 oncenow3..1426703489 Data repcifs
-Replicate=
-Roperands=10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1426703489 oncenow3..1426703489 Data repcifs
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426703493 rep RemoteVolSearch repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426703493 Authorized found
-loopline=found
-afterrequest=found
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426703499 rep RemoteGetSnaplist repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426703499 Authorized Data/repcifs@oncenow2..1426703322 Data/repcifs@oncenow2..1426702999 Data/repcifs@oncenow..1426702773 Data/repcifs@oncenow..1426702578 Data/repcifs@Repli.hourly.4.3.12.na.1426702054 Data/repcifs@Repli.hourly.4.3.12.na.1426701759 Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Minutely.3.31.na.na.1426696251 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524
-loopline=Data/repcifs@oncenow2..1426703322 Data/repcifs@oncenow2..1426702999 Data/repcifs@oncenow..1426702773 Data/repcifs@oncenow..1426702578 Data/repcifs@Repli.hourly.4.3.12.na.1426702054 Data/repcifs@Repli.hourly.4.3.12.na.1426701759 Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Minutely.3.31.na.na.1426696251 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524
-afterrequest=Data/repcifs@oncenow2..1426703322 Data/repcifs@oncenow2..1426702999 Data/repcifs@oncenow..1426702773 Data/repcifs@oncenow..1426702578 Data/repcifs@Repli.hourly.4.3.12.na.1426702054 Data/repcifs@Repli.hourly.4.3.12.na.1426701759 Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Minutely.3.31.na.na.1426696251 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524
-ll=Data/repcifs@oncenow2..1426703322 Data/repcifs@oncenow2..1426702999 Data/repcifs@oncenow..1426702773 Data/repcifs@oncenow..1426702578 Data/repcifs@Repli.hourly.4.3.12.na.1426702054 Data/repcifs@Repli.hourly.4.3.12.na.1426701759 Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Minutely.3.31.na.na.1426696251 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524 spot
-targetsnap=Data/repcifs@oncenow3..1426703489
-initialsnap=Data/repcifs@oncenow2..1426703322
-Remoterequest.sh 10.3.2.8 10.3.2.7 nop repli.sh 5837 Data 10.3.2.8 repcifs
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426703507 nop repli.sh 5837 Data 10.3.2.8 repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426703507 Authorized received
-loopline=received
-afterrequest=received
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426703523 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426703523 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426703523 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426703523 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426703523 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426703523 Authorized received
-loopline=received
-afterrequest=received
-./Replicate 10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1426703823 oncenow4..1426703823 Data repcifs
-Replicate=
-Roperands=10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1426703823 oncenow4..1426703823 Data repcifs
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426703824 rep RemoteVolSearch repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426703824 Authorized found
-loopline=found
-afterrequest=found
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426703826 rep RemoteGetSnaplist repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426703826 Authorized Data/repcifs@oncenow3..1426703489 Data/repcifs@Minutely.3.31.na.na.1426703434 Data/repcifs@oncenow2..1426703322 Data/repcifs@oncenow2..1426702999 Data/repcifs@oncenow..1426702773 Data/repcifs@oncenow..1426702578 Data/repcifs@Repli.hourly.4.3.12.na.1426702054 Data/repcifs@Repli.hourly.4.3.12.na.1426701759 Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524
-loopline=Data/repcifs@oncenow3..1426703489 Data/repcifs@Minutely.3.31.na.na.1426703434 Data/repcifs@oncenow2..1426703322 Data/repcifs@oncenow2..1426702999 Data/repcifs@oncenow..1426702773 Data/repcifs@oncenow..1426702578 Data/repcifs@Repli.hourly.4.3.12.na.1426702054 Data/repcifs@Repli.hourly.4.3.12.na.1426701759 Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524
-afterrequest=Data/repcifs@oncenow3..1426703489 Data/repcifs@Minutely.3.31.na.na.1426703434 Data/repcifs@oncenow2..1426703322 Data/repcifs@oncenow2..1426702999 Data/repcifs@oncenow..1426702773 Data/repcifs@oncenow..1426702578 Data/repcifs@Repli.hourly.4.3.12.na.1426702054 Data/repcifs@Repli.hourly.4.3.12.na.1426701759 Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524
-ll=Data/repcifs@oncenow3..1426703489 Data/repcifs@Minutely.3.31.na.na.1426703434 Data/repcifs@oncenow2..1426703322 Data/repcifs@oncenow2..1426702999 Data/repcifs@oncenow..1426702773 Data/repcifs@oncenow..1426702578 Data/repcifs@Repli.hourly.4.3.12.na.1426702054 Data/repcifs@Repli.hourly.4.3.12.na.1426701759 Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524 spot
-targetsnap=Data/repcifs@oncenow4..1426703823
-initialsnap=Data/repcifs@oncenow3..1426703489
-Remoterequest.sh 10.3.2.8 10.3.2.7 nop repli.sh 3741 Data 10.3.2.8 repcifs
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426703829 nop repli.sh 3741 Data 10.3.2.8 repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426703829 Authorized received
-loopline=received
-afterrequest=received
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426703839 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-loopline=failed
-echo 10.3.2.8 1426703839 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426703839 Authorized received
-loopline=received
-afterrequest=received
-Replicate=
-Roperands=10.3.2.8 10.3.2.7 txt/./RemoteSnapshotnowSystem.txt1426704012 Repli.hourly.4.3.12.na.1426704012 Data repcifs
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426704013 rep RemoteVolSearch repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426704013 Authorized found
-loopline=found
-afterrequest=found
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426704015 rep RemoteGetSnaplist repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426704015 Authorized Data/repcifs@oncenow4..1426703823 Data/repcifs@oncenow3..1426703489 Data/repcifs@Minutely.3.31.na.na.1426703434 Data/repcifs@oncenow2..1426703322 Data/repcifs@oncenow2..1426702999 Data/repcifs@oncenow..1426702773 Data/repcifs@oncenow..1426702578 Data/repcifs@Repli.hourly.4.3.12.na.1426702054 Data/repcifs@Repli.hourly.4.3.12.na.1426701759 Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524
-loopline=Data/repcifs@oncenow4..1426703823 Data/repcifs@oncenow3..1426703489 Data/repcifs@Minutely.3.31.na.na.1426703434 Data/repcifs@oncenow2..1426703322 Data/repcifs@oncenow2..1426702999 Data/repcifs@oncenow..1426702773 Data/repcifs@oncenow..1426702578 Data/repcifs@Repli.hourly.4.3.12.na.1426702054 Data/repcifs@Repli.hourly.4.3.12.na.1426701759 Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524
-afterrequest=Data/repcifs@oncenow4..1426703823 Data/repcifs@oncenow3..1426703489 Data/repcifs@Minutely.3.31.na.na.1426703434 Data/repcifs@oncenow2..1426703322 Data/repcifs@oncenow2..1426702999 Data/repcifs@oncenow..1426702773 Data/repcifs@oncenow..1426702578 Data/repcifs@Repli.hourly.4.3.12.na.1426702054 Data/repcifs@Repli.hourly.4.3.12.na.1426701759 Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524
-ll=Data/repcifs@oncenow4..1426703823 Data/repcifs@oncenow3..1426703489 Data/repcifs@Minutely.3.31.na.na.1426703434 Data/repcifs@oncenow2..1426703322 Data/repcifs@oncenow2..1426702999 Data/repcifs@oncenow..1426702773 Data/repcifs@oncenow..1426702578 Data/repcifs@Repli.hourly.4.3.12.na.1426702054 Data/repcifs@Repli.hourly.4.3.12.na.1426701759 Data/repcifs@Repli.hourly.4.3.12.na.1426701726 Data/repcifs@Minutely.3.31.na.na.1426701574 Data/repcifs@Repli.hourly.4.3.12.na.1426701452 Data/repcifs@oncenow..1426700718 Data/repcifs@oncenow..1426700448 Data/repcifs@oncenow..1426700180 Data/repcifs@Minutely.3.31.na.na.1426699834 Data/repcifs@oncenow..1426699153 Data/repcifs@Repli.Minutely.2.2.na.na.1426698895 Data/repcifs@Repli.Minutely.2.2.na.na.1426698840 Data/repcifs@Repli.hourly.2.3.5.na.1426442515 Data/repcifs@jkkj..1426437906 Data/repcifs@Repli.hourly.2.3.5.na.1426112037 Data/repcifs@hourly.4.2.3.na.1426111315 Data/repcifs@from8..1426103844 Data/repcifs@from7..1426103771 Data/repcifs@from7..1426103625 Data/repcifs@hello..1426102524 spot
-targetsnap=Data/repcifs@Repli.hourly.4.3.12.na.1426704012
-initialsnap=Data/repcifs@oncenow4..1426703823
-Remoterequest.sh 10.3.2.8 10.3.2.7 nop repli.sh 3314 Data 10.3.2.8 repcifs
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426704026 nop repli.sh 3314 Data 10.3.2.8 repcifs | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426704026 Authorized received
-loopline=received
-afterrequest=received
-Replicating:./Replicate 10.3.2.8 10.3.2.7 txt/./RemoteSnapshotnowSystem.txt1426704012 Repli.hourly.4.3.12.na.1426704012 Data repcifs
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-echo 10.3.2.8 1426704041 nop GetSnaplist hi | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
-line=1426704041 Authorized received
-loopline=received
-afterrequest=received
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag=Data/repcifs@Repli.hourly.4.3.12.na.1427613025 linen=      47 count=1
+afterAsk=Data/repcifs@Repli.hourly.4.3.12.na.1427613025
+ll=Data/repcifs@Repli.hourly.4.3.12.na.1427613025 spot
+targetsnap=Data/repcifs@Repli.hourly.4.3.12.na.1427613115
+initialsnap=Data/repcifs@Repli.hourly.4.3.12.na.1427613025
+RemoteAsk 10.3.2.7 repli.sh 5089 Data 10.3.2.8 repcifs
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag=ready linen=       6 count=2
+afterAsk=ready
+RemoteAsk 10.3.2.7 GetSnaplist hi
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag=ready linen=       6 count=2
+afterAsk=ready
+POR=5088 RemoteAsk 10.3.2.7 done
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag= linen=       1 count=2
+lineflag= linen=       1 count=3
+lineflag= linen=       1 count=4
+lineflag= linen=       1 count=5
+lineflag= linen=       1 count=6
+lineflag= linen=       1 count=7
+lineflag= linen=       1 count=8
+lineflag= linen=       1 count=9
+lineflag= linen=       1 count=10
+lineflag= linen=       1 count=11
+lineflag= linen=       1 count=12
+lineflag= linen=       1 count=13
+lineflag= linen=       1 count=14
+lineflag= linen=       1 count=15
+lineflag= linen=       1 count=16
+lineflag= linen=       1 count=17
+lineflag= linen=       1 count=18
+lineflag= linen=       1 count=19
+lineflag= linen=       1 count=20
+lineflag= linen=       1 count=21
+afterAsk=
+Replicating:./Replicate 10.3.2.8 10.3.2.7 txt/./RemoteSnapshotnowSystem.txt1427613115 Repli.hourly.4.3.12.na.1427613115 Data repcifs
