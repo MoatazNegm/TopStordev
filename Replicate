@@ -129,4 +129,4 @@ else
  RemoteAsk $dst GetSnaplist hi  
 fi
  echo POR=$POR RemoteAsk $dst done >> txt/tmprequest ; 
- RemoteAsk $dst done ; 
+ RemoteAsk $dst done  & ; 

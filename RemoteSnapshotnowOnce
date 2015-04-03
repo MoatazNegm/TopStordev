@@ -14,5 +14,15 @@ newsnap=`echo $oper1@$newsnap2`;
 /sbin/zfs snapshot $newsnap; 
 /sbin/zfs set repli:sender=$hostip $newsnap;
 /sbin/zfs set repli:receiver=$oper3 $newsnap;
-echo ./Replicate $hostip $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol >> txt/tmprequest
-./Replicate $hostip $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol;
+isproxy=`cat partners.txt | grep $oper3 | awk '{print $3}'`;
+if [[ $isproxy == "true" ]];
+then
+##########with proxy##################################################
+ Pass=`cat partners.txt | grep $oper3 | awk '{print $4}'`;
+ Proxy=`cat proxy.txt`;
+ ./ProxyReplicate $hostip $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol $Proxy $Pass;
+##########noproxy####################################################
+else
+ echo ./Replicate $hostip $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol >> txt/tmprequest
+ ./Replicate $hostip $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol;
+fi

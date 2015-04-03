@@ -185,3 +185,200 @@ lineflag= linen=       1 count=20
 lineflag= linen=       1 count=21
 afterAsk=
 Replicating:./Replicate 10.3.2.8 10.3.2.7 txt/./RemoteSnapshotnowSystem.txt1427613115 Repli.hourly.4.3.12.na.1427613115 Data repcifs
+./Replicate 10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1428072719 hihi..1428072719 Data repcifs
+Replicate=
+Roperands=10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1428072719 hihi..1428072719 Data repcifs
+initxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+echo 10.3.2.8 1428072719 nop ReInit.sh 5079 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
+line=1428072719 Authorized received
+initloopline=received
+initafterrequest=waiting
+pp=5079 while POR=waiting
+RemoteAsk 10.3.2.7 RemoteVolSearch repcifs
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag=found linen=       6 count=1
+afterAsk=found
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag= linen=       1 count=2
+lineflag=Data/repcifs@Repli.hourly.4.3.12.na.1427613115 Data/repcifs@Repli.hourly.4.3.12.na.1427613025 linen=      94 count=3
+afterAsk=Data/repcifs@Repli.hourly.4.3.12.na.1427613115 Data/repcifs@Repli.hourly.4.3.12.na.1427613025
+ll=Data/repcifs@Repli.hourly.4.3.12.na.1427613115 Data/repcifs@Repli.hourly.4.3.12.na.1427613025 spot
+targetsnap=Data/repcifs@hihi..1428072719
+initialsnap=Data/repcifs@Repli.hourly.4.3.12.na.1427613115
+RemoteAsk 10.3.2.7 repli.sh 5080 Data 10.3.2.8 repcifs
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag= linen=       1 count=2
+lineflag= linen=       1 count=3
+lineflag=ready linen=       6 count=4
+afterAsk=ready
+RemoteAsk 10.3.2.7 GetSnaplist hi
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag= linen=       1 count=2
+lineflag= linen=       1 count=3
+lineflag=ready linen=       6 count=4
+afterAsk=ready
+POR=5079 RemoteAsk 10.3.2.7 done
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag= linen=       1 count=2
+lineflag= linen=       1 count=3
+lineflag= linen=       1 count=4
+lineflag= linen=       1 count=5
+lineflag= linen=       1 count=6
+lineflag= linen=       1 count=7
+lineflag= linen=       1 count=8
+lineflag= linen=       1 count=9
+lineflag= linen=       1 count=10
+lineflag= linen=       1 count=11
+lineflag= linen=       1 count=12
+lineflag= linen=       1 count=13
+lineflag= linen=       1 count=14
+lineflag= linen=       1 count=15
+lineflag= linen=       1 count=16
+lineflag= linen=       1 count=17
+lineflag= linen=       1 count=18
+lineflag= linen=       1 count=19
+lineflag= linen=       1 count=20
+lineflag= linen=       1 count=21
+afterAsk=
+./Replicate 10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1428072852 hi2..1428072852 Data repcifs
+Replicate=
+Roperands=10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1428072852 hi2..1428072852 Data repcifs
+initxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+echo 10.3.2.8 1428072854 nop ReInit.sh 4483 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
+line=1428072854 Authorized received
+initloopline=received
+initafterrequest=waiting
+pp=4483 while POR=waiting
+RemoteAsk 10.3.2.7 RemoteVolSearch repcifs
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag=found linen=       6 count=1
+afterAsk=found
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag=Data/repcifs@hihi..1428072719 Data/repcifs@Minutely.3.31.na.na.1428071421 Data/repcifs@Minutely.3.31.na.na.1428069574 Data/repcifs@Minutely.3.31.na.na.1428067834 Data/repcifs@Repli.hourly.4.3.12.na.1427613115 Data/repcifs@Repli.hourly.4.3.12.na.1427613025 linen=     256 count=1
+afterAsk=Data/repcifs@hihi..1428072719 Data/repcifs@Minutely.3.31.na.na.1428071421 Data/repcifs@Minutely.3.31.na.na.1428069574 Data/repcifs@Minutely.3.31.na.na.1428067834 Data/repcifs@Repli.hourly.4.3.12.na.1427613115 Data/repcifs@Repli.hourly.4.3.12.na.1427613025
+ll=Data/repcifs@hihi..1428072719 Data/repcifs@Minutely.3.31.na.na.1428071421 Data/repcifs@Minutely.3.31.na.na.1428069574 Data/repcifs@Minutely.3.31.na.na.1428067834 Data/repcifs@Repli.hourly.4.3.12.na.1427613115 Data/repcifs@Repli.hourly.4.3.12.na.1427613025 spot
+targetsnap=Data/repcifs@hi2..1428072852
+initialsnap=Data/repcifs@hihi..1428072719
+RemoteAsk 10.3.2.7 repli.sh 4484 Data 10.3.2.8 repcifs
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag=ready linen=       6 count=1
+afterAsk=ready
+RemoteAsk 10.3.2.7 GetSnaplist hi
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag= linen=       1 count=2
+lineflag= linen=       1 count=3
+lineflag= linen=       1 count=4
+lineflag= linen=       1 count=5
+lineflag= linen=       1 count=6
+lineflag= linen=       1 count=7
+lineflag= linen=       1 count=8
+lineflag= linen=       1 count=9
+lineflag= linen=       1 count=10
+lineflag= linen=       1 count=11
+lineflag= linen=       1 count=12
+lineflag=ready linen=       6 count=13
+afterAsk=ready
+POR=4483 RemoteAsk 10.3.2.7 done
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag= linen=       1 count=2
+lineflag= linen=       1 count=3
+lineflag= linen=       1 count=4
+lineflag= linen=       1 count=5
+lineflag= linen=       1 count=6
+lineflag= linen=       1 count=7
+lineflag= linen=       1 count=8
+lineflag= linen=       1 count=9
+lineflag= linen=       1 count=10
+lineflag= linen=       1 count=11
+lineflag= linen=       1 count=12
+lineflag= linen=       1 count=13
+lineflag= linen=       1 count=14
+lineflag= linen=       1 count=15
+lineflag= linen=       1 count=16
+lineflag= linen=       1 count=17
+lineflag= linen=       1 count=18
+lineflag= linen=       1 count=19
+lineflag= linen=       1 count=20
+lineflag= linen=       1 count=21
+afterAsk=
+./Replicate 10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1428072916 mezomezo..1428072916 Data repcifs
+Replicate=
+Roperands=10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1428072916 mezomezo..1428072916 Data repcifs
+initxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+echo 10.3.2.8 1428072919 nop ReInit.sh 5723 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
+line=1428072919 Authorized received
+initloopline=received
+initafterrequest=waiting
+pp=5723 while POR=waiting
+RemoteAsk 10.3.2.7 RemoteVolSearch repcifs
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag=found linen=       6 count=2
+afterAsk=found
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag=Data/repcifs@hi2..1428072852 Data/repcifs@hihi..1428072719 Data/repcifs@Minutely.3.31.na.na.1428071421 Data/repcifs@Minutely.3.31.na.na.1428069574 Data/repcifs@Minutely.3.31.na.na.1428067834 Data/repcifs@Repli.hourly.4.3.12.na.1427613115 Data/repcifs@Repli.hourly.4.3.12.na.1427613025 linen=     285 count=2
+afterAsk=Data/repcifs@hi2..1428072852 Data/repcifs@hihi..1428072719 Data/repcifs@Minutely.3.31.na.na.1428071421 Data/repcifs@Minutely.3.31.na.na.1428069574 Data/repcifs@Minutely.3.31.na.na.1428067834 Data/repcifs@Repli.hourly.4.3.12.na.1427613115 Data/repcifs@Repli.hourly.4.3.12.na.1427613025
+ll=Data/repcifs@hi2..1428072852 Data/repcifs@hihi..1428072719 Data/repcifs@Minutely.3.31.na.na.1428071421 Data/repcifs@Minutely.3.31.na.na.1428069574 Data/repcifs@Minutely.3.31.na.na.1428067834 Data/repcifs@Repli.hourly.4.3.12.na.1427613115 Data/repcifs@Repli.hourly.4.3.12.na.1427613025 spot
+targetsnap=Data/repcifs@mezomezo..1428072916
+initialsnap=Data/repcifs@hi2..1428072852
+RemoteAsk 10.3.2.7 repli.sh 5724 Data 10.3.2.8 repcifs
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag=ready linen=       6 count=2
+afterAsk=ready
+RemoteAsk 10.3.2.7 GetSnaplist hi
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag=ready linen=       6 count=1
+afterAsk=ready
+POR=5723 RemoteAsk 10.3.2.7 done
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag= linen=       1 count=2
+lineflag= linen=       1 count=3
+lineflag= linen=       1 count=4
+lineflag= linen=       1 count=5
+lineflag= linen=       1 count=6
+lineflag= linen=       1 count=7
+lineflag= linen=       1 count=8
+lineflag= linen=       1 count=9
+lineflag= linen=       1 count=10
+lineflag= linen=       1 count=11
+lineflag= linen=       1 count=12
+lineflag= linen=       1 count=13
+lineflag= linen=       1 count=14
+lineflag= linen=       1 count=15
+lineflag= linen=       1 count=16
+lineflag= linen=       1 count=17
+lineflag= linen=       1 count=18
+lineflag= linen=       1 count=19
+lineflag= linen=       1 count=20
+lineflag= linen=       1 count=21
+afterAsk=

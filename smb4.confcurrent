@@ -52,19 +52,6 @@ browsable = no
 map archive = yes
 inherit acls = Yes
 ##########################
-;;;;;;;;;; startforAbdo_only
-[forAbdo]
-path = /Data/forAbdo
-read only = no
-browsable = yes
-write list = @everyone
-admin users = administrator
-writeable - Yes
-nt acl support - yes
-inherit acls = Yes
-<<<<<<< HEAD
-=======
-;;;;;;;;;;;;;;;;    stopforAbdo_only
 
 ;;;;;;;;         startrepcifs_only
 [repcifs]
@@ -76,5 +63,15 @@ admin users = administrator
 writeable - Yes
 nt acl support - yes
 inherit acls = Yes
->>>>>>> 1520fb1d45614562e6b2bc2809bdeede4fe4afce
 ;;;;;;;;;;;;;;;;;;;;   stoprepcifs_only
+;;;;;;;;         startrepnew_only
+[repnew]
+path = /Data/repnew
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+;;;;;;;;;;;;;;;;;;;;   stoprepnew_only
