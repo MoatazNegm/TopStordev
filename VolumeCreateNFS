@@ -56,3 +56,4 @@ fi
 fi
 bb=`cat $web`;
 echo $datenow $timenow :$bb > ${logging}2
+echo ready ;
