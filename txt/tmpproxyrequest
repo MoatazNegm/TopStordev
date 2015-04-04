@@ -1,0 +1,14 @@
+Replicate=
+Roperands=10.3.2.8 10.3.2.7 dsdks snap pool vol 10.3.2.6 12345
+initxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+echo 10.3.2.8 1428112369 12345 ProxyReInit.sh 10.3.2.7 3591 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.6 2234
+line= , flagcount=0
+initloopline=failed
+line=1428112369 waiting receiver , flagcount=1
+line=1428112369 waiting receiver
+initloopline=waiting receiver
+initafterrequest=waiting receiver
+pp=3591 while POR=waiting receiver
+cannot make session..receiver session is not ready with proxy
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0

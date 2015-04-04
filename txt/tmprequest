@@ -382,3 +382,72 @@ lineflag= linen=       1 count=19
 lineflag= linen=       1 count=20
 lineflag= linen=       1 count=21
 afterAsk=
+Replicate=
+Roperands=10.3.2.8 10.3.2.7 txt/./RemoteSnapshotnowSystem.txt1428098554 Repli.hourly.4.3.12.na.1428098554 Data repcifs
+initxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+echo 10.3.2.8 1428098554 nop ReInit.sh 3805 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
+line=1428098554 Authorized received
+initloopline=received
+initafterrequest=waiting
+pp=3805 while POR=waiting
+RemoteAsk 10.3.2.7 RemoteVolSearch repcifs
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag=found linen=       6 count=1
+afterAsk=found
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag=Data/repcifs@hihi..1428072719 linen=      30 count=2
+afterAsk=Data/repcifs@hihi..1428072719
+ll=Data/repcifs@hihi..1428072719 spot
+targetsnap=Data/repcifs@Repli.hourly.4.3.12.na.1428098554
+initialsnap=Data/repcifs@hihi..1428072719
+RemoteAsk 10.3.2.7 repli.sh 3806 Data 10.3.2.8 repcifs
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag=ready linen=       6 count=2
+afterAsk=ready
+RemoteAsk 10.3.2.7 GetSnaplist hi
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag= linen=       1 count=2
+lineflag= linen=       1 count=3
+lineflag= linen=       1 count=4
+lineflag= linen=       1 count=5
+lineflag= linen=       1 count=6
+lineflag=ready linen=       6 count=7
+afterAsk=ready
+POR=3805 RemoteAsk 10.3.2.7 done
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag= linen=       1 count=2
+lineflag= linen=       1 count=3
+lineflag= linen=       1 count=4
+lineflag= linen=       1 count=5
+lineflag= linen=       1 count=6
+lineflag= linen=       1 count=7
+lineflag= linen=       1 count=8
+lineflag= linen=       1 count=9
+lineflag= linen=       1 count=10
+lineflag= linen=       1 count=11
+lineflag= linen=       1 count=12
+lineflag= linen=       1 count=13
+lineflag= linen=       1 count=14
+lineflag= linen=       1 count=15
+lineflag= linen=       1 count=16
+lineflag= linen=       1 count=17
+lineflag= linen=       1 count=18
+lineflag= linen=       1 count=19
+lineflag= linen=       1 count=20
+lineflag= linen=       1 count=21
+afterAsk=
+RemoteAsk 10.3.2.6 done
+RemoteAsk 10.3.2.6 done
+RemoteAsk 10.3.2.6 done
+RemoteAsk 10.3.2.6 done
