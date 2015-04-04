@@ -140,8 +140,7 @@ else
   ./GetSnaplist & 
   echo RemoteAsk $proxy $passnew GetSnaplist hi  >> txt/tmpproxyrequest 
   RemoteAsk $proxy $passnew GetSnaplist hi  
- fi
- echo RemoteAsk $proxy $passnew done >> txt/tmprequest ;
- RemoteAsk $proxy $passnew done  & ;
-
+  echo RemoteAsk $proxy $passnew done >> txt/tmprequest ;
+  RemoteAsk $proxy $passnew done  & ;
+ fi 
 fi
