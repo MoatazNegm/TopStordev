@@ -451,3 +451,94 @@ RemoteAsk 10.3.2.6 done
 RemoteAsk 10.3.2.6 done
 RemoteAsk 10.3.2.6 done
 RemoteAsk 10.3.2.6 done
+RemoteAsk 10.3.2.6 1428124758 done
+Replicate=
+Roperands=10.3.2.8 10.3.2.7 txt/./RemoteSnapshotnowSystem.txt1428141754 Repli.hourly.4.3.12.na.1428141754 Data repcifs
+initxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+echo 10.3.2.8 1428141766 nop ReInit.sh 4611 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.7 2234
+line=1428141766 Authorized received
+initloopline=received
+initafterrequest=waiting
+pp=4611 while POR=waiting
+RemoteAsk 10.3.2.7 RemoteVolSearch repcifs
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag=found linen=       6 count=1
+afterAsk=found
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag=Data/repcifs@Repli.hourly.4.3.12.na.1428098554 Data/repcifs@Minutely.3.31.na.na.1428098383 Data/repcifs@Minutely.3.31.na.na.1428096634 Data/repcifs@Minutely.3.31.na.na.1428094774 Data/repcifs@mezomezo..1428072916 Data/repcifs@hi2..1428072852 Data/repcifs@hihi..1428072719 linen=     272 count=1
+afterAsk=Data/repcifs@Repli.hourly.4.3.12.na.1428098554 Data/repcifs@Minutely.3.31.na.na.1428098383 Data/repcifs@Minutely.3.31.na.na.1428096634 Data/repcifs@Minutely.3.31.na.na.1428094774 Data/repcifs@mezomezo..1428072916 Data/repcifs@hi2..1428072852 Data/repcifs@hihi..1428072719
+ll=Data/repcifs@Repli.hourly.4.3.12.na.1428098554 Data/repcifs@Minutely.3.31.na.na.1428098383 Data/repcifs@Minutely.3.31.na.na.1428096634 Data/repcifs@Minutely.3.31.na.na.1428094774 Data/repcifs@mezomezo..1428072916 Data/repcifs@hi2..1428072852 Data/repcifs@hihi..1428072719 spot
+targetsnap=Data/repcifs@Repli.hourly.4.3.12.na.1428141754
+initialsnap=Data/repcifs@Repli.hourly.4.3.12.na.1428098554
+RemoteAsk 10.3.2.7 repli.sh 4612 Data 10.3.2.8 repcifs
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag=ready linen=       6 count=2
+afterAsk=ready
+RemoteAsk 10.3.2.7 GetSnaplist hi
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag= linen=       1 count=2
+lineflag= linen=       1 count=3
+lineflag= linen=       1 count=4
+lineflag= linen=       1 count=5
+lineflag= linen=       1 count=6
+lineflag= linen=       1 count=7
+lineflag= linen=       1 count=8
+lineflag= linen=       1 count=9
+lineflag= linen=       1 count=10
+lineflag= linen=       1 count=11
+lineflag= linen=       1 count=12
+lineflag= linen=       1 count=13
+lineflag= linen=       1 count=14
+lineflag= linen=       1 count=15
+lineflag= linen=       1 count=16
+lineflag= linen=       1 count=17
+lineflag= linen=       1 count=18
+lineflag= linen=       1 count=19
+lineflag=ready linen=       6 count=20
+afterAsk=ready
+POR=4611 RemoteAsk 10.3.2.7 done
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+lineflag= linen=       1 count=0
+lineflag= linen=       1 count=1
+lineflag= linen=       1 count=2
+lineflag= linen=       1 count=3
+lineflag= linen=       1 count=4
+lineflag= linen=       1 count=5
+lineflag= linen=       1 count=6
+lineflag= linen=       1 count=7
+lineflag= linen=       1 count=8
+lineflag= linen=       1 count=9
+lineflag= linen=       1 count=10
+lineflag= linen=       1 count=11
+lineflag= linen=       1 count=12
+lineflag= linen=       1 count=13
+lineflag= linen=       1 count=14
+lineflag= linen=       1 count=15
+lineflag= linen=       1 count=16
+lineflag= linen=       1 count=17
+lineflag= linen=       1 count=18
+lineflag= linen=       1 count=19
+lineflag= linen=       1 count=20
+lineflag= linen=       1 count=21
+afterAsk=
+RemoteAsk 10.3.2.6 1428142696 done
+RemoteAsk 10.3.2.6 4256 done
+RemoteAsk 10.3.2.6 4007 done
+RemoteAsk 10.3.2.6 5254 done
+RemoteAsk 10.3.2.6 5472 done
+RemoteAsk 10.3.2.6 3969 done
+RemoteAsk 10.3.2.6 5834 done
+RemoteAsk 10.3.2.6 4319 done
+RemoteAsk 10.3.2.6 3054 done
+RemoteAsk 10.3.2.6 5172 done
+RemoteAsk 10.3.2.6 5906 done
+RemoteAsk 10.3.2.6 3133 done
+RemoteAsk 10.3.2.6 5852 done

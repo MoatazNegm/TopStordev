@@ -35,21 +35,25 @@ function Remoteinitialize() {
 #############################################################################33
 function RemoteAsk() {
  dst=`echo $@ | awk '{print $1}'`;
- msg=`echo $@ | awk '{$1=""; print substr($0,2)}'`
+ ppc=`echo $@ | awk '{print $2}'`;
+ msg=`echo $@ | awk '{$1=$2=""; print substr($0,3)}'`
+ stamp=`date +%s`
  flagcount=0;
  echo RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx >> txt/tmpproxyrequest
- lineflag=`echo $msg | nc -N  $dst $POR `; 
- lineflagn=`echo $lineflag | wc -c `;
-  echo lineflag=$lineflag  linen=$lineflagn count=$flagcount >> txt/tmpproxyrequest
+ echo echo $stamp $msg \| nc -N  $dst $ppc >> txt/tmpproxyrequest
+ echo $msg | nc -N  $dst $ppc ; 
+ lineflagn=0; flagcount=0;
  while [[ $lineflagn -le 2 && $flagcount -le 40 ]]; do
  {
-  sleep 1
- lineflag=`echo waiting | nc -N $dst $POR`;
- lineflagn=`echo $lineflag | wc -c `;
+ sleep 1
+ flag=`echo waiting | nc -N $dst $ppc`;
+ flag=` echo $flag | grep $stamp `;
+ echo flag=$flag >> txt/tmpproxyrequest
+ if [[ $flag != "waiting" && $flagn -ge 3 ]]; then lineflag=`echo $flag | awk '{$1=""; print substr($0,2)}'`; lineflagn=$flagn; fi;  
   flagcount=$((flagcount+1));
  }
  done;
- if [[ $lineflag == "waiting" ]]; then RR="FAILED"; else RR=$lineflag; fi;
+ RR=$lineflag;
  echo afterAsk=$RR >> txt/tmpproxyrequest
  #echo $lineflag;
 }
@@ -66,9 +70,10 @@ proxy=`echo $@ | awk '{print $7}'`;
 pass=`echo $@ | awk '{print $8}'`;
 pp=$(( 3000+( $(od -An -N2 -i /dev/random) )%(4000-1024+1) ))
 pt=$(( pp+1 ));
+pt2=$(( pp+2 ));
 echo Replicate=$RR >> txt/tmpproxyrequest
 echo Roperands=$@ >> txt/tmpproxyrequest;
-Remoteinitialize $so $proxy $pass ProxyReInit.sh $dst $pp ;
+Remoteinitialize $so $proxy $pass nolicense ProxysendReInit.sh $dst $pp ;
 echo pp=$pp while POR=$POR >> txt/tmpproxyrequest
 proxywait=` echo $POR | awk '{print $1}'`;
 passnew=` echo $POR | awk '{print $3}'`;
@@ -77,9 +82,8 @@ if [[ $proxywait != "waiting" ]]; then echo cannot make session with proxy >> tx
 else 
  if [[ $dstwait != "waiting" ]]; then echo cannot make session..receiver session is not ready with proxy >> txt/tmpproxyrequest; exit 1;
  else 
-  POR=$pp;
-  echo RemoteAsk $proxy $passnew RemoteVolSearch $vol >> txt/tmpproxyrequest
-  RemoteAsk $proxy $passnew RemoteVolSearch $vol ;
+  echo RemoteAsk $proxy $pp RemoteVolSearch $vol >> txt/tmpproxyrequest
+  RemoteAsk $proxy $pp RemoteVolSearch $vol ;
   volfound=$RR;
   echo volfound=$volfound >> txt/tmpproxyrequest
   if [[ $volfound == 'FAILED' ]]; then echo Problem: $volfound >> $filelog; exit 1 ; fi
@@ -89,10 +93,10 @@ else
    volpar=`./RemoteGetPoolVollist $vol`;
    prot=`echo $volpar | awk '{print $1}'`;
    size=`echo $volpar | awk '{print $2}'`;
-   echo RemoteAsk $proxy $passnew VolumeCreate$prot $pool $vol ${size}M admin >> txt/tmpproxyrequest 
-   RemoteAsk $proxy $passnew VolumeCreate$prot $pool $vol ${size}M admin; 
-   echo RemoteAsk $proxy $passnew repli.sh $pt $pool $so $vol >> txt/tmpproxyrequest;
-   tobeready=`RemoteAsk  $proxy $passnew repli.sh $pt $pool $so $vol` ;
+   echo RemoteAsk $proxy $pp VolumeCreate$prot $pool $vol ${size}M admin >> txt/tmpproxyrequest 
+   RemoteAsk $proxy $pp VolumeCreate$prot $pool $vol ${size}M admin; 
+   echo RemoteAsk $proxy $pp repli.sh $pt $pool $so $vol >> txt/tmpproxyrequest;
+   tobeready=`RemoteAsk  $proxy $pp repli.sh $pt $pool $so $vol` ;
 #  echo RemoteAsk $dst GetPoolVollist hi  >> txt/tmpproxyrequest; 
 #  RemoteAsk $dst GetPoolVollist hi  
    echo zfs send -D $pool/$vol@$snap  \| openssl enc -a -A -aes-256-cbc -k SuperSecretPWD \| gzip -cf \| nc -N  $proxy $pt  >> txt/tmpproxyrequest;
@@ -101,8 +105,8 @@ else
    if [[ $volfound == "found" ]];
    then
     echo foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn >> txt/tmpproxyrequest
-    echo RemoteAsk $proxy $passnew RemoteGetSnaplist $vol >> txt/tmpproxyrequest;
-    RemoteAsk $proxy $passnew RemoteGetSnaplist $vol;
+    echo RemoteAsk $proxy $pp RemoteGetSnaplist $vol >> txt/tmpproxyrequest;
+    RemoteAsk $proxy $pp RemoteGetSnaplist $vol;
     oldsnaps=$RR
     localsnaps=`./RemoteGetSnaplist $vol`;
     ll=$oldsnaps;
@@ -123,24 +127,25 @@ else
     if [[ $initialsnap == "" ]];
     then 
      echo yyyyyyyyyyyyyintital is null >> txt/tmpproxyrequest 
-     echo RemoteAsk  $proxy $passnew destroysnaps.sh $vol >> txt/tmpproxyrequest;
-     RemoteAsk $proxy $passnew destroysnaps.sh $vol ;
-     echo RemoteAsk $proxy $passnew repli.sh $pt $pool $so $voli >> txt/tmpproxyrequest;
-     RemoteAsk $proxy $passnew repli.sh $pt $pool $so $vol;
+     echo RemoteAsk  $proxy $pp destroysnaps.sh $vol >> txt/tmpproxyrequest;
+     RemoteAsk $proxy $pp destroysnaps.sh $vol ;
+     echo RemoteAsk $proxy $pp repli.sh $pt $pool $so $voli >> txt/tmpproxyrequest;
+     RemoteAsk $proxy $pp repli.sh $pt $pool $so $vol;
      echo zfs send -R   $targetsnap  \| openssl enc -a -A -aes-256-cbc -k SuperSecretPWD \| gzip -cf \| nc -N  $proxy $pt >> txt/tmpproxyrequest
      zfs send -R   $targetsnap  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $proxy $pt;
     else
-     echo RemoteAsk $proxy $passnew repli.sh $pt $pool $so $vol >> txt/tmpproxyrequest;
-     RemoteAsk $proxy $passnew repli.sh $pt $pool $so $vol;
+     echo RemoteAsk $proxy $pp repli.sh $pt $pool $so $vol >> txt/tmpproxyrequest;
+     RemoteAsk $proxy $pp repli.sh $pt $pool $so $vol;
      echo zfs send -R -I $initialsnap  $targetsnap  \| openssl enc -a -A -aes-256-cbc -k SuperSecretPWD \| gzip -cf \| nc -N  $proxy $pt >> txt/tmpproxyrequest;
      zfs send -R -I $initialsnap  $targetsnap  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $proxy $pt;
     fi
    fi
   fi
   ./GetSnaplist & 
-  echo RemoteAsk $proxy $passnew GetSnaplist hi  >> txt/tmpproxyrequest 
-  RemoteAsk $proxy $passnew GetSnaplist hi  
-  echo RemoteAsk $proxy $passnew done >> txt/tmprequest ;
-  RemoteAsk $proxy $passnew done  & ;
+  echo RemoteAsk $proxy $pp GetSnaplist hi  >> txt/tmpproxyrequest 
+  RemoteAsk $proxy $pp GetSnaplist hi  
+  echo RemoteAsk $proxy $pp done >> txt/tmprequest ;
+  RemoteAsk $proxy $pp done  & ;
+  RemoteAsk $proxy $pt2 done  & ;
  fi 
 fi

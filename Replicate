@@ -38,7 +38,7 @@ function RemoteAsk() {
   echo lineflag=$lineflag  linen=$lineflagn count=$flagcount >> txt/tmprequest
  while [[ $lineflagn -le 2 && $flagcount -le 20 ]]; do
  {
-  sleep 1
+#  sleep 1
  lineflag=`echo waiting | nc -N $dst $POR`;
  lineflagn=`echo $lineflag | wc -c `;
   flagcount=$((flagcount+1));
