@@ -1,2 +1,2 @@
-10.3.2.8 sender
+10.3.2.8 sender true mezomezo
 10.3.2.7 receiver

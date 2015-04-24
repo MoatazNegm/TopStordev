@@ -382,6 +382,2997 @@ admin users = administrator
 writeable - Yes
 nt acl support - yes
 inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+>>>>>>> 1520fb1d45614562e6b2bc2809bdeede4fe4afce
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+<<<<<<< HEAD
+=======
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+>>>>>>> 1520fb1d45614562e6b2bc2809bdeede4fe4afce
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+<<<<<<< HEAD
+=======
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+>>>>>>> 1520fb1d45614562e6b2bc2809bdeede4fe4afce
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+<<<<<<< HEAD
+=======
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+>>>>>>> 1520fb1d45614562e6b2bc2809bdeede4fe4afce
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+<<<<<<< HEAD
+=======
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+>>>>>>> 1520fb1d45614562e6b2bc2809bdeede4fe4afce
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+<<<<<<< HEAD
+=======
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+>>>>>>> 1520fb1d45614562e6b2bc2809bdeede4fe4afce
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+<<<<<<< HEAD
+=======
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+>>>>>>> 1520fb1d45614562e6b2bc2809bdeede4fe4afce
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+<<<<<<< HEAD
+=======
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
 ;;;;;;;;         startrepcifs_only
 [repcifs]
 path = /Data/repcifs
@@ -393,6 +3384,26 @@ writeable - Yes
 nt acl support - yes
 inherit acls = Yes
 >>>>>>> 1520fb1d45614562e6b2bc2809bdeede4fe4afce
+;;;;;;;;         startrepcifs_only
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+;;;;;;;;         startrepcifs_only
+[repcifs]
+path = /Data/repcifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
 ;;;;;;;;         startrepcifs_only
 [repcifs]
 path = /Data/repcifs

@@ -62,8 +62,6 @@ admin users = administrator
 writeable - Yes
 nt acl support - yes
 inherit acls = Yes
-<<<<<<< HEAD
-=======
 ;;;;;;;;;;;;;;;;    stopforAbdo_only
 
 ;;;;;;;;         startrepcifs_only
@@ -76,5 +74,4 @@ admin users = administrator
 writeable - Yes
 nt acl support - yes
 inherit acls = Yes
->>>>>>> 1520fb1d45614562e6b2bc2809bdeede4fe4afce
 ;;;;;;;;;;;;;;;;;;;;   stoprepcifs_only
