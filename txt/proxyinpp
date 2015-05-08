@@ -1,578 +1,84 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-RemoteVolSearch vol
-ready
-dodo
-dodo
-RemoteVolSearch vol
-RemoteVolSearch vol
-RemoteVolSearch vol
-RemoteVolSearch vol
-RemoteVolSearch vol
-RemoteVolSearch vol
-wait vol
-wait vol
-wait vol
-RemoteVolSearch vol
-RemoteVolSearch repcifs
-RemoteVolSearch repcifs
-RemoteVolSearch repcifs
-RemoteVolSearch repcifs
-RemoteVolSearch repcifs
-RemoteVolSearch repcifs
-RemoteVolSearch repcifs
-done
-RemoteVolSearch repcifs
-RemoteVolSearch repcifs
-done
-RemoteVolSearch repcifs
-done
-RemoteVolSearch vol
-RemoteVolSearch vol
-RemoteVolSearch vol
-VolumeCreate pool vol M admin
-repli.sh 4257 pool 10.3.2.8 vol
-GetSnaplist hi
-done
-RemoteVolSearch repcifs
-RemoteGetSnaplist repcifs
-repli.sh 4008 Data 10.3.2.8 repcifs
-GetSnaplist hi
-done
-RemoteVolSearch repcifs
-RemoteGetSnaplist repcifs
-repli.sh 5255 Data 10.3.2.8 repcifs
-GetSnaplist hi
-done
-RemoteVolSearch repcifs
-RemoteGetSnaplist repcifs
-repli.sh 5473 Data 10.3.2.8 repcifs
-GetSnaplist hi
-done
-RemoteVolSearch repcifs
-RemoteGetSnaplist repcifs
-repli.sh 3970 Data 10.3.2.8 repcifs
-GetSnaplist hi
-done
-RemoteVolSearch repcifs
-VolumeCreateCIFS Data repcifs 1024M admin
-repli.sh 5835 Data 10.3.2.8 repcifs
-GetSnaplist hi
-done
-RemoteVolSearch repcifs
-VolumeCreateCIFS Data repcifs 1024M admin
-repli.sh 4320 Data 10.3.2.8 repcifs
-GetSnaplist hi
-done
-RemoteVolSearch repcifs
-GetSnaplist hi
-done
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-repcifs
-
-
-repcifs
-
-
-
-
-
+1430529178
+status: stamp=1430583611 e=ready
+e=ready sendingready=1430583611 ready
+status: stamp=1430583611 e=ready
+e=ready sendingready=1430583611 ready
+status: stamp=1430583611 e=ready
+e=ready sendingready=1430583611 ready
+status: stamp=1430583637 e=10.3.2.7
+1430583637
+status: stamp=1430583930 e=ready
+e=ready sendingready=1430583930 ready
+status: stamp=1430583930 e=ready
+e=ready sendingready=1430583930 ready
+status: stamp=1430583975 e=RemoteVolSearch
+1430583975 no
+status: stamp=1430584041 e=ready
+e=ready sendingready=1430584041 ready
+status: stamp=1430584041 e=ready
+e=ready sendingready=1430584041 ready
+status: stamp=1430584054 e=RemoteVolSearch
+1430584054 no
+status: stamp=1430584307 e=ready
+e=ready sendingready=1430584307 ready
+status: stamp=1430584307 e=ready
+e=ready sendingready=1430584307 ready
+status: stamp=1430584307 e=ready
+e=ready sendingready=1430584307 ready
+status: stamp=1430584320 e=RemoteVolSearch repcifs
+1430584320 found
+status: stamp=1430584537 e=ready
+e=ready sendingready=1430584537 ready
+status: stamp=1430584537 e=ready
+e=ready sendingready=1430584537 ready
+status: stamp=1430584549 e=RemoteVolSearch repcifs
+1430584549 found
+status: stamp=1430584549 e=RemoteVolSearch repcifs
+status: stamp=1430584562 e=10.3.2.7 RemoteGetSnaplist repcifs
+1430584562
+status: stamp=1430584562 e=10.3.2.7 RemoteGetSnaplist repcifs
+status: stamp=1430584562 e=10.3.2.7 RemoteGetSnaplist repcifs
+status: stamp=1430584576 e=10.3.2.7 destroysnaps.sh repcifs
+1430584576
+status: stamp=1430584576 e=10.3.2.7 destroysnaps.sh repcifs
+status: stamp=1430584576 e=10.3.2.7 destroysnaps.sh repcifs
+status: stamp=1430584590 e=10.3.2.7 repli.sh 4450 Data 10.3.2.8 repcifs
+1430584590
+status: stamp=1430584590 e=10.3.2.7 repli.sh 4450 Data 10.3.2.8 repcifs
+status: stamp=1430584590 e=10.3.2.7 repli.sh 4450 Data 10.3.2.8 repcifs
+status: stamp=1430584610 e=10.3.2.7 GetSnaplist hi
+1430584610
+status: stamp=1430584610 e=10.3.2.7 GetSnaplist hi
+status: stamp=1430584623 e=10.3.2.7 done
+1430584623
+status: stamp=1430584623 e=10.3.2.7 done
+status: stamp=1430584623 e=10.3.2.7 done
+status: stamp=1430584907 e=ready
+e=ready sendingready=1430584907 ready
+status: stamp=1430584907 e=ready
+e=ready sendingready=1430584907 ready
+status: stamp=1430584921 e=RemoteVolSearch repcifs
+1430584921 found
+status: stamp=1430584921 e=RemoteVolSearch repcifs
+status: stamp=1430584933 e=RemoteGetSnaplist repcifs
+1430584933
+status: stamp=1430584943 e=destroysnaps.sh repcifs
+1430584943 ready
+status: stamp=1430584943 e=destroysnaps.sh repcifs
+status: stamp=1430584943 e=destroysnaps.sh repcifs
+status: stamp=1430584956 e=repli.sh 4450 Data 10.3.2.8 repcifs
+status: stamp=1430585207 e=done
+1430585207
+status: stamp=hi e=
+hi
+status: stamp=hi e=
+status: stamp=hi e=
+hi
+status: stamp=hi e=
+status: stamp=ls e=
+ls
+status: stamp=ls e=
+status: stamp=hi e=
+hi
+status: stamp=hi e=
+hi

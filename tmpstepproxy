@@ -1,0 +1,2 @@
+echo 10.3.2.7 iwlaniwlan nop iwlanwlanwlanwlan ProxyrcvReInit.sh 10.3.2.8 3333 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.6 2234
+echo waiting | nc -N 10.3.2.6 
