@@ -1,3 +1,4 @@
 */31 * * * * /TopStor/pump.sh Snapshotnow Data/repcifs Minutely.3.31.na.na
 37 17 * * Thu /TopStor/pump.sh Snapshotnow Data/repcifs Weekly.1.17.37.Thu
 3 */12 * * * /TopStor/pump.sh RemoteSnapshotnow Data/repcifs hourly.4.3.12.na 10.3.2.7
+*/3 * * * * /TopStor/pump.sh RemoteSnapshotnow Data/repcifs Minutely.2.3.na.na 10.3.2.7

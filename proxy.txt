@@ -1,1 +1,1 @@
-ec2-54-149-130-49.us-west-2.compute.amazonaws.com
+10.3.2.6 iwlanwlanwlanwlan 

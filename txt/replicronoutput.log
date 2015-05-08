@@ -1,17 +1,20 @@
 oper=Data/repcifs hourly.4.3.12.na 10.3.2.7
 oper1=Data/repcifs
 oper2=hourly.4.3.12.na
-stamp=1428141754
+stamp=1430517754
 keep=4
-currentsnaps=Data/repcifs@Repli.hourly.4.3.12.na.1427613025
-Data/repcifs@Repli.hourly.4.3.12.na.1427613115
-Data/repcifs@Repli.hourly.4.3.12.na.1428098554
-oldsnap=Data/repcifs@Repli.hourly.4.3.12.na.1427613025
-countsnap=       3
-countsnapplus=4
+currentsnaps=Data/repcifs@Repli.hourly.4.3.12.na.1428141754
+Data/repcifs@Repli.hourly.4.3.12.na.1429912889
+Data/repcifs@Repli.hourly.4.3.12.na.1430358069
+Data/repcifs@Repli.hourly.4.3.12.na.1430358309
+oldsnap=Data/repcifs@Repli.hourly.4.3.12.na.1428141754
+countsnap=       4
+countsnapplus=5
 keeppluszero=4
-newsnap2=Repli.hourly.4.3.12.na.1428141754
-newsnap=Data/repcifs@Repli.hourly.4.3.12.na.1428141754
+{"Date":"05/02/2015","time":"00:02:40","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/repcifs@Repli.hourly.4.3.12.na.1428141754"}
+newsnap2=Repli.hourly.4.3.12.na.1430517754
+newsnap=Data/repcifs@Repli.hourly.4.3.12.na.1430517754
+./ProxyReplicate 10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1430517754 Repli.hourly.4.3.12.na.1430517754 repcifs 10.3.2.6 iwlanwlanwlanwlan  admin
 snapshotresult :
-filenameis=txt/./RemoteSnapshotnowSystem.txt1428141754
-{"Date":"04/04/2015","time":"12:03:37","msg":"info","user":"System","data":"Success_Replicating_Snapshot:Data/repcifs@Repli.hourly.4.3.12.na.1428141754"}
+filenameis=txt/./RemoteSnapshotnowSystem.txt1430517754
+{"Date":"05/02/2015","time":"00:02:56","msg":"info","user":"System","data":"Success_Replicating_Snapshot:Data/repcifs@Repli.hourly.4.3.12.na.1430517754"}
