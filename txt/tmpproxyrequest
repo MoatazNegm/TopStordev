@@ -1,5 +1,324 @@
 Replicate=
 Roperands=10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1430584903 zizo..1430584903 Data repcifs
+OPERS 10.3.2.8 10.3.2.7 ProxysendReInit.sh 10.3.2.7 4449
 initporxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
-echo 10.3.2.8 1431108147 10.3.2.7 iwlanwlanwlanwlan ProxysendReInit.sh 10.3.2.7 4449 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.6 2234
+echo 10.3.2.8 1431167665 10.3.2.7 iwlanwlanwlanwlan ProxysendReInit.sh 10.3.2.7 4449 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.6 2234
 /usr/local/bin/socat TCP4:10.3.2.6:4449,reuseaddr GOPEN:txt/cin4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+initporxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+echo 10.3.2.8 1431167671 10.3.2.7 iwlanwlanwlanwlan ProxysendReInit.sh 10.3.2.7 4449 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.6 2234
+/usr/local/bin/socat TCP4:10.3.2.6:4449,reuseaddr GOPEN:txt/cin4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+Replicate=
+Roperands=10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1430584903 zizo..1430584903 Data repcifs
+OPERS 10.3.2.8 10.3.2.7 ProxysendReInit.sh 10.3.2.7 4449
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Remotestamp=1431167710 ready
+initporxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+echo 10.3.2.8 1431167710 10.3.2.7 iwlanwlanwlanwlan ProxysendReInit.sh 10.3.2.7 4449 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.6 2234
+initporxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+echo 10.3.2.8 1431167711 10.3.2.7 iwlanwlanwlanwlan ProxysendReInit.sh 10.3.2.7 4449 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.6 2234
+/usr/local/bin/socat TCP4:10.3.2.6:4449,reuseaddr GOPEN:txt/cin4449
+/usr/local/bin/socat TCP4:10.3.2.6:4449,reuseaddr GOPEN:txt/cin4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449 5
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449 97
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449 97
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449 97
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449 97
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+flag1=1431167710
+lineflag=1431167710 linen=      11 count=1
+afterAsk=
+RR=
+donennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+Replicate=
+Roperands=10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1430584903 zizo..1430584903 Data repcifs
+OPERS 10.3.2.8 10.3.2.7 ProxysendReInit.sh 10.3.2.7 4449
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Remotestamp=1431167741 ready
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+flag1=
+lineflag= linen=       1 count=1
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+Replicate=
+Roperands=10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1430584903 zizo..1430584903 Data repcifs
+OPERS 10.3.2.8 10.3.2.7 ProxysendReInit.sh 10.3.2.7 4449
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Remotestamp=1431168045 ready
+initporxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+echo 10.3.2.8 1431168045 10.3.2.7 iwlanwlanwlanwlan ProxysendReInit.sh 10.3.2.7 4449 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.6 2234
+initporxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+echo 10.3.2.8 1431168045 10.3.2.7 iwlanwlanwlanwlan ProxysendReInit.sh 10.3.2.7 4449 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.6 2234
+/usr/local/bin/socat TCP4:10.3.2.6:4449,reuseaddr GOPEN:txt/cin4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat TCP4:10.3.2.6:4449,reuseaddr GOPEN:txt/cin4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449 5
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449 97
+initporxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+echo 10.3.2.8 1431168052 10.3.2.7 iwlanwlanwlanwlan ProxysendReInit.sh 10.3.2.7 4449 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.6 2234
+/usr/local/bin/socat TCP4:10.3.2.6:4449,reuseaddr GOPEN:txt/cin4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+flag1=1431168045
+lineflag=1431168045 linen=      11 count=1
+afterAsk=
+RR=
+donennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+Replicate=
+Roperands=10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1430584903 zizo..1430584903 Data repcifs
+OPERS 10.3.2.8 10.3.2.7 ProxysendReInit.sh 10.3.2.7 4449
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Remotestamp=1431168117 ready
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+flag1=
+lineflag= linen=       1 count=1
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+Replicate=
+Roperands=10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1430584903 zizo..1430584903 Data repcifs
+OPERS 10.3.2.8 10.3.2.7 ProxysendReInit.sh 10.3.2.7 4449
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Remotestamp=1431168349 ready
+flag1=1431168349 ready
+lineflag=1431168349 ready linen=      17 count=1
+afterAsk=ready
+RR=ready
+donennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+Replicate=
+Roperands=10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1430584903 zizo..1430584903 Data repcifs
+OPERS 10.3.2.8 10.3.2.7 ProxysendReInit.sh 10.3.2.7 4449
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Remotestamp=1431168450 ready
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+flag1=
+lineflag= linen=       1 count=1
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+flag1=
+lineflag= linen=       1 count=2
+Replicate=
+Roperands=10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1430584903 zizo..1430584903 Data repcifs
+OPERS 10.3.2.8 10.3.2.7 ProxysendReInit.sh 10.3.2.7 4449
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Remotestamp=1431168528 ready
+initporxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+echo 10.3.2.8 1431168528 10.3.2.7 iwlanwlanwlanwlan ProxysendReInit.sh 10.3.2.7 4449 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.6 2234
+/usr/local/bin/socat TCP4:10.3.2.6:4449,reuseaddr GOPEN:txt/cin4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+initporxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+echo 10.3.2.8 1431168535 10.3.2.7 iwlanwlanwlanwlan ProxysendReInit.sh 10.3.2.7 4449 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.6 2234
+/usr/local/bin/socat TCP4:10.3.2.6:4449,reuseaddr GOPEN:txt/cin4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+flag1=1431168528 ready
+lineflag=1431168528 ready linen=      17 count=1
+afterAsk=ready
+RR=ready
+donennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+Replicate=
+Roperands=10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1430584903 zizo..1430584903 Data repcifs
+OPERS 10.3.2.8 10.3.2.7 ProxysendReInit.sh 10.3.2.7 4449
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Remotestamp=1431168830 ready
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+flag1=
+lineflag= linen=       1 count=1
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+flag1=
+lineflag= linen=       1 count=2
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+flag1=
+lineflag= linen=       1 count=3
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+flag1=
+lineflag= linen=       1 count=4
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+flag1=
+lineflag= linen=       1 count=5
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+Replicate=
+Roperands=10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1430584903 zizo..1430584903 Data repcifs
+OPERS 10.3.2.8 10.3.2.7 ProxysendReInit.sh 10.3.2.7 4449
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Remotestamp=1431169144 ready
+flag1=1431169144 ready
+lineflag=1431169144 ready linen=      17 count=1
+afterAsk=ready
+RR=ready
+donennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+Replicate=
+Roperands=10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1430584903 zizo..1430584903 Data repcifs
+OPERS 10.3.2.8 10.3.2.7 ProxysendReInit.sh 10.3.2.7 4449
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Remotestamp=1431169162 ready
+flag1=1431169162 ready
+lineflag=1431169162 ready linen=      17 count=1
+afterAsk=ready
+RR=ready
+donennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+Replicate=
+Roperands=10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1430584903 zizo..1430584903 Data repcifs
+OPERS 10.3.2.8 10.3.2.7 ProxysendReInit.sh 10.3.2.7 4449
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Remotestamp=1431169181 ready
+flag1=1431169181 ready
+lineflag=1431169181 ready linen=      17 count=1
+afterAsk=ready
+RR=ready
+donennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+initporxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+echo 10.3.2.8 1431169213 10.3.2.7 iwlanwlanwlanwlan ProxysendReInit.sh 10.3.2.7 4449 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.6 2234
+/usr/local/bin/socat TCP4:10.3.2.6:4449,reuseaddr GOPEN:txt/cin4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+Replicate=
+Roperands=10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1430584903 zizo..1430584903 Data repcifs
+OPERS 10.3.2.8 10.3.2.7 ProxysendReInit.sh 10.3.2.7 4449
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Remotestamp=1431169251 ready
+initporxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+echo 10.3.2.8 1431169252 10.3.2.7 iwlanwlanwlanwlan ProxysendReInit.sh 10.3.2.7 4449 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.6 2234
+/usr/local/bin/socat TCP4:10.3.2.6:4449,reuseaddr GOPEN:txt/cin4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+initporxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+echo 10.3.2.8 1431169259 10.3.2.7 iwlanwlanwlanwlan ProxysendReInit.sh 10.3.2.7 4449 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N 10.3.2.6 2234
+/usr/local/bin/socat TCP4:10.3.2.6:4449,reuseaddr GOPEN:txt/cin4449
+/usr/local/bin/socat -u TCP4:10.3.2.6:4450,reuseaddr GOPEN:txt/cout4449
+flag1=1431169251 ready
+lineflag=1431169251 ready linen=      17 count=1
+afterAsk=ready
+RR=ready
+donennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+Replicate=
+Roperands=10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1430584903 zizo..1430584903 Data repcifs
+OPERS 10.3.2.8 10.3.2.7 ProxysendReInit.sh 10.3.2.7 4449
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Remotestamp=1431169281 ready
+flag1=1431169281 ready
+lineflag=1431169281 ready linen=      17 count=1
+afterAsk=ready
+RR=ready
+donennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn

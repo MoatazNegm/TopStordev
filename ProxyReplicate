@@ -4,40 +4,6 @@ export POR;
 export RR; 
 export PROXY;
 export OPERS;
-function Proxyinitialize() {
- so=`echo $@ | awk '{print $1}'`;
- dst=`echo $@ | awk '{print $2}'`;
- msg=`echo $@ | awk '{$1=$2=""; print substr($0,3)}'`
- proxyser=`cat proxy.txt | awk '{print $1}'`;
- license=` cat proxy.txt | awk '{print $2}'`;
- lineflag="failed"
- stamp=`date +%s`
- read -t 2  line</tmp/msgrack ;
- echo initporxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy >> txt/tmpproxyrequest
- echo $so $stamp $dst $license $msg  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N $proxyser 2234
- echo echo $so $stamp $dst $license $msg  \| openssl enc -a -A -aes-256-cbc -k SuperSecretPWD \| gzip -cf \| nc -N $proxyser 2234 >> txt/tmpproxyrequest
- sleep 5
- mkfifo txt/cin$POR  txt/cout$POR
- echo /usr/local/bin/socat TCP4:$proxyser:$POR,reuseaddr GOPEN:txt/cin$POR >>txt/tmpproxyrequest 
- /usr/local/bin/socat TCP4:$proxyser:$POR,reuseaddr GOPEN:txt/cin$POR &
- porplus=$((POR+1));
- porplusin=`ps -auxw | grep -w $porplus | wc -c`;
- porplusinn=$((porplusin+0));
- if [[ $porplusinn -le 3 ]]; 
- then
-  socatit=5;
-  while [[ socatit -ge 4 ]]; do
-  {
-   echo /usr/local/bin/socat -u TCP4:$proxyser:$porplus,reuseaddr GOPEN:txt/cout$POR $socatit 2>txt/socatit >> txt/tmpproxyrequest
-   /usr/local/bin/socat -u TCP4:$proxyser:$porplus,reuseaddr GOPEN:txt/cout$POR 2>txt/socatit &
-   socatit=` cat txt/socatit | wc -c `
-   socatit=$((socatit+0));
-  }
-  done; 
- fi
- PROXY=$proxyser;
-}
-#############################################################################
 #############################################################################33
 function RemoteAsk() {
  RR="";
@@ -45,17 +11,12 @@ function RemoteAsk() {
  msg=`echo $@ `;
  flagcount=0;
  echo RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx >> txt/tmpproxyrequest
-# tmptmp=`echo $stamp $msg | nc -N  $PROXY $POR` ; 
  lineflagn=0;
  echo Remotestamp=$stamp $msg  >> txt/tmpproxyrequest;
  while [[ $lineflagn -le 2 && $flagcount -le 20 ]]; do
  {
-  issocat=`ps -axuw | grep socat | grep "$POR" | wc -c`
-  if [[  issocat -le 3 ]]; then Proxyinitialize $OPERS; fi
-  echo $stamp $msg > txt/cin$POR &;
-  sleep 5;
+  echo $stamp $msg > txt/cin$POR ;
   read -t 5 lineflag1<txt/cout$POR;
-#  lineflag1=`echo $stamp $msg | nc -N $PROXY $POR `;
   echo flag1=$lineflag1 >> txt/tmpproxyrequest; 
   lineflag=` echo $lineflag1 | grep -w "$stamp" | tail -n 1 `;
   lineflagn=`echo $lineflag | wc -c `;
@@ -84,12 +45,15 @@ pt=$(( pp+1 ));
 echo Replicate=$RR >> txt/tmpproxyrequest
 echo Roperands=$@ >> txt/tmpproxyrequest;
 OPERS=`echo $so $dst ProxysendReInit.sh $dst $pp`;
-Proxyinitialize $so $dst ProxysendReInit.sh $dst $pp;
-#Remoteinitialize $so $dst nop ReInit.sh $pp ;
-exit
+echo OPERS $OPERS >> txt/tmpproxyrequest
+issocat=`ps -axuw | grep ProxyReplicateSVC | grep -w "$dst" |  wc -c `
+if [[ $issocat -le 3 ]]; then 
+./ProxyReplicateSVC.sh $OPERS &
+fi
 RemoteAsk  ready; 
 echo RR=$RR  >> txt/tmpproxyrequest
 echo donennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn >> txt/tmpproxyrequest
+exit
 if [[ $RR != "ready" ]]; then echo cannot make session;
 else 
  POR=$pp;
