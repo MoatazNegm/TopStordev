@@ -8,7 +8,7 @@ while true;  do
  issocat=`ps -auxw | grep -w socat | grep "$ppplus" | wc -c `;
  if [[ $issocat -le 3 ]];
  then
-  /usr/local/bin/socat TCP4:$Proxy:$ppplus,reuseaddr GOPEN:txt/cin$pp &
+  /usr/local/bin/socat TCP4:$Proxy:$ppplus,reuseaddr GOPEN:txt/cin$ppplus &
  sleep 1;
  fi
  issocat=`ps -auxw | grep -w socat | grep "$pp" | wc -c `;

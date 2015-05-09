@@ -23,7 +23,7 @@ while [[ $e != "done" ]]; do
   echo status: stamp=$stamp e=$e >> txt/proxyinpp
   if [[ $e == "ready" ]]; 
   then 
-    echo $stamp ready > txt/cin$pp;
+    echo $stamp ready > txt/cin$ppplus;
     echo e=$e sendingready=$stamp ready >> txt/proxyinpp;
   else
    if [[ $oldstamp != $stamp ]];
@@ -33,9 +33,9 @@ while [[ $e != "done" ]]; do
     par=`echo $e | awk '{$1="";print substr($0,2)}'`;
     res=` ./$req $par `;
     echo $stamp $res  >> txt/proxyinpp ; 
-    echo $stamp $res  > txt/cin$pp ; 
+    echo $stamp $res  > txt/cin$ppplus ; 
    else
-    echo $stamp $res > txt/cin$pp;
+    echo $stamp $res > txt/cin$ppplus;
    fi 
   fi
  fi
