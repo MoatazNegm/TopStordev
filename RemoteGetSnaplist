@@ -8,5 +8,5 @@ if [[ $wlines -ge 2 ]];
 then
 echo $lines  |  sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/ /g'  ;
 else 
-echo $lines;
+echo nothing;
 fi

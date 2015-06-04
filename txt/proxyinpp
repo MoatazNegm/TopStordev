@@ -1,200 +1,1089 @@
-1430529178
-status: stamp=1430583611 e=ready
-e=ready sendingready=1430583611 ready
-status: stamp=1430583611 e=ready
-e=ready sendingready=1430583611 ready
-status: stamp=1430583611 e=ready
-e=ready sendingready=1430583611 ready
-status: stamp=1430583637 e=10.3.2.7
-1430583637
-status: stamp=1430583930 e=ready
-e=ready sendingready=1430583930 ready
-status: stamp=1430583930 e=ready
-e=ready sendingready=1430583930 ready
-status: stamp=1430583975 e=RemoteVolSearch
-1430583975 no
-status: stamp=1430584041 e=ready
-e=ready sendingready=1430584041 ready
-status: stamp=1430584041 e=ready
-e=ready sendingready=1430584041 ready
-status: stamp=1430584054 e=RemoteVolSearch
-1430584054 no
-status: stamp=1430584307 e=ready
-e=ready sendingready=1430584307 ready
-status: stamp=1430584307 e=ready
-e=ready sendingready=1430584307 ready
-status: stamp=1430584307 e=ready
-e=ready sendingready=1430584307 ready
-status: stamp=1430584320 e=RemoteVolSearch repcifs
-1430584320 found
-status: stamp=1430584537 e=ready
-e=ready sendingready=1430584537 ready
-status: stamp=1430584537 e=ready
-e=ready sendingready=1430584537 ready
-status: stamp=1430584549 e=RemoteVolSearch repcifs
-1430584549 found
-status: stamp=1430584549 e=RemoteVolSearch repcifs
-status: stamp=1430584562 e=10.3.2.7 RemoteGetSnaplist repcifs
-1430584562
-status: stamp=1430584562 e=10.3.2.7 RemoteGetSnaplist repcifs
-status: stamp=1430584562 e=10.3.2.7 RemoteGetSnaplist repcifs
-status: stamp=1430584576 e=10.3.2.7 destroysnaps.sh repcifs
-1430584576
-status: stamp=1430584576 e=10.3.2.7 destroysnaps.sh repcifs
-status: stamp=1430584576 e=10.3.2.7 destroysnaps.sh repcifs
-status: stamp=1430584590 e=10.3.2.7 repli.sh 4450 Data 10.3.2.8 repcifs
-1430584590
-status: stamp=1430584590 e=10.3.2.7 repli.sh 4450 Data 10.3.2.8 repcifs
-status: stamp=1430584590 e=10.3.2.7 repli.sh 4450 Data 10.3.2.8 repcifs
-status: stamp=1430584610 e=10.3.2.7 GetSnaplist hi
-1430584610
-status: stamp=1430584610 e=10.3.2.7 GetSnaplist hi
-status: stamp=1430584623 e=10.3.2.7 done
-1430584623
-status: stamp=1430584623 e=10.3.2.7 done
-status: stamp=1430584623 e=10.3.2.7 done
-status: stamp=1430584907 e=ready
-e=ready sendingready=1430584907 ready
-status: stamp=1430584907 e=ready
-e=ready sendingready=1430584907 ready
-status: stamp=1430584921 e=RemoteVolSearch repcifs
-1430584921 found
-status: stamp=1430584921 e=RemoteVolSearch repcifs
-status: stamp=1430584933 e=RemoteGetSnaplist repcifs
-1430584933
-status: stamp=1430584943 e=destroysnaps.sh repcifs
-1430584943 ready
-status: stamp=1430584943 e=destroysnaps.sh repcifs
-status: stamp=1430584943 e=destroysnaps.sh repcifs
-status: stamp=1430584956 e=repli.sh 4450 Data 10.3.2.8 repcifs
-status: stamp=1430585207 e=done
-1430585207
-status: stamp=hi e=
-hi
-status: stamp=hi e=
-status: stamp=hi e=
-hi
-status: stamp=hi e=
-status: stamp=ls e=
-ls
-status: stamp=ls e=
-status: stamp=hi e=
-hi
-status: stamp=hi e=
-hi
-status: stamp=1431109291 e=ready
-e=ready sendingready=1431109291 ready
-status: stamp=1431109390 e=ready
-e=ready sendingready=1431109390 ready
-status: stamp=1431109487 e=ready
-e=ready sendingready=1431109487 ready
-status: stamp=1431109526 e=ready
-e=ready sendingready=1431109526 ready
-status: stamp=1431110135 e=ready
-status: stamp=1431110543 e=ready
-e=ready sendingready=1431110543 ready
-status: stamp=1431110635 e=ready
-e=ready sendingready=1431110635 ready
-status: stamp=1431110690 e=ready
-e=ready sendingready=1431110690 ready
-status: stamp=1431110795 e=ready
-e=ready sendingready=1431110795 ready
-status: stamp=1431110870 e=ready
-e=ready sendingready=1431110870 ready
-status: stamp=1431110881 e=ProxysendReInit.sh 10.3.2.7 4449
-1431110881
-status: stamp=1431110881 e=ProxysendReInit.sh 10.3.2.7 4449
-status: stamp=1431110969 e=ready
-e=ready sendingready=1431110969 ready
-status: stamp=1431163978 e=ready
-e=ready sendingready=1431163978 ready
-status: stamp=1431165765 e=ready
-e=ready sendingready=1431165765 ready
-status: stamp=1431165765 e=ready
-e=ready sendingready=1431165765 ready
-status: stamp=1431165954 e=ready
-e=ready sendingready=1431165954 ready
-status: stamp=1431165765 e=ready
-e=ready sendingready=1431165765 ready
-status: stamp=1431165765 e=ready
-e=ready sendingready=1431165765 ready
-status: stamp=1431165765 e=ready
-e=ready sendingready=1431165765 ready
-status: stamp=1431165765 e=ready
-e=ready sendingready=1431165765 ready
-status: stamp=1431165765 e=ready
-e=ready sendingready=1431165765 ready
-status: stamp=1431165765 e=ready
-e=ready sendingready=1431165765 ready
-status: stamp=1431165765 e=ready
-e=ready sendingready=1431165765 ready
-status: stamp=1431165765 e=ready
-e=ready sendingready=1431165765 ready
-status: stamp=1431165765 e=ready
-e=ready sendingready=1431165765 ready
-status: stamp=1431165765 e=ready
-e=ready sendingready=1431165765 ready
-status: stamp=1431165765 e=ready
-e=ready sendingready=1431165765 ready
-status: stamp=1431165765 e=ready
-e=ready sendingready=1431165765 ready
-status: stamp=1431165765 e=ready
-e=ready sendingready=1431165765 ready
-status: stamp=1431165765 e=ready
-e=ready sendingready=1431165765 ready
-status: stamp=1431165765 e=ready
-e=ready sendingready=1431165765 ready
-status: stamp=1431165765 e=ready
-e=ready sendingready=1431165765 ready
-status: stamp=1431165765 e=ready
-e=ready sendingready=1431165765 ready
-status: stamp=1431165765 e=ready
-e=ready sendingready=1431165765 ready
-status: stamp=1431165765 e=ready
-e=ready sendingready=1431165765 ready
-status: stamp=1431167710 e=ProxysendReInit.sh 10.3.2.7 4449
-1431167710
-status: stamp=1431167741 e=ready
-e=ready sendingready=1431167741 ready
-status: stamp=1431167741 e=ready
-e=ready sendingready=1431167741 ready
-status: stamp=1431168045 e=ProxysendReInit.sh 10.3.2.7 4449
-1431168045
-status: stamp=1431168117 e=ready
-e=ready sendingready=1431168117 ready
-status: stamp=1431168117 e=ready
-e=ready sendingready=1431168117 ready
-status: stamp=1431168349 e=ready
-e=ready sendingready=1431168349 ready
-status: stamp=1431168450 e=ready
-e=ready sendingready=1431168450 ready
-status: stamp=1431168450 e=ready
-e=ready sendingready=1431168450 ready
-status: stamp=1431168450 e=ready
-e=ready sendingready=1431168450 ready
-status: stamp=1431168528 e=ready
-e=ready sendingready=1431168528 ready
-status: stamp=1431168830 e=ready
-e=ready sendingready=1431168830 ready
-status: stamp=1431168830 e=ready
-e=ready sendingready=1431168830 ready
-status: stamp=1431168830 e=ready
-e=ready sendingready=1431168830 ready
-status: stamp=1431168830 e=ready
-e=ready sendingready=1431168830 ready
-status: stamp=1431168830 e=ready
-e=ready sendingready=1431168830 ready
-status: stamp=1431168830 e=ready
-e=ready sendingready=1431168830 ready
-status: stamp=2332 e=ready
-e=ready sendingready=2332 ready
-status: stamp=1431169144 e=ready
-e=ready sendingready=1431169144 ready
-status: stamp=1431169162 e=ready
-e=ready sendingready=1431169162 ready
-status: stamp=1431169181 e=ready
-e=ready sendingready=1431169181 ready
-status: stamp=1431169251 e=ready
-e=ready sendingready=1431169251 ready
-status: stamp=1431169281 e=ready
-e=ready sendingready=1431169281 ready
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+received 33333333 ready
+status: oldstamp=0 stamp=33333333 e=ready
+e=ready sendingready=33333333 ready txt/cin3334
+start read -r readproxy txt/cout3333
+received 33333333 ready
+status: oldstamp=33333333 stamp=33333333 e=ready
+start read -r readproxy txt/cout3333
+received 33333333 ready
+status: oldstamp=33333333 stamp=33333333 e=ready
+start read -r readproxy txt/cout3333
+received 33333333 ready
+status: oldstamp=33333333 stamp=33333333 e=ready
+start read -r readproxy txt/cout3333
+received 33333333 ready
+status: oldstamp=33333333 stamp=33333333 e=ready
+start read -r readproxy txt/cout3333
+received 33333333 ready
+status: oldstamp=33333333 stamp=33333333 e=ready
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+received 333sd ready
+status: oldstamp=33333333 stamp=333sd e=ready
+e=ready sendingready=333sd ready txt/cin3334
+start read -r readproxy txt/cout3333
+received 333sd ready
+status: oldstamp=333sd stamp=333sd e=ready
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sd stamp=333sddsfs e=ready
+e=ready sendingready=333sddsfs ready txt/cin3334
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+received 333sddsfs ready
+status: oldstamp=333sddsfs stamp=333sddsfs e=ready
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
+start read -r readproxy txt/cout3333
