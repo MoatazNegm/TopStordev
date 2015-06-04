@@ -17,7 +17,8 @@ do
   echo $so $stamp $dst $license ProxyrcvReInit.sh $so $pp | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N $proxy 2234
   ./ProxyReCloseSVC.sh $proxy $pp &;
   sleep 1;
-  ./Proxyreading.sh txt/cout$pp &
   ./ProxyReClose.sh $pp &;
+  sleep 1;
+  ./Proxyreading.sh txt/cout$pp &
  fi 
 done < partners.txt

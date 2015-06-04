@@ -6,18 +6,21 @@ pp=`echo $@ | awk '{print $2}'`;
 ppplus=$((pp+1));
 ppzfs=$((pp+2));
 while true;  do  
- if [[ ! -p  txt/cin$ppplus ]];
+ issocat=`ps -auxw | grep -w socat | grep -w "$ppplus" | wc -c `;
+ if [[ $issocat -le 3 ]];
  then
   /usr/local/bin/socat PIPE:txt/cin$ppplus TCP4:$Proxy:$ppplus &
   echo /usr/local/bin/socat PIPE:txt/cin$ppplus TCP4:$Proxy:$ppplus >> txt/tmpsocat
 
  fi
- if [[ ! -p txt/cout$pp ]];
+ issocat=`ps -auxw | grep -w socat | grep -w "$pp" | wc -c `;
+ if [[ $issocat -le 3 ]];
  then
   /usr/local/bin/socat TCP4:$Proxy:$pp PIPE:txt/cout$pp &
   echo /usr/local/bin/socat  TCP4:$Proxy:$pp PIPE:txt/cout$pp >> txt/tmpsocat
  fi;
- if [[ ! -p txt/c$ppzfs ]];
+ issocat=`ps -auxw | grep -w socat | grep -w "$ppzfs" | wc -c `;
+ if [[ $issocat -le 3 ]];
  then
   /usr/local/bin/socat  TCP4:$Proxy:$ppzfs PIPE:txt/c$ppzfs &
   echo /usr/local/bin/socat  TCP4:$Proxy:$ppzfs PIPE:txt/c$ppzfs >> txt/tmpsocat
