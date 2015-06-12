@@ -33,15 +33,4 @@ while true; do
    echo /usr/local/bin/socat  TCP4:$proxyser:$porplus,forever,reuseaddr PIPE:txt/cout$pp >> txt/tmpproxyrequest 
    /usr/local/bin/socat  TCP4:$proxyser:$porplus,forever,reuseaddr PIPE:txt/cout$pp &
  fi;
- ppzfsin=`ps -auxw | grep -w socat | grep -w "$ppzfs" | wc -c`;
- ppzfsinn=$((ppzfsin+0));
- if [[ $ppzfsin -le 3 ]]; 
- then
-  echo $so $stamp $dst $license $msg  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N $proxyser 2234
- sleep 2
-#   echo /usr/local/bin/socat  TCP4:$proxyser:$porplus,forever,reuseaddr GOPEN:txt/cout$pp 2>txt/socatit >> txt/tmpproxyrequest
-  echo initporxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy >> txt/tmpproxyrequest
- echo   /usr/local/bin/socat  TCP4:$proxyser:$ppzfs,forever,reuseaddr PIPE:txt/c$ppzfs >> txt/tmpproxyrequest
-   /usr/local/bin/socat  PIPE:txt/c$ppzfs TCP4:$proxyser:$ppzfs,forever,reuseaddr &
- fi;
 done

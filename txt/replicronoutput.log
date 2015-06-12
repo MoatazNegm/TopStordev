@@ -1,20 +1,20 @@
 oper=Data/repcifs hourly.4.3.12.na 10.3.2.7
 oper1=Data/repcifs
 oper2=hourly.4.3.12.na
-stamp=1433412115
+stamp=1434103349
 keep=4
-currentsnaps=Data/repcifs@Repli.hourly.4.3.12.na.1432461754
-Data/repcifs@Repli.hourly.4.3.12.na.1432504954
-Data/repcifs@Repli.hourly.4.3.12.na.1432548505
-Data/repcifs@Repli.hourly.4.3.12.na.1433368954
-oldsnap=Data/repcifs@Repli.hourly.4.3.12.na.1432461754
+currentsnaps=Data/repcifs@Repli.hourly.4.3.12.na.1433412115
+Data/repcifs@Repli.hourly.4.3.12.na.1433628154
+Data/repcifs@Repli.hourly.4.3.12.na.1433973741
+Data/repcifs@Repli.hourly.4.3.12.na.1434016928
+oldsnap=Data/repcifs@Repli.hourly.4.3.12.na.1433412115
 countsnap=       4
 countsnapplus=5
 keeppluszero=4
-{"Date":"06/04/2015","time":"12:01:58","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/repcifs@Repli.hourly.4.3.12.na.1432461754"}
-newsnap2=Repli.hourly.4.3.12.na.1433412115
-newsnap=Data/repcifs@Repli.hourly.4.3.12.na.1433412115
-./ProxyReplicate 10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1433412115 Repli.hourly.4.3.12.na.1433412115 repcifs 10.3.2.6 iwlanwlanwlanwlan  admin
+{"Date":"06/12/2015","time":"12:02:35","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/repcifs@Repli.hourly.4.3.12.na.1433412115"}
+newsnap2=Repli.hourly.4.3.12.na.1434103349
+newsnap=Data/repcifs@Repli.hourly.4.3.12.na.1434103349
+./ProxyReplicate 10.3.2.8 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1434103349 Repli.hourly.4.3.12.na.1434103349 repcifs 10.3.2.6 iwlanwlanwlanwlan  admin
 snapshotresult :
-filenameis=txt/./RemoteSnapshotnowSystem.txt1433412115
-{"Date":"06/04/2015","time":"12:02:42","msg":"info","user":"System","data":"Success_Replicating_Snapshot:Data/repcifs@Repli.hourly.4.3.12.na.1433412115"}
+filenameis=txt/./RemoteSnapshotnowSystem.txt1434103349
+{"Date":"06/12/2015","time":"12:03:20","msg":"info","user":"System","data":"Success_Replicating_Snapshot:Data/repcifs@Repli.hourly.4.3.12.na.1434103349"}
