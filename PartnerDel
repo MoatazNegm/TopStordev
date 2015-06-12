@@ -19,8 +19,10 @@ partnerlist=`cat partners.txt `;
 echo $partnerlist | grep -v "$Partnername" > partners.txt
 result="[";
 cat partners.txt | while read -r line ; do
-  n=` echo $line | awk '{print $1}'`;  t=`echo $line | awk '{print $2}'`;
-  subres=`./jsonthis3.sh name $n type $t`;
+  n=` echo $line | awk '{print $1}'`;  
+  t=`echo $line | awk '{print $2}'`;
+  p=`echo $line | awk '{print $3}'`;
+  subres=`./jsonthis3.sh name $n type $t proxy $p`;
   result=$result$subres,
 done;
 result=`echo $result | rev | cut -c 2- | rev`];
