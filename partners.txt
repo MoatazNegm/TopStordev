@@ -1,4 +1,1 @@
-10.3.2.8 sender
-123.2.2.2 sender false
-233.34334k2 sender true dfadk
-10.3.2.7 receiver true admin
+10.3.2.7 receiver true Mezo1 15485

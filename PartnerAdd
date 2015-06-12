@@ -7,7 +7,8 @@ Partnername=`echo $@ | awk '{print $1}'`;
 type=`echo $@ | awk '{print $2}'`;
 Proxy=`echo $@  | awk '{print $3}'`;
 passphrase=`echo $@  | awk '{print $4}'`;
-userreq=`echo $@  | awk '{print $5}'`;
+portused=`echo $@  | awk '{print $5}'`;
+userreq=`echo $@  | awk '{print $6}'`;
 privilege="Replication";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
@@ -36,13 +37,14 @@ newtype=$type;
 oldtype=`echo $partnerlist | grep "$Partnername" | awk '{print $2}'`;
 if [[ $oldtype == "sender" && $type == "receiver" ]]; then newtype="DualWay";fi
 if [[ $oldtype == "receiver" && $type == "sender" ]]; then newtype="DualWay";fi
-echo $Partnername $newtype $Proxy $passphrase >> partners.txt
+echo $Partnername $newtype $Proxy $passphrase $portused >> partners.txt
 result="[";
 cat partners.txt | while read -r line ; do
   n=` echo $line | awk '{print $1}'`; 
   t=`echo $line | awk '{print $2}'`;
   p=`echo $line | awk '{print $3}'`;
-  subres=`./jsonthis3.sh name $n type $t proxy $p `;
+  pass=`echo $line | awk '{print $4}'`;
+  subres=`./jsonthis3.sh name $n type $t proxy $p passphrase $pass`;
   result=$result$subres,
 done;
 result=`echo $result | rev | cut -c 2- | rev`];
