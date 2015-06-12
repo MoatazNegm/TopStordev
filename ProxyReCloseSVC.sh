@@ -19,11 +19,13 @@ while true;  do
   /usr/local/bin/socat TCP4:$Proxy:$pp,forever,reuseaddr PIPE:txt/cout$pp &
   echo /usr/local/bin/socat TCP4:$Proxy:$pp,forever,reuseaddr PIPE:txt/cout$pp >> txt/tmpsocat
  fi;
- issocat=`ps -auxw | grep -w socat | grep -w "$ppzfs" | wc -c `;
- if [[ $issocat -le 3 ]];
+
+ if [[ -f txt/replicate.txt ]];
  then
-  /usr/local/bin/socat TCP4:$Proxy:$ppzfs,forever,reuseaddr PIPE:txt/c$ppzfs &
-  echo /usr/local/bin/socat  TCP4:$Proxy:$ppzfs,forever,reuseaddr PIPE:txt/c$ppzfs >> txt/tmpsocat
+  instr=`cat txt/replicate.txt`;
+  rm txt/replicate.txt
+  /usr/local/bin/socat TCP4:$Proxy:$ppzfs exec:"$instr" &
+  echo /usr/local/bin/socat TCP4:$Proxy:$ppzfs exec:"$instr" > txt/tmpsocat
  fi;
  sleep 1
 done

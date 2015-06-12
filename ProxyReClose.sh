@@ -16,6 +16,7 @@ while [[ $e != "noproxy" ]]; do
 #   read -r readproxy < ${pipefile}f
 #   echo "waiting" > ${pipefile}f;
   readproxy=`tail -n 1 txt/cout${pp}f `
+  echo "-" > txt/cout${pp}f
   ee=` echo $readproxy | grep -v waiting | tail -n 1`
   een=` echo $ee | wc -c `;
   if [[ $een -ge 2 ]]; 
@@ -29,6 +30,7 @@ while [[ $e != "noproxy" ]]; do
    then 
     if [[ $oldstamp != $stamp ]];
     then 
+     echo this is a ready $e >> txt/proxyinpp
      oldstamp=$stamp;
      if [[ -p txt/cin$ppplus ]]; then echo $stamp ready > txt/cin$ppplus; 
       echo e=$e sendingready=$stamp ready  txt/cin$ppplus >> txt/proxyinpp;
@@ -40,17 +42,14 @@ while [[ $e != "noproxy" ]]; do
      oldstamp=$stamp;
      req=`echo $e | awk '{print $1}'`;
      par=`echo $e | awk '{$1="";print substr($0,2)}'`;
-     isrepli=` echo $e | awk '{print $1}'`;
-     if [[ isrepli == "repli.sh" ]];  
-     then
-      res=`./$req $par $pp` ;
-     else
-      res=` ./$req $par `;
-     fi
-     echo $stamp $res  >> txt/proxyinpp ; 
+     echo running: $req $par  >> txt/proxyinpp ; 
+     res=` ./$req $par `;
+     echo run: $req $par  >> txt/proxyinpp ; 
+     echo sending: $stamp $res  >> txt/proxyinpp ; 
      echo $stamp $res  > txt/cin$ppplus ; 
     else
-  #   echo $stamp $res > txt/cin$ppplus
+     echo $stamp $res > txt/cin$ppplus
+     echo resending: $stamp $res >> txt/proxyinpp
     fi 
    fi
   fi

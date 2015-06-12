@@ -63,7 +63,6 @@ writeable - Yes
 nt acl support - yes
 inherit acls = Yes
 ;;;;;;;;;;;;;;;;    stopforAbdo_only
-
 ;;;;;;;;         startrepcifs_only
 [repcifs]
 path = /Data/repcifs
