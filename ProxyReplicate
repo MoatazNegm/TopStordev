@@ -63,7 +63,7 @@ function Sendzfs () {
  pp=$POR;
  ppzfs=$((pp+2));
  echo sending /usr/local/bin/socat TCP4:$proxyser:$ppzfs exec:"$msgf" >> txt/tmpproxyrequest
- sleep 1
+ /usr/local/bin/socat TCP4:10.1.1.1:323,connect-timeout=.002,interval=0.2,retry=2 PIPE:txt/tmptmp 2> /dev/null 
  /usr/local/bin/socat TCP4:$proxyser:$ppzfs exec:${msgf};
  echo finish sending /usr/local/bin/socat TCP4:$proxyser:$ppzfs exec:"$msgf" >> txt/tmpproxyrequest
 }
@@ -158,7 +158,7 @@ else
  fi
  ./GetSnaplist & 
  echo RemoteAsk GetSnaplist hi  >> txt/tmpproxyrequest 
- RemoteAsk GetSnaplist hi  
+ RemoteAsk GetSnaplist hi & 
 fi
  echo POR=$POR Compelete  >> txt/tmpproxyrequest ; 
 # RemoteAsk done  & ; 
