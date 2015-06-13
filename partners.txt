@@ -1,2 +1,1 @@
-10.3.2.8 sender true mezomezo 5555
-10.3.2.7 receiver
+10.3.2.8 sender true Mezo1 15384

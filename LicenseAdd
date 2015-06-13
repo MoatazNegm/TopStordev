@@ -23,6 +23,7 @@ fi
 halfproxy=`echo $isthere | awk '{print $1}'`
 newproxy=${halfproxy}' '${Licensename};
 echo $newproxy > proxy.txt
+./ProxyrcvInit.sh &
 subres=`./jsonthis3.sh Proxyurl $halfproxy License $Licensename`
 result='['${subres}']' ;
 echo $result >$webproxy
