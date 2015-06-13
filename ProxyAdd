@@ -18,12 +18,13 @@ isthere=`cat proxy.txt `
 istheren=` echo $isthere | wc -c `
 istheren=$((istheren+0));
 if [[ $istheren -le 2 ]]; then
- isthere='n/a n/a';
+ isthere='n/a n/a n/a';
 fi
-halfproxy=`echo $isthere | awk '{print $2}'`
-newproxy=${proxyname}' '${halfproxy};
+licensename=`echo $isthere | awk '{print $2}'`
+aliasname=`echo $isthere | awk '{print $3}'`
+newproxy=${proxyname}' '${licensename}' '${aliasname};
 echo $newproxy > proxy.txt
-subres=`./jsonthis3.sh Proxyurl $proxyname License $halfproxy`
+subres=`./jsonthis3.sh Proxyurl $proxyname License $licensename Alias $aliasname`
 result='['${subres}']' ;
 echo $result >$webproxy
 resdate=`date +%s`;
