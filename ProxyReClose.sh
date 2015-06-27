@@ -12,7 +12,7 @@ while [[ $e != "noproxy" ]]; do
  issocat=`ps -auxw | grep -w socat | grep "$pp" | wc -c `;
  if [[ $issocat -ge 3 ]];
  then
-  echo start read  -r readproxy  txt/cout$pp >> txt/proxyinpp;
+#  echo start read  -r readproxy  txt/cout$pp >> txt/proxyinpp;
 #   read -r readproxy < ${pipefile}f
 #   echo "waiting" > ${pipefile}f;
   readproxy=`tail -n 1 txt/cout${pp}f `

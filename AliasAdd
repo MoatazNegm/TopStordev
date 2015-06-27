@@ -3,15 +3,15 @@ webproxy='/usr/local/www/apache24/data/des19/Data/Proxylist.txt';
 resweb='/usr/local/www/apache24/data/des19/Data/Proxylist.txtupdated'
 web='/usr/local/www/apache24/data/des19/Data/Proxystatus.log';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log';
-proxyname=`echo $@ | awk '{print $1}'`;
+aliasname=`echo $@ | awk '{print $1}'`;
 userreq=`echo $@  | awk '{print $2}'`;
 privilege="Proxy";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
 then
-echo Adding Proxy $proxyname.... > $web;
+echo Adding Alias $aliasname for this storage... > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-logdata='adding_Proxy:'$proxyname;
+logdata='adding_Alias:'$aliasname;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 isthere=`cat proxy.txt `
@@ -20,8 +20,8 @@ istheren=$((istheren+0));
 if [[ $istheren -le 2 ]]; then
  isthere='n/a n/a n/a';
 fi
+proxyname=`echo $isthere | awk '{print $1}'`
 licensename=`echo $isthere | awk '{print $2}'`
-aliasname=`echo $isthere | awk '{print $3}'`
 newproxy=${proxyname}' '${licensename}' '${aliasname};
 echo $newproxy > proxy.txt
 ./ProxyrcvInit.sh &
@@ -31,7 +31,7 @@ echo $result >$webproxy
 resdate=`date +%s`;
 res=` ./jsonthis3.sh updated $resdate`;
 echo $res > $resweb;
-echo Success Adding $proxyname for license $halfproxy > $web;
+echo Success Adding $aliasname for this storage > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='success_adding_Proxy:'$proxyname;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;

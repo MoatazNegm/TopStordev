@@ -6,6 +6,7 @@ pp=`echo $@ | awk '{print $2}'`;
 ppplus=$((pp+1));
 ppzfs=$((pp+2));
 while true;  do  
+ ./proxyinit${pp}.sh
  issocat=`ps -auxw | grep -w socat | grep -w "$ppplus" | wc -c `;
  if [[ $issocat -le 3 ]];
  then
@@ -24,6 +25,7 @@ while true;  do
  then
   instr=`cat txt/replicate.txt`;
   rm txt/replicate.txt
+  cp txt/replicate.txt txt/tmprepliate.txt
   /usr/local/bin/socat TCP4:$Proxy:$ppzfs exec:"$instr" &
   echo /usr/local/bin/socat TCP4:$Proxy:$ppzfs exec:"$instr" > txt/tmpsocat
  fi;
