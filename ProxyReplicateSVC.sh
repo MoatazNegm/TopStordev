@@ -17,6 +17,8 @@ while true; do
   read -t 2  line</tmp/msgrack ;
   echo initporxyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy >> txt/tmpproxyrequest
   echo $so $stamp $dst $license ProxysendReInit.sh $so $pp $passphrase $dst  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N $proxyser 2234
+
+  echo $so $stamp $dst $license ProxysendReInit.sh $so $pp $passphrase $dst >> tmpl 
   sleep 2
   echo /usr/local/bin/socat -u TCP4:$proxyser:$pp,forever,reuseaddr PIPE:txt/cin$pp >>txt/tmpproxyrequest 
   /usr/local/bin/socat   PIPE:txt/cin$pp  TCP4:$proxyser:$pp,forever,reuseaddr &

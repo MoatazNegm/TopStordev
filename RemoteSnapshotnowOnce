@@ -18,8 +18,9 @@ isproxy=`cat partners.txt | grep $oper3 | awk '{print $3}'`;
 if [[ $isproxy == "true" ]];
 then
 ##########with proxy##################################################
-echo  ./ProxyReplicate $hostip $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol >> txt/tmpproxyrequest;
- ./ProxyReplicate $hostip $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol ;
+sendername=`cat proxy.txt  | awk '{print $3}'`;
+ echo ./ProxyReplicate $sendername $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol ;
+ ./ProxyReplicate $sendername $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol ;
 ##########noproxy####################################################
 else
  echo ./Replicate $hostip $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol >> txt/tmprequest

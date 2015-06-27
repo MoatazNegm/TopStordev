@@ -16,6 +16,7 @@ function RemoteAsk() {
  ppplus=$((pp+1));
  ppzfs=$((pp+2));
  pipefile="txt/cout"$POR
+ while [ ! -p txt/cin$POR ] ; do  echo hi > /dev/null; done
  issocat=`ps -auxw | grep Proxyreading | wc -c `;
  if [[ $issocat -le 2 ]];
  then
@@ -25,7 +26,7 @@ function RemoteAsk() {
  lineflagn=0;
  echo Remotestamp=$stamp $msg txt/cin$POR >> txt/tmpproxyrequest;
  echo $stamp $msg > txt/cin$POR ;
- while [[ $lineflagn -le 2 && $flagcount -le 500 ]]; do
+ while [[ $lineflagn -le 2 && $flagcount -le 50 ]]; do
  {
 # sleep 1
  echo sending $stamp $msg >> txt/tmpproxyrequest
@@ -69,7 +70,7 @@ function Sendzfs () {
 }
 #########################################################################
 ###############################################################################
-so=`sysctl kern.hostname | awk '{print $2}'`;
+so=`cat proxy.txt | awk '{print $3}'`;
 dst=`echo $@ | awk '{print $2}'`;
 filelog=`echo $@ | awk '{print $3}'`;
 snap=`echo $@ | awk '{print $4}'`
@@ -87,7 +88,7 @@ OPERS=`echo $so $dst ProxysendReInit.sh $dst $pp`;
 echo OPERS $OPERS >> txt/tmpproxyrequest
 issocat=`ps -axuw | grep ProxyReplicateSVC | grep -w "$dst" `
 issocatn=`echo $issocat | wc -c `;
-./Proxyalert.sh $OPERS;
+./Proxyalert.sh $so $dst $passphrase $pp;
 if [[ $issocatn -le 3 ]]; then 
 ./ProxyReplicateSVC.sh $so $dst $passphrase $pp &
 fi
@@ -147,6 +148,8 @@ else
     RemoteAsk destroysnaps.sh $vol ;
     echo RemoteAsk repli.sh $pp $pool $so $vol >> txt/tmpproxyrequest;
     RemoteAsk repli.sh $pp $pool $so $vol;
+#echo exit  >> txt/tmpproxyrequest
+#exit
     echo zfs send -R   $targetsnap  to  txt/c$ppzfs >> txt/tmpproxyrequest;
     Sendzfs zfs send -R   $targetsnap ;
     exit;
