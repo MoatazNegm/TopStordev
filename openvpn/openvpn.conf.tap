@@ -1,0 +1,59 @@
+#
+# Sample OpenVPN configuration file for
+# office using SSL/TLS mode and RSA certificates/keys.
+#
+# '#' or ';' may be used to delimit comments.
+
+# Use a dynamic tun device.
+# For Linux 2.2 or non-Linux OSes,
+# you may want to use an explicit
+# unit number such as "tun1".
+# OpenVPN also supports virtual
+# ethernet "tap" devices.
+dev tun 
+
+# 192.168.100.2 is our local VPN endpoint (home).
+# 192.168.100.3 is our remote VPN endpoint (office).
+ifconfig 192.168.100.3 255.255.255.0
+
+# In SSL/TLS key exchange, Office will
+# assume server role and Home
+# will assume client role.
+tls-server
+
+# Diffie-Hellman Parameters (tls-server only)
+dh /usr/local/etc/openvpn/keys/dh2048.pem
+
+# Certificate Authority file
+ca /usr/local/etc/openvpn/keys/ca.crt
+
+# Our certificate/public key
+cert /usr/local/etc/openvpn/keys/RepliProxy.quickstor.net.crt
+
+# Our private key
+key /usr/local/etc/openvpn/keys/RepliProxy.quickstor.net.key
+
+# OpenVPN 2.0 uses UDP port 1194 by default
+# (official port assignment by iana.org 11/04).
+# OpenVPN 1.x uses UDP port 5000 by default.
+# Each OpenVPN tunnel must use
+# a different port number.
+# lport or rport can be used
+# to denote different ports
+# for local and remote.
+port 1194
+
+# Downgrade UID and GID to
+# "nobody" after initialization
+# for extra security.
+; user nobody
+; group nobody
+
+# Verbosity level.
+# 0 -- quiet except for fatal errors.
+# 1 -- mostly quiet, but display non-fatal network errors.
+# 3 -- medium output, good for normal operation.
+# 9 -- verbose, good for troubleshooting
+verb 3
+
+status openvpn-status.log
