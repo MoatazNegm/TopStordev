@@ -1,0 +1,2 @@
+V	250716175134Z		01	unknown	/C=EG/ST=PA/L=CAIRO/O=QuickStor/OU=Sales/CN=Proxystor-quickstor.net/name=EasyRSA/emailAddress=sales@quickstor.net
+V	250716175411Z		02	unknown	/C=EG/ST=PA/L=CAIRO/O=QuickStor/OU=Sales/CN=client.quickstor.net/name=EasyRSA/emailAddress=sales@quickstor.net
