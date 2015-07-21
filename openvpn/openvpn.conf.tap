@@ -1,0 +1,72 @@
+#
+# Sample OpenVPN configuration file for
+# home using SSL/TLS mode and RSA certificates/keys.
+#
+# '#' or ';' may be used to delimit comments.
+
+# Use a dynamic tun device.
+# For Linux 2.2 or non-Linux OSes,
+# you may want to use an explicit
+# unit number such as "tun1".
+# OpenVPN also supports virtual
+# ethernet "tap" devices.
+dev tap
+
+# Our OpenVPN peer is the office gateway.
+float
+remote 10.3.2.6
+
+# 192.168.100.2 is our local VPN endpoint (home).
+# 192.168.100.3 is our remote VPN endpoint (office).
+ifconfig 192.168.100.8 255.255.255.0
+route 10.55.0.0 255.255.255.0 192.168.100.3
+
+# In SSL/TLS key exchange, Office will
+# assume server role and Home
+# will assume client role.
+tls-client
+
+ns-cert-type server
+
+# Certificate Authority file
+ca /usr/local/etc/openvpn/keys/ca.crt
+# Our certificate/public key
+cert /usr/local/etc/openvpn/keys/Repliserv2.crt
+
+# Our private key
+key /usr/local/etc/openvpn/keys/Repliserv2.key
+
+# OpenVPN 2.0 uses UDP port 1194 by default
+# (official port assignment by iana.org 11/04).
+# OpenVPN 1.x uses UDP port 5000 by default.
+# Each OpenVPN tunnel must use
+# a different port number.
+# lport or rport can be used
+# to denote different ports
+# for local and remote.
+port 1194
+
+# Downgrade UID and GID to
+# "nobody" after initialization
+# for extra security.
+user nobody
+group nobody
+
+persist-key
+persist-tun
+
+# Send a UDP ping to remote once
+# every 15 seconds to keep
+# stateful firewall connection
+# alive.  Uncomment this
+# out if you are using a stateful
+# firewall.
+ping 15
+#keepalive 10 60
+
+# Verbosity level.
+# 0 -- quiet except for fatal errors.
+# 1 -- mostly quiet, but display non-fatal network errors.
+# 3 -- medium output, good for normal operation.
+# 9 -- verbose, good for troubleshooting
+verb 3
