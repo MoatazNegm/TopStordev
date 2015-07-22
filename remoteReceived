@@ -1,0 +1,17 @@
+#! /usr/local/bin/zsh
+cd /TopStor
+line=`cat tmplineremote `;
+stamp=`echo $line | awk '{print $2}'`
+so=`echo $line | awk '{print $1}'`
+dst=`echo $line | awk '{print $3}'`
+license=`echo $line | awk '{print $4}'`
+request=`echo $line | awk '{print $5}'`
+pp=`echo $line | awk '{print $7}'`
+passphrase=`echo $line | awk '{print $8}'`
+islicense=`cat licenses | grep  -w $license | wc -c`
+if [[ $islicense -le 1 ]]; then; exit; fi;
+ipaddr="10.66.100.0";
+port=$pp
+sed -e "s/IPADDR/$ipaddr/g" -e "s/PORT/$port/g" openvpn.conf > txt/${so}_${stamp}_openvpn.conf; 
+/usr/local/sbin/openvpn --daemon $so --cd /TopStor/txt --config ${so}_${stamp}_openvpn.conf; 
+

@@ -12,6 +12,7 @@ while true; do
 nc -l 2234 | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD > /tmp/msgremotefile & 
 read line < /tmp/msgremotefile;
 echo $line > /TopStor/tmplineremote
+./remoteReceived
 stamp=`echo $line | awk '{print $2}'`
 request=`echo $line | awk '{print $1}'`
 searsource=` cat partners.txt | grep "$request" | awk '{print $1}'`; 
