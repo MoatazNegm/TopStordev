@@ -17,8 +17,8 @@ do
  ispid=`ps -xo pid -o command | grep openvpn | grep $dst`;
  ispidn=`echo $ispid | wc -c `
  if [[ -f txt/$pp && $ispidn -ge 5 ]]; then kill -TERM `echo $ispid | awk '{ print $1}'`; fi
- tun=`ifconfig tun0 | grep -w 'inet' | awk '{print $2}'`
- router=`echo $tun | awk '{print $1"."$2"."$3".1"}'`
+ tun=`ifconfig tun0 | grep -w 'inet' | awk '{print $2}' 2>/dev/null`
+ router=`echo $tun | awk -F. '{print $1"."$2"."$3".1"}'`
  ping -c 3 $router > /dev/null 2>&1
  if [[ $? -ne 0 ]]; then killall openvpn; ispidn=1; fi
  if [[ -f txt/$pp || $ispidn -le 3 ]];
