@@ -30,7 +30,7 @@ do
 done < partners.txt;
 sleep 10;
 tun=`ifconfig tun0 | grep -w 'inet' | awk '{print $2}'`
-router=`echo $tun | awk '{print $1"."$2"."$3".1"}'`
+router=`echo $tun | awk -F. '{print $1"."$2"."$3".1"}'`
 ping -c 3 $router > /dev/null 2>&1
 if [[ $? -ne 0 ]]; then killall openvpn; fi
 done;
