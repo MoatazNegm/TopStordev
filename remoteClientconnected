@@ -1,0 +1,11 @@
+#! /usr/local/bin/zsh
+cd /TopStor
+license=`echo $@ | awk '{print $1}'`
+bothsd=`echo $@ | awk '{print $2}'`
+env > tmpclient
+echo $@ >> tmpclient
+echo $bothsd >> tmpclient
+oldconnections=`cat txt/clientconnections | grep -v -w "$bothsd"`
+echo $oldconnections > txt/clientconnections
+echo $bothsd $license  $ifconfig_pool_remote_ip $local_port_1 $daemon_pid >> txt/clientconnections
+exit 0

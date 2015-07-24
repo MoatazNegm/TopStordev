@@ -1,17 +1,80 @@
 #! /usr/local/bin/zsh
 cd /TopStor
-line=`cat tmplineremote `;
-stamp=`echo $line | awk '{print $2}'`
+line=`cat tmplineremote`;
 so=`echo $line | awk '{print $1}'`
 dst=`echo $line | awk '{print $3}'`
+bothsd=${so}"__"$dst;
 license=`echo $line | awk '{print $4}'`
 request=`echo $line | awk '{print $5}'`
 pp=`echo $line | awk '{print $7}'`
 passphrase=`echo $line | awk '{print $8}'`
-islicense=`cat licenses | grep  -w $license | wc -c`
+islicense=`cat licenses | grep  -w "$license" | wc -c`
+revbothsd=${dst}"__"$so;
+vpnpls=0;
+pvpnpls=0;
 if [[ $islicense -le 1 ]]; then; exit; fi;
-ipaddr="10.66.100.0";
-port=$pp
-sed -e "s/IPADDR/$ipaddr/g" -e "s/PORT/$port/g" openvpn.conf > txt/${so}_${stamp}_openvpn.conf; 
-/usr/local/sbin/openvpn --daemon $so --cd /TopStor/txt --config ${so}_${stamp}_openvpn.conf; 
+isconnection1=`cat txt/clientconnections | grep -w "$bothsd" `
+isconnection2=`cat txt/clientconnections | grep -w "$revbothsd" `
+isconnection=${isconnection1}'||'${isconnection2}
+isconnectionn=`echo $isconnection | wc -c`;
+isconnection1n=`echo $isconnection1 | wc -c`;
+isconnection2n=`echo $isconnection2 | wc -c`;
+if [[ $isconnection1n -le 6 && $isconnection2n -le 6 ]]; 
+then
+ vp=$(( 10+( $(od -An -N2 -i /dev/random) )%(240) ))
+ vp2=$(( 10+( $(od -An -N2 -i /dev/random) )%(240) ))
+ pvp=$(( 10+( $(od -An -N2 -i /dev/random) )%(240) ))
+ pvp2=$(( 10+( $(od -An -N2 -i /dev/random) )%(240) ))
+ ipaddr="10."${vp}"."${vp2}".0";
+ pipaddr="10."${pvp}"."${pvp2}".0";
+ route="route "${pipaddr}" 255.255.255.0";
+ sed -e "s/IPADDR/$ipaddr/g" -e "s/PORT/$pp/g" -e "s/LICENSE/$license/g" -e "s/\;PUSH/push \"$route\"/g" -e "s/SOADDR/$ipaddr/g" -e "s/DSTADDR/$pipaddr/g" openvpn.conf > txt/${bothsd}_openvpn.conf; 
+ vpnpls=1;
+fi
+if [[ $isconnection1n -ge 6 ]]; 
+then
+ isconn=$isconnection1;
+ oldpid=`echo $isconn | awk '{print $5}'`;
+ oldpp=`echo $isconn | awk '{print $4}'`;
+ ps -p $oldpid > /dev/null 2>&1
+ psn=$?;
+ if [[ $psn -eq 0 && $oldpp != $pp ]]; then kill -TERM $oldpid; fi
+ if [[ $psn -ne 0 ||  $oldpp != $pp ]]; 
+ then 
+  sed -e "s/$oldpp/$pp/g" txt/${bothsd}_openvpn.conf > txt/tmp_${bothsd}_openvpn.conf
+  cp txt/tmp_${bothsd}_openvpn.conf txt/${bothsd}_openvpn.conf;
+  vpnpls=1;
+ fi
+fi
+if [[ $isconnection2n -ge 6 ]]; 
+then
+ isconn=$isconnection2;
+ oldpid=`echo $isconn | awk '{print $5}'`;
+ oldpp=`echo $isconn | awk '{print $4}'`;
+ ps -p $oldpid > /dev/null 2>&1
+ psn=$?;
+ if [[ $psn -ne 0  ]]; 
+ then 
+  pvpnpls=1;
+ fi
+fi
+if [[ $isconnection2n -ge 6 && $isconnection1n -le 5 ]]; 
+then
+ ipaddr=`cat txt/${revbothsd}_openvpn.conf | grep PeerNet | awk '{print $3}'`;
+ pipaddr=`cat txt/${revbothsd}_openvpn.conf | grep MyNet | awk '{print $3}'`;
+ route="route "${pipaddr}" 255.255.255.0";
+ sed -e "s/IPADDR/$ipaddr/g" -e "s/PORT/$pp/g" -e "s/LICENSE/$license/g" -e "s/\;PUSH/push \"$route\"/g" -e "s/SOADDR/$ipaddr/g" -e "s/DSTADDR/$pipaddr/g" openvpn.conf > txt/${bothsd}_openvpn.conf; 
+ vpnpls=1; 
+fi
 
+if [[ $vpnpls -ne 0 || $pvpnpls -ne 0 ]];
+then
+ if [[ $vpnpls == 1 ]];
+ then  
+  /usr/local/sbin/openvpn --daemon $so --cd /TopStor/txt --config ${bothsd}_openvpn.conf --script-security 2 --client-connect "/TopStor/remoteClientconnected $license $bothsd"; 
+ fi
+ if [[ $pvpnpls == 1 ]];
+ then  
+  /usr/local/sbin/openvpn --daemon $dst --cd /TopStor/txt --config ${revbothsd}_openvpn.conf --script-security 2 --client-connect "/TopStor/remoteClientconnected $license $revbothsd"; 
+ fi 
+fi
