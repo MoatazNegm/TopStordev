@@ -7,6 +7,7 @@ ClearExit() {
 }
 trap ClearExit HUP
 /sbin/sysctl net.inet.tcp.msl=2500 
+./ProxyrcvSVC.sh &
 while true; do
 {
 nc -l 2234 | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD > /tmp/msgremotefile & 
