@@ -1,5 +1,5 @@
 [global]
-workgroup = UPQST
+workgroup = DOMSH
 load printers = no
 server string = FreeBSD Client %v
 encrypt passwords = yes
@@ -7,7 +7,7 @@ socket options = TCP_NODELAY SO_RCVBUF=8192 SO_SNDBUF=8192
 dns proxy = yes
 smb ports = 139
 security = ADS
-realm = UPQST.LOCAL
+realm = DOMC
 winbind enum users = yes
 winbind enum groups = yes
 idmap uid = 15000-30000 
@@ -26,7 +26,7 @@ dos charset = ASCII
 unix charset = UTF8
 name resolve order = wins bcast host
 bind interfaces only = yes
-wins server = windc12.upqst.local 
+wins server = CONT.DOMSMALL 
 vfs objects = acl_xattr
 map acl inherit = Yes
 store dos attributes = Yes
@@ -53,25 +53,3 @@ map archive = yes
 inherit acls = Yes
 ##########################
 
-;;;;;;;;         startrepcifs_only
-[repcifs]
-path = /Data/repcifs
-read only = no
-browsable = yes
-write list = @everyone
-admin users = administrator
-writeable - Yes
-nt acl support - yes
-inherit acls = Yes
-;;;;;;;;;;;;;;;;;;;;   stoprepcifs_only
-;;;;;;;;         startrepnew_only
-[repnew]
-path = /Data/repnew
-read only = no
-browsable = yes
-write list = @everyone
-admin users = administrator
-writeable - Yes
-nt acl support - yes
-inherit acls = Yes
-;;;;;;;;;;;;;;;;;;;;   stoprepnew_only
