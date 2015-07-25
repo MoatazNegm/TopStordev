@@ -1,0 +1,11 @@
+;;;;;;;;         startforreplic_only
+[forreplic]
+path = /Data/forreplic
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+;;;;;;;;;;;;;;;;;;;;   stopforreplic_only

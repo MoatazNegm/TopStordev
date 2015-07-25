@@ -9,7 +9,8 @@ do
  name=` echo $line | awk '{print $1}'`;
  onlyname=` echo $name | awk -F@ '{print $2}'`;
  father2=` echo $name | awk -F@ '{print $1}' | awk -F/ '{print $2}'`;
- creat=` echo $line | awk '{print $2" "$3" "$4"  "$5" "$6}'`; 
+ revcreat=` echo $line | awk '{print $2" "$3" "$4"  "$5" "$6}' | rev`; 
+ creat=`echo ${revcreat:0:5}:${revcreat:5} | rev`
  creall=`/bin/date -j -f %c $creat +%m/%d/%y_%R`;
  creatform=` echo $creall | awk -F_ '{print $1}'`;
  time2=` echo $creall | awk -F_ '{print $2}'`;
@@ -23,4 +24,4 @@ echo $result >$websnaps;
 resdate=`date +%s`;
 res=` ./jsonthis3.sh updated $resdate`;
 echo $res > $resweb;
-echo ready;
+#echo ready;

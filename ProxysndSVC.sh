@@ -16,7 +16,7 @@ do
  echo $so $stamp $dst $license ProxyInitsnd $so $pp $passphrase $dst  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N $proxyser 2234
  ispid=`ps -xo pid -o command | grep openvpn | grep $dst`;
  ispidn=`echo $ispid | wc -c `
- if [[ -f txt/$pp && $ispidn -ge 5 ]]; then kill -TERM `echo $ispid | awk '{ print $1}'`; fi
+ if [[ -f txt/$pp && $ispidn -ge 5 ]]; then killall openvpn ; fi
  tun=`ifconfig tun0 | grep -w 'inet' | awk '{print $2}' 2>/dev/null`
  router=`echo $tun | awk -F. '{print $1"."$2"."$3".1"}'`
  ping -c 3 $router > /dev/null 2>&1
