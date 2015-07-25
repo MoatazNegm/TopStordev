@@ -10,6 +10,7 @@ pp=`echo $line | awk '{print $7}'`
 passphrase=`echo $line | awk '{print $8}'`
 islicense=`cat licenses | grep  -w "$license" | wc -c`
 revbothsd=${dst}"__"$so;
+./remoteData $bothsd $revbothsd
 vpnpls=0;
 pvpnpls=0;
 if [[ $islicense -le 1 ]]; then; exit; fi;
@@ -71,10 +72,10 @@ if [[ $vpnpls -ne 0 || $pvpnpls -ne 0 ]];
 then
  if [[ $vpnpls == 1 ]];
  then  
-  /usr/local/sbin/openvpn --daemon $so --cd /TopStor/txt --config ${bothsd}_openvpn.conf --script-security 2 --client-connect "/TopStor/remoteClientconnected $license $bothsd"; 
+  /usr/local/sbin/openvpn --daemon $so --cd /TopStor/txt --config ${bothsd}_openvpn.conf --script-security 2 --client-connect "/TopStor/remoteClientconnected $license $bothsd $revbothsd"; 
  fi
  if [[ $pvpnpls == 1 ]];
  then  
-  /usr/local/sbin/openvpn --daemon $dst --cd /TopStor/txt --config ${revbothsd}_openvpn.conf --script-security 2 --client-connect "/TopStor/remoteClientconnected $license $revbothsd"; 
+  /usr/local/sbin/openvpn --daemon $dst --cd /TopStor/txt --config ${revbothsd}_openvpn.conf --script-security 2 --client-connect "/TopStor/remoteClientconnected $license $revbothsd $bothsd"; 
  fi 
 fi

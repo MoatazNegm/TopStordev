@@ -1,0 +1,15 @@
+#! /usr/local/bin/zsh
+cd /TopStor
+bothsd=`echo $@ | awk '{print $1}'`
+revbothsd=`echo $@ | awk '{print $2}'`
+while read line;
+do
+ clientaddr=`echo $line | grep -w "$bothsd" | awk '{print $3}'`
+ isclient=`echo $clientaddr | wc -c`
+ if [[ $isclient -ge 3 ]];
+ then
+  lines=`cat txt/clientconnections | grep $bothsd`;
+  echo $lines | nc -w 3 $clientaddr 2236  
+ fi
+done < txt/clientconnections
+exit 0
