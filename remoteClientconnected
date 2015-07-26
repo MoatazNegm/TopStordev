@@ -2,10 +2,11 @@
 cd /TopStor
 license=`echo $@ | awk '{print $1}'`
 bothsd=`echo $@ | awk '{print $2}'`
+revbothsd=`echo $@ | awk '{print $3}'`
 env > tmpclient
 echo $@ >> tmpclient
 echo $bothsd >> tmpclient
-oldconnections=`cat txt/clientconnections | grep -v -w "$bothsd"`
+oldconnections=`cat txt/clientconnections | grep -v "$bothsd":`
 echo $oldconnections > txt/clientconnections
-echo $bothsd $license  $ifconfig_pool_remote_ip $local_port_1 $daemon_pid >> txt/clientconnections
+echo ${bothsd}:${revbothsd}  $license  $ifconfig_pool_remote_ip $local_port_1 $daemon_pid >> txt/clientconnections
 exit 0

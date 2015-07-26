@@ -2,14 +2,20 @@
 cd /TopStor
 bothsd=`echo $@ | awk '{print $1}'`
 revbothsd=`echo $@ | awk '{print $2}'`
+pp=`echo $@ | awk '{print $3}'`
 while read line;
 do
- clientaddr=`echo $line | grep -w "$bothsd" | awk '{print $3}'`
+ clientaddr=`echo $line | grep "$bothsd": | awk '{print $3}'`
  isclient=`echo $clientaddr | wc -c`
  if [[ $isclient -ge 3 ]];
  then
-  lines=`cat txt/clientconnections | grep $bothsd`;
-  echo $lines | nc -w 3 $clientaddr 2236  
+  lines=`cat txt/clientconnections | grep "$revbothsd": `;
+  linesn=` echo $lines | wc -c `;
+  if [[ $linesn -ge 5 ]];
+  then
+  echo $lines | nc -w 6 -N $clientaddr $pp  
+#  echo $lines \| nc -w 3 $clientaddr $pp  
+  fi
  fi
 done < txt/clientconnections
 exit 0
