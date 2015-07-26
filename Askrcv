@@ -1,0 +1,35 @@
+#! /usr/local/bin/zsh
+cd /TopStor
+pp=`echo  $@ | awk '{print $1}'`;
+tun=`echo  $@ | awk '{print $2}'`;
+replier=`echo  $@ | awk '{print $3}'`;
+pp=$((pp+1));
+oldstamp=0;
+# packet : sender stamp command
+while true;
+do
+ readthis=`nc -ld $tun $pp`
+ echo this $readthis > ask1
+ newsender=`echo $readthis | awk '{print $1}'`;
+ stamp=`echo $readthis | awk '{print $2}'`;
+ isreply=`echo $readthis | awk '{print $3}'`;
+ newcom=`echo $readthis | awk '{$1=$2="";print substr($0,3)}'`
+ echo this $readthis > ask1
+ if [[ $isreply == "finish" ]]; then break; fi
+ if [[ $isreply == "reply" ]]; then echo $newsender:$newcom > txt/remtereply; 
+ else 
+  if [[ $stamp != $oldstamp ]];
+  then
+ echo this $readthis > ask1
+   oldstamp=$stamp;
+   issender=`cat txt/sender | grep "$newsender"`;
+   if [[ $? -eq 0 ]];
+   then
+    sendertun=`echo $issender | awk '{print $3}'`
+    senderpp=`echo $issender | awk '{print $4}'`
+    ./runthis $sendertun $newsender $replier $senderpp $newcom;
+   fi
+  fi
+ fi
+done
+
