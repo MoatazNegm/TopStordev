@@ -1,0 +1,20 @@
+#! /usr/local/bin/zsh
+cd /TopStor
+# command is newcom paramaters (at least one)
+echo $@ > tmprep
+sendertun=`echo  $@ | awk '{print $1}'`;
+sender=`echo  $@ | awk '{print $2}'`;
+replier=`echo  $@ | awk '{print $3}'`;
+senderpp=`echo  $@ | awk '{print $4}'`;
+newcom=`echo  $@ | awk '{print $5}'`;
+param=`echo  $@ | awk '{$1=$2=$3=$4=$5="";print substr($0,6)}'`;
+# packet : sender stamp command
+isvalid=`cat Commands.txt | grep "$newcom" `
+if [[ $? -eq 0 ]];
+then 
+ res=`$isvalid $param`;
+ echo $res > tmprep
+ ppp=$((senderpp+1));
+ echo ./Askreply $replier $sendertun $ppp reply $res > tmprep
+ ./Askreply $replier $sendertun $ppp reply $res
+fi

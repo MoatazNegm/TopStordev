@@ -1,0 +1,13 @@
+#! /usr/local/bin/zsh
+cd /TopStor
+pp=`echo  $@ | awk '{print $1}'`;
+tun=`echo  $@ | awk '{print $2}'`;
+peer=`echo  $@ | awk '{print $3}'`;
+ps -auxw | grep "nc -l" | grep "$tun" >/dev/null 2>&1;
+if [[ $? -ne 0 ]];
+then
+ rm txt/tmp$peer 2>/dev/null
+ nc -l $tun $pp > txt/tmp$peer ;
+ cp txt/tmp$peer txt/$peer;
+fi
+
