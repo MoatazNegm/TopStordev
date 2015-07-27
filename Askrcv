@@ -1,31 +1,42 @@
 #! /usr/local/bin/zsh
 cd /TopStor
-pp=`echo  $@ | awk '{print $1}'`;
+replierpp=`echo  $@ | awk '{print $1}'`;
 tun=`echo  $@ | awk '{print $2}'`;
 replier=`echo  $@ | awk '{print $3}'`;
-pp=$((pp+1));
+stampid=`echo  $@ | awk '{print $4}'`;
+pp=$((replierpp+1));
 oldstamp=0;
+currentPID=$$;
 # packet : sender stamp command
+otherAsk=`ps -awx | grep Askrcv | grep "$tun" | grep "$pp" | grep -v "$stampid"  >/dev/null 2>&1`
+if [[ $? -eq 0 ]]; then echo found; exit 0;  fi
+kill -TERM `ps -awx | grep Askrcv | grep -v "$stampid"` >/dev/null 2>&1 ; 
 while true;
 do
- readthis=`nc -ld $tun $pp`
- newsender=`echo $readthis | awk '{print $1}'`;
- stamp=`echo $readthis | awk '{print $2}'`;
- newcom=`echo $readthis | awk '{$1=$2="";print substr($0,3)}'`
- echo hi > ask1
- if [[ $newcom == "finish" ]]; then break; fi
- if [[ $newcom == "reply" ]]; then echo $newsender:$newcom > txt/remtereply; fi
- if [[ $stamp != $oldstamp ]];
- then 
-  echo hihi > ask1
-  oldstamp=$stamp;
-  issender=`cat txt/sender | grep "$newsender"`; 
-  if [[ $? -eq 0 ]]; 
-  then
-   echo hihihi > ask1
-   sendertun=`echo $issender | awk '{print $3}'`
-   senderpp=`echo $issender | awk '{print $4}'`
-   ./runthis $sendertun $newsender $replier $senderpp $newcom;
-  fi
+ ps -awx | grep "nc -ld" | grep "$tun" | grep "$pp" >/dev/null 2>&1
+ if [[ $? -eq 0 ]]; then sleep 5;
+ else
+  readthis=`nc -ld $tun $pp`
+  newsender=`echo $readthis | awk '{print $1}'`;
+  stamp=`echo $readthis | awk '{print $2}'`;
+  isreply=`echo $readthis | awk '{print $3}'`;
+  newcom=`echo $readthis | awk '{$1=$2="";print substr($0,3)}'`
+  if [[ $isreply == "finish" ]]; then break; fi
+  if [[ $isreply == "reply" ]]; 
+  then echo $readthis >> txt/remotereply$newsender ;
+  else
+   if [[ $stamp != $oldstamp ]];
+   then 
+    oldstamp=$stamp;
+    issender=`cat txt/sender | grep "$newsender"`; 
+    if [[ $? -eq 0 ]]; 
+    then
+     sendertun=`echo $issender | awk '{print $3}'`
+     senderpp=`echo $issender | awk '{print $4}'`
+     ./runthis $sendertun $newsender $replier $senderpp $pp $tun $newcom;
+     echo ./runthis $sendertun $newsender $replier $senderpp $pp $tun $newcom > tmprunthis
+    fi
+   fi
+  fi 
  fi 
 done

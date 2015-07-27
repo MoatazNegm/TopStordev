@@ -1,3 +1,4 @@
 ./RemoteVolSearch
+./replidf.sh $pp $tun $sender
 ls
 rm
