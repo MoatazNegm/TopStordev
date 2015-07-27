@@ -17,10 +17,15 @@ newsnap=`echo $oper1@$newsnap2`;
 isproxy=`cat partners.txt | grep $oper3 | awk '{print $3}'`;
 if [[ $isproxy == "true" ]];
 then
-##########with proxy##################################################
-sendername=`cat proxy.txt  | awk '{print $3}'`;
- echo ./ProxyReplicate $sendername $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol ;
- ./ProxyReplicate $sendername $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol ;
+##########with proxy##################################################o
+## $hostip $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pooli $vol $remotetun $pp $so
+############################################################3
+  ./ProxysndSVC.sh
+  so=`cat proxy.txt | awk '{print $3}'`
+  remotetun=`cat txt/receiver | grep "$oper3" | awk '{print $3}'`
+  pp=`cat txt/receiver | grep "$oper3" | awk '{print $4}'`
+ echo  running ./ProxyReplicate $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so >> txt/tmpproxyrequest;
+ ./ProxyReplicate $sendername $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so;
 ##########noproxy####################################################
 else
  echo ./Replicate $hostip $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol >> txt/tmprequest

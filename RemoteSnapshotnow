@@ -73,10 +73,13 @@ then
  if [[ $isproxy == "true" ]];
  then
 ##########with proxy##################################################
-  Pass=`cat partners.txt | grep $oper3 | awk '{print $4}'`;
-  Proxy=`cat proxy.txt`
-  echo ./ProxyReplicate $hostip $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pooli $vol $Proxy $Pass >> $cronout;
-  ./ProxyReplicate $hostip $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pooli $vol $Proxy $Pass;
+### ./Asksend 1032_8($8) 10.176.214.6($6) 15737($7) RemoteVolSearch sdk
+  ./ProxysndSVC.sh
+  so=`cat proxy.txt | awk '{print $3}'`
+  remotetun=`cat txt/receiver | grep "$oper3"`
+  pp=`cat partners.txt | grep "$oper3" | awk '{print $5}'` 
+  echo ./ProxyReplicate $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pooli $vol $remotetun $pp $so>> $cronout;
+  ./ProxyReplicate $hostip $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pooli $vol $remotetun $pp $so;
 ##########noproxy####################################################
  else
   ./Replicate $hostip $oper3 txt/$0$userreq.txt$stamp $newsnap2 $pool $vol  ;
