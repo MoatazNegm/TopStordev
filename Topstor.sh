@@ -24,7 +24,8 @@ read line < /tmp/msgfile
 echo $line > /TopStor/tmpline
 request=`echo $line | awk '{print $1}'`
 reqparam=`echo $line | cut -d " " -f2-`
-./$request $reqparam & 
+
+./$request $reqparam >/dev/null 2>&1  & 
 }
 done;
 echo it is dead >/TopStor/txt/status.txt

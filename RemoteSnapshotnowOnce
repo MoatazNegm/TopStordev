@@ -20,7 +20,7 @@ then
 ##########with proxy##################################################o
 ## $hostip $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pooli $vol $remotetun $pp $so
 ############################################################3
-  ./ProxysndSVC.sh
+  #./ProxysndSVC.sh
   so=`cat proxy.txt | awk '{print $3}'`
   remotetun=`cat txt/receiver | grep "$oper3" | awk '{print $3}'`
   pp=`cat txt/receiver | grep "$oper3" | awk '{print $4}'`

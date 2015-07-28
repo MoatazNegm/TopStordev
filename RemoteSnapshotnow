@@ -40,11 +40,11 @@ then
         	logdata='Deleting_Snapshot:'$oldsnap;
         	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 		oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-	/sbin/zfs destroy $oldsnap 2>txt/$0$userreq.txt$stamp
-	err=`wc -c  txt/$0$userreq.txt$stamp | awk '{print $1}'`;
+	/sbin/zfs destroy $oldsnap 2>txt/${0:2}$userreq.txt$stamp
+	err=`wc -c  txt/${0:2}$userreq.txt$stamp | awk '{print $1}'`;
 	datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 	if [[ $err -ge  4  ]]; then
-        	cat txt/$0$userreq.txt$stamp > $web;
+        	cat txt/${0:2}$userreq.txt$stamp > $web;
         	logdata='Difficulty_Deleting_Snapshot:'$oldsnap;
         	logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata`;
         echo $logthis >> $cronout
@@ -65,7 +65,7 @@ then
  logdata='Creating_Snapshot:'$newsnap;
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
- /sbin/zfs snapshot $newsnap &> txt/$0$userreq.txt$stamp;
+ /sbin/zfs snapshot $newsnap &> txt/${0:2}$userreq.txt$stamp;
  /sbin/zfs set repli:sender=$hostip $newsnap;
  /sbin/zfs set repli:receiver=$oper3 $newsnap;
  echo $hostip $oper3 $newsnap2 $pool $vol 
@@ -82,16 +82,16 @@ then
   ./ProxyReplicate $hostip $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pooli $vol $remotetun $pp $so;
 ##########noproxy####################################################
  else
-  ./Replicate $hostip $oper3 txt/$0$userreq.txt$stamp $newsnap2 $pool $vol  ;
+  ./Replicate $hostip $oper3 txt/${0:2}$userreq.txt$stamp $newsnap2 $pool $vol  ;
  fi;
  echo donereplicating
  echo snapshotresult : >> $cronout
- cat txt/$0$userreq.txt$stamp >> $cronout 
- echo filenameis=txt/$0$userreq.txt$stamp >> $cronout
- err=`wc -c  txt/$0$userreq.txt$stamp | awk '{print $1}'`;
+ cat txt/${0:2}$userreq.txt$stamp >> $cronout 
+ echo filenameis=txt/${0:2}$userreq.txt$stamp >> $cronout
+ err=`wc -c  txt/${0:2}$userreq.txt$stamp | awk '{print $1}'`;
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
  if [[ $err -ge  4  ]]; then
-	cat txt/$0$userreq.txt$stamp > $web;
+	cat txt/${0:2}$userreq.txt$stamp > $web;
 	logdata='Failed_Replicating'$newsnap;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
 	echo $logthis >> $cronout
@@ -104,4 +104,4 @@ then
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 fi
 echo $datenow $timenow :$logdata > ${logging}2
-rm txt/$0$userreq.txt$stamp
+rm txt/${0:2}$userreq.txt$stamp

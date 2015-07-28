@@ -47,10 +47,10 @@ service samba_server restart;
 cp txt/ntp.conf /etc/
 service ntpd stop;
 service ntpdate restart;
-/usr/local/bin/net ads join  -U $admin%$pass > txt/$0$userreq.txt ;
-err=`cat  txt/$0$userreq.txt | grep Failed | wc -c `;
+/usr/local/bin/net ads join  -U $admin%$pass > txt/${0:2}$userreq.txt ;
+err=`cat  txt/${0:2}$userreq.txt | grep Failed | wc -c `;
 if [ $err -ge  4  ]; then
-	cat txt/$0$userreq.txt > $web;
+	cat txt/${0:2}$userreq.txt > $web;
 	logdata='failed_changing_domain:'$domain;
 else 
  echo DONE...Domain $doms is joined > $web; 

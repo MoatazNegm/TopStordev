@@ -3,29 +3,31 @@ cd /TopStor
 export POR;
 export DST; 
 export RR; 
+export PPSEND; 
 export PORzfs; 
 export REMOTETUN; 
 export OPERS;
-export SEND;
 #############################################################################33
 function RemoteAsk() {
- RR="";
+ RR="failed";
  msg=$@;
- flagcount=0;
+ stamp=`date +%s`;
  echo RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx >> txt/tmpproxyrequest
  rm txt/remotereply$DST 2>/dev/null
  echo sending $msg >> txt/tmpproxyrequest
- ./Asksend $SEND $msg; 
- echo Asksend $SEND $msg >> txt/tmpproxyrequest; 
- RR="failed"
+# echo Asksend $SEND $msg >> txt/tmpproxyrequest; 
+# ./Asksend $SEND $msg 2>/dev/null ; 
+ echo $SO $stamp $@ \| nc -w 4 -N $REMOTETUN $PPSEND >> txt/tmpproxyrequest
+ echo $SO $stamp $@ | nc -w 5 -N $REMOTETUN $PPSEND
+ echo finished Ask >> txt/tmpproxyrequest
  echo asking for txt/remotereply$DST  >> txt/tmpproxyrequest; 
  flagcount=0;
- sleepcount=0
- while [[ $flagcount -le 5000000 ]]; 
+ while [[ $flagcount -le 5 ]]; 
  do
   if [[ -a txt/remotereply$DST ]]; then break; fi
-   flagcount=$((flagcount+1)); 
- done;
+  flagcount=$((flagcount+1)); 
+  sleep 1;
+ done
  if [[ -f txt/remotereply$DST ]];
  then
   RR=`cat txt/remotereply$DST | tail -1 | awk '{print $4}'`;
@@ -37,28 +39,24 @@ function Sendzfs () {
  msg=$@;
 # zfscom=`echo $msg | awk '{print $1}'`;
 # param=`echo $msg | awk '{$1=""; print substr($0,2)}'`;
- echo msg=$@
- echo \/sbin\/zfs send  $@ \|  nc -w 10 $REMOTETUN $PORzfs
+# echo \/sbin\/zfs send  $@ \|  nc -w 10 $REMOTETUN $PORzfs
  /sbin/zfs send $@ |  nc -w 10 $REMOTETUN $PORzfs
 }
 #########################################################################
 ## ./Asksend 1032_8($11) 10.176.214.6($9) 15737($10) RemoteVolSearch sdk
 ### $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pooli $vol $remotetun $pp $so
 ###############################################################################
-so=`echo $@ | awk '{print $8}'`;
+SO=`echo $@ | awk '{print $8}'`;
 DST=`echo $@ | awk '{print $1}'`;
-remotetun=`echo $@ | awk '{print $6}'`;
+REMOTETUN=`echo $@ | awk '{print $6}'`;
 filelog=`echo $@ | awk '{print $2}'`;
 snap=`echo $@ | awk '{print $3}'`
 pool=`echo $@ | awk '{print $4}'`;
 vol=`echo $@ | awk '{print $5}'`;
 pp=` echo $@ | awk '{print $7}'`;
 #pp=$(( 3000+( $(od -An -N2 -i /dev/random) )%(4000-1024+1) ))
-ppsend=$((pp+1));
+PPSEND=$((pp+1));
 PORzfs=$((pp+2));
-REMOTETUN=$remotetun;
-SEND=${so}" "${remotetun}" "${ppsend}
-echo so=${so} remtun=${remotetun} newpp=${ppsend} >> txt/tmpproxyrequest
 echo Replicate=$RR >> txt/tmpproxyrequest
 echo Roperands=$@ >> txt/tmpproxyrequest;
 POR=$pp;
@@ -66,15 +64,16 @@ echo RemoteAsk RemoteVolSearch $vol >> txt/tmpproxyrequest
 RemoteAsk RemoteVolSearch $vol;
 volfound=$RR;
 echo volfound=$volfound >> txt/tmpproxyrequest
-if [[ $volfound == 'failed' ]]; then echo Problem: $volfound >> $filelog; exit 1 ; fi
+if [[ $volfound == 'failed' ]]; then 
+ #echo \Problem\: $volfound >> $filelog;i
+ exit 0 ; fi
 if [[ $volfound == "no" ]];
 then
- echo volfound=no >> txt/tmpproxyrequet
- RemoteAsk replidf
+ RemoteAsk replidf $PORzfs $REMOTETUN $so 
  echo zfs -D $pool/$vol@$snap  >> txt/tmpproxyrequest;
  Sendzfs  -D $pool/$vol@$snap ;
  echo zfs RR=$RR >> txt/tmpproxyrequest
- exit
+ exit 0
  if [[ $volfound == "found" ]];
  then
   echo foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn >> txt/tmpproxyrequest

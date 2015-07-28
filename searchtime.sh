@@ -12,14 +12,14 @@ json1=`echo "{\"Date\":\"$date\",\"times\":[\n"$json"\n]}"`
 search=`echo $json1 | grep $Time`
 pre=`echo $json1 | grep -B99999999 $Time| grep -v $Time | tr "\n" "," | sed 's:\[,:\[:'` 
 post=`echo $json1 | grep -A99999999 $Time| grep -v $Time| tr "\n" ","|sed 's:^:,:'|sed 's:,]},$:]}:'`
-echo $pre
-echo $search
-echo $post
+#echo $pre
+#echo $search
+#echo $post
 else
 pre=`echo "{\"Date\":\"$date\",\"times\":[\n"$json"\n"|tr "\n" ","| sed 's:\[,:\[:'|sed 's:},,:},:'`
 search=`echo $json1 | grep $Time`
 post=`echo "]}"`
-echo $pre
-echo $search
-echo $post
+#echo $pre
+#echo $search
+#echo $post
 fi

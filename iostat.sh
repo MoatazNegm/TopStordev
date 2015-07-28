@@ -14,13 +14,13 @@
 which iostat > /dev/null 2>&1
 if [ $? -ne 0 ]
 then
-  echo "iostat command not found!"
+#  echo "iostat command not found!"
   exit 0
 fi
 
 if [ $# -lt 1 ]
 then
-  echo "diskname argument not specified!"
+#  echo "diskname argument not specified!"
   exit
 fi
 os=`uname`

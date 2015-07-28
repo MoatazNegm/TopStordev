@@ -17,8 +17,8 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Deleting:'$DG/$volname;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-/sbin/zfs destroy $DG/$volname &>txt/$0$userreq.txt;
-err=`wc -c  txt/$0$userreq.txt | awk '{print $1}'`;
+/sbin/zfs destroy $DG/$volname &>txt/${0:2}$userreq.txt;
+err=`wc -c  txt/${0:2}$userreq.txt | awk '{print $1}'`;
 err=$((err+1));
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 if [[ $err -ge  4  ]]; then
@@ -34,7 +34,7 @@ else
 fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 ./GetPoolVollist
-rm txt/$0$userreq.txt
+rm txt/${0:2}$userreq.txt
 fi
 bb=`cat $web`;
 echo $datenow $timenow :$bb > ${logging}2

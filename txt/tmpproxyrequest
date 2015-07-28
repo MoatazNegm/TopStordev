@@ -1,334 +1,102 @@
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438107388 SShi..1438107388 Data forreplic 10.176.214.6 15737 1032_8
 so=1032_8 remtun=10.176.214.6 newpp=15738
 Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438107388 SShi..1438107388 Data forreplic 10.176.214.6 15737 1032_8
 RemoteAsk RemoteVolSearch forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteVolSearch forreplic
 Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
+1032_8 1438107388 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
 asking for txt/remotereply1032_7
+afterAsk=failed flagcount=6
+volfound=failed
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438107466 SShi..1438107466 Data forreplic 10.176.214.6 15737 1032_8
 so=1032_8 remtun=10.176.214.6 newpp=15738
 Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438107466 SShi..1438107466 Data forreplic 10.176.214.6 15737 1032_8
 RemoteAsk RemoteVolSearch forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteVolSearch forreplic
 Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-afterAsk=no flagcount=9000001
-volfound=no
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf
-Asksend 1032_8 10.176.214.6 15738 replidf
-asking for txt/remotereply1032_7
-afterAsk= flagcount=9000001
-zfs send -D Data/forreplic@try1..1437973057
-zfs RR=
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-afterAsk=no flagcount=420798
-volfound=no
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf
-Asksend 1032_8 10.176.214.6 15738 replidf
-asking for txt/remotereply1032_7
-afterAsk= flagcount=549824
-zfs send -D Data/forreplic@try1..1437973057
-zfs RR=
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
+1032_8 1438107466 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
 asking for txt/remotereply1032_7
 afterAsk=no flagcount=5
 volfound=no
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf
-Asksend 1032_8 10.176.214.6 15738 replidf
+sending replidf 15739 10.176.214.6 1032_8
+Asksend 1032_8 10.176.214.6 15738 replidf 15739 10.176.214.6 1032_8
+1032_8 1438107471 replidf 15739 10.176.214.6 1032_8 | nc -w 4 -N 10.176.214.6 15738
+finished Ask
 asking for txt/remotereply1032_7
-afterAsk= flagcount=5
-zfs send -D Data/forreplic@try1..1437973057
-zfs RR=
-so=1032_8 remtun=10.176.214.6 newpp=15738
+afterAsk=failed flagcount=6
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438108024 SShi..1438108024 Data forreplic 10.176.214.6 15737 1032_8
 Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438108024 SShi..1438108024 Data forreplic 10.176.214.6 15737 1032_8
 RemoteAsk RemoteVolSearch forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
+1032_8 1438108024 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=failed flagcount=6
+volfound=failed
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438108081 SShi..1438108081 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438108081 SShi..1438108081 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438108081 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=failed flagcount=6
+volfound=failed
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438108302 SShi..1438108302 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438108302 SShi..1438108302 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438108302 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=failed flagcount=6
+volfound=failed
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438108320 SShi..1438108320 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438108320 SShi..1438108320 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438108320 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
 asking for txt/remotereply1032_7
 afterAsk=no flagcount=5
 volfound=no
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf
-Asksend 1032_8 10.176.214.6 15738 replidf
+sending replidf 15739 10.176.214.6
+1032_8 1438108326 replidf 15739 10.176.214.6 | nc -w 4 -N 10.176.214.6 15738
+finished Ask
 asking for txt/remotereply1032_7
-afterAsk= flagcount=5
-zfs send -D Data/forreplic@try1..1437973057
-zfs RR=
-so=1032_8 remtun=10.176.214.6 newpp=15738
+afterAsk=failed flagcount=6
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438108615 SShi..1438108615 Data forreplic 10.176.214.6 15737 1032_8
 Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438108615 SShi..1438108615 Data forreplic 10.176.214.6 15737 1032_8
 RemoteAsk RemoteVolSearch forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
+1032_8 1438108615 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
 asking for txt/remotereply1032_7
-afterAsk=no flagcount=414256
+afterAsk=no flagcount=4
 volfound=no
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf
-Asksend 1032_8 10.176.214.6 15738 replidf
+sending replidf 15739 10.176.214.6
+1032_8 1438108620 replidf 15739 10.176.214.6 | nc -w 4 -N 10.176.214.6 15738
+finished Ask
 asking for txt/remotereply1032_7
-afterAsk= flagcount=443704
-zfs send -D Data/forreplic@try1..1437973057
-zfs RR=
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-afterAsk=no flagcount=456082
-volfound=no
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf
-Asksend 1032_8 10.176.214.6 15738 replidf
-asking for txt/remotereply1032_7
-afterAsk= flagcount=434311
-zfs send -D Data/forreplic@try1..1437973057
-zfs RR=
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-afterAsk=no flagcount=498020
-volfound=no
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf
-Asksend 1032_8 10.176.214.6 15738 replidf
-asking for txt/remotereply1032_7
-afterAsk= flagcount=427765
-zfs send -D Data/forreplic@try1..1437973057
-zfs RR=
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-afterAsk=no flagcount=481496
-volfound=no
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf
-Asksend 1032_8 10.176.214.6 15738 replidf
-asking for txt/remotereply1032_7
-afterAsk= flagcount=440250
-zfs send -D Data/forreplic@try1..1437973057
-zfs RR=
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-afterAsk=no flagcount=430563
-volfound=no
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf
-Asksend 1032_8 10.176.214.6 15738 replidf
-asking for txt/remotereply1032_7
-afterAsk= flagcount=480748
-zfs -D Data/forreplic@try1..1437973057
-zfs RR=
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-afterAsk=no flagcount=574874
-volfound=no
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf
-Asksend 1032_8 10.176.214.6 15738 replidf
-asking for txt/remotereply1032_7
-afterAsk= flagcount=430261
-zfs -D Data/forreplic@try1..1437973057
-zfs RR=
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-afterAsk=no flagcount=431836
-volfound=no
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf
-Asksend 1032_8 10.176.214.6 15738 replidf
-asking for txt/remotereply1032_7
-afterAsk=no flagcount=557431
-zfs -D Data/forreplic@try1..1437973057
-zfs RR=no
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-afterAsk=no flagcount=525364
-volfound=no
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf
-Asksend 1032_8 10.176.214.6 15738 replidf
-asking for txt/remotereply1032_7
-afterAsk=failed flagcount=5000001
-zfs -D Data/forreplic@try1..1437973057
+afterAsk=failed flagcount=6
+zfs -D Data/forreplic@SShi..1438108615
 zfs RR=failed
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-afterAsk=no flagcount=449634
-volfound=no
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf
-Asksend 1032_8 10.176.214.6 15738 replidf
-asking for txt/remotereply1032_7
-afterAsk=no flagcount=422492
-zfs -D Data/forreplic@try1..1437973057
-zfs RR=no
-so=1032_8 remtun=10.176.214.6 newpp=15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1437973057 try1..1437973057 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Asksend 1032_8 10.176.214.6 15738 RemoteVolSearch forreplic
-asking for txt/remotereply1032_7
-afterAsk=no flagcount=448165
-volfound=no
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf
-Asksend 1032_8 10.176.214.6 15738 replidf
-asking for txt/remotereply1032_7
-afterAsk=no flagcount=450230
-zfs -D Data/forreplic@try1..1437973057
-zfs RR=no

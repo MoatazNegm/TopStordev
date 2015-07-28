@@ -1,7 +1,7 @@
 #! /usr/local/bin/zsh
 cd /TopStor/;
 websnaps='/usr/local/www/apache24/data/des19/Data/Hourlylist.txt';
-list1=`crontab -l | awk -F"now" '{print $2}' | grep hourly`; 
+list1=`crontab -l | awk -F"now" '{print $2}' | grep hourly 2>/dev/null`; 
 list2=`echo $list1 | awk '{print $1"@"$2" "$2" "}'`;  
 echo $list2
 nameforjson=`echo $list2 | tr -d '\n'` ;

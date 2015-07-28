@@ -13,7 +13,7 @@ if [[ $? -eq 0 ]]; then exit 0;  fi
 kill -TERM `ps -awx | grep Askrcv | grep -v "$stampid"` >/dev/null 2>&1 ;
 while true;
 do
- ps -awx | grep "nc -ld" | grep "$tun" | grep "$pp"
+ ps -awx | grep "nc -ld" | grep "$tun" | grep "$pp" > /dev/null 2>&1 
  if [[ $? -eq 0 ]]; then sleep 5;
  else
   readthis=`nc -ld $tun $pp`

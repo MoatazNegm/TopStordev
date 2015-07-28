@@ -13,13 +13,13 @@ logdata='Deleting_user:'$username;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq`;
 oldlog=`cat $logging | sed 's/]//g' `; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 /usr/local/bin/smbpasswd -d $username;
-pw user del $username -r  2>txt/$0$userreq.txt;
+pw user del $username -r  2>txt/${0:2}$userreq.txt;
 rm -R  /Data/Common/$username;
 rm key/$username;
 echo DONE..user $username is deleted > $web;
-err=`wc -c txt/$0$userreq.txt | awk '{print $1}'`;
+err=`wc -c txt/${0:2}$userreq.txt | awk '{print $1}'`;
 if [[ $err -ge 3 ]]; then
-	cat txt/$0$userreq.txt > $web;
+	cat txt/${0:2}$userreq.txt > $web;
  	logdata='failed_deleting_user:'$username	;
 else
 	logdata='success_deleting_user:'$username;
@@ -29,6 +29,6 @@ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user 
 oldlog=`cat $logging | sed 's/]//g' `; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 ./UnisListUsers;
 fi
-rm txt/$0$userreq.txt
+rm txt/${0:2}$userreq.txt
 bb=`cat $web`;
 echo $datenow $timenow :$bb > ${logging}2

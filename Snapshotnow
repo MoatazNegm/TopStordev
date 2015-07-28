@@ -33,11 +33,11 @@ if (( $countsnap >  $keep )); then
         	logdata='Deleting_Snapshot:'$oldsnap;
         	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 		oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-	/sbin/zfs destroy $oldsnap 2>txt/$0$userreq.txt$stamp
-	err=`wc -c  txt/$0$userreq.txt$stamp | awk '{print $1}'`;
+	/sbin/zfs destroy $oldsnap 2>txt/${0:2}$userreq.txt$stamp
+	err=`wc -c  txt/${0:2}$userreq.txt$stamp | awk '{print $1}'`;
 	datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 	if [[ $err -ge  4  ]]; then
-        	cat txt/$0$userreq.txt$stamp > $web;
+        	cat txt/${0:2}$userreq.txt$stamp > $web;
         	logdata='Difficulty_Deleting_Snapshot:'$oldsnap;
         	logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata`;
         echo $logthis >> $cronout
@@ -56,14 +56,14 @@ echo newsnap=$newsnap >> $cronout
 logdata='Creating_Snapshot:'$newsnap;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-/sbin/zfs snapshot $newsnap &> txt/$0$userreq.txt$stamp
+/sbin/zfs snapshot $newsnap &> txt/${0:2}$userreq.txt$stamp
 echo snapshotresult : >> $cronout
-cat txt/$0$userreq.txt$stamp >> $cronout 
-echo filenameis=txt/$0$userreq.txt$stamp >> $cronout
-err=`wc -c  txt/$0$userreq.txt$stamp | awk '{print $1}'`;
+cat txt/${0:2}$userreq.txt$stamp >> $cronout 
+echo filenameis=txt/${0:2}$userreq.txt$stamp >> $cronout
+err=`wc -c  txt/${0:2}$userreq.txt$stamp | awk '{print $1}'`;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 if [[ $err -ge  4  ]]; then
-	cat txt/$0$userreq.txt$stamp > $web;
+	cat txt/${0:2}$userreq.txt$stamp > $web;
 	logdata='Failed_Creating_Snapshot:'$newsnap;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
 	echo $logthis >> $cronout
@@ -74,5 +74,5 @@ else
 	echo $logthis >> $cronout
 fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-rm txt/$0$userreq.txt$stamp
+rm txt/${0:2}$userreq.txt$stamp
 ./GetSnaplist

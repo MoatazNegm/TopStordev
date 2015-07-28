@@ -6,4 +6,5 @@ res=`echo  $@ | awk '{$1=$2=$3="";print substr($0,4)}'`;
 stamp=`date +%s`;
 # packet : sender stamp command
 
-echo $so $stamp $res | nc -w 4 -N $dst $pp
+echo $so $stamp $res \| nc -w 4 -N $dst $pp >> txt/tmpproxyrequest
+echo $so $stamp $res | nc -w 5 -N $dst $pp

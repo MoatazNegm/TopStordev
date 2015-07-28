@@ -20,15 +20,15 @@ echo $json1 |grep $date | grep "times" > /dev/null 2>&1
 search=`echo $search`
 pre=`echo $json1 | grep -B99999999 $date| grep -v $date | tr "\n" "," | sed 's:\[,:\[:'` 
 post=`echo $json1 | grep -A99999999 $date| grep -v $date| tr "\n" ","|sed 's:^:,:'|sed 's:,]}]},$:]}]}:'`
-echo $pre
-echo $search
-echo $post
+#echo $pre
+#echo $search
+#echo $post
 else
 json=`echo $json`
 pre=`echo "{\"name\":\"$device\",\"stats\":[{\"Dates\":[\n"$json"\n"|tr "\n" ","| sed 's:\[,:\[:' | sed 's:\]},,:]},:'| sed 's:\[,,:[:' `
 search=`echo "{\"Date\":\"$date\",\"times\":[]}"`
 post=`echo "]}]}"`
-echo $pre
-echo $search
-echo $post
+#echo $pre
+#echo $search
+#echo $post
 fi

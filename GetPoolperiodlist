@@ -2,7 +2,7 @@
 cd /TopStor/;
 websnaps='/usr/local/www/apache24/data/des19/Data/periodlist.txt';
 resweb='/usr/local/www/apache24/data/des19/Data/periodlist.txtupdated';
-list=`/usr/bin/crontab -l | grep -w Snapshotnow | awk -F"now" '{print $2}'`;
+list=`/usr/bin/crontab -l | grep -w Snapshotnow | awk -F"now" '{print $2}' 2>/dev/null`;
 result='[';
 echo $list | while read -r line;
 do
