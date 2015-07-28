@@ -111,6 +111,8 @@ else
   size=`echo $volpar | awk '{print $2}'`;
   echo RemoteAsk VolumeCreate$prot $pool $vol ${size}M admin >> txt/tmpproxyrequest 
   RemoteAsk VolumeCreate$prot $pool $vol ${size}M admin; 
+  echo creating 
+exit
   echo RemoteAsk repli.sh $pp $pool $so $vol >> txt/tmpproxyrequest;
   RemoteAsk repli.sh $pp $pool $so $vol ;
 #  tobeready=`RemoteAsk repli.sh $pt $pool $so $vol` ;
@@ -149,7 +151,6 @@ else
     echo RemoteAsk repli.sh $pp $pool $so $vol >> txt/tmpproxyrequest;
     RemoteAsk repli.sh $pp $pool $so $vol;
 #echo exit  >> txt/tmpproxyrequest
-#exit
     echo zfs send -R   $targetsnap  to  txt/c$ppzfs >> txt/tmpproxyrequest;
     Sendzfs zfs send -R   $targetsnap ;
     exit;

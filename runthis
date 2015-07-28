@@ -15,9 +15,11 @@ isvalid=`cat Commands.txt | grep "$newcom"`
 if [[ $? -eq 0 ]];
 then 
  validcom=$isvalid" "$param;
+ res=`eval $validcom`
  echo $validcom  > tmp2runthis 
- res=no
+ echo res=$res >> tmp2runthis
  ppp=$((senderpp+1));
  echo Askreply $replier $sendertun $ppp reply $res > tmprep
  ./Askreply $replier $sendertun $ppp reply $res
 fi
+echo isvalid=$isvalid  >> tmp2runthis 

@@ -26,6 +26,13 @@ do
    sed -e "s/PROXY/$proxy/g" -e "s/PORT/$port/g" openvpn.conf > txt/${so}_${dst}_openvpn.conf;
    /usr/local/sbin/openvpn --daemon $dst --cd /TopStor/txt --config ${so}_${dst}_openvpn.conf; 
   fi
+ tun=`ifconfig tun0 | grep -w 'inet' | awk '{print $2}' 2>/dev/null`
+ istun=`echo $tun | awk -F. '{print $1}'`;
+ istunn=$((istun+1))
+ if [[ $istunn -ge 5 ]];
+ then
+  ./Askrcv $pp $tun $so $stamp
+ fi
  done < partners.txt;
 # sleep 1;
  tun=`ifconfig tun0 | grep -w 'inet' | awk '{print $2}' 2>/dev/null`

@@ -1,1 +1,3 @@
-./replidf.sh $pp $tun $sender 
+./replidf.sh 15739 10.176.214.6
+res=ready
+isvalid=./replidf.sh
