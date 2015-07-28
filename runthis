@@ -16,8 +16,11 @@ if [[ $? -eq 0 ]];
 then 
  validcom=$isvalid" "$param;
  res=`eval $validcom`
- echo $validcom  > tmp2runthis 
+ echo $validcom  >> tmp2runthis 
  echo res=$res >> tmp2runthis
+ resn=`echo $res | wc -c`;
+ echo resn=$resn >> tmp2runthis
+ if [[ $resn -eq 0 ]]; then res="ready"; fi
  ppp=$((senderpp+1));
  echo Askreply $replier $sendertun $ppp reply $res > tmprep
  ./Askreply $replier $sendertun $ppp reply $res

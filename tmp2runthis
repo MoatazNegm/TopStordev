@@ -1,3 +1,60 @@
+./RemoteVolSearch forreplic
+res=no
+resn=       3
+isvalid=./RemoteVolSearch
 ./replidf.sh 15739 10.176.214.6
 res=ready
+resn=       6
 isvalid=./replidf.sh
+./RemoteGetSnaplist hi
+res=
+resn=       1
+isvalid=./RemoteGetSnaplist
+./RemoteVolSearch forreplic
+res=found
+resn=       6
+isvalid=./RemoteVolSearch
+./RemoteGetSnaplist forreplic
+res=Data/forreplic@mezo..1438113722
+resn=      32
+isvalid=./RemoteGetSnaplist
+./replivol.sh 15739 10.176.214.6 Data forreplic
+res=ready
+resn=       6
+isvalid=./replivol.sh
+./RemoteGetSnaplist hi
+res=
+resn=       1
+isvalid=./RemoteGetSnaplist
+./RemoteVolSearch forreplic
+res=found
+resn=       6
+isvalid=./RemoteVolSearch
+./RemoteGetSnaplist forreplic
+res=Data/forreplic@mezo..1438113722
+resn=      32
+isvalid=./RemoteGetSnaplist
+./replivol.sh 15739 10.176.214.6 1032_8 Data forreplic
+res=ready
+resn=       6
+isvalid=./replivol.sh
+./RemoteGetSnaplist hi
+res=
+resn=       1
+isvalid=./RemoteGetSnaplist
+./RemoteVolSearch forreplic
+res=found
+resn=       6
+isvalid=./RemoteVolSearch
+./RemoteGetSnaplist forreplic
+res=Data/forreplic@mezo2..1438114110 Data/forreplic@mezo2..1438113827 Data/forreplic@mezo..1438113722
+resn=      98
+isvalid=./RemoteGetSnaplist
+./replivol.sh 15739 10.176.214.6 1032_8 Data forreplic
+res=ready
+resn=       6
+isvalid=./replivol.sh
+./RemoteGetSnaplist hi
+res=
+resn=       1
+isvalid=./RemoteGetSnaplist

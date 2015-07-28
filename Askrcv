@@ -17,6 +17,7 @@ do
  if [[ $? -eq 0 ]]; then sleep 5;
  else
   readthis=`nc -ld $tun $pp`
+  echo $readthis > tmpreadthis
   newsender=`echo $readthis | awk '{print $1}'`;
   stamp=`echo $readthis | awk '{print $2}'`;
   isreply=`echo $readthis | awk '{print $3}'`;

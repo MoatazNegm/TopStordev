@@ -1,4 +1,5 @@
 ./RemoteVolSearch
 ./replidf.sh
-ls
-rm
+./replivol.sh
+./destroysnaps.sh
+./RemoteGetSnaplist
