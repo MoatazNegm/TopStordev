@@ -78,6 +78,7 @@ then
   so=`cat proxy.txt | awk '{print $3}'`
   remotetun=`cat txt/receiver | grep "$oper3"`
   pp=`cat partners.txt | grep "$oper3" | awk '{print $5}'` 
+  /sbin/zfs set repli:sender=$so $newsnap; 
   echo ./ProxyReplicate $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pooli $vol $remotetun $pp $so>> $cronout;
   ./ProxyReplicate $hostip $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pooli $vol $remotetun $pp $so;
 ##########noproxy####################################################

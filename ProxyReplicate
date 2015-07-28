@@ -18,17 +18,17 @@ function RemoteAsk() {
 # echo Asksend $SEND $msg >> txt/tmpproxyrequest; 
 # ./Asksend $SEND $msg 2>/dev/null ; 
  echo $SO $stamp $@ \| nc -w 4 -N $REMOTETUN $PPSEND >> txt/tmpproxyrequest
- echo $SO $stamp $@ | nc -w 5 -N $REMOTETUN $PPSEND
+ echo $SO $stamp $@ | nc -w 20  -N $REMOTETUN $PPSEND
  echo finished Ask >> txt/tmpproxyrequest
  echo asking for txt/remotereply$DST  >> txt/tmpproxyrequest; 
  flagcount=0;
- while [[ $flagcount -le 5 ]]; 
+ while [[ $flagcount -le 20 ]]; 
  do
   if [[ -a txt/remotereply$DST ]]; then break; fi
   flagcount=$((flagcount+1)); 
   sleep 1;
  done
- if [[ -f txt/remotereply$DST ]];
+ if [[ -a txt/remotereply$DST ]];
  then
   RR=`cat txt/remotereply$DST | tail -1 | awk '{print $4}'`;
  fi
@@ -41,6 +41,19 @@ function Sendzfs () {
 # param=`echo $msg | awk '{$1=""; print substr($0,2)}'`;
 # echo \/sbin\/zfs send  $@ \|  nc -w 10 $REMOTETUN $PORzfs
  /sbin/zfs send $@ |  nc -w 10 $REMOTETUN $PORzfs
+ flagcount=0;
+ while [[ $flagcount -le 20 ]];
+ do
+  if [[ -a txt/remotereply$DST ]]; then break; fi
+  flagcount=$((flagcount+1));
+  sleep 1;
+ done
+ if [[ -a txt/remotereply$DST ]];
+ then
+  RR=`cat txt/remotereply$DST | tail -1 | awk '{print $4}'`;
+ fi
+ echo After=$RR flagcount=$flagcount >> txt/tmpproxyrequest
+
 }
 #########################################################################
 ## ./Asksend 1032_8($11) 10.176.214.6($9) 15737($10) RemoteVolSearch sdk
@@ -69,55 +82,52 @@ if [[ $volfound == 'failed' ]]; then
  exit 0 ; fi
 if [[ $volfound == "no" ]];
 then
- RemoteAsk replidf $PORzfs $REMOTETUN $so 
+ RemoteAsk replidf $PORzfs $REMOTETUN $SO 
  echo zfs -D $pool/$vol@$snap  >> txt/tmpproxyrequest;
  Sendzfs  -D $pool/$vol@$snap ;
  echo zfs RR=$RR >> txt/tmpproxyrequest
- exit 0
- if [[ $volfound == "found" ]];
- then
-  echo foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn >> txt/tmpproxyrequest
-  RemoteAsk RemoteGetSnaplist $vol;
-  if [[ $RR == "nothing" ]];  then oldsnaps=""; else oldsnaps=$RR; fi;
-  localsnaps=`./RemoteGetSnaplist $vol`;
-  ll=$oldsnaps;
-  ll=${ll}' spot';
-  echo ll=$ll >> txt/tmpproxyrequest
-  echo oldsnaps result $RR >> txt/tmpproxyrequest;
-  lineupsnaps=`echo $ll | tr ' ' '\n' `
-  initialsnap="";
-  echo $lineupsnaps | while read -r line  
-  do
-   if [[ ${localsnaps/$line} == $localsnaps ]];
-   then ; else initialsnap=$line;  break; fi;
-  done;
-  targetsnap=$pool/$vol@$snap
-  echo targetsnap=$targetsnap >> txt/tmpproxyrequest
-  echo initialsnap=$initialsnap >> txt/tmpproxyrequest
-  if [[ $initialsnap == $targetsnap ]]; 
-  then echo up-to-date >> txt/tmpproxyrequest; fi
-  if [[ $initialsnap == "" ]];
-  then 
-   echo yyyyyyyyyyyyyintital is null >> txt/tmpproxyrequest 
-   echo RemoteAsk destroysnaps.sh $vol >> txt/tmpproxyrequest;
-   RemoteAsk destroysnaps.sh $vol ;
-   echo RemoteAsk repli.sh $pp $pool $so $vol >> txt/tmpproxyrequest;
-   RemoteAsk repli.sh $pp $pool $so $vol;
+else
+ echo foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn >> txt/tmpproxyrequest
+ RemoteAsk RemoteGetSnaplist $vol;
+ if [[ $RR == "nothing" ]];  then oldsnaps=""; else oldsnaps=$RR; fi;
+ localsnaps=`./RemoteGetSnaplist $vol`;
+ ll=$oldsnaps;
+ ll=${ll}' spot';
+ echo ll=$ll >> txt/tmpproxyrequest
+ echo oldsnaps result $RR >> txt/tmpproxyrequest;
+ lineupsnaps=`echo $ll | tr ' ' '\n' `
+ initialsnap="";
+ echo $lineupsnaps | while read -r line  
+ do
+  if [[ ${localsnaps/$line} == $localsnaps ]];
+  then ; else initialsnap=$line;  break; fi;
+ done;
+ targetsnap=$pool/$vol@$snap
+ echo targetsnap=$targetsnap >> txt/tmpproxyrequest
+ echo initialsnap=$initialsnap >> txt/tmpproxyrequest
+ if [[ $initialsnap == $targetsnap ]]; 
+ then echo up-to-date >> txt/tmpproxyrequest; fi
+ if [[ $initialsnap == "" ]];
+ then 
+  echo yyyyyyyyyyyyyintital is null >> txt/tmpproxyrequest 
+  echo RemoteAsk destroysnaps.sh $vol >> txt/tmpproxyrequest;
+  RemoteAsk destroysnaps.sh $vol ;
+  echo RemoteAsk replivol $PORzfs $REMOTETUN $SO $pool $vol >> txt/tmpproxyrequest;
+  RemoteAsk replivol $PORzfs $REMOTETUN $SO $pool $vol;
 #echo exit  >> txt/tmpproxyrequest
 #exit
-   echo zfs send -R   $targetsnap  to  txt/c$ppzfs >> txt/tmpproxyrequest;
-   Sendzfs zfs send -R   $targetsnap ;
-   exit;
-  else
-   echo RemoteAsk repli.sh $pp $pool $so $vol >> txt/tmpproxyrequest;
-   RemoteAsk repli.sh $pp $pool $so $vol;
-   echo zfs send -R -I $initialsnap  $targetsnap to txt/c$ppzfs >> txt/tmpproxyrequest;
-   Sendzfs zfs send -R -I $initialsnap  $targetsnap ;
-  fi
+  echo zfs send -R   $targetsnap  to  txt/c$ppzfs >> txt/tmpproxyrequest;
+  Sendzfs  -R   $targetsnap ;
+  exit;
+ else
+  echo RemoteAsk replivol $PORzfs $REMOTETUN $SO  $pool $vol >> txt/tmpproxyrequest
+  RemoteAsk replivol $PORzfs $REMOTETUN $SO  $pool $vol;
+  echo zfs send -R -I $initialsnap  $targetsnap to txt/c$ppzfs >> txt/tmpproxyrequest;
+  Sendzfs  -R -I $initialsnap  $targetsnap ;
  fi
 fi
 ./GetSnaplist & 
 echo RemoteAsk GetSnaplist hi  >> txt/tmpproxyrequest 
-RemoteAsk GetSnaplist hi & 
+RemoteAsk RemoteGetSnaplist hi & 
  echo POR=$POR Compelete  >> txt/tmpproxyrequest ; 
 # RemoteAsk done  & ; 

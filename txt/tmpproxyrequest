@@ -100,3 +100,656 @@ asking for txt/remotereply1032_7
 afterAsk=failed flagcount=6
 zfs -D Data/forreplic@SShi..1438108615
 zfs RR=failed
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438109220 rrhi..1438109220 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438109220 rrhi..1438109220 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438109220 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=no flagcount=5
+volfound=no
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replidf 15739 10.176.214.6
+1032_8 1438109225 replidf 15739 10.176.214.6 | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=failed flagcount=6
+zfs -D Data/forreplic@rrhi..1438109220
+After=ready flagcount=0
+zfs RR=ready
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438110228 rrhi..1438110228 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438110228 rrhi..1438110228 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438110228 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=found flagcount=5
+volfound=found
+RemoteAsk GetSnaplist hi
+POR=15737 Compelete
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending GetSnaplist hi
+1032_8 1438110234 GetSnaplist hi | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=failed flagcount=6
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438110987 rrhi..1438110987 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438110987 rrhi..1438110987 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438110987 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=4
+volfound=ready
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438110991 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=failed flagcount=6
+ll=failed spot
+oldsnaps result failed
+targetsnap=Data/forreplic@rrhi..1438110987
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438110998 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=4
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438111091 rrhi..1438111091 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438111091 rrhi..1438111091 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438111091 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+volfound=ready
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438111096 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=failed flagcount=6
+ll=failed spot
+oldsnaps result failed
+targetsnap=Data/forreplic@rrhi..1438111091
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438111103 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438112323 rrhi..1438112323 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438112323 rrhi..1438112323 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438112323 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+volfound=ready
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438112328 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+ll=ready spot
+oldsnaps result ready
+targetsnap=Data/forreplic@rrhi..1438112323
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438112334 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=4
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438112808 rrhi..1438112808 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438112808 rrhi..1438112808 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438112808 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=4
+volfound=ready
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438112813 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+ll=ready spot
+oldsnaps result ready
+targetsnap=Data/forreplic@rrhi..1438112808
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438112819 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+RemoteAsk replivol 15739 10.176.214.6 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending repli.sh 15737 Data forreplic
+1032_8 1438112824 repli.sh 15737 Data forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=failed flagcount=6
+zfs send -R Data/forreplic@rrhi..1438112808 to txt/c
+After=failed flagcount=6
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438112897 rrhi..1438112897 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438112897 rrhi..1438112897 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438112897 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+volfound=ready
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438112903 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=4
+ll=ready spot
+oldsnaps result ready
+targetsnap=Data/forreplic@rrhi..1438112897
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438112907 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+RemoteAsk replivol 15739 10.176.214.6 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 15739 10.176.214.6 Dataforreplic
+1032_8 1438112913 replivol 15739 10.176.214.6 Dataforreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+zfs send -R Data/forreplic@rrhi..1438112897 to txt/c
+After=ready flagcount=0
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438112960 mezo22..1438112960 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438112960 mezo22..1438112960 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438112960 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+volfound=ready
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438112966 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+ll=ready spot
+oldsnaps result ready
+targetsnap=Data/forreplic@mezo22..1438112960
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438112971 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+RemoteAsk replivol 15739 10.176.214.6 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 15739 10.176.214.6 Dataforreplic
+1032_8 1438112977 replivol 15739 10.176.214.6 Dataforreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+zfs send -R Data/forreplic@mezo22..1438112960 to txt/c
+After=ready flagcount=0
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438113062 mezo23..1438113062 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438113062 mezo23..1438113062 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438113062 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=4
+volfound=ready
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438113066 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+ll=ready spot
+oldsnaps result ready
+targetsnap=Data/forreplic@mezo23..1438113062
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438113072 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+RemoteAsk replivol 15739 10.176.214.6 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 15739 10.176.214.6 Dataforreplic
+1032_8 1438113077 replivol 15739 10.176.214.6 Dataforreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+zfs send -R Data/forreplic@mezo23..1438113062 to txt/c
+After=ready flagcount=0
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438113194 mezo..1438113194 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438113194 mezo..1438113194 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438113194 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=4
+volfound=ready
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438113199 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=4
+ll=ready spot
+oldsnaps result ready
+targetsnap=Data/forreplic@mezo..1438113194
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438113204 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=4
+RemoteAsk replivol 15739 10.176.214.6 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 15739 10.176.214.6 Dataforreplic
+1032_8 1438113208 replivol 15739 10.176.214.6 Dataforreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=4
+zfs send -R Data/forreplic@mezo..1438113194 to txt/c
+After=ready flagcount=0
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438113223 mezo..1438113223 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438113223 mezo..1438113223 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438113223 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=4
+volfound=ready
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438113227 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+ll=ready spot
+oldsnaps result ready
+targetsnap=Data/forreplic@mezo..1438113223
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438113233 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+RemoteAsk replivol 15739 10.176.214.6 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 15739 10.176.214.6 Dataforreplic
+1032_8 1438113238 replivol 15739 10.176.214.6 Dataforreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+zfs send -R Data/forreplic@mezo..1438113223 to txt/c
+After=ready flagcount=0
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438113292 mezo..1438113292 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438113292 mezo..1438113292 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438113292 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=4
+volfound=ready
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438113297 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+ll=ready spot
+oldsnaps result ready
+targetsnap=Data/forreplic@mezo..1438113292
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438113302 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+RemoteAsk replivol 15739 10.176.214.6 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 15739 10.176.214.6 Data forreplic
+1032_8 1438113308 replivol 15739 10.176.214.6 Data forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+zfs send -R Data/forreplic@mezo..1438113292 to txt/c
+After=ready flagcount=0
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438113331 mezo..1438113331 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438113331 mezo..1438113331 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438113331 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+volfound=ready
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438113336 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+ll=ready spot
+oldsnaps result ready
+targetsnap=Data/forreplic@mezo..1438113331
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438113342 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+RemoteAsk replivol 15739 10.176.214.6 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 15739 10.176.214.6 Data forreplic
+1032_8 1438113347 replivol 15739 10.176.214.6 Data forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=4
+zfs send -R Data/forreplic@mezo..1438113331 to txt/c
+After=ready flagcount=0
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438113468 mezo..1438113468 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438113468 mezo..1438113468 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438113468 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+volfound=ready
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438113474 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=4
+ll=ready spot
+oldsnaps result ready
+targetsnap=Data/forreplic@mezo..1438113468
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438113478 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+RemoteAsk replivol 15739 10.176.214.6 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 15739 10.176.214.6 Data forreplic
+1032_8 1438113484 replivol 15739 10.176.214.6 Data forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=4
+zfs send -R Data/forreplic@mezo..1438113468 to txt/c
+After=ready flagcount=0
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438113605 mezo..1438113605 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438113605 mezo..1438113605 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438113605 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=no flagcount=4
+volfound=no
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replidf 15739 10.176.214.6
+1032_8 1438113610 replidf 15739 10.176.214.6 | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=failed flagcount=21
+zfs -D Data/forreplic@mezo..1438113605
+After=failed flagcount=21
+zfs RR=failed
+RemoteAsk GetSnaplist hi
+POR=15737 Compelete
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist hi
+1032_8 1438113654 RemoteGetSnaplist hi | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk= flagcount=4
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438113722 mezo..1438113722 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438113722 mezo..1438113722 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438113722 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=no flagcount=5
+volfound=no
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replidf 15739 10.176.214.6
+1032_8 1438113727 replidf 15739 10.176.214.6 | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=failed flagcount=21
+zfs -D Data/forreplic@mezo..1438113722
+After=ready flagcount=0
+zfs RR=ready
+RemoteAsk GetSnaplist hi
+POR=15737 Compelete
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist hi
+1032_8 1438113759 RemoteGetSnaplist hi | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk= flagcount=4
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438113827 mezo2..1438113827 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438113827 mezo2..1438113827 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438113827 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=found flagcount=4
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438113832 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=Data/forreplic@mezo..1438113722 flagcount=5
+ll=Data/forreplic@mezo..1438113722 spot
+oldsnaps result Data/forreplic@mezo..1438113722
+targetsnap=Data/forreplic@mezo2..1438113827
+initialsnap=Data/forreplic@mezo..1438113722
+RemoteAsk replivol 15739 10.176.214.6 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 15739 10.176.214.6 Data forreplic
+1032_8 1438113837 replivol 15739 10.176.214.6 Data forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+zfs send -R -I Data/forreplic@mezo..1438113722 Data/forreplic@mezo2..1438113827 to txt/c
+After=ready flagcount=0
+RemoteAsk GetSnaplist hi
+POR=15737 Compelete
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist hi
+1032_8 1438113843 RemoteGetSnaplist hi | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk= flagcount=5
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438114110 mezo2..1438114110 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438114110 mezo2..1438114110 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438114110 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=found flagcount=4
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438114114 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=Data/forreplic@mezo..1438113722 flagcount=5
+ll=Data/forreplic@mezo..1438113722 spot
+oldsnaps result Data/forreplic@mezo..1438113722
+targetsnap=Data/forreplic@mezo2..1438114110
+initialsnap=Data/forreplic@mezo..1438113722
+RemoteAsk replivol 15739 10.176.214.6 1032_8 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 15739 10.176.214.6 1032_8 Data forreplic
+1032_8 1438114120 replivol 15739 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=failed flagcount=21
+zfs send -R -I Data/forreplic@mezo..1438113722 Data/forreplic@mezo2..1438114110 to txt/c
+After=ready flagcount=0
+RemoteAsk GetSnaplist hi
+POR=15737 Compelete
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist hi
+1032_8 1438114152 RemoteGetSnaplist hi | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk= flagcount=5
+running ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowOnce.txt1438114245 mezo2..1438114245 Data forreplic 10.176.214.6 15737 1032_8
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438114245 mezo2..1438114245 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438114245 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=found flagcount=5
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438114250 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=Data/forreplic@mezo2..1438114110 flagcount=5
+ll=Data/forreplic@mezo2..1438114110 spot
+oldsnaps result Data/forreplic@mezo2..1438114110
+targetsnap=Data/forreplic@mezo2..1438114245
+initialsnap=Data/forreplic@mezo2..1438114110
+RemoteAsk replivol 15739 10.176.214.6 1032_8 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 15739 10.176.214.6 1032_8 Data forreplic
+1032_8 1438114256 replivol 15739 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=failed flagcount=21
+zfs send -R -I Data/forreplic@mezo2..1438114110 Data/forreplic@mezo2..1438114245 to txt/c
+After=ready flagcount=0
+RemoteAsk GetSnaplist hi
+POR=15737 Compelete
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist hi
+1032_8 1438114288 RemoteGetSnaplist hi | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk= flagcount=4

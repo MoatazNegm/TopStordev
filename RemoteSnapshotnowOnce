@@ -24,6 +24,7 @@ then
   so=`cat proxy.txt | awk '{print $3}'`
   remotetun=`cat txt/receiver | grep "$oper3" | awk '{print $3}'`
   pp=`cat txt/receiver | grep "$oper3" | awk '{print $4}'`
+  /sbin/zfs set repli:sender=$so $newsnap;
  echo  running ./ProxyReplicate $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so >> txt/tmpproxyrequest;
  ./ProxyReplicate $sendername $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so;
 ##########noproxy####################################################
