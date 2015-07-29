@@ -23,7 +23,7 @@ function RemoteAsk() {
  echo finished Ask >> txt/tmpproxyrequest
  echo asking for txt/remotereply$DST  >> txt/tmpproxyrequest; 
  flagcount=0;
- while [[ $flagcount -le 20 ]]; 
+ while [[ $flagcount -le 30 ]]; 
  do
   if [[ -a txt/remotereply$DST ]]; then break; fi
   flagcount=$((flagcount+1)); 
@@ -34,6 +34,7 @@ function RemoteAsk() {
   RR=`cat txt/remotereply$DST | tail -1 | awk '{print $4}'`;
  else
   echo Failed_Communication >> $FILELOG;
+  echo Failed_Communication >> txt/tmpproxyrequest;
   exit 0 ;
  fi
 
@@ -82,6 +83,8 @@ echo RemoteAsk RemoteVolSearch $vol >> txt/tmpproxyrequest
 RemoteAsk RemoteVolSearch $vol;
 volfound=$RR;
 echo volfound=$volfound >> txt/tmpproxyrequest
+ps -axw | grep zfs | grep send >/dev/null 2>&1
+if [[ $? -eq 0 ]]; then echo another replication is wokring.. canceled this > $FILELOG; echo another replication is wokring.. canceled this >> txt/tmpproxyrequest; exit 0 ; fi 
 if [[ $volfound == "no" ]];
 then
  RemoteAsk replidf $PORzfs $REMOTETUN $SO 

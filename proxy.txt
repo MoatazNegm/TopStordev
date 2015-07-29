@@ -1,1 +1,1 @@
-10.3.2.6 iwiwiw 1032_8
+ec2-54-149-2-154.us-west-2.compute.amazonaws.com iwiwiw 1032_8

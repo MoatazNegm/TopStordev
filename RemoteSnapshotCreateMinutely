@@ -32,9 +32,9 @@ else
 	logdata='Success_Creating_Minutely_Replication_Period:'$DG/$FileS'_for_'$partner;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 fi;
-rm txt/${0:2}$userreq.txt
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 ./RemoteGetPoolperiodlist
 fi
 bb=`cat $web`;
 echo ${datenow} ${timenow} :${bb} > ${logging}2
+rm txt/${0:2}$userreq.txt
