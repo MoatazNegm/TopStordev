@@ -6,6 +6,7 @@ export RR;
 export PPSEND; 
 export PORzfs; 
 export REMOTETUN; 
+export FILELOG; 
 export OPERS;
 #############################################################################33
 function RemoteAsk() {
@@ -31,7 +32,11 @@ function RemoteAsk() {
  if [[ -a txt/remotereply$DST ]];
  then
   RR=`cat txt/remotereply$DST | tail -1 | awk '{print $4}'`;
+ else
+  echo Failed_Communication >> $FILELOG;
+  exit 0 ;
  fi
+
  echo afterAsk=$RR flagcount=$flagcount >> txt/tmpproxyrequest
 }
 ###############################################################################
@@ -62,7 +67,7 @@ function Sendzfs () {
 SO=`echo $@ | awk '{print $8}'`;
 DST=`echo $@ | awk '{print $1}'`;
 REMOTETUN=`echo $@ | awk '{print $6}'`;
-filelog=`echo $@ | awk '{print $2}'`;
+FILELOG=`echo $@ | awk '{print $2}'`;
 snap=`echo $@ | awk '{print $3}'`
 pool=`echo $@ | awk '{print $4}'`;
 vol=`echo $@ | awk '{print $5}'`;
@@ -77,12 +82,10 @@ echo RemoteAsk RemoteVolSearch $vol >> txt/tmpproxyrequest
 RemoteAsk RemoteVolSearch $vol;
 volfound=$RR;
 echo volfound=$volfound >> txt/tmpproxyrequest
-if [[ $volfound == 'failed' ]]; then 
- #echo \Problem\: $volfound >> $filelog;i
- exit 0 ; fi
 if [[ $volfound == "no" ]];
 then
  RemoteAsk replidf $PORzfs $REMOTETUN $SO 
+ 
  echo zfs -D $pool/$vol@$snap  >> txt/tmpproxyrequest;
  Sendzfs  -D $pool/$vol@$snap ;
  echo zfs RR=$RR >> txt/tmpproxyrequest
@@ -128,6 +131,6 @@ else
 fi
 ./GetSnaplist & 
 echo RemoteAsk GetSnaplist hi  >> txt/tmpproxyrequest 
-RemoteAsk RemoteGetSnaplist hi & 
+RemoteAsk RemoteGetSnaplist $vol & 
  echo POR=$POR Compelete  >> txt/tmpproxyrequest ; 
 # RemoteAsk done  & ; 

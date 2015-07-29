@@ -6,7 +6,7 @@ ClearExit() {
 	exit 0;
 }
 trap ClearExit HUP
-/sbin/sysctl net.inet.tcp.msl=2500 
+/sbin/sysctl net.inet.tcp.msl=2500  >/dev/null
 ./ProxysndSVC.sh
 while true; do
 {

@@ -1,8 +1,8 @@
 #! /usr/local/bin/zsh
 cd /TopStor
-mkfifo -m 660 /tmp/msgfile
-mkfifo -m 600 /tmp/msgrack;
-mkfifo -m 600 /tmp/msgremotefile;
+mkfifo -m 660 /tmp/msgfile 2>/dev/null
+mkfifo -m 600 /tmp/msgrack 2>/dev/null
+mkfifo -m 600 /tmp/msgremotefile 2>/dev/null
 export REMOTE=Topstor
 ./Topstorremote.sh &
 ./Topstorremoteack.sh &

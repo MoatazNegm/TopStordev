@@ -18,12 +18,13 @@ then
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 # echo ./RemoteSnapshotnowOnce $DG/$FileS $name. $partner  txt/${0:2}.txt 
- ./RemoteSnapshotnowOnce $DG/$FileS $name. $partner 2> txt/${0:2}.txt 
- err=`wc -c  txt/${0:2}.txt | awk '{print $1}'`;
+ ./RemoteSnapshotnowOnce $DG/$FileS $name. $partner txt/${0:2}.txt; 
+ errres=`txt/${0:2}.txt `;
+ errn=`echo $errres | wc -nc`;
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
- if [[ $err -ge  4  ]]; then
-	cat txt/${0:2}.txt > $web;
-	logdata='Failed_Replicating_manually:'$DG/$FileS' to'$partner;
+ if [[ $errn -ge  4  ]]; then
+        echo $errres > $web;
+	logdata='Failed_Replicating_manually:'$DG/$FileS' to'${partner}": "$errres;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
  else 
  	echo DONE...Replicating_manually:$DG/$FileS to $partner > $web; 

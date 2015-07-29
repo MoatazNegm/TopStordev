@@ -1,14 +1,15 @@
 #! /usr/local/bin/zsh
 cd /TopStor
-web='/usr/local/www/apache24/data/des19/Data/statusglobal.log';
 oper=$@; 
 oper1=`echo $oper | awk '{print $1}'`;
 oper2=`echo $oper | awk '{print $2}'`;
 oper3=`echo $oper | awk '{print $3}'`;
+errf=`echo $oper | awk '{print $4}'`;
 hostip=`ifconfig em1 | grep "inet " | awk '{print $2}'`;
 pool=`echo $oper1 | awk -F/ '{print $1}'`;
 vol=`echo $oper1 | awk -F/ '{print $2}'`;
 stamp=`date +%s`;
+echo NA >  txt/${0:2}${userreq}.txt$stamp
 newsnap2=`echo $oper2.$stamp`;
 newsnap=`echo $oper1@$newsnap2`;
 /sbin/zfs snapshot $newsnap; 
@@ -25,10 +26,11 @@ then
   remotetun=`cat txt/receiver | grep "$oper3" | awk '{print $3}'`
   pp=`cat txt/receiver | grep "$oper3" | awk '{print $4}'`
   /sbin/zfs set repli:sender=$so $newsnap;
- echo  running ./ProxyReplicate $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so >> txt/tmpproxyrequest;
- ./ProxyReplicate $sendername $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so;
+ echo  running ./ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so >> txt/tmpproxyrequest;
+ ./ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so;
 ##########noproxy####################################################
 else
- echo ./Replicate $hostip $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol >> txt/tmprequest
- ./Replicate $hostip $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pool $vol;
+ echo ./Replicate $hostip $oper3 $errf $newsnap2 $pool $vol >> txt/tmprequest
+ ./Replicate $hostip $oper3 $errf $newsnap2 $pool $vol;
 fi
+ #echo donereplicating
