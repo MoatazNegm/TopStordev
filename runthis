@@ -8,19 +8,24 @@ replier=`echo  $@ | awk '{print $3}'`;
 senderpp=`echo  $@ | awk '{print $4}'`;
 pp=`echo  $@ | awk '{print $5}'`;
 tun=`echo  $@ | awk '{print $6}'`;
-newcom=`echo  $@ | awk '{print $7}'`;
-param=`echo  $@ | awk '{$1=$2=$3=$4=$5=$6=$7="";print substr($0,8)}'`;
+stamp=`echo  $@ | awk '{print $7}'`;
+newcom=`echo  $@ | awk '{print $8}'`;
+param=`echo  $@ | awk '{$1=$2=$3=$4=$5=$6=$7=$8="";print substr($0,9)}'`;
 # packet : sender stamp command
+fileres='txt/runthis'$stamp
 isvalid=`cat Commands.txt | grep "$newcom"`
 if [[ $? -eq 0 ]];
 then 
- validcom=$isvalid" "$param;
- res=`eval $validcom`
- echo $validcom  >> tmp2runthis 
+ validcom=${isvalid}" "${fileres}" "$param;
+ echo $validcom  > tmp2runthis 
+ eval $validcom
+ while [[ ! -a $fileres ]];  
+ do
+  c=0;  while [[ $c -le 30 ]]; do c=$((c+1)); done
+ done
+ res=`cat $fileres`
  echo res=$res >> tmp2runthis
- resn=`echo $res | wc -c`;
- echo resn=$resn >> tmp2runthis
- if [[ $resn -eq 0 ]]; then res="ready"; fi
+ rm $fileres 2>/dev/null
  ppp=$((senderpp+1));
  echo Askreply $replier $sendertun $ppp reply $res > tmprep
  ./Askreply $replier $sendertun $ppp reply $res

@@ -24,4 +24,4 @@ echo $result >$websnaps;
 resdate=`date +%s`;
 res=` ./jsonthis3.sh updated $resdate`;
 echo $res > $resweb;
-echo ready;
+#echo ready;
