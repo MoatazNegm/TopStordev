@@ -130,6 +130,84 @@ else
   RemoteAsk replivol $PORzfs $REMOTETUN $SO  $pool $vol;
   echo zfs send -R -I $initialsnap  $targetsnap to txt/c$ppzfs >> txt/tmpproxyrequest;
   Sendzfs  -R -I $initialsnap  $targetsnap ;
+=======
+OPERS=`echo $so $dst ProxysendReInit.sh $dst $pp`;
+echo OPERS $OPERS >> txt/tmpproxyrequest
+issocat=`ps -axuw | grep ProxyReplicateSVC | grep -w "$dst" `
+issocatn=`echo $issocat | wc -c `;
+./Proxyalert.sh $so $dst $passphrase $pp;
+if [[ $issocatn -le 3 ]]; then 
+./ProxyReplicateSVC.sh $so $dst $passphrase $pp &
+fi
+RemoteAsk  ready; 
+echo RR=$RR  >> txt/tmpproxyrequest
+echo donennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn >> txt/tmpproxyrequest
+if [[ $RR != "ready" ]]; then echo cannot make session;
+else 
+ POR=$pp;
+ echo RemoteAsk RemoteVolSearch $vol >> txt/tmpproxyrequest
+ RemoteAsk RemoteVolSearch $vol;
+ volfound=$RR;
+ echo volfound=$volfound >> txt/tmpproxyrequest
+ if [[ $volfound == 'FAILED' ]]; then echo Problem: $volfound >> $filelog; exit 1 ; fi
+ if [[ $volfound == "no" ]];
+ then
+  echo no >> txt/tmpproxyrequest
+  volpar=`./RemoteGetPoolVollist $vol`;
+  prot=`echo $volpar | awk '{print $1}'`;
+  size=`echo $volpar | awk '{print $2}'`;
+  echo RemoteAsk VolumeCreate$prot $pool $vol ${size}M admin >> txt/tmpproxyrequest 
+  RemoteAsk VolumeCreate$prot $pool $vol ${size}M admin; 
+  echo creating 
+exit
+  echo RemoteAsk repli.sh $pp $pool $so $vol >> txt/tmpproxyrequest;
+  RemoteAsk repli.sh $pp $pool $so $vol ;
+#  tobeready=`RemoteAsk repli.sh $pt $pool $so $vol` ;
+#  echo RemoteAsk GetPoolVollist hi  >> txt/tmpproxyrequest; 
+#  RemoteAsk GetPoolVollist hi  
+  echo zfs send -D $pool/$vol@$snap  to txt/c$ppzfs >> txt/tmpproxyrequest;
+  Sendzfs zfs send -D $pool/$vol@$snap ;
+ else 
+  if [[ $volfound == "found" ]];
+  then
+   echo foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn >> txt/tmpproxyrequest
+   RemoteAsk RemoteGetSnaplist $vol;
+   if [[ $RR == "nothing" ]];  then oldsnaps=""; else oldsnaps=$RR; fi;
+   localsnaps=`./RemoteGetSnaplist $vol`;
+   ll=$oldsnaps;
+   ll=${ll}' spot';
+   echo ll=$ll >> txt/tmpproxyrequest
+   echo oldsnaps result $RR >> txt/tmpproxyrequest;
+   lineupsnaps=`echo $ll | tr ' ' '\n' `
+   initialsnap="";
+   echo $lineupsnaps | while read -r line  
+   do
+    if [[ ${localsnaps/$line} == $localsnaps ]];
+    then ; else initialsnap=$line;  break; fi;
+   done;
+   targetsnap=$pool/$vol@$snap
+   echo targetsnap=$targetsnap >> txt/tmpproxyrequest
+   echo initialsnap=$initialsnap >> txt/tmpproxyrequest
+   if [[ $initialsnap == $targetsnap ]]; 
+   then echo up-to-date >> txt/tmpproxyrequest; fi
+   if [[ $initialsnap == "" ]];
+   then 
+    echo yyyyyyyyyyyyyintital is null >> txt/tmpproxyrequest 
+    echo RemoteAsk destroysnaps.sh $vol >> txt/tmpproxyrequest;
+    RemoteAsk destroysnaps.sh $vol ;
+    echo RemoteAsk repli.sh $pp $pool $so $vol >> txt/tmpproxyrequest;
+    RemoteAsk repli.sh $pp $pool $so $vol;
+#echo exit  >> txt/tmpproxyrequest
+    echo zfs send -R   $targetsnap  to  txt/c$ppzfs >> txt/tmpproxyrequest;
+    Sendzfs zfs send -R   $targetsnap ;
+    exit;
+   else
+    echo RemoteAsk repli.sh $pp $pool $so $vol >> txt/tmpproxyrequest;
+    RemoteAsk repli.sh $pp $pool $so $vol;
+    echo zfs send -R -I $initialsnap  $targetsnap to txt/c$ppzfs >> txt/tmpproxyrequest;
+    Sendzfs zfs send -R -I $initialsnap  $targetsnap ;
+   fi
+  fi
  fi
 fi
 ./GetSnaplist & 

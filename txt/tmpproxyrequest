@@ -341,3 +341,63 @@ sending RemoteGetSnaplist forreplic
 finished Ask
 asking for txt/remotereply1032_7
 afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438222800 flagcount=5
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438223100 Repli.Minutely.2.5.na.na.1438223100 Data forreplic 10.176.214.6 15737 
+1032_8
+
+1032_7
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438223400 Repli.Minutely.2.5.na.na.1438223400 Data forreplic 10.176.214.6 15737 
+1032_8
+
+1032_7
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438223700 Repli.Minutely.2.5.na.na.1438223700 Data forreplic 10.176.214.6 15737 
+1032_8
+
+1032_7
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438224000 Repli.Minutely.2.5.na.na.1438224000 Data forreplic 10.176.214.6 15737 
+1032_8
+
+1032_7
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438224300 Repli.Minutely.2.5.na.na.1438224300 Data forreplic 10.176.214.6 15737 
+1032_8
+
+1032_7
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438224600 Repli.Minutely.2.5.na.na.1438224600 Data forreplic 10.176.214.6 15737 
+1032_8
+
+1032_7
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438224900 Repli.Minutely.2.5.na.na.1438224900 Data forreplic 10.176.214.6 15737 
+1032_8
+
+1032_7
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438225200 Repli.Minutely.2.5.na.na.1438225200 Data forreplic 10.176.214.6 15737 
+1032_8
+
+1032_7
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438225500 Repli.Minutely.2.5.na.na.1438225500 Data forreplic 10.176.214.6 15737 
+1032_8
+
+1032_7
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438225800 Repli.Minutely.2.5.na.na.1438225800 Data forreplic 10.176.214.6 15737 
+1032_8
+
+1032_7
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1438225800 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+1032_8
+
+1032_7
+Failed_Communication

@@ -1,0 +1,14 @@
+10.176.214.1
+82030  -  SNs    0:00.35 /usr/local/sbin/openvpn --daemon 1032_8 --cd /TopStor/txt --config 1032_7_1032_8_openvpn.conf      119
+passed first killing
+       1
+passed first killing
+removing txt/15737
+ 911  -  SNs  0:00.01 /usr/local/sbin/openvpn --daemon 1032_8 --cd /TopStor/txt --config 1032_7_1032_8_openvpn.conf      116
+passed first killing
+ 911  -  SNs  0:00.04 /usr/local/sbin/openvpn --daemon 1032_8 --cd /TopStor/txt --config 1032_7_1032_8_openvpn.conf      116
+passed first killing
+ 911  -  SNs  0:00.05 /usr/local/sbin/openvpn --daemon 1032_8 --cd /TopStor/txt --config 1032_7_1032_8_openvpn.conf      116
+passed first killing
+ 911  -  SNs  0:00.05 /usr/local/sbin/openvpn --daemon 1032_8 --cd /TopStor/txt --config 1032_7_1032_8_openvpn.conf      116
+passed first killing
