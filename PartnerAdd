@@ -38,6 +38,7 @@ oldtype=`echo $partnerlist | grep "$Partnername" | awk '{print $2}'`;
 if [[ $oldtype == "sender" && $type == "receiver" ]]; then newtype="DualWay";fi
 if [[ $oldtype == "receiver" && $type == "sender" ]]; then newtype="DualWay";fi
 echo $Partnername $newtype $Proxy $passphrase $portused >> partners.txt
+touch txt/$portused;
 result="[";
 cat partners.txt | while read -r line ; do
   n=` echo $line | awk '{print $1}'`; 

@@ -1,4 +1,5 @@
 #! /usr/local/bin/zsh
+cd /TopStor
 pp=`echo  $@ | awk '{print $1}'`;
 tun=`echo  $@ | awk '{print $2}'`;
 peer=`echo  $@ | awk '{print $3}'`;
