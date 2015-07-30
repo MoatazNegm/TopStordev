@@ -302,3 +302,42 @@ sending RemoteGetSnaplist forreplic
 finished Ask
 asking for txt/remotereply1032_7
 afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438222500 flagcount=5
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438222800 Repli.Minutely.2.5.na.na.1438222800 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438222800 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=found flagcount=5
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438222808 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438222500 flagcount=8
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438222500 spot
+oldsnaps result Data/forreplic@Repli.Minutely.2.5.na.na.1438222500
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438222800
+initialsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438222500
+RemoteAsk replivol 15739 10.176.214.6 1032_8 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 15739 10.176.214.6 1032_8 Data forreplic
+1032_8 1438222819 replivol 15739 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+zfs send -R -I Data/forreplic@Repli.Minutely.2.5.na.na.1438222500 Data/forreplic@Repli.Minutely.2.5.na.na.1438222800 to txt/c
+After=ready flagcount=0
+RemoteAsk GetSnaplist hi
+POR=15737 Compelete
+finishedddddddddddddddddddddddddddddddddddddddddddddddddd
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438222837 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438222800 flagcount=5
