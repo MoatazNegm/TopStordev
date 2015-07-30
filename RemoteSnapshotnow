@@ -10,6 +10,7 @@ echo oper=$oper > $cronout
 oper1=`echo $oper | awk '{print $1}'`;
 oper2=`echo $oper | awk '{print $2}'`;
 oper3=`echo $oper | awk '{print $3}'`;
+userreq='System';
 touch txt/${0:2}${userreq}.txt$stamp
 isallowed=`cat partners.txt | grep $oper3 | awk '{print $2}'`;
 if [[ $isallowed == "DualWay" ||  $isallowed == "receiver" ]];
@@ -34,7 +35,6 @@ then
  keep=$(($keep+0));
  echo keeppluszero=$keep >> $cronout
  timenow=`date`;
- userreq='System';
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
  counter=$((keep+1));
  snapsc=$((countsnap+0));

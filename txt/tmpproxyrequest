@@ -1,520 +1,304 @@
-another replication is wokring.. canceled this
 Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438204440 Repli.Minutely.3.2.na.na.1438204440 Data forreplic 10.176.214.6 15737 1032_8
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438220400 Repli.Minutely.2.5.na.na.1438220400 Data forreplic 10.176.214.6 15737 1032_8
 RemoteAsk RemoteVolSearch forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteVolSearch forreplic
-1032_8 1438204440 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+1032_8 1438220400 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
 afterAsk=found flagcount=6
-volfound=found
-another replication is wokring.. canceled this
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438204560 Repli.Minutely.3.2.na.na.1438204560 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438204560 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-finished Ask
-asking for txt/remotereply1032_7
-afterAsk=found flagcount=6
-volfound=found
-another replication is wokring.. canceled this
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438204680 Repli.Minutely.3.2.na.na.1438204680 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438204680 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-finished Ask
-asking for txt/remotereply1032_7
-afterAsk=found flagcount=7
-volfound=found
-another replication is wokring.. canceled this
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438204800 Repli.Minutely.3.2.na.na.1438204800 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438204800 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-finished Ask
-asking for txt/remotereply1032_7
-afterAsk=found flagcount=6
-volfound=found
-another replication is wokring.. canceled this
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438204920 Repli.Minutely.3.2.na.na.1438204920 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438204920 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-finished Ask
-asking for txt/remotereply1032_7
-afterAsk=found flagcount=6
-volfound=found
-another replication is wokring.. canceled this
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438205040 Repli.Minutely.3.2.na.na.1438205040 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438205040 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-finished Ask
-asking for txt/remotereply1032_7
-afterAsk=found flagcount=5
-volfound=found
-another replication is wokring.. canceled this
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438205160 Repli.Minutely.3.2.na.na.1438205160 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438205160 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-finished Ask
-asking for txt/remotereply1032_7
-afterAsk=found flagcount=6
-volfound=found
-another replication is wokring.. canceled this
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438205280 Repli.Minutely.3.2.na.na.1438205280 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438205280 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-finished Ask
-asking for txt/remotereply1032_7
-afterAsk=found flagcount=7
-volfound=found
-another replication is wokring.. canceled this
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438205400 Repli.Minutely.3.2.na.na.1438205400 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438205400 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-finished Ask
-asking for txt/remotereply1032_7
-afterAsk=found flagcount=5
 volfound=found
 foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteGetSnaplist forreplic
-1032_8 1438205409 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
+1032_8 1438220409 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438203600 flagcount=5
-ll=Data/forreplic@Repli.Minutely.3.2.na.na.1438203600 spot
-oldsnaps result Data/forreplic@Repli.Minutely.3.2.na.na.1438203600
-targetsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438205400
-initialsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438203600
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438219800 flagcount=6
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438219800 spot
+oldsnaps result Data/forreplic@Repli.Minutely.2.5.na.na.1438219800
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438220400
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438220419 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=6
 RemoteAsk replivol 15739 10.176.214.6 1032_8 Data forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending replivol 15739 10.176.214.6 1032_8 Data forreplic
-1032_8 1438205418 replivol 15739 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 15738
-finished Ask
-asking for txt/remotereply1032_7
-afterAsk=ready flagcount=9
-zfs send -R -I Data/forreplic@Repli.Minutely.3.2.na.na.1438203600 Data/forreplic@Repli.Minutely.3.2.na.na.1438205400 to txt/c
-After=ready flagcount=20
-After=ready flagcount=0
-RemoteAsk GetSnaplist hi
-POR=15737 Compelete
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-1032_8 1438205441 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
-finished Ask
-asking for txt/remotereply1032_7
-afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438205400 flagcount=7
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438205520 Repli.Minutely.3.2.na.na.1438205520 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438205520 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-finished Ask
-asking for txt/remotereply1032_7
-afterAsk=found flagcount=5
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-1032_8 1438205532 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
-finished Ask
-asking for txt/remotereply1032_7
-afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438205400 flagcount=5
-ll=Data/forreplic@Repli.Minutely.3.2.na.na.1438205400 spot
-oldsnaps result Data/forreplic@Repli.Minutely.3.2.na.na.1438205400
-targetsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438205520
-initialsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438205400
-RemoteAsk replivol 15739 10.176.214.6 1032_8 Data forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replivol 15739 10.176.214.6 1032_8 Data forreplic
-1032_8 1438205539 replivol 15739 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 15738
+1032_8 1438220428 replivol 15739 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
 afterAsk=ready flagcount=5
-zfs send -R -I Data/forreplic@Repli.Minutely.3.2.na.na.1438205400 Data/forreplic@Repli.Minutely.3.2.na.na.1438205520 to txt/c
+zfs send -R Data/forreplic@Repli.Minutely.2.5.na.na.1438220400 to txt/c
+After=ready flagcount=0
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438220700 Repli.Minutely.2.5.na.na.1438220700 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438220700 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=found flagcount=5
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438220710 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438220400 flagcount=5
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438220400 spot
+oldsnaps result Data/forreplic@Repli.Minutely.2.5.na.na.1438220400
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438220700
+initialsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438220400
+RemoteAsk replivol 15739 10.176.214.6 1032_8 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 15739 10.176.214.6 1032_8 Data forreplic
+1032_8 1438220718 replivol 15739 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+zfs send -R -I Data/forreplic@Repli.Minutely.2.5.na.na.1438220400 Data/forreplic@Repli.Minutely.2.5.na.na.1438220700 to txt/c
 After=ready flagcount=0
 RemoteAsk GetSnaplist hi
 POR=15737 Compelete
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteGetSnaplist forreplic
-1032_8 1438205558 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
+1032_8 1438220737 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438205520 flagcount=6
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438220700 flagcount=5
 Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438205640 Repli.Minutely.3.2.na.na.1438205640 Data forreplic 10.176.214.6 15737 1032_8
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438221000 Repli.Minutely.2.5.na.na.1438221000 Data forreplic 10.176.214.6 15737 1032_8
 RemoteAsk RemoteVolSearch forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteVolSearch forreplic
-1032_8 1438205640 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+1032_8 1438221001 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowOnce.txt1438205760 Repli.Minutely.3.2.na.na.1438205760 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
+afterAsk=found flagcount=5
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438205760 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+sending RemoteGetSnaplist forreplic
+1032_8 1438221008 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438205880 Repli.Minutely.3.2.na.na.1438205880 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438220700 flagcount=6
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438220700 spot
+oldsnaps result Data/forreplic@Repli.Minutely.2.5.na.na.1438220700
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438221000
+initialsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438220700
+RemoteAsk replivol 15739 10.176.214.6 1032_8 Data forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438205880 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+sending replivol 15739 10.176.214.6 1032_8 Data forreplic
+1032_8 1438221018 replivol 15739 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438206000 Repli.Minutely.3.2.na.na.1438206000 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
+afterAsk=ready flagcount=5
+zfs send -R -I Data/forreplic@Repli.Minutely.2.5.na.na.1438220700 Data/forreplic@Repli.Minutely.2.5.na.na.1438221000 to txt/c
+After=ready flagcount=0
+RemoteAsk GetSnaplist hi
+POR=15737 Compelete
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438206000 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+sending RemoteGetSnaplist forreplic
+1032_8 1438221037 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438221000 flagcount=6
 Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438206120 Repli.Minutely.3.2.na.na.1438206120 Data forreplic 10.176.214.6 15737 1032_8
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438221300 Repli.Minutely.2.5.na.na.1438221300 Data forreplic 10.176.214.6 15737 1032_8
 RemoteAsk RemoteVolSearch forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteVolSearch forreplic
-1032_8 1438206120 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+1032_8 1438221300 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438206240 Repli.Minutely.3.2.na.na.1438206240 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
+afterAsk=found flagcount=5
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438206240 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+sending RemoteGetSnaplist forreplic
+1032_8 1438221307 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438206360 Repli.Minutely.3.2.na.na.1438206360 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438221000 flagcount=5
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438221000 spot
+oldsnaps result Data/forreplic@Repli.Minutely.2.5.na.na.1438221000
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438221300
+initialsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438221000
+RemoteAsk replivol 15739 10.176.214.6 1032_8 Data forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438206360 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+sending replivol 15739 10.176.214.6 1032_8 Data forreplic
+1032_8 1438221316 replivol 15739 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438206480 Repli.Minutely.3.2.na.na.1438206480 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
+afterAsk=ready flagcount=5
+zfs send -R -I Data/forreplic@Repli.Minutely.2.5.na.na.1438221000 Data/forreplic@Repli.Minutely.2.5.na.na.1438221300 to txt/c
+After=ready flagcount=0
+RemoteAsk GetSnaplist hi
+POR=15737 Compelete
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438206480 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+sending RemoteGetSnaplist forreplic
+1032_8 1438221334 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438221300 flagcount=5
 Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438206600 Repli.Minutely.3.2.na.na.1438206600 Data forreplic 10.176.214.6 15737 1032_8
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438221600 Repli.Minutely.2.5.na.na.1438221600 Data forreplic 10.176.214.6 15737 1032_8
 RemoteAsk RemoteVolSearch forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteVolSearch forreplic
-1032_8 1438206600 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+1032_8 1438221600 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438206720 Repli.Minutely.3.2.na.na.1438206720 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
+afterAsk=found flagcount=6
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438206720 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+sending RemoteGetSnaplist forreplic
+1032_8 1438221609 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438206840 Repli.Minutely.3.2.na.na.1438206840 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438221300 flagcount=5
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438221300 spot
+oldsnaps result Data/forreplic@Repli.Minutely.2.5.na.na.1438221300
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438221600
+initialsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438221300
+RemoteAsk replivol 15739 10.176.214.6 1032_8 Data forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438206840 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+sending replivol 15739 10.176.214.6 1032_8 Data forreplic
+1032_8 1438221616 replivol 15739 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438206960 Repli.Minutely.3.2.na.na.1438206960 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
+afterAsk=ready flagcount=5
+zfs send -R -I Data/forreplic@Repli.Minutely.2.5.na.na.1438221300 Data/forreplic@Repli.Minutely.2.5.na.na.1438221600 to txt/c
+After=ready flagcount=0
+RemoteAsk GetSnaplist hi
+POR=15737 Compelete
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438206960 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+sending RemoteGetSnaplist forreplic
+1032_8 1438221636 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438221600 flagcount=5
 Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438207080 Repli.Minutely.3.2.na.na.1438207080 Data forreplic 10.176.214.6 15737 1032_8
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438221900 Repli.Minutely.2.5.na.na.1438221900 Data forreplic 10.176.214.6 15737 1032_8
 RemoteAsk RemoteVolSearch forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteVolSearch forreplic
-1032_8 1438207080 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+1032_8 1438221900 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438207200 Repli.Minutely.3.2.na.na.1438207200 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
+afterAsk=found flagcount=5
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438207200 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+sending RemoteGetSnaplist forreplic
+1032_8 1438221908 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438207320 Repli.Minutely.3.2.na.na.1438207320 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438221600 flagcount=5
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438221600 spot
+oldsnaps result Data/forreplic@Repli.Minutely.2.5.na.na.1438221600
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438221900
+initialsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438221600
+RemoteAsk replivol 15739 10.176.214.6 1032_8 Data forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438207320 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+sending replivol 15739 10.176.214.6 1032_8 Data forreplic
+1032_8 1438221916 replivol 15739 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438207440 Repli.Minutely.3.2.na.na.1438207440 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
+afterAsk=ready flagcount=5
+zfs send -R -I Data/forreplic@Repli.Minutely.2.5.na.na.1438221600 Data/forreplic@Repli.Minutely.2.5.na.na.1438221900 to txt/c
+After=ready flagcount=0
+RemoteAsk GetSnaplist hi
+POR=15737 Compelete
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438207440 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+sending RemoteGetSnaplist forreplic
+1032_8 1438221935 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438221900 flagcount=5
 Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438207560 Repli.Minutely.3.2.na.na.1438207560 Data forreplic 10.176.214.6 15737 1032_8
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438222200 Repli.Minutely.2.5.na.na.1438222200 Data forreplic 10.176.214.6 15737 1032_8
 RemoteAsk RemoteVolSearch forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteVolSearch forreplic
-1032_8 1438207560 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+1032_8 1438222200 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438207680 Repli.Minutely.3.2.na.na.1438207680 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
+afterAsk=found flagcount=5
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438207680 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+sending RemoteGetSnaplist forreplic
+1032_8 1438222208 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438207800 Repli.Minutely.3.2.na.na.1438207800 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438221900 flagcount=6
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438221900 spot
+oldsnaps result Data/forreplic@Repli.Minutely.2.5.na.na.1438221900
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438222200
+initialsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438221900
+RemoteAsk replivol 15739 10.176.214.6 1032_8 Data forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438207800 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+sending replivol 15739 10.176.214.6 1032_8 Data forreplic
+1032_8 1438222216 replivol 15739 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438207920 Repli.Minutely.3.2.na.na.1438207920 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
+afterAsk=ready flagcount=5
+zfs send -R -I Data/forreplic@Repli.Minutely.2.5.na.na.1438221900 Data/forreplic@Repli.Minutely.2.5.na.na.1438222200 to txt/c
+After=ready flagcount=0
+RemoteAsk GetSnaplist hi
+POR=15737 Compelete
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438207920 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+sending RemoteGetSnaplist forreplic
+1032_8 1438222235 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438222200 flagcount=5
 Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438208040 Repli.Minutely.3.2.na.na.1438208040 Data forreplic 10.176.214.6 15737 1032_8
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438222500 Repli.Minutely.2.5.na.na.1438222500 Data forreplic 10.176.214.6 15737 1032_8
 RemoteAsk RemoteVolSearch forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteVolSearch forreplic
-1032_8 1438208040 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+1032_8 1438222500 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438208112 Repli.Minutely.3.2.na.na.1438208112 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
+afterAsk=found flagcount=5
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438208113 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+sending RemoteGetSnaplist forreplic
+1032_8 1438222507 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438208160 Repli.Minutely.3.2.na.na.1438208160 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438222200 flagcount=6
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438222200 spot
+oldsnaps result Data/forreplic@Repli.Minutely.2.5.na.na.1438222200
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438222500
+initialsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438222200
+RemoteAsk replivol 15739 10.176.214.6 1032_8 Data forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438208160 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-Failed_Communication
+sending replivol 15739 10.176.214.6 1032_8 Data forreplic
+1032_8 1438222516 replivol 15739 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438208280 Repli.Minutely.3.2.na.na.1438208280 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
+afterAsk=ready flagcount=5
+zfs send -R -I Data/forreplic@Repli.Minutely.2.5.na.na.1438222200 Data/forreplic@Repli.Minutely.2.5.na.na.1438222500 to txt/c
+After=ready flagcount=0
+RemoteAsk GetSnaplist hi
+POR=15737 Compelete
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438208280 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+sending RemoteGetSnaplist forreplic
+1032_8 1438222535 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 15738
 finished Ask
 asking for txt/remotereply1032_7
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438208400 Repli.Minutely.3.2.na.na.1438208400 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438208400 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-finished Ask
-asking for txt/remotereply1032_7
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438208993 Repli.Minutely.3.2.na.na.1438208993 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438208993 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438209000 Repli.Minutely.3.2.na.na.1438209000 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438209000 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-finished Ask
-asking for txt/remotereply1032_7
-finished Ask
-asking for txt/remotereply1032_7
-Failed_Communication
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438209086 Repli.Minutely.3.2.na.na.1438209086 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438209086 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438209120 Repli.Minutely.3.2.na.na.1438209120 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438209120 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-finished Ask
-asking for txt/remotereply1032_7
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438209193 Repli.Minutely.3.2.na.na.1438209193 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438209193 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438209240 Repli.Minutely.3.2.na.na.1438209240 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438209240 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-finished Ask
-asking for txt/remotereply1032_7
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438209359 Repli.Minutely.3.2.na.na.1438209359 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438209360 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438209360 Repli.Minutely.3.2.na.na.1438209360 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438209360 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-finished Ask
-asking for txt/remotereply1032_7
-finished Ask
-asking for txt/remotereply1032_7
-Failed_Communication
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438209447 Repli.Minutely.3.2.na.na.1438209447 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438209447 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-finished Ask
-asking for txt/remotereply1032_7
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438209613 Repli.Minutely.3.2.na.na.1438209613 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438209614 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-finished Ask
-asking for txt/remotereply1032_7
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438209868 Repli.Minutely.3.2.na.na.1438209868 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438209869 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-finished Ask
-asking for txt/remotereply1032_7
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438209970 Repli.Minutely.3.2.na.na.1438209970 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438209971 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438209984 Repli.Minutely.3.2.na.na.1438209984 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438209985 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438210015 Repli.Minutely.3.2.na.na.1438210015 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438210016 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438210021 Repli.Minutely.3.2.na.na.1438210021 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438210021 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438210027 Repli.Minutely.3.2.na.na.1438210027 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438210027 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438210163 Repli.Minutely.3.2.na.na.1438210163 Data forreplic 10.176.214.6 15737 1032_8
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438210163 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
-finished Ask
-asking for txt/remotereply1032_7
-Failed_Communication
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438222500 flagcount=5

@@ -9,7 +9,6 @@ hostip=`ifconfig em1 | grep "inet " | awk '{print $2}'`;
 pool=`echo $oper1 | awk -F/ '{print $1}'`;
 vol=`echo $oper1 | awk -F/ '{print $2}'`;
 stamp=`date +%s`;
-echo NA >  txt/${0:2}${userreq}.txt$stamp
 newsnap2=`echo $oper2.$stamp`;
 newsnap=`echo $oper1@$newsnap2`;
 /sbin/zfs snapshot $newsnap; 

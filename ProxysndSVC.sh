@@ -13,7 +13,7 @@ do
  license=` cat proxy.txt | awk '{print $2}'`;
  so=` cat proxy.txt | awk '{print $3}'`;
  lineflag="failed"
- tun=`ifconfig tun0 | grep -w 'inet' | awk '{print $2}' 2>/dev/null`
+ tun=`(ifconfig tun0 | grep -w 'inet' | awk '{print $2}') 2>/dev/null`
  istun=`echo $tun | awk -F. '{print $4}' `
  istunn=$((istun+1));
  if [[ $istunn -ge 5 ]];
@@ -21,7 +21,7 @@ do
   ps -xo command | grep ProxyncSVC | grep "$pp" >/dev/null 2>&1
   if [[ $? -ne 0 ]]; then ./ProxyncSVC $pp $tun receiver  &; fi; 
   router=`echo $tun | awk -F. '{print $1"."$2"."$3".1"}'`
-  ping -c 3 $router > /dev/null 2>&1
+  ping -c 2 $router > /dev/null 2>&1
   if [[ $? -ne 0 ]]; then killall openvpn; ispidn=1; fi
  fi
  ispid=`ps -xo pid -o command | grep openvpn | grep $dst`;
@@ -43,7 +43,7 @@ do
   /usr/local/sbin/openvpn --daemon $dst --cd /TopStor/txt --config ${so}_${dst}_openvpn.conf;
  fi
  sleep 10
- tun=`ifconfig tun0 | grep -w 'inet' | awk '{print $2}' 2>/dev/null`
+ tun=`(ifconfig tun0 | grep -w 'inet' | awk '{print $2}') 2>/dev/null`
  istun=`echo $tun | awk -F. '{print $1}'`;
  istunn=$((istun+1))
  if [[ $istunn -ge 5 ]];
