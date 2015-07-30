@@ -401,3 +401,18 @@ asking for txt/remotereply1032_7
 
 1032_7
 Failed_Communication
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438285500 Repli.Minutely.2.5.na.na.1438285500 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438285500 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
+finished Ask
+asking for txt/remotereply1032_7
+Failed_Communication
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438285800 Repli.Minutely.2.5.na.na.1438285800 Data forreplic 10.176.214.6 15737 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438285800 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 15738
