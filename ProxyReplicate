@@ -137,3 +137,4 @@ echo RemoteAsk GetSnaplist hi  >> txt/tmpproxyrequest
 RemoteAsk RemoteGetSnaplist $vol & 
  echo POR=$POR Compelete  >> txt/tmpproxyrequest ; 
 # RemoteAsk done  & ; 
+echo finishedddddddddddddddddddddddddddddddddddddddddddddddddd >> txt/tmpproxyrequest
