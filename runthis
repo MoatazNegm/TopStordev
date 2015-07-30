@@ -18,7 +18,7 @@ if [[ $? -eq 0 ]];
 then 
  validcom=${isvalid}" "${fileres}" "$param;
  echo $validcom  > tmp2runthis 
- eval $validcom
+ eval $validcom 2>> tmp2runthis
  while [[ ! -a $fileres ]];  
  do
   c=0;  while [[ $c -le 30 ]]; do c=$((c+1)); done

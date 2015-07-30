@@ -6,10 +6,11 @@ ClearExit() {
 	exit 0;
 }
 trap ClearExit HUP
-/sbin/sysctl net.inet.tcp.msl=2500 
-./ProxyrcvSVC.sh &
+/sbin/sysctl net.inet.tcp.msl=2500
 while true; do
 {
+ps -axw | grep ProxySVC >/dev/null 
+if [[ $? -ne 0 ]]; then ./ProxySVC &;  fi
 nc -l 2234 | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD > /tmp/msgremotefile & 
 read line < /tmp/msgremotefile;
 echo $line > /TopStor/tmplineremote

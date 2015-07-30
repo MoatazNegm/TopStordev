@@ -5,8 +5,7 @@ do
  while read line;
  do
   isproxy=`echo $line | awk '{print $3}'`;
-  issender=`echo $line | awk '{print $2}'`;
-  if [[ $isproxy != "true" || $issender != "sender" ]]; then; break; fi
+  if [[ $isproxy != "true" ]]; then; break; fi
   dst=`echo $line | awk '{print $1}'`;
   passphrase=`echo $line | awk '{print $4}'`;
   pp=`echo $line | awk '{print $5}'`;

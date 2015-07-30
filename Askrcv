@@ -6,11 +6,7 @@ replier=`echo  $@ | awk '{print $3}'`;
 stampid=`echo  $@ | awk '{print $4}'`;
 pp=$((replierpp+1));
 oldstamp=0;
-currentPID=$$;
 # packet : sender stamp command
-otherAsk=`ps -awx | grep Askrcv | grep "$tun" | grep "$pp" | grep -v "$stampid"  >/dev/null 2>&1`
-if [[ $? -eq 0 ]]; then echo found; exit 0;  fi
-kill -TERM `ps -awx | grep Askrcv | grep -v "$stampid"` >/dev/null 2>&1 ; 
 while true;
 do
  ps -awx | grep "nc -ld" | grep "$tun" | grep "$pp" >/dev/null 2>&1
