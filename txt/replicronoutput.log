@@ -13,3 +13,6 @@ keeppluszero=2
 newsnap2=Repli.Minutely.2.5.na.na.1438356900
 newsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438356900
 ./ProxyReplicate 1032_7 txt/RemoteSnapshotnowSystem.txt1438356900 Repli.Minutely.2.5.na.na.1438356900 Data forreplic 10.176.214.6 2236 1032_8
+snapshotresult :
+filenameis=txt/RemoteSnapshotnowSystem.txt1438356900
+{"Date":"07/31/2015","time":"18:35:47","msg":"info","user":"System","data":"Success_Replicating_Snapshot:Data/forreplic@Repli.Minutely.2.5.na.na.1438356900"}
