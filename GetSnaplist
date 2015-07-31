@@ -12,7 +12,6 @@ do
  revcreat=` echo $line | awk '{print $2" "$3" "$4"  "$5" "$6}' | rev`; 
  creat=`echo ${revcreat:0:5}':'${revcreat:5} | rev`
  creall=`/bin/date -j -f %c $creat +%m/%d/%y_%R`;
- echo $creall
  creatform=` echo $creall | awk -F_ '{print $1}'`;
  time2=` echo $creall | awk -F_ '{print $2}'`;
  sender=`echo $line | awk '{print $7}'`;

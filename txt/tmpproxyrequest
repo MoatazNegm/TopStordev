@@ -344,3 +344,724 @@ asking for txt/remotereply1032_7
 afterAsk=ready flagcount=8
 zfs send -R Data/forreplic@Repli.Minutely.2.5.na.na.1438349534 to txt/c
 After=ready flagcount=0
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438349700 Repli.Minutely.2.5.na.na.1438349700 Data forreplic 10.176.214.6 2236 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438349700 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=found flagcount=6
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438349713 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438349534 flagcount=6
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438349534 spot
+oldsnaps result Data/forreplic@Repli.Minutely.2.5.na.na.1438349534
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438349700
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438349726 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=6
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic
+1032_8 1438349739 replivol 2238 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=10
+zfs send -R Data/forreplic@Repli.Minutely.2.5.na.na.1438349700 to txt/c
+After=ready flagcount=0
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438350000 Repli.Minutely.2.5.na.na.1438350000 Data forreplic 10.176.214.6 2236 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438350000 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+Failed_Communication
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438350215 Repli.Minutely.2.5.na.na.1438350215 Data forreplic 10.176.214.6 2236 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438350215 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=found flagcount=6
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438350225 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438349700 flagcount=6
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438349700 spot
+oldsnaps result Data/forreplic@Repli.Minutely.2.5.na.na.1438349700
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438350215
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438350240 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=6
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic
+1032_8 1438350249 replivol 2238 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=7
+zfs send -R Data/forreplic@Repli.Minutely.2.5.na.na.1438350215 to txt/c
+After=ready flagcount=0
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438350300 Repli.Minutely.2.5.na.na.1438350300 Data forreplic 10.176.214.6 2236 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438350300 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=found flagcount=6
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438350310 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438350215 flagcount=6
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438350215 spot
+oldsnaps result Data/forreplic@Repli.Minutely.2.5.na.na.1438350215
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438350300
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438350322 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=8
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic
+1032_8 1438350334 replivol 2238 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=7
+zfs send -R Data/forreplic@Repli.Minutely.2.5.na.na.1438350300 to txt/c
+After=ready flagcount=0
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438350600 Repli.Minutely.2.5.na.na.1438350600 Data forreplic 10.176.214.6 2236 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438350600 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=found flagcount=6
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438350609 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438350300 flagcount=8
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438350300 spot
+oldsnaps result Data/forreplic@Repli.Minutely.2.5.na.na.1438350300
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438350600
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438350624 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=5
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic
+1032_8 1438350633 replivol 2238 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=6
+zfs send -R Data/forreplic@Repli.Minutely.2.5.na.na.1438350600 to txt/c
+After=ready flagcount=0
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438350900 Repli.Minutely.2.5.na.na.1438350900 Data forreplic 10.176.214.6 2236 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438350900 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=found flagcount=6
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438350911 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438350600 flagcount=7
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438350600 spot
+oldsnaps result Data/forreplic@Repli.Minutely.2.5.na.na.1438350600
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438350900
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438350923 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=7
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic
+1032_8 1438350933 replivol 2238 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=7
+zfs send -R Data/forreplic@Repli.Minutely.2.5.na.na.1438350900 to txt/c
+After=ready flagcount=0
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438351085 Repli.Minutely.2.5.na.na.1438351085 Data forreplic 10.176.214.6 2236 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438351085 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=found flagcount=7
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438351097 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438350900 flagcount=6
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438350900 spot
+oldsnaps result Data/forreplic@Repli.Minutely.2.5.na.na.1438350900
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438351085
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438351108 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=8
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic
+1032_8 1438351120 replivol 2238 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=7
+zfs send -R Data/forreplic@Repli.Minutely.2.5.na.na.1438351085 to txt/c
+After=ready flagcount=0
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438351200 Repli.Minutely.2.5.na.na.1438351200 Data forreplic 10.176.214.6 2236 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438351200 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=found flagcount=6
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438351211 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438351085 flagcount=6
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438351085 spot
+oldsnaps result Data/forreplic@Repli.Minutely.2.5.na.na.1438351085
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438351200
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438351224 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=6
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic
+1032_8 1438351234 replivol 2238 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+afterAsk=ready flagcount=6
+zfs send -R Data/forreplic@Repli.Minutely.2.5.na.na.1438351200 to txt/c
+After=ready flagcount=0
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438351305 Repli.Minutely.2.5.na.na.1438351305 Data forreplic 10.176.214.6 2236 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438351305 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+Failed_Communication
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438351379 Repli.Minutely.2.5.na.na.1438351379 Data forreplic 10.176.214.6 2236 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438351380 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438351382 reply found
+afterAsk=found flagcount=7
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438351390 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438351394 reply Data/forreplic@Repli.Minutely.2.5.na.na.1438351200 Data/forreplic@Repli.Minutely.2.5.na.na.1438351085 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438351200 flagcount=7
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438351200 spot
+oldsnaps result Data/forreplic@Repli.Minutely.2.5.na.na.1438351200
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438351379
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438351402 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438351407 reply ready
+afterAsk=ready flagcount=6
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic
+1032_8 1438351415 replivol 2238 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438351418 reply ready
+afterAsk=ready flagcount=6
+zfs send -R Data/forreplic@Repli.Minutely.2.5.na.na.1438351379 to txt/c
+After=ready flagcount=0
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438351500 Repli.Minutely.2.5.na.na.1438351500 Data forreplic 10.176.214.6 2236 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438351500 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438351508 reply found
+afterAsk=found flagcount=8
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438351518 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+Failed_Communication
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438351688 Repli.Minutely.2.5.na.na.1438351688 Data forreplic 10.176.214.6 2236 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438351689 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+Failed_Communication
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438351749 Repli.Minutely.2.5.na.na.1438351749 Data forreplic 10.176.214.6 2236 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438351749 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438351752 reply found
+afterAsk=found flagcount=6
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438351760 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438351763 reply Data/forreplic@Repli.Minutely.2.5.na.na.1438351379 Data/forreplic@Repli.Minutely.2.5.na.na.1438351305 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438351379 Data/forreplic@Repli.Minutely.2.5.na.na.1438351305 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353 flagcount=6
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438351379 Data/forreplic@Repli.Minutely.2.5.na.na.1438351305 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353 spot
+oldsnaps result Data/forreplic@Repli.Minutely.2.5.na.na.1438351379 Data/forreplic@Repli.Minutely.2.5.na.na.1438351305 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438351749
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438351771 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438351775 reply ready
+afterAsk=ready flagcount=10
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic
+1032_8 1438351785 replivol 2238 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438351789 reply ready
+afterAsk=ready flagcount=7
+zfs send -R Data/forreplic@Repli.Minutely.2.5.na.na.1438351749 to txt/c
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438351800 Repli.Minutely.2.5.na.na.1438351800 Data forreplic 10.176.214.6 2236 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438351800 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438351803 reply found
+afterAsk=found flagcount=9
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438351813 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+After=Data/forreplic@Repli.Minutely.2.5.na.na.1438351749 flagcount=6
+reply is
+1032_7 1438351817 reply Data/forreplic@Repli.Minutely.2.5.na.na.1438351749 Data/forreplic@Repli.Minutely.2.5.na.na.1438351688 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438351749 Data/forreplic@Repli.Minutely.2.5.na.na.1438351688 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353 flagcount=7
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438351749 Data/forreplic@Repli.Minutely.2.5.na.na.1438351688 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353 spot
+oldsnaps result Data/forreplic@Repli.Minutely.2.5.na.na.1438351749 Data/forreplic@Repli.Minutely.2.5.na.na.1438351688 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438351800
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438351825 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438351829 reply ready
+afterAsk=ready flagcount=9
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic
+1032_8 1438351839 replivol 2238 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438351843 reply ready
+afterAsk=ready flagcount=7
+zfs send -R Data/forreplic@Repli.Minutely.2.5.na.na.1438351800 to txt/c
+After=ready flagcount=0
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438352100 Repli.Minutely.2.5.na.na.1438352100 Data forreplic 10.176.214.6 2236 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438352100 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438352102 reply found
+afterAsk=found flagcount=6
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438352109 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438352113 reply Data/forreplic@Repli.Minutely.2.5.na.na.1438351800 Data/forreplic@Repli.Minutely.2.5.na.na.1438351749 Data/forreplic@Repli.Minutely.2.5.na.na.1438351688 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438351800 Data/forreplic@Repli.Minutely.2.5.na.na.1438351749 Data/forreplic@Repli.Minutely.2.5.na.na.1438351688 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353 flagcount=6
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438351800 Data/forreplic@Repli.Minutely.2.5.na.na.1438351749 Data/forreplic@Repli.Minutely.2.5.na.na.1438351688 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353 spot
+oldsnaps result Data/forreplic@Repli.Minutely.2.5.na.na.1438351800 Data/forreplic@Repli.Minutely.2.5.na.na.1438351749 Data/forreplic@Repli.Minutely.2.5.na.na.1438351688 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438352100
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438352120 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+Failed_Communication
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438352400 Repli.Minutely.2.5.na.na.1438352400 Data forreplic 10.176.214.6 2236 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438352400 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438352402 reply found
+afterAsk=found flagcount=6
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438352409 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438352413 reply nothing
+afterAsk=nothing flagcount=6
+ll= spot
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438352400
+initialsnap=
+yyyyyyyyyyyyyintital is null
+RemoteAsk destroysnaps.sh forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending destroysnaps.sh forreplic
+1032_8 1438352421 destroysnaps.sh forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438352425 reply ready
+afterAsk=ready flagcount=6
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic
+1032_8 1438352433 replivol 2238 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438352436 reply ready
+afterAsk=ready flagcount=9
+zfs send -R Data/forreplic@Repli.Minutely.2.5.na.na.1438352400 to txt/c
+After=ready flagcount=0
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438352630 Repli.Minutely.2.5.na.na.1438352630 Data forreplic 10.176.214.6 2236 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438352630 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438352635 reply found
+afterAsk=found flagcount=6
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438352642 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438352645 reply Data/forreplic@Repli.Minutely.2.5.na.na.1438352400 Data/forreplic@Repli.Minutely.2.5.na.na.1438352100 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438352400 Data/forreplic@Repli.Minutely.2.5.na.na.1438352100 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353 flagcount=6
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438352400 Data/forreplic@Repli.Minutely.2.5.na.na.1438352100 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353 spot
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438352630
+initialsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438352400
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic
+1032_8 1438352652 replivol 2238 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438352655 reply ready
+afterAsk=ready flagcount=8
+zfs send -R -I Data/forreplic@Repli.Minutely.2.5.na.na.1438352400 Data/forreplic@Repli.Minutely.2.5.na.na.1438352630 to txt/c
+After=ready flagcount=0
+RemoteAsk GetSnaplist hi
+POR=2236 Compelete
+finishedddddddddddddddddddddddddddddddddddddddddddddddddd
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438352676 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438352682 reply Data/forreplic@Repli.Minutely.2.5.na.na.1438352630 Data/forreplic@Repli.Minutely.2.5.na.na.1438352400 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438352630 Data/forreplic@Repli.Minutely.2.5.na.na.1438352400 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353 flagcount=7
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438352700 Repli.Minutely.2.5.na.na.1438352700 Data forreplic 10.176.214.6 2236 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438352700 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438352704 reply found
+afterAsk=found flagcount=6
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438352712 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438352716 reply Data/forreplic@Repli.Minutely.2.5.na.na.1438352630 Data/forreplic@Repli.Minutely.2.5.na.na.1438352400 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438352630 Data/forreplic@Repli.Minutely.2.5.na.na.1438352400 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353 flagcount=6
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438352630 Data/forreplic@Repli.Minutely.2.5.na.na.1438352400 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353 spot
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438352700
+initialsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438352630
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic
+1032_8 1438352724 replivol 2238 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438352726 reply ready
+afterAsk=ready flagcount=6
+zfs send -R -I Data/forreplic@Repli.Minutely.2.5.na.na.1438352630 Data/forreplic@Repli.Minutely.2.5.na.na.1438352700 to txt/c
+After=ready flagcount=0
+RemoteAsk GetSnaplist hi
+POR=2236 Compelete
+finishedddddddddddddddddddddddddddddddddddddddddddddddddd
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438352749 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438352754 reply Data/forreplic@Repli.Minutely.2.5.na.na.1438352700 Data/forreplic@Repli.Minutely.2.5.na.na.1438352630 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438352700 Data/forreplic@Repli.Minutely.2.5.na.na.1438352630 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353 flagcount=7
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438353000 Repli.Minutely.2.5.na.na.1438353000 Data forreplic 10.176.214.6 2236 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438353000 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438353005 reply found
+afterAsk=found flagcount=6
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438353013 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438353016 reply Data/forreplic@Repli.Minutely.2.5.na.na.1438352700 Data/forreplic@Repli.Minutely.2.5.na.na.1438352630 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438352700 Data/forreplic@Repli.Minutely.2.5.na.na.1438352630 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353 flagcount=7
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438352700 Data/forreplic@Repli.Minutely.2.5.na.na.1438352630 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353 spot
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438353000
+initialsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438352700
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic
+1032_8 1438353025 replivol 2238 10.176.214.6 1032_8 Data forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438353031 reply ready
+afterAsk=ready flagcount=7
+zfs send -R -I Data/forreplic@Repli.Minutely.2.5.na.na.1438352700 Data/forreplic@Repli.Minutely.2.5.na.na.1438353000 to txt/c
+After=ready flagcount=0
+RemoteAsk GetSnaplist hi
+POR=2236 Compelete
+finishedddddddddddddddddddddddddddddddddddddddddddddddddd
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438353051 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438353055 reply Data/forreplic@Repli.Minutely.2.5.na.na.1438353000 Data/forreplic@Repli.Minutely.2.5.na.na.1438352700 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438353000 Data/forreplic@Repli.Minutely.2.5.na.na.1438352700 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353 flagcount=7
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438353300 Repli.Minutely.2.5.na.na.1438353300 Data forreplic 10.176.214.6 2236 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438353300 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+Failed_Communication
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438353600 Repli.Minutely.2.5.na.na.1438353600 Data forreplic 10.176.214.6 2236 1032_8
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+1032_8 1438353600 RemoteVolSearch forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438353602 reply found
+afterAsk=found flagcount=7
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438353610 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438353614 reply Data/forreplic@Repli.Minutely.2.5.na.na.1438353000 Data/forreplic@Repli.Minutely.2.5.na.na.1438352700 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438353000 Data/forreplic@Repli.Minutely.2.5.na.na.1438352700 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353 flagcount=6
+ll=Data/forreplic@Repli.Minutely.2.5.na.na.1438353000 Data/forreplic@Repli.Minutely.2.5.na.na.1438352700 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353 spot
+targetsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438353600
+initialsnap=Data/forreplic@mezo..1438113292
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@mezo..1438113292
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@mezo..1438113292
+1032_8 1438353621 replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@mezo..1438113292 | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438353624 reply ready
+afterAsk=ready flagcount=6
+zfs send -R -I Data/forreplic@mezo..1438113292 Data/forreplic@Repli.Minutely.2.5.na.na.1438353600 to txt/c
+After=ready flagcount=0
+RemoteAsk GetSnaplist hi
+POR=2236 Compelete
+finishedddddddddddddddddddddddddddddddddddddddddddddddddd
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+1032_8 1438353648 RemoteGetSnaplist forreplic | nc -w 4 -N 10.176.214.6 2237
+finished Ask
+asking for txt/remotereply1032_7
+reply is
+1032_7 1438353651 reply Data/forreplic@Repli.Minutely.2.5.na.na.1438353600 Data/forreplic@Repli.Minutely.2.5.na.na.1438353300 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353
+afterAsk=Data/forreplic@Repli.Minutely.2.5.na.na.1438353600 Data/forreplic@Repli.Minutely.2.5.na.na.1438353300 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353 flagcount=6
