@@ -1,5 +1,6 @@
 #! /usr/local/bin/zsh
 cd /TopStor
+openvpnflag=0
 stamp=`date +%s`;
 while true;
 do
@@ -32,6 +33,7 @@ do
    if [[ $? -ne 0 ]];
    then
     echo no ping >> tmpprox
+    openvpnflag=0;
     killall openvpn;
     ispid=`ps -axw  | grep nc | grep "$pp" | grep -v Proxy | awk '{print $1}'`;
     if [[ $? -eq 0 ]]; then kill -TERM $ispid 2>/dev/null; fi
@@ -43,8 +45,12 @@ do
    echo second stage >> tmpprox
   fi
   echo third  stage >> tmpprox
-  echo $so $stamp $dst $license ProxyInit $so $pp $passphrase $dst  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 -N $proxyser 2234
-  echo 4th  stage >> tmpprox
+  if [[ openvpnflag -eq 0 ]];
+  then 
+   openvpnflag=1;
+   echo $so $stamp $dst $license ProxyInit $so $pp $passphrase $dst  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 -N $proxyser 2234
+   echo 4th  stage >> tmpprox
+  fi 
   ispid=`ps -axw | grep openvpn | grep "$dst"`
   echo 5th  stage >> tmpprox
   ispidn=`echo $ispid | wc -c `
