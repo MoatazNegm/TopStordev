@@ -9,7 +9,7 @@ partner=`echo $@ | awk '{print $4 }'`;
 pool=`echo $@ | awk '{print $5 }'`;
 vol=`echo $@ | awk '{print $6 }'`;
 initsnap=`echo $@ | awk '{print $7 }'`;
-zfs rollback -Rf $initsnap 2>/dev/null
+zfs rollback -Rf $initsnap 2>/dev/null;
 echo /usr/bin/nc -ld $tun $pp \|  zfs receive -dF  $pool > tmprepli
 /usr/bin/nc -ld $tun $pp |  zfs receive -dF  $pool &
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;

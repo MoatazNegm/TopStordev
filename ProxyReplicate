@@ -30,8 +30,10 @@ function RemoteAsk() {
   sleep 1;
  done
  if [[ -a txt/remotereply$DST ]];
- then
-  RR=`cat txt/remotereply$DST | tail -1 | awk '{print $4}'`;
+ then 
+  echo reply is >> txt/tmpproxyrequest
+  cat txt/remotereply$DST >> txt/tmpproxyrequest
+  RR=`cat txt/remotereply$DST | tail -1 | awk '{$1=$2=$3="";print substr($0,4)}'`;
  else
   echo Failed_Communication >> $FILELOG;
   echo Failed_Communication >> txt/tmpproxyrequest;
@@ -96,11 +98,10 @@ else
  echo foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn >> txt/tmpproxyrequest
  RemoteAsk RemoteGetSnaplist $vol;
  if [[ $RR == "nothing" ]];  then oldsnaps=""; else oldsnaps=$RR; fi;
- localsnaps=`./RemoteGetSnaplist $vol`;
+ localsnaps=`./localGetSnaplist $vol`;
  ll=$oldsnaps;
  ll=${ll}' spot';
  echo ll=$ll >> txt/tmpproxyrequest
- echo oldsnaps result $RR >> txt/tmpproxyrequest;
  lineupsnaps=`echo $ll | tr ' ' '\n' `
  initialsnap="";
  echo $lineupsnaps | while read -r line  
@@ -118,16 +119,18 @@ else
   echo yyyyyyyyyyyyyintital is null >> txt/tmpproxyrequest 
   echo RemoteAsk destroysnaps.sh $vol >> txt/tmpproxyrequest;
   RemoteAsk destroysnaps.sh $vol ;
-  echo RemoteAsk replivol $PORzfs $REMOTETUN $SO $pool $vol >> txt/tmpproxyrequest;
-  RemoteAsk replivol $PORzfs $REMOTETUN $SO $pool $vol;
+  RemoteAsk replidf $PORzfs $REMOTETUN $SO
+  RemoteAsk replidf $PORzfs $REMOTETUN $SO >> txt/tmpproxyrequest
+#  echo RemoteAsk replivol $PORzfs $REMOTETUN $SO $pool $vol nothing >> txt/tmpproxyrequest;
+#  RemoteAsk replivol $PORzfs $REMOTETUN $SO $pool $vol nothing;
 #echo exit  >> txt/tmpproxyrequest
 #exit
   echo zfs send -R   $targetsnap  to  txt/c$ppzfs >> txt/tmpproxyrequest;
   Sendzfs  -R   $targetsnap ;
   exit;
  else
-  echo RemoteAsk replivol $PORzfs $REMOTETUN $SO  $pool $vol >> txt/tmpproxyrequest
-  RemoteAsk replivol $PORzfs $REMOTETUN $SO  $pool $vol;
+  echo RemoteAsk replivol $PORzfs $REMOTETUN $SO  $pool $vol $initialsnap >> txt/tmpproxyrequest
+  RemoteAsk replivol $PORzfs $REMOTETUN $SO  $pool $vol $initialsnap;
   echo zfs send -R -I $initialsnap  $targetsnap to txt/c$ppzfs >> txt/tmpproxyrequest;
   Sendzfs  -R -I $initialsnap  $targetsnap ;
  fi
