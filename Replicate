@@ -18,8 +18,8 @@ function RemoteAsk() {
  echo sending $msg >> txt/tmpproxyrequest
 # echo Asksend $SEND $msg >> txt/tmpproxyrequest; 
 # ./Asksend $SEND $msg 2>/dev/null ; 
-echo $SO $stamp $@ | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N nc -w 4 -N $REMOTETUN $PPSEND 
-echo $SO $stamp $@ \| openssl enc -a -A -aes-256-cbc -k SuperSecretPWD \| gzip -cf \| nc -N nc -w 4 -N $REMOTETUN $PPSEND >> txt/tmpproxyrequest
+echo $SO $stamp $@ | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf |  nc -w 4 $REMOTETUN $PPSEND 
+echo $SO $stamp $@ \| openssl enc -a -A -aes-256-cbc -k SuperSecretPWD \| gzip -cf \| nc -w 4  $REMOTETUN $PPSEND >> txt/tmpproxyrequest
  echo finished Ask >> txt/tmpproxyrequest
  echo asking for txt/remotereply$DST  >> txt/tmpproxyrequest; 
  flagcount=0;
@@ -48,7 +48,7 @@ function Sendzfs () {
 # zfscom=`echo $msg | awk '{print $1}'`;
 # param=`echo $msg | awk '{$1=""; print substr($0,2)}'`;
 # echo \/sbin\/zfs send  $@ \|  nc -w 10 $REMOTETUN $PORzfs
- /sbin/zfs send $@  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N nc -w 10 -N $REMOTETUN $PORzfs 
+ /sbin/zfs send $@  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 -N $REMOTETUN $PORzfs 
  flagcount=0;
  while [[ $flagcount -le 20 ]];
  do
