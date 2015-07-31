@@ -1,4 +1,5 @@
-isvalidcome=./RemoteVolSearch txt/runthis1438373040 forreplic
-res=found
-Askreply 10.3.2.7 10.3.2.8 3337 local reply found
-isvalid=./RemoteVolSearch
+isvalidcome=RemoteGetSnaplist txt/runthis14sddfdssda forreplic
+./runthis:23: no such file or directory: ./RemoteGetSnaplist txt/runthis14sddfdssda forreplic
+res=local
+Askreply 10.3.2.7 10.3.2.8 3337 local reply local
+isvalid=RemoteGetSnaplist

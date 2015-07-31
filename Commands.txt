@@ -2,4 +2,4 @@
 ./replidf.sh
 ./replivol.sh
 ./destroysnaps.sh
-./RemoteGetSnaplist
+RemoteGetSnaplist

@@ -17,8 +17,8 @@ oldstamp=0;
 while true;
 do
  ps -awx | grep "nc -ld" | grep "$tun" | grep "$pp" >/dev/null 2>&1
- if [[ $? -eq 0 ]]; then sleep 5;
- else
+ if [[ $? -ne 0 ]]; 
+ then
   if [[ $localrep == "local" ]];
   then
    readthis=`nc -ld $tun $pp | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD`;
@@ -29,7 +29,7 @@ do
   newsender=`echo $readthis | awk '{print $1}'`;
   stamp=`echo $readthis | awk '{print $2}'`;
   isreply=`echo $readthis | awk '{print $3}'`;
-  newcom=`echo $readthis | awk '{$1=$2="";print substr($0,3)}'`
+  newcom=`echo $readthis | awk '{$1=$2=$3="";print substr($0,4)}'`
   if [[ $isreply == "finish" ]]; then break; fi
   if [[ $isreply == "reply" ]]; 
   then echo $readthis >> txt/remotereply$newsender ;
@@ -37,6 +37,7 @@ do
    if [[ $stamp != $oldstamp ]];
    then 
     oldstamp=$stamp;
+    echo $oldstamp >> tmpreadthis
     if [[ $localrep == "local" ]];
     then 
      issender=`cat partners.txt | grep "$newsender" | grep sender`; 
@@ -50,8 +51,8 @@ do
     then
 #     senderpp=`echo $issender | awk '{print $4}'`
       senderpp=$pp
-     ./runthis $sendertun $newsender $replier $senderpp $pp $tun $stamp $localrep $newcom;
-     echo ./runthis $sendertun $newsender $replier $senderpp $pp $tun $stamp $localrep $newcom >> tmprunthis
+     ./runthis $sendertun $newsender $replier $senderpp $pp $tun $stamp $localrep $newcom &;
+     echo ./runthis $sendertun $newsender $replier $senderpp $pp $tun $stamp $localrep $newcom >> tmprunthis2
     fi
    fi
   fi 

