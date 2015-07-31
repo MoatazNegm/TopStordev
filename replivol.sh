@@ -1,7 +1,9 @@
 #! /bin/sh
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 res=`echo $@ | awk '{print $1}'`;
-pp=`echo $@ | awk '{print $2}'`;
+#pp=`echo $@ | awk '{print $2}'`;
+pp=`cat workingpp | awk '{print $1}'`;
+pp=$((pp+2));
 tun=`echo $@ | awk '{print $3 }'`;
 partner=`echo $@ | awk '{print $4 }'`;
 pool=`echo $@ | awk '{print $5 }'`;

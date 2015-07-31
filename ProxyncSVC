@@ -1,6 +1,7 @@
 #! /usr/local/bin/zsh
 cd /TopStor
-pp=`echo  $@ | awk '{print $1}'`;
+#pp=`echo  $@ | awk '{print $1}'`;
+pp=`cat workingpp | awk '{print $1}'`;
 tun=`echo  $@ | awk '{print $2}'`;
 peer=`echo  $@ | awk '{print $3}'`;
 ps -auxw | grep "nc -l" | grep "$tun" >/dev/null 2>&1;
