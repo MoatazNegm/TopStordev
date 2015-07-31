@@ -48,7 +48,7 @@ do
   if [[ openvpnflag -eq 0 ]];
   then 
    openvpnflag=1;
-   echo $so $stamp $dst $license ProxyInit $so $pp $passphrase $dst  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 -N $proxyser 2234
+   echo $so $stamp $dst $license ProxyInit $so $pp $passphrase $dst  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 -N $proxyser 2234 2>/dev/null
    echo 4th  stage >> tmpprox
   fi 
   ispid=`ps -axw | grep openvpn | grep "$dst"`

@@ -91,6 +91,12 @@ echo ./ProxyReplicate $oper3 txt/${0:2}${userreq}.txt$stamp $newsnap2 $pool $vol
 
 ##########noproxy####################################################
  else
+  so=`cat proxy.txt | awk '{print $3}'`
+  remotetun=$so
+  pp=`cat workingpplocal | awk '{print $1}'` 
+  /sbin/zfs set repli:sender=$so $newsnap; 
+echo ./ProxyReplicate $oper3 txt/${0:2}${userreq}.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so >> $cronout
+./ProxyReplicate $oper3 txt/${0:2}${userreq}.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so
   ./Replicate $hostip $oper3 txt/${0:2}$userreq.txt$stamp $newsnap2 $pool $vol  ;
  fi;
  #echo donereplicating

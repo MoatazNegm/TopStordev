@@ -1,18 +1,15 @@
 oper=Data/forreplic Minutely.2.5.na.na 1032_7
 oper1=Data/forreplic
 oper2=Minutely.2.5.na.na
-stamp=1438353600
+stamp=1438356900
 keep=2
-currentsnaps=Data/forreplic@Repli.Minutely.2.5.na.na.1438353000
-Data/forreplic@Repli.Minutely.2.5.na.na.1438353300
-oldsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438353000
+currentsnaps=Data/forreplic@Repli.Minutely.2.5.na.na.1438356300
+Data/forreplic@Repli.Minutely.2.5.na.na.1438356600
+oldsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438356300
 countsnap=       2
 countsnapplus=3
 keeppluszero=2
-{"Date":"07/31/2015","time":"17:40:00","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/forreplic@Repli.Minutely.2.5.na.na.1438353000"}
-newsnap2=Repli.Minutely.2.5.na.na.1438353600
-newsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438353600
-./ProxyReplicate 1032_7 txt/RemoteSnapshotnowSystem.txt1438353600 Repli.Minutely.2.5.na.na.1438353600 Data forreplic 10.176.214.6 2236 1032_8
-snapshotresult :
-filenameis=txt/RemoteSnapshotnowSystem.txt1438353600
-{"Date":"07/31/2015","time":"17:40:48","msg":"info","user":"System","data":"Success_Replicating_Snapshot:Data/forreplic@Repli.Minutely.2.5.na.na.1438353600"}
+{"Date":"07/31/2015","time":"18:35:00","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/forreplic@Repli.Minutely.2.5.na.na.1438356300"}
+newsnap2=Repli.Minutely.2.5.na.na.1438356900
+newsnap=Data/forreplic@Repli.Minutely.2.5.na.na.1438356900
+./ProxyReplicate 1032_7 txt/RemoteSnapshotnowSystem.txt1438356900 Repli.Minutely.2.5.na.na.1438356900 Data forreplic 10.176.214.6 2236 1032_8
