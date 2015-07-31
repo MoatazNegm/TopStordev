@@ -13,7 +13,7 @@ do
  ps -awx | grep "nc -ld" | grep "$tun" | grep "$pp" >/dev/null 2>&1
  if [[ $? -eq 0 ]]; then sleep 5;
  else
-  readthis=`nc -ld $tun $pp`
+  readthis=`nc -ld $tun $pp 2>/dev/null`
   echo $readthis > tmpreadthis
   newsender=`echo $readthis | awk '{print $1}'`;
   stamp=`echo $readthis | awk '{print $2}'`;

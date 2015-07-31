@@ -1,3 +1,3 @@
-./RemoteGetSnaplist txt/runthis1438353648 forreplic
-res=Data/forreplic@Repli.Minutely.2.5.na.na.1438353600 Data/forreplic@Repli.Minutely.2.5.na.na.1438353300 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353
+./RemoteGetSnaplist txt/runthis1438356947 forreplic
+res=Data/forreplic@Repli.Minutely.2.5.na.na.1438356900 Data/forreplic@Repli.Minutely.2.5.na.na.1438356600 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353
 isvalid=./RemoteGetSnaplist
