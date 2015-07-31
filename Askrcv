@@ -30,12 +30,8 @@ do
     if [[ $? -eq 0 ]]; 
     then
      sendertun=`echo $issender | awk '{print $3}'`
-<<<<<<< HEAD
-     senderpp=$pp
-=======
 #     senderpp=`echo $issender | awk '{print $4}'`
       senderpp=$pp
->>>>>>> 6e7c785761f76e38a771dcbd2ffaaf33c5de6be0
      ./runthis $sendertun $newsender $replier $senderpp $pp $tun $stamp $newcom;
      echo ./runthis $sendertun $newsender $replier $senderpp $pp $tun $stamp $newcom > tmprunthis
     fi
