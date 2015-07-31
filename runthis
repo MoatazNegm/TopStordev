@@ -26,7 +26,8 @@ then
  res=`cat $fileres`
  echo res=$res >> tmp2runthis
  rm $fileres 2>/dev/null
- ppp=$((senderpp+1));
+# ppp=$((senderpp+1));
+ ppp=$senderpp
  echo Askreply $replier $sendertun $ppp reply $res > tmprep
  ./Askreply $replier $sendertun $ppp reply $res
 fi
