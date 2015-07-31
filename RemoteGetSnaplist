@@ -3,6 +3,7 @@ cd /TopStor
 res=`echo $@ | awk '{print $1}'`;
 instr=`echo $@ | awk '{print $2}'`;
 lines=`zfs list -H -t snapshot -o name -S creation | grep -w "$instr" 2>/dev/null `;
+./GetSnalist;
 wlines=`echo $lines | wc -l`; 
 wlines=$((wlines+0));
 if [[ $wlines -ge 2 ]]; 
@@ -11,4 +12,3 @@ echo $lines  |  sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/ /g' > $res ;
 else 
 echo nothing > $res
 fi
-./GetSnaplist &

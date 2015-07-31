@@ -2,6 +2,6 @@
 cd /TopStor
 while true; do
 {
-nc -l 2235 | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD > /tmp/msgrack
+nc -ld 2235 | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD > /tmp/msgrack
 }
 done;

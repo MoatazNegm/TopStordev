@@ -1,3 +1,4 @@
-./RemoteGetSnaplist txt/runthis1438356947 forreplic
-res=Data/forreplic@Repli.Minutely.2.5.na.na.1438356900 Data/forreplic@Repli.Minutely.2.5.na.na.1438356600 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353
-isvalid=./RemoteGetSnaplist
+isvalidcome=./RemoteVolSearch txt/runthis1438373040 forreplic
+res=found
+Askreply 10.3.2.7 10.3.2.8 3337 local reply found
+isvalid=./RemoteVolSearch

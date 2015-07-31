@@ -1,1 +1,1 @@
-1032_7 1438356950 reply Data/forreplic@Repli.Minutely.2.5.na.na.1438356900 Data/forreplic@Repli.Minutely.2.5.na.na.1438356600 Data/forreplic@mezo..1438113292 Data/forreplic@mezo..1438113223 Data/forreplic@mezo..1438113194 Data/forreplic@hopa..1437783353 | nc -w 4 10.173.232.6 2237
+10.3.2.7 1438373048 reply found | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 -N 10.3.2.8 3337
