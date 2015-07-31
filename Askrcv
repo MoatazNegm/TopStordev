@@ -1,6 +1,7 @@
 #! /usr/local/bin/zsh
 cd /TopStor
-replierpp=`echo  $@ | awk '{print $1}'`;
+#replierpp=`echo  $@ | awk '{print $1}'`;
+replierpp=`cat workingpp | awk '{print $1}'`;
 tun=`echo  $@ | awk '{print $2}'`;
 replier=`echo  $@ | awk '{print $3}'`;
 stampid=`echo  $@ | awk '{print $4}'`;
