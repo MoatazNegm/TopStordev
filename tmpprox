@@ -3584,3 +3584,44 @@ ps -awx | grep Askrcv | grep 10.176.214.6 | grep 13330 | grep -v 1438347930
 istun=10
 router=10.176.214.1
 router=10.176.214.1
+second stage
+third stage
+4th stage
+5th stage
+6th stage
+passed first killing:13330      118
+7th stage
+8th stage istunn=11
+9th stage istunn=11
+ps -awx | grep Askrcv | grep 10.176.214.6 | grep 13330 | grep -v 1438347930
+istun=10
+router=10.176.214.1
+router=10.176.214.1
+second stage
+third stage
+4th stage
+5th stage
+6th stage
+passed first killing:13330      118
+7th stage
+8th stage istunn=11
+9th stage istunn=11
+ps -awx | grep Askrcv | grep 10.176.214.6 | grep 13330 | grep -v 1438347930
+istun=10
+router=10.176.214.1
+router=10.176.214.1
+second stage
+third stage
+4th stage
+5th stage
+6th stage
+passed first killing:13330      118
+7th stage
+8th stage istunn=11
+9th stage istunn=11
+ps -awx | grep Askrcv | grep 10.176.214.6 | grep 13330 | grep -v 1438347930
+istun=10
+router=10.176.214.1
+router=10.176.214.1
+second stage
+third stage
