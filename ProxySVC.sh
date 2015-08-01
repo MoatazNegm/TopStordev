@@ -23,6 +23,11 @@ do
    tun=`(ifconfig em1 | grep -w 'inet' | awk '{print $2}') 2>/dev/null`
    so=$tun
   fi 
+  otherask=`ps -awx | grep Askrcv | grep "$tun" | grep "$pp" | grep -w "$stamp"`
+  if [[ $? -ne 0 ]]; then
+   ./Askrcv $pp $tun $so $stamp $localrep &;
+  fi
+
   istun=`echo $tun | awk -F. '{print $1}'`;
   istunn=$((istun+1))
   if [[ $istunn -ge 5 ]];
@@ -69,15 +74,11 @@ do
   fi
   if [[ $istunn -ge 5 ]];
   then
-   otherask=`ps -awx | grep Askrcv | grep "$tun" | grep "$pp" | grep -v "$stamp"`
+   otherask=`ps -awx | grep Askrcv | grep "$tun" | grep -vw "$pp" | grep -vw "$stamp"`
    if [[ $? -eq 0 ]]; then 
     kill -TERM ` echo $otherask | awk '{print $1}'` >/dev/null 2>&1 ;
    fi
-   otherask=`ps -awx | grep Askrcv | grep "$tun" | grep "$pp" | grep -w "$stamp"`
-   if [[ $? -ne 0 ]]; then 
-    ./Askrcv $pp $tun $so $stamp $localrep &;
-   fi
   fi
  done < partners.txt;
-#  sleep 1;
+ sleep 5;
 done;

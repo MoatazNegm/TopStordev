@@ -1,0 +1,4 @@
+./replidf.sh txt/runthis14367 local 3338 10.3.2.7 10.3.2.8
+./replidf.sh txt/runthis1438437922 local 3338 10.3.2.7 10.3.2.8
+./replidf.sh txt/runthis1438438158 local 3338 10.3.2.7 10.3.2.8
+./replidf.sh txt/runthis1438439117 local 3338 10.3.2.7 10.3.2.8

@@ -1,8 +1,7 @@
 #! /bin/sh
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 res=`echo $@ | awk '{print $1}'`;
-localfile=`echo $res | awk -F"res" '{print $1}'`
-localrep=`cat $localfile`;
+localrep=`echo $@ | awk '{print $2}'`;
 if [[ $localrep == "proxy" ]];
 then
  pp=`cat workingpp | awk '{print $1}'`;
@@ -11,11 +10,11 @@ else
 fi
 #pp=`echo $@ | awk '{print $2}'`;
 pp=$((pp+2));
-tun=`echo $@ | awk '{print $3 }'`;
-partner=`echo $@ | awk '{print $4 }'`;
-pool=`echo $@ | awk '{print $5 }'`;
-vol=`echo $@ | awk '{print $6 }'`;
-initsnap=`echo $@ | awk '{print $7 }'`;
+tun=`echo $@ | awk '{print $4 }'`;
+partner=`echo $@ | awk '{print $5 }'`;
+pool=`echo $@ | awk '{print $6 }'`;
+vol=`echo $@ | awk '{print $7 }'`;
+initsnap=`echo $@ | awk '{print $8 }'`;
 zfs rollback -Rf $initsnap 2>/dev/null;
 if [[ $localrep == "proxy" ]];
 then

@@ -16,6 +16,7 @@ oldstamp=0;
 # packet : sender stamp command
 while true;
 do
+ echo starting >> tmpask
  ps -awx | grep "nc -ld" | grep "$tun" | grep "$pp" >/dev/null 2>&1
  if [[ $? -ne 0 ]]; 
  then
@@ -25,6 +26,7 @@ do
   else
    readthis=`nc -ld $tun $pp 2>/dev/null`
   fi;
+  echo readthis $readthis >>tmpask
   echo $readthis > tmpreadthis
   newsender=`echo $readthis | awk '{print $1}'`;
   stamp=`echo $readthis | awk '{print $2}'`;

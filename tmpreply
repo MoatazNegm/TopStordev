@@ -1,1 +1,2 @@
-10.3.2.7 1438387758 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438387465 Data/forreplic@Repli.Minutely.3.2.na.na.1438387459 Data/forreplic@Repli.Minutely.3.2.na.na.1438387453 Data/forreplic@Repli.Minutely.2.3.na.na.1438387380 Data/forreplic@Repli.Minutely.2.3.na.na.1438387200 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.8 3337
+10.3.2.7 1438453350 reply ready | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.8 3337
+finisehd
