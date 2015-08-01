@@ -1,7 +1,8 @@
 #! /bin/sh
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 res=`echo $@ | awk '{print $1}'`;
-localrep=`cat $res`;
+localfile=`echo $res | awk -F"res" '{print $1}'`
+localrep=`cat $localfile`;
 #pp=`echo $@ | awk '{print $2}'`;
 if [[ $localrep == "proxy" ]];
 then

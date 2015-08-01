@@ -1,1 +1,16 @@
-./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 14sddfdssda local RemoteGetSnaplist forreplic
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438386840 local RemoteVolSearch forreplic
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438386858 local RemoteGetSnaplist forreplic
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438386876 local replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438386233
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438386911 local RemoteGetSnaplist forreplic
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438387126 local RemoteVolSearch forreplic
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438387143 local RemoteGetSnaplist forreplic
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438387161 local destroysnaps.sh forreplic
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438387182 local replidf 3338 10.3.2.7 10.3.2.8
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438387287 local RemoteVolSearch forreplic
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438387314 local RemoteGetSnaplist forreplic
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438387339 local destroysnaps.sh forreplic
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438387362 local replidf 3338 10.3.2.7 10.3.2.8
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438387465 local RemoteVolSearch forreplic
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438387488 local RemoteGetSnaplist forreplic
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438387514 local replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.2.3.na.na.1438387200
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438387555 local RemoteGetSnaplist forreplic
