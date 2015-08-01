@@ -1,19 +1,20 @@
 oper=Data/forreplic Minutely.3.2.na.na 10.3.2.7
 oper1=Data/forreplic
 oper2=Minutely.3.2.na.na
-stamp=1438456694
+stamp=1438458266
 keep=3
-currentsnaps=Data/forreplic@Repli.Minutely.3.2.na.na.1438456300
-Data/forreplic@Repli.Minutely.3.2.na.na.1438456321
-Data/forreplic@Repli.Minutely.3.2.na.na.1438456495
-oldsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438456300
+currentsnaps=Data/forreplic@Repli.Minutely.3.2.na.na.1438457342
+Data/forreplic@Repli.Minutely.3.2.na.na.1438457377
+Data/forreplic@Repli.Minutely.3.2.na.na.1438457395
+oldsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438457342
 countsnap=       3
 countsnapplus=4
 keeppluszero=3
-{"Date":"08/01/2015","time":"22:18:14","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/forreplic@Repli.Minutely.3.2.na.na.1438456300"}
-newsnap2=Repli.Minutely.3.2.na.na.1438456694
-newsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438456694
-./ProxyReplicate 10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438456694 Repli.Minutely.3.2.na.na.1438456694 Data forreplic 10.3.2.7 3336 10.3.2.8 local
+{"Date":"08/01/2015","time":"22:44:26","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/forreplic@Repli.Minutely.3.2.na.na.1438457342"}
+newsnap2=Repli.Minutely.3.2.na.na.1438458266
+newsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438458266
+./ProxyReplicate 10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438458266 Repli.Minutely.3.2.na.na.1438458266 Data forreplic 10.3.2.7 3336 10.3.2.8 local
 snapshotresult :
-filenameis=txt/RemoteSnapshotnowSystem.txt1438456694
-{"Date":"08/01/2015","time":"22:19:06","msg":"info","user":"System","data":"Success_Replicating_Snapshot:Data/forreplic@Repli.Minutely.3.2.na.na.1438456694"}
+filenameis=txt/RemoteSnapshotnowSystem.txt1438458266
+{"Date":"08/01/2015","time":"22:45:33","msg":"info","user":"System","data":"Success_Replicating_Snapshot:Data/forreplic@Repli.Minutely.3.2.na.na.1438458266"}
+./ProxyReplicate 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1438458864 mezo..1438458864 Data forreplic 10.3.2.7 3336 10.3.2.8 local

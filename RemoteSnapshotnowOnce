@@ -8,6 +8,7 @@ errf=`echo $oper | awk '{print $4}'`;
 hostip=`ifconfig em1 | grep "inet " | awk '{print $2}'`;
 pool=`echo $oper1 | awk -F/ '{print $1}'`;
 vol=`echo $oper1 | awk -F/ '{print $2}'`;
+cronout='txt/replicronoutput.log';
 stamp=`date +%s`;
 newsnap2=`echo $oper2.$stamp`;
 newsnap=`echo $oper1@$newsnap2`;
@@ -25,11 +26,19 @@ then
   remotetun=`cat txt/receiver | grep "$oper3" | awk '{print $3}'`
   pp=`cat workingpp | awk '{print $1}'`
   /sbin/zfs set repli:sender=$so $newsnap;
- echo  running ./ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so >> txt/tmpproxyrequest;
- ./ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so;
+ echo  running ./ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so proxy >> txt/tmpproxyrequest;
+ ./ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so proxy;
 ##########noproxy####################################################
 else
- echo ./Replicate $hostip $oper3 $errf $newsnap2 $pool $vol >> txt/tmprequest
- ./Replicate $hostip $oper3 $errf $newsnap2 $pool $vol;
+ so=$hostip
+ remotetun=$oper3
+ pp=`cat workingpplocal | awk '{print $1}'`
+ /sbin/zfs set repli:sender=$so $newsnap;
+ ps -axuw | grep  ProxyReplicate >/dev/null 2>&1
+ if [[ $? -ne 0 ]];
+ then
+  echo ./ProxyReplicate $oper3 txt/${0:2}${userreq}.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so local>> $cronout
+  ./ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so local
+ fi
 fi
  #echo donereplicating
