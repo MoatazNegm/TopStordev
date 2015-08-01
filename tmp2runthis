@@ -1,3 +1,30 @@
+<<<<<<< HEAD
+isvalidcome=./RemoteVolSearch
+./replidf.sh
+./replivol.sh
+./destroysnaps.sh
+./RemoteGetSnaplist txt/runthislocal 
+./RemoteVolSearch:6: no such file or directory: 
+./replidf.sh: cannot create : No such file or directory
+missing snapshot argument
+usage:
+	receive|recv [-vnFu] <filesystem|volume|snapshot>
+	receive|recv [-vnFu] [-d | -e] <filesystem>
+
+For the property list, run: zfs set|get
+
+For the delegated permission list, run: zfs allow|unallow
+./replivol.sh: cannot create : No such file or directory
+./destroysnaps.sh: cannot create : No such file or directory
+./RemoteGetSnaplist:6: no such file or directory: ./GetSnalist
+res=nothing
+Askreply 3337 3337 3337 reply nothing
+isvalid=./RemoteVolSearch
+./replidf.sh
+./replivol.sh
+./destroysnaps.sh
+./RemoteGetSnaplist
+=======
 isvalidcome=replidf txt/runthis14367localforrepli local 3338 10.3.2.7 10.3.2.8
 Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
 isvalidcome=RemoteVolSearch txt/runthis1438437903localforrepli local forreplic
@@ -30,6 +57,7 @@ isvalidcome=destroysnaps txt/runthis1438439102localforrepli local forreplic
 Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
 isvalidcome=replidf txt/runthis1438439117localforrepli local 3338 10.3.2.7 10.3.2.8
 Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
+<<<<<<< HEAD
 isvalidcome=RemoteVolSearch txt/runthis1438455127localforrepli local forreplic
 Askreply 10.3.2.7 10.3.2.8 3337 local reply found
 isvalidcome=RemoteGetSnaplist txt/runthis1438455142localforrepli local forreplic
@@ -88,3 +116,6 @@ isvalidcome=replivol txt/runthis1438456722localforrepli local 3338 10.3.2.7 10.3
 Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
 isvalidcome=localGetSnaplist txt/runthis1438456746localforrepli local forreplic
 Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
+=======
+>>>>>>> d0fc6597f32ae9eaea6e0c003ef617bd09304645
+>>>>>>> fc0959fbd84f6fb66d6283932d937f2be29b63c0

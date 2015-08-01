@@ -33,6 +33,7 @@ starting
 readthis 10.3.2.8 1438439117 ask replidf 3338 10.3.2.7 10.3.2.8
 starting
 starting
+<<<<<<< HEAD
 readthis 10.3.2.8 1438455127 ask RemoteVolSearch forreplic
 starting
 readthis 10.3.2.8 1438455142 ask RemoteGetSnaplist forreplic
@@ -90,4 +91,64 @@ starting
 readthis 10.3.2.8 1438456722 ask replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438456495
 starting
 readthis 10.3.2.8 1438456746 ask localGetSnaplist forreplic
+=======
+starting
+readthis 10.3.2.7 1438455137 reply found
+starting
+readthis 10.3.2.7 1438455153 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438439071 Data/forreplic@Repli.Minutely.3.2.na.na.1438439072
+starting
+readthis 10.3.2.7 1438455168 reply ready
+starting
+readthis 10.3.2.7 1438455183 reply ready
+starting
+readthis 10.3.2.7 1438455333 reply found
+starting
+readthis 10.3.2.7 1438455384 reply found
+starting
+readthis 10.3.2.7 1438455399 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438455127 Data/forreplic@Repli.Minutely.3.2.na.na.1438439073 Data/forreplic@Repli.Minutely.3.2.na.na.1438439072
+starting
+readthis 10.3.2.7 1438455413 reply ready
+starting
+readthis 10.3.2.7 1438455427 reply ready
+starting
+readthis 10.3.2.7 1438455491 reply found
+starting
+readthis 10.3.2.7 1438455505 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438455374 Data/forreplic@Repli.Minutely.3.2.na.na.1438455322 Data/forreplic@Repli.Minutely.3.2.na.na.1438455309
+starting
+readthis 10.3.2.7 1438455519 reply ready
+starting
+readthis 10.3.2.7 1438455534 reply ready
+starting
+readthis 10.3.2.7 1438456058 reply found
+starting
+readthis 10.3.2.7 1438456072 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438455481 Data/forreplic@Repli.Minutely.3.2.na.na.1438455374 Data/forreplic@Repli.Minutely.3.2.na.na.1438455322
+starting
+readthis 10.3.2.7 1438456086 reply ready
+starting
+readthis 10.3.2.7 1438456100 reply ready
+starting
+readthis 10.3.2.7 1438456332 reply found
+starting
+readthis 10.3.2.7 1438456346 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438456047 Data/forreplic@Repli.Minutely.3.2.na.na.1438455481 Data/forreplic@Repli.Minutely.3.2.na.na.1438455374
+starting
+readthis 10.3.2.7 1438456360 reply ready
+starting
+readthis 10.3.2.7 1438456375 reply ready
+starting
+readthis 10.3.2.7 1438456505 reply found
+starting
+readthis 10.3.2.7 1438456519 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438456321 Data/forreplic@Repli.Minutely.3.2.na.na.1438456300 Data/forreplic@Repli.Minutely.3.2.na.na.1438456296
+starting
+readthis 10.3.2.7 1438456533 reply ready
+starting
+readthis 10.3.2.7 1438456557 reply ready
+starting
+readthis 10.3.2.7 1438456704 reply found
+starting
+readthis 10.3.2.7 1438456718 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438456495 Data/forreplic@Repli.Minutely.3.2.na.na.1438456321 Data/forreplic@Repli.Minutely.3.2.na.na.1438456300
+starting
+readthis 10.3.2.7 1438456732 reply ready
+starting
+readthis 10.3.2.7 1438456756 reply ready
+>>>>>>> fc0959fbd84f6fb66d6283932d937f2be29b63c0
 starting

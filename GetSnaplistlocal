@@ -6,7 +6,7 @@ wlines=`echo $lines | wc -l`;
 wlines=$((wlines+0));
 if [[ $wlines -ge 2 ]]; 
 then
-echo $lines  |  sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/ /g'  ;
+echo $lines  |  sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/ /g' ;
 else 
-echo nothing ;
+echo nothing; 
 fi
