@@ -14,22 +14,27 @@ newcom=`echo  $@ | awk '{print $9}'`;
 param=`echo  $@ | awk '{$1=$2=$3=$4=$5=$6=$7=$8=$9="";print substr($0,10)}'`;
 # packet : sender stamp command
 fileres='txt/runthis'$stamp
-isvalid=`cat Commands.txt | grep "$newcom"`
-if [[ $? -eq 0 ]];
-then 
- validcom=${isvalid}" "${fileres}" "$param;
- echo isvalidcome=$validcom  > tmp2runthis 
- eval $validcom 2>> tmp2runthis
- while [[ ! -a $fileres ]];  
- do
-  c=0;  while [[ $c -le 30 ]]; do c=$((c+1)); done
- done
- res=`cat $fileres`
- echo res=$res >> tmp2runthis
- rm $fileres 2>/dev/null
+case "$newcom" in 
+ RemoteVolSearch) ./RemoteVolSearch ${fileres} $param > $fileres;;
+ replidf)  ./replidf.sh ${fileres} $localrep $param ;
+  echo  ./replidf.sh ${fileres} $localrep $param >> tmpreplidf ;;
+ replivol) ./replivol.sh ${fileres} $localrep  $param ;;
+ destroysnaps) ./destroysnaps.sh ${fileres} $param ;;
+ RemoteGetSnaplist) ./RemoteGetSnaplist ${fileres} $param ;;
+ localGetSnaplist) ./localGetSnaplist ${fileres} $param ;;
+ *) echo not valid command $newcom >> tmp2runthis
+esac;
+validcom=${newcom}" "${fileres}"localforrepli "${localrep}" "$param;
+echo isvalidcome=$validcom  >> tmp2runthis 
+#./$validcom 2>> tmp2runthis
+while [[ ! -a $fileres ]];  
+do
+ c=0;  while [[ $c -le 30 ]]; do c=$((c+1)); done
+done
+res=`cat $fileres`
+echo res=$res >> tmp3runthis
+rm $fileres 2>/dev/null
 # ppp=$((senderpp+1));
- ppp=$senderpp
- echo Askreply $replier $sendertun $ppp $localrep reply $res >> tmp2runthis
- ./Askreply $replier $sendertun $ppp $localrep reply $res
-fi
-echo isvalid=$isvalid  >> tmp2runthis 
+ppp=$senderpp
+echo Askreply $replier $sendertun $ppp $localrep reply $res >> tmp2runthis
+./Askreply $replier $sendertun $ppp $localrep reply $res
