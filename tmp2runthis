@@ -1,121 +1,20 @@
-<<<<<<< HEAD
-isvalidcome=./RemoteVolSearch
-./replidf.sh
-./replivol.sh
-./destroysnaps.sh
-./RemoteGetSnaplist txt/runthislocal 
-./RemoteVolSearch:6: no such file or directory: 
-./replidf.sh: cannot create : No such file or directory
-missing snapshot argument
-usage:
-	receive|recv [-vnFu] <filesystem|volume|snapshot>
-	receive|recv [-vnFu] [-d | -e] <filesystem>
-
-For the property list, run: zfs set|get
-
-For the delegated permission list, run: zfs allow|unallow
-./replivol.sh: cannot create : No such file or directory
-./destroysnaps.sh: cannot create : No such file or directory
-./RemoteGetSnaplist:6: no such file or directory: ./GetSnalist
-res=nothing
-Askreply 3337 3337 3337 reply nothing
-isvalid=./RemoteVolSearch
-./replidf.sh
-./replivol.sh
-./destroysnaps.sh
-./RemoteGetSnaplist
-=======
-isvalidcome=replidf txt/runthis14367localforrepli local 3338 10.3.2.7 10.3.2.8
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=RemoteVolSearch txt/runthis1438437903localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply no
-isvalidcome=replidf txt/runthis1438437922localforrepli local 3338 10.3.2.7 10.3.2.8
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=localGetSnaplist txt/runthis1438437952localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=RemoteVolSearch txt/runthis1438438103localforrepli local forreplic
+not valid command forreplic
+isvalidcome=forreplic txt/runthislocallocalforrepli RemoteVolSearch 
+isvalidcome=RemoteVolSearch txt/runthis1438458267localforrepli local forreplic
 Askreply 10.3.2.7 10.3.2.8 3337 local reply found
-isvalidcome=RemoteGetSnaplist txt/runthis1438438122localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply nothing
-isvalidcome=destroysnaps txt/runthis1438438141localforrepli local forreplic
+isvalidcome=RemoteGetSnaplist txt/runthis1438458281localforrepli local forreplic
+Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/forreplic@Repli.Minutely.3.2.na.na.1438456694 Data/forreplic@Repli.Minutely.3.2.na.na.1438456495 Data/forreplic@Repli.Minutely.3.2.na.na.1438456321
+isvalidcome=destroysnaps txt/runthis1438458295localforrepli local forreplic
 Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=replidf txt/runthis1438438158localforrepli local 3338 10.3.2.7 10.3.2.8
+isvalidcome=replidf txt/runthis1438458309localforrepli local 3338 10.3.2.7 10.3.2.8
 Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=RemoteVolSearch txt/runthis1438438284localforrepli local forreplic
+isvalidcome=localGetSnaplist txt/runthis1438458333localforrepli local forreplic
+Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
+isvalidcome=RemoteVolSearch txt/runthis1438458864localforrepli local forreplic
 Askreply 10.3.2.7 10.3.2.8 3337 local reply found
-isvalidcome=RemoteGetSnaplist txt/runthis1438438303localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/forreplic@Repli.Minutely.3.2.na.na.1438438103 Data/forreplic@Repli.Minutely.3.2.na.na.1438437902 Data/forreplic@Repli.Minutely.3.2.na.na.1438437896
-isvalidcome=replivol txt/runthis1438438321localforrepli local 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438438103
+isvalidcome=RemoteGetSnaplist txt/runthis1438458878localforrepli local forreplic
+Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 Data/forreplic@Repli.Minutely.3.2.na.na.1438457377
+isvalidcome=replivol txt/runthis1438458892localforrepli local 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438458266
 Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=localGetSnaplist txt/runthis1438438352localforrepli local forreplic
+isvalidcome=localGetSnaplist txt/runthis1438458918localforrepli local forreplic
 Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=RemoteVolSearch txt/runthis1438439072localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply found
-isvalidcome=RemoteGetSnaplist txt/runthis1438439087localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/forreplic@Repli.Minutely.3.2.na.na.1438438284 Data/forreplic@Repli.Minutely.3.2.na.na.1438438103 Data/forreplic@Repli.Minutely.3.2.na.na.1438437902
-isvalidcome=destroysnaps txt/runthis1438439102localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=replidf txt/runthis1438439117localforrepli local 3338 10.3.2.7 10.3.2.8
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-<<<<<<< HEAD
-isvalidcome=RemoteVolSearch txt/runthis1438455127localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply found
-isvalidcome=RemoteGetSnaplist txt/runthis1438455142localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/forreplic@Repli.Minutely.3.2.na.na.1438439071 Data/forreplic@Repli.Minutely.3.2.na.na.1438439072
-isvalidcome=destroysnaps txt/runthis1438455158localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=replidf txt/runthis1438455173localforrepli local 3338 10.3.2.7 10.3.2.8
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=RemoteVolSearch txt/runthis1438455322localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply found
-isvalidcome=RemoteVolSearch txt/runthis1438455374localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply found
-isvalidcome=RemoteGetSnaplist txt/runthis1438455388localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/forreplic@Repli.Minutely.3.2.na.na.1438455127 Data/forreplic@Repli.Minutely.3.2.na.na.1438439073 Data/forreplic@Repli.Minutely.3.2.na.na.1438439072
-isvalidcome=destroysnaps txt/runthis1438455402localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=replidf txt/runthis1438455417localforrepli local 3338 10.3.2.7 10.3.2.8
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=RemoteVolSearch txt/runthis1438455481localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply found
-isvalidcome=RemoteGetSnaplist txt/runthis1438455495localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/forreplic@Repli.Minutely.3.2.na.na.1438455374 Data/forreplic@Repli.Minutely.3.2.na.na.1438455322 Data/forreplic@Repli.Minutely.3.2.na.na.1438455309
-isvalidcome=destroysnaps txt/runthis1438455509localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=replidf txt/runthis1438455523localforrepli local 3338 10.3.2.7 10.3.2.8
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=RemoteVolSearch txt/runthis1438456047localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply found
-isvalidcome=RemoteGetSnaplist txt/runthis1438456062localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/forreplic@Repli.Minutely.3.2.na.na.1438455481 Data/forreplic@Repli.Minutely.3.2.na.na.1438455374 Data/forreplic@Repli.Minutely.3.2.na.na.1438455322
-isvalidcome=destroysnaps txt/runthis1438456076localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=replidf txt/runthis1438456090localforrepli local 3338 10.3.2.7 10.3.2.8
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=RemoteVolSearch txt/runthis1438456322localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply found
-isvalidcome=RemoteGetSnaplist txt/runthis1438456336localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/forreplic@Repli.Minutely.3.2.na.na.1438456047 Data/forreplic@Repli.Minutely.3.2.na.na.1438455481 Data/forreplic@Repli.Minutely.3.2.na.na.1438455374
-isvalidcome=destroysnaps txt/runthis1438456350localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=replidf txt/runthis1438456364localforrepli local 3338 10.3.2.7 10.3.2.8
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=RemoteVolSearch txt/runthis1438456495localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply found
-isvalidcome=RemoteGetSnaplist txt/runthis1438456509localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/forreplic@Repli.Minutely.3.2.na.na.1438456321 Data/forreplic@Repli.Minutely.3.2.na.na.1438456300 Data/forreplic@Repli.Minutely.3.2.na.na.1438456296
-isvalidcome=replivol txt/runthis1438456523localforrepli local 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438456321
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=localGetSnaplist txt/runthis1438456547localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=RemoteVolSearch txt/runthis1438456694localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply found
-isvalidcome=RemoteGetSnaplist txt/runthis1438456708localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/forreplic@Repli.Minutely.3.2.na.na.1438456495 Data/forreplic@Repli.Minutely.3.2.na.na.1438456321 Data/forreplic@Repli.Minutely.3.2.na.na.1438456300
-isvalidcome=replivol txt/runthis1438456722localforrepli local 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438456495
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=localGetSnaplist txt/runthis1438456746localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-=======
->>>>>>> d0fc6597f32ae9eaea6e0c003ef617bd09304645
->>>>>>> fc0959fbd84f6fb66d6283932d937f2be29b63c0
