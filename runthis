@@ -9,15 +9,16 @@ senderpp=`echo  $@ | awk '{print $4}'`;
 pp=`echo  $@ | awk '{print $5}'`;
 tun=`echo  $@ | awk '{print $6}'`;
 stamp=`echo  $@ | awk '{print $7}'`;
-newcom=`echo  $@ | awk '{print $8}'`;
-param=`echo  $@ | awk '{$1=$2=$3=$4=$5=$6=$7=$8="";print substr($0,9)}'`;
+localrep=`echo  $@ | awk '{print $8}'`;
+newcom=`echo  $@ | awk '{print $9}'`;
+param=`echo  $@ | awk '{$1=$2=$3=$4=$5=$6=$7=$8=$9="";print substr($0,10)}'`;
 # packet : sender stamp command
 fileres='txt/runthis'$stamp
 isvalid=`cat Commands.txt | grep "$newcom"`
 if [[ $? -eq 0 ]];
 then 
  validcom=${isvalid}" "${fileres}" "$param;
- echo $validcom  > tmp2runthis 
+ echo isvalidcome=$validcom  > tmp2runthis 
  eval $validcom 2>> tmp2runthis
  while [[ ! -a $fileres ]];  
  do
@@ -28,7 +29,7 @@ then
  rm $fileres 2>/dev/null
 # ppp=$((senderpp+1));
  ppp=$senderpp
- echo Askreply $replier $sendertun $ppp reply $res > tmprep
- ./Askreply $replier $sendertun $ppp reply $res
+ echo Askreply $replier $sendertun $ppp $localrep reply $res >> tmp2runthis
+ ./Askreply $replier $sendertun $ppp $localrep reply $res
 fi
 echo isvalid=$isvalid  >> tmp2runthis 

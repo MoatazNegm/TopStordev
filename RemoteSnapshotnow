@@ -95,8 +95,12 @@ echo ./ProxyReplicate $oper3 txt/${0:2}${userreq}.txt$stamp $newsnap2 $pool $vol
   remotetun=$oper3
   pp=`cat workingpplocal | awk '{print $1}'` 
   /sbin/zfs set repli:sender=$so $newsnap; 
-echo ./ProxyReplicate $oper3 txt/${0:2}${userreq}.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so local>> $cronout
-./ProxyReplicate $oper3 txt/${0:2}${userreq}.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so local
+  ps -axuw | grep  ProxyReplicate >/dev/null 2>&1
+  if [[ $? -ne 0 ]];
+  then 
+   echo ./ProxyReplicate $oper3 txt/${0:2}${userreq}.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so local>> $cronout
+   ./ProxyReplicate $oper3 txt/${0:2}${userreq}.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so local
+  fi
  fi;
  #echo donereplicating
  echo snapshotresult : >> $cronout

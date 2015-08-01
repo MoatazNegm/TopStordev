@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-hi hi hi
-=======
-1032_7 1438270907 reply found | nc -w 4 10.173.232.6 15541
->>>>>>> ce616b516b092edf95cf95d00680c5f1109e91c6
+3337 1438432296 nothing | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 -N 3337 3337

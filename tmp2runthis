@@ -1,2 +1,25 @@
-./RemoteVolSearch txt/runthis1438221600 forreplic
-res=found
+isvalidcome=./RemoteVolSearch
+./replidf.sh
+./replivol.sh
+./destroysnaps.sh
+./RemoteGetSnaplist txt/runthislocal 
+./RemoteVolSearch:6: no such file or directory: 
+./replidf.sh: cannot create : No such file or directory
+missing snapshot argument
+usage:
+	receive|recv [-vnFu] <filesystem|volume|snapshot>
+	receive|recv [-vnFu] [-d | -e] <filesystem>
+
+For the property list, run: zfs set|get
+
+For the delegated permission list, run: zfs allow|unallow
+./replivol.sh: cannot create : No such file or directory
+./destroysnaps.sh: cannot create : No such file or directory
+./RemoteGetSnaplist:6: no such file or directory: ./GetSnalist
+res=nothing
+Askreply 3337 3337 3337 reply nothing
+isvalid=./RemoteVolSearch
+./replidf.sh
+./replivol.sh
+./destroysnaps.sh
+./RemoteGetSnaplist
