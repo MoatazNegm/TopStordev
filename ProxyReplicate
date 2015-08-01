@@ -28,11 +28,11 @@ function RemoteAsk() {
   echo $SO $stamp ask $@ | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf |  nc -w 10 $REMOTETUN $PPSEND
  fi
  flagcount=0;
- while [[ $flagcount -le 30 ]];
+ while [[ $flagcount -le 300000 ]];
  do
 #  echo finished Ask >> txt/tmpproxyrequest
 #  echo asking for txt/remoo tereply$DST  >> txt/tmpproxyrequest; 
-  sleep 1
+  c=0;  while [[ $c -le 30 ]]; do c=$((c+1)); done
   if [[ -a txt/remotereply$DST ]]; then break; fi
   flagcount=$((flagcount+1)); 
  done
@@ -107,14 +107,14 @@ if [[ $volfound == "no" ]];
 then
  RemoteAsk replidf $PORzfs $REMOTETUN $SO 
  
- echo zfs -D $pool/$vol@$snap  >> txt/tmpproxyrequest;
- Sendzfs  -D $pool/$vol@$snap ;
+ echo zfs -DR $pool/$vol@$snap  >> txt/tmpproxyrequest;
+ Sendzfs  -DR $pool/$vol@$snap ;
  echo zfs RR=$RR >> txt/tmpproxyrequest
 else
  echo foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn >> txt/tmpproxyrequest
  RemoteAsk RemoteGetSnaplist $vol;
  if [[ $RR == "nothing" ]];  then oldsnaps=""; else oldsnaps=$RR; fi;
- localsnaps=`./localGetSnaplist $vol`;
+ localsnaps=`./GetSnaplistlocal $vol`;
  ll=$oldsnaps;
  ll=${ll}' spot';
  echo ll=$ll >> txt/tmpproxyrequest
@@ -141,14 +141,13 @@ else
 #  RemoteAsk replivol $PORzfs $REMOTETUN $SO $pool $vol nothing;
 #echo exit  >> txt/tmpproxyrequest
 #exit
-  echo zfs send -R   $targetsnap   >> txt/tmpproxyrequest;
-  Sendzfs  -R   $targetsnap ;
-  exit;
+  echo zfs send -DR   $targetsnap   >> txt/tmpproxyrequest;
+  Sendzfs  -DR   $targetsnap ;
  else
   echo RemoteAsk replivol $PORzfs $REMOTETUN $SO  $pool $vol $initialsnap >> txt/tmpproxyrequest
   RemoteAsk replivol $PORzfs $REMOTETUN $SO  $pool $vol $initialsnap;
-  echo zfs send -R -I $initialsnap  $targetsnap to txt/c$ppzfs >> txt/tmpproxyrequest;
-  Sendzfs  -R -I $initialsnap  $targetsnap ;
+  echo zfs send -DR -I $initialsnap  $targetsnap to txt/c$ppzfs >> txt/tmpproxyrequest;
+  Sendzfs  -DR -I $initialsnap  $targetsnap ;
  fi
 fi
 ./GetSnaplist & 

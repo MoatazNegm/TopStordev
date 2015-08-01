@@ -1,21 +1,19 @@
 oper=Data/forreplic Minutely.3.2.na.na 10.3.2.7
 oper1=Data/forreplic
 oper2=Minutely.3.2.na.na
-stamp=1438439073
+stamp=1438456694
 keep=3
-currentsnaps=Data/forreplic@Repli.Minutely.3.2.na.na.1438439069
-Data/forreplic@Repli.Minutely.3.2.na.na.1438439071
-Data/forreplic@Repli.Minutely.3.2.na.na.1438439072
-oldsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438439069
+currentsnaps=Data/forreplic@Repli.Minutely.3.2.na.na.1438456300
+Data/forreplic@Repli.Minutely.3.2.na.na.1438456321
+Data/forreplic@Repli.Minutely.3.2.na.na.1438456495
+oldsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438456300
 countsnap=       3
 countsnapplus=4
 keeppluszero=3
-{"Date":"08/01/2015","time":"17:24:33","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/forreplic@Repli.Minutely.3.2.na.na.1438439069"}
-newsnap2=Repli.Minutely.3.2.na.na.1438439073
-newsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438439073
+{"Date":"08/01/2015","time":"22:18:14","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/forreplic@Repli.Minutely.3.2.na.na.1438456300"}
+newsnap2=Repli.Minutely.3.2.na.na.1438456694
+newsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438456694
+./ProxyReplicate 10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438456694 Repli.Minutely.3.2.na.na.1438456694 Data forreplic 10.3.2.7 3336 10.3.2.8 local
 snapshotresult :
-filenameis=txt/RemoteSnapshotnowSystem.txt1438439073
-{"Date":"08/01/2015","time":"17:24:33","msg":"info","user":"System","data":"Success_Replicating_Snapshot:Data/forreplic@Repli.Minutely.3.2.na.na.1438439073"}
-snapshotresult :
-filenameis=txt/RemoteSnapshotnowSystem.txt1438439072
-{"Date":"08/01/2015","time":"17:25:42","msg":"info","user":"System","data":"Success_Replicating_Snapshot:Data/forreplic@Repli.Minutely.3.2.na.na.1438439072"}
+filenameis=txt/RemoteSnapshotnowSystem.txt1438456694
+{"Date":"08/01/2015","time":"22:19:06","msg":"info","user":"System","data":"Success_Replicating_Snapshot:Data/forreplic@Repli.Minutely.3.2.na.na.1438456694"}
