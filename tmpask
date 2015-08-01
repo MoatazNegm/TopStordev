@@ -32,3 +32,62 @@ readthis 10.3.2.8 1438439102 ask destroysnaps forreplic
 starting
 readthis 10.3.2.8 1438439117 ask replidf 3338 10.3.2.7 10.3.2.8
 starting
+starting
+readthis 10.3.2.8 1438455127 ask RemoteVolSearch forreplic
+starting
+readthis 10.3.2.8 1438455142 ask RemoteGetSnaplist forreplic
+starting
+readthis 10.3.2.8 1438455158 ask destroysnaps forreplic
+starting
+readthis 10.3.2.8 1438455173 ask replidf 3338 10.3.2.7 10.3.2.8
+starting
+readthis 10.3.2.8 1438455322 ask RemoteVolSearch forreplic
+starting
+readthis 10.3.2.8 1438455374 ask RemoteVolSearch forreplic
+starting
+readthis 10.3.2.8 1438455388 ask RemoteGetSnaplist forreplic
+starting
+readthis 10.3.2.8 1438455402 ask destroysnaps forreplic
+starting
+readthis 10.3.2.8 1438455417 ask replidf 3338 10.3.2.7 10.3.2.8
+starting
+readthis 10.3.2.8 1438455481 ask RemoteVolSearch forreplic
+starting
+readthis 10.3.2.8 1438455495 ask RemoteGetSnaplist forreplic
+starting
+readthis 10.3.2.8 1438455509 ask destroysnaps forreplic
+starting
+readthis 10.3.2.8 1438455523 ask replidf 3338 10.3.2.7 10.3.2.8
+starting
+readthis 10.3.2.8 1438456047 ask RemoteVolSearch forreplic
+starting
+readthis 10.3.2.8 1438456062 ask RemoteGetSnaplist forreplic
+starting
+readthis 10.3.2.8 1438456076 ask destroysnaps forreplic
+starting
+readthis 10.3.2.8 1438456090 ask replidf 3338 10.3.2.7 10.3.2.8
+starting
+readthis 10.3.2.8 1438456322 ask RemoteVolSearch forreplic
+starting
+readthis 10.3.2.8 1438456336 ask RemoteGetSnaplist forreplic
+starting
+readthis 10.3.2.8 1438456350 ask destroysnaps forreplic
+starting
+readthis 10.3.2.8 1438456364 ask replidf 3338 10.3.2.7 10.3.2.8
+starting
+readthis 10.3.2.8 1438456495 ask RemoteVolSearch forreplic
+starting
+readthis 10.3.2.8 1438456509 ask RemoteGetSnaplist forreplic
+starting
+readthis 10.3.2.8 1438456523 ask replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438456321
+starting
+readthis 10.3.2.8 1438456547 ask localGetSnaplist forreplic
+starting
+readthis 10.3.2.8 1438456694 ask RemoteVolSearch forreplic
+starting
+readthis 10.3.2.8 1438456708 ask RemoteGetSnaplist forreplic
+starting
+readthis 10.3.2.8 1438456722 ask replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438456495
+starting
+readthis 10.3.2.8 1438456746 ask localGetSnaplist forreplic
+starting

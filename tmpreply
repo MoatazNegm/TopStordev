@@ -1,2 +1,2 @@
-10.3.2.7 1438453350 reply ready | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.8 3337
+10.3.2.7 1438456756 reply ready | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.8 3337
 finisehd
