@@ -23,7 +23,7 @@ then
 ############################################################3
   #./ProxysndSVC.sh
   so=`cat proxy.txt | awk '{print $3}'`
-  remotetun=`cat txt/receiver | grep "$oper3" | awk '{print $3}'`
+  remotetun=`cat txt/peer | grep "$oper3" | awk '{print $3}'`
   pp=`cat workingpp | awk '{print $1}'`
   /sbin/zfs set repli:sender=$so $newsnap;
  echo  running ./ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so proxy >> txt/tmpproxyrequest;

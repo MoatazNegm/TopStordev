@@ -28,3 +28,15 @@ isvalidcome=replivol txt/runthis1438464346localforrepli local 3338 10.3.2.7 10.3
 Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
 isvalidcome=localGetSnaplist txt/runthis1438464370localforrepli local forreplic
 Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
+<<<<<<< HEAD
+=======
+>>>>>>> d0fc6597f32ae9eaea6e0c003ef617bd09304645
+not valid command
+isvalidcome= txt/runthislocalforrepli  
+not valid command
+isvalidcome= txt/runthislocalforrepli  
+not valid command
+isvalidcome= txt/runthislocalforrepli  
+not valid command
+isvalidcome= txt/runthislocalforrepli  
+>>>>>>> 60df1c127dad16d8f2f3d0587c4337573a0a378b

@@ -2,10 +2,26 @@
 cd /TopStor
 openvpnflag=0
 stamp=`date +%s`;
+proxycurrent=`cat proxy.txt | awk '{print $1}'`;
 while true;
 do
  proxyser=`cat proxy.txt | awk '{print $1}'`;
  license=` cat proxy.txt | awk '{print $2}'`;
+ if [[ $proxycurrent != $proxyser ]];
+ then
+  openvpnflag=0;
+  proxycurrent=$proxyser;
+  killall openvpn 2>/dev/null;
+  kill -KILL `ps -axw | grep ProxyncSVC | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep Askrcv | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep nc | grep 3336 | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep nc | grep 3337 | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep nc | grep 2236 | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep nc | grep 2237 | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep zfs | grep send | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep zfs | grep receive | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep nc | grep 2238 | awk '{print $1}'` 2>/dev/null;
+ fi
  while read line;
  do
   isproxy=`echo $line | awk '{print $3}'`;
@@ -23,13 +39,21 @@ do
    tun=`(ifconfig em1 | grep -w 'inet' | awk '{print $2}') 2>/dev/null`
    so=$tun
   fi 
-  if [[ -n $tun ]]; then
+  if [[ -n $tun ]];
+  then
+   if [[ $localrep == "proxy" ]];
+   then
+    ps -auxw | grep ProxyncSVC > /dev/null 2>&1;
+    if [[ $? -ne 0 ]];
+    then
+     ./ProxyncSVC $pp $tun peer &;
+    fi
+   fi
    otherask=`ps -awx | grep Askrcv | grep "$tun" | grep "$pp" | grep -w "$stamp"`
    if [[ $? -ne 0 ]]; then
     ./Askrcv $pp $tun $so $stamp $localrep &;
    fi
   fi
-
   istun=`echo $tun | awk -F. '{print $1}'`;
   istunn=$((istun+1))
   if [[ $istunn -ge 5 ]];
@@ -42,16 +66,20 @@ do
      ./ProxyncSVC $pp $tun sender &;
     fi
     router=`echo $tun | awk -F. '{print $1"."$2"."$3".1"}'`
-    /sbin/ping -c 2 $router >/dev/null 2>&1
+    /sbin/ping -c 3 $router >/dev/null 2>&1
     if [[ $? -ne 0 ]];
     then
      openvpnflag=0;
      killall openvpn;
-     ispid=`ps -axw  | grep nc | grep "$pp" | grep -v Proxy | awk '{print $1}'`;
-     if [[ $? -eq 0 ]]; then kill -TERM $ispid 2>/dev/null; fi
-     ppzfs=$((pp+1));
-     ispid=`ps -axw  | grep nc | grep "$ppzfs" | grep -v Proxy | awk '{print $1}'`;
-     if [[ $? -eq 0 ]]; then kill -TERM $ispid 2>/dev/null; fi
+     kill -KILL `ps -axw | grep ProxyncSVC | awk '{print $1}'` 2>/dev/null;
+     kill -KILL `ps -axw | grep Askrcv | awk '{print $1}'` 2>/dev/null;
+     kill -KILL `ps -axw | grep nc | grep 3336 | awk '{print $1}'` 2>/dev/null;
+     kill -KILL `ps -axw | grep nc | grep 3337 | awk '{print $1}'` 2>/dev/null;
+     kill -KILL `ps -axw | grep nc | grep 2236 | awk '{print $1}'` 2>/dev/null;
+     kill -KILL `ps -axw | grep nc | grep 2237 | awk '{print $1}'` 2>/dev/null;
+     kill -KILL `ps -axw | grep zfs | grep send | awk '{print $1}'` 2>/dev/null;
+     kill -KILL `ps -axw | grep zfs | grep receive | awk '{print $1}'` 2>/dev/null;
+     kill -KILL `ps -axw | grep nc | grep 2238 | awk '{print $1}'` 2>/dev/null;
     fi
    fi
   fi
@@ -64,7 +92,7 @@ do
    fi 
    ispid=`ps -axw | grep openvpn | grep "$dst"`
    ispidn=`echo $ispid | wc -c `
-   if [[ -a txt/$pp && $ispidn -ge 5 ]]; then kill -TERM `echo $ispid | awk '{ print $1}'`; fi
+   if [[ -a txt/$pp && $ispidn -ge 5 ]]; then kill -KILL `echo $ispid | awk '{ print $1}'`; fi
    if [[ -a txt/$pp || $ispidn -le 3 ]];
    then
     rm txt/$pp 2>/dev/null;  
@@ -78,9 +106,15 @@ do
   then
    otherask=`ps -awx | grep Askrcv | grep "$tun" | grep -vw "$pp" | grep -vw "$stamp"`
    if [[ $? -eq 0 ]]; then 
-    kill -TERM ` echo $otherask | awk '{print $1}'` >/dev/null 2>&1 ;
+    kill -KILL ` echo $otherask | awk '{print $1}'` >/dev/null 2>&1 ;
    fi
   fi
+  sleep 5;
+  tun=`(ifconfig tun0 | grep -w 'inet' | awk '{print $2}') 2>/dev/null`
+  if [[ $localrep == "proxy" && -n $tun ]];
+  then
+   echo $so $stamp $dst $license ProxyUpdate $so $pp $passphrase $dst  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 -N $proxyser 2234 2>/dev/null
+  ;
+  fi
  done < partners.txt;
- sleep 5;
 done;
