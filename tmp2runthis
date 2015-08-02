@@ -18,3 +18,13 @@ isvalidcome=replivol txt/runthis1438458892localforrepli local 3338 10.3.2.7 10.3
 Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
 isvalidcome=localGetSnaplist txt/runthis1438458918localforrepli local forreplic
 Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
+not valid command
+isvalidcome= txt/runthislocalforrepli  
+isvalidcome=RemoteVolSearch txt/runthis1438464318localforrepli local forreplic
+Askreply 10.3.2.7 10.3.2.8 3337 local reply found
+isvalidcome=RemoteGetSnaplist txt/runthis1438464332localforrepli local forreplic
+Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 Data/forreplic@Repli.Minutely.3.2.na.na.1438457377
+isvalidcome=replivol txt/runthis1438464346localforrepli local 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@mezo..1438458864
+Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
+isvalidcome=localGetSnaplist txt/runthis1438464370localforrepli local forreplic
+Askreply 10.3.2.7 10.3.2.8 3337 local reply ready

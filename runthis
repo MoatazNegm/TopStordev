@@ -37,4 +37,4 @@ rm $fileres 2>/dev/null
 # ppp=$((senderpp+1));
 ppp=$senderpp
 echo Askreply $replier $sendertun $ppp $localrep reply $res >> tmp2runthis
-./Askreply $replier $sendertun $ppp $localrep reply $res
+./Askreply $replier $sendertun $ppp $localrep reply $res &

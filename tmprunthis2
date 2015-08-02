@@ -8,3 +8,8 @@
 ./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438458878 local RemoteGetSnaplist forreplic
 ./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438458892 local replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438458266
 ./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438458918 local localGetSnaplist forreplic
+./runthis 10.173.232.6 1438457114 3337 3337 1032_7
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438464318 local RemoteVolSearch forreplic
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438464332 local RemoteGetSnaplist forreplic
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438464346 local replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@mezo..1438458864
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1438464370 local localGetSnaplist forreplic

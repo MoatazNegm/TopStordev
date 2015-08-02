@@ -23,9 +23,11 @@ do
    tun=`(ifconfig em1 | grep -w 'inet' | awk '{print $2}') 2>/dev/null`
    so=$tun
   fi 
-  otherask=`ps -awx | grep Askrcv | grep "$tun" | grep "$pp" | grep -w "$stamp"`
-  if [[ $? -ne 0 ]]; then
-   ./Askrcv $pp $tun $so $stamp $localrep &;
+  if [[ -n $tun ]]; then
+   otherask=`ps -awx | grep Askrcv | grep "$tun" | grep "$pp" | grep -w "$stamp"`
+   if [[ $? -ne 0 ]]; then
+    ./Askrcv $pp $tun $so $stamp $localrep &;
+   fi
   fi
 
   istun=`echo $tun | awk -F. '{print $1}'`;

@@ -1,813 +1,103 @@
 Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438431040 Repli.Minutely.3.2.na.na.1438431040 Data forreplic 10.3.2.7 3336 10.3.2.8 local
+Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438457395 Repli.Minutely.3.2.na.na.1438457395 Data forreplic 10.3.2.7 3336 10.3.2.8 local
 RemoteAsk RemoteVolSearch forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteVolSearch forreplic
-10.3.2.8 1438431041 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438431041 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
+10.3.2.8 1438457396 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
+10.3.2.8 1438457396 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
 Failed_Communication
 Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438431100 Repli.Minutely.3.2.na.na.1438431100 Data forreplic 10.3.2.7 3336 10.3.2.8 local
+Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438458266 Repli.Minutely.3.2.na.na.1438458266 Data forreplic 10.3.2.7 3336 10.3.2.8 local
 RemoteAsk RemoteVolSearch forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteVolSearch forreplic
-10.3.2.8 1438431100 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438431100 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-Failed_Communication
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438431273 Repli.Minutely.3.2.na.na.1438431273 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438431274 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438431274 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
+10.3.2.8 1438458267 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
+10.3.2.8 1438458267 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
 reply is
-10.3.2.7 1438425079 reply found
-afterAsk=found flagcount=12
+10.3.2.7 1438458277 reply found
+afterAsk=found flagcount=43830
 volfound=found
 foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteGetSnaplist forreplic
-10.3.2.8 1438431297 RemoteGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438431297 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
+10.3.2.8 1438458281 RemoteGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
+10.3.2.8 1438458281 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
 reply is
-10.3.2.7 1438425104 reply Data/forreplic@Repli.Minutely.2.3.na.na.1438430580 Data/forreplic@Repli.Minutely.2.3.na.na.1438430400 Data/forreplic@Repli.Minutely.3.2.na.na.1438395072 Data/forreplic@Repli.Minutely.3.2.na.na.1438388046 Data/forreplic@Repli.Minutely.3.2.na.na.1438388036
-afterAsk=Data/forreplic@Repli.Minutely.2.3.na.na.1438430580 Data/forreplic@Repli.Minutely.2.3.na.na.1438430400 Data/forreplic@Repli.Minutely.3.2.na.na.1438395072 Data/forreplic@Repli.Minutely.3.2.na.na.1438388046 Data/forreplic@Repli.Minutely.3.2.na.na.1438388036 flagcount=14
-ll=Data/forreplic@Repli.Minutely.2.3.na.na.1438430580 Data/forreplic@Repli.Minutely.2.3.na.na.1438430400 Data/forreplic@Repli.Minutely.3.2.na.na.1438395072 Data/forreplic@Repli.Minutely.3.2.na.na.1438388046 Data/forreplic@Repli.Minutely.3.2.na.na.1438388036 spot
-targetsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438431273
-initialsnap=
-yyyyyyyyyyyyyintital is null
-RemoteAsk destroysnaps.sh forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending destroysnaps.sh forreplic
-10.3.2.8 1438431322 destroysnaps.sh forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438431322 ask destroysnaps.sh forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-Failed_Communication
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438431480 Repli.Minutely.2.3.na.na.1438431480 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438431480 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438431480 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438425286 reply found
-afterAsk=found flagcount=14
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-10.3.2.8 1438431505 RemoteGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438431505 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438425310 reply Data/forreplic@Repli.Minutely.2.3.na.na.1438430580 Data/forreplic@Repli.Minutely.2.3.na.na.1438430400 Data/forreplic@Repli.Minutely.3.2.na.na.1438395072 Data/forreplic@Repli.Minutely.3.2.na.na.1438388046 Data/forreplic@Repli.Minutely.3.2.na.na.1438388036
-afterAsk=Data/forreplic@Repli.Minutely.2.3.na.na.1438430580 Data/forreplic@Repli.Minutely.2.3.na.na.1438430400 Data/forreplic@Repli.Minutely.3.2.na.na.1438395072 Data/forreplic@Repli.Minutely.3.2.na.na.1438388046 Data/forreplic@Repli.Minutely.3.2.na.na.1438388036 flagcount=13
-ll=Data/forreplic@Repli.Minutely.2.3.na.na.1438430580 Data/forreplic@Repli.Minutely.2.3.na.na.1438430400 Data/forreplic@Repli.Minutely.3.2.na.na.1438395072 Data/forreplic@Repli.Minutely.3.2.na.na.1438388046 Data/forreplic@Repli.Minutely.3.2.na.na.1438388036 spot
-targetsnap=Data/forreplic@Repli.Minutely.2.3.na.na.1438431480
+10.3.2.7 1438458291 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438456694 Data/forreplic@Repli.Minutely.3.2.na.na.1438456495 Data/forreplic@Repli.Minutely.3.2.na.na.1438456321
+afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438456694 Data/forreplic@Repli.Minutely.3.2.na.na.1438456495 Data/forreplic@Repli.Minutely.3.2.na.na.1438456321 flagcount=41084
+ll=Data/forreplic@Repli.Minutely.3.2.na.na.1438456694 Data/forreplic@Repli.Minutely.3.2.na.na.1438456495 Data/forreplic@Repli.Minutely.3.2.na.na.1438456321 spot
+targetsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438458266
 initialsnap=
 yyyyyyyyyyyyyintital is null
 RemoteAsk destroysnaps forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending destroysnaps forreplic
-10.3.2.8 1438431530 destroysnaps forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438431530 ask destroysnaps forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
+10.3.2.8 1438458295 destroysnaps forreplic | nc -w 4 10.3.2.7 3337
+10.3.2.8 1438458295 ask destroysnaps forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
 reply is
-10.3.2.7 1438425335 reply ready
-afterAsk=ready flagcount=13
+10.3.2.7 1438458305 reply ready
+afterAsk=ready flagcount=48607
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending replidf 3338 10.3.2.7 10.3.2.8
-10.3.2.8 1438431554 replidf 3338 10.3.2.7 10.3.2.8 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438431554 ask replidf 3338 10.3.2.7 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
+10.3.2.8 1438458309 replidf 3338 10.3.2.7 10.3.2.8 | nc -w 4 10.3.2.7 3337
+10.3.2.8 1438458309 ask replidf 3338 10.3.2.7 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
 reply is
-10.3.2.7 1438425364 reply ready
-afterAsk=ready flagcount=18
+10.3.2.7 1438458320 reply ready
+afterAsk=ready flagcount=32901
 RemoteAsk replidf 3338 10.3.2.7 10.3.2.8
-zfs send -R Data/forreplic@Repli.Minutely.2.3.na.na.1438431480
-/sbin/zfs send -R Data/forreplic@Repli.Minutely.2.3.na.na.1438431480 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438431971 Repli.Minutely.3.2.na.na.1438431971 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438431971 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438431971 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438425772 reply found
-afterAsk=found flagcount=12
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-10.3.2.8 1438431995 RemoteGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438431995 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438425797 reply nothing
-afterAsk=nothing flagcount=13
-ll= spot
-targetsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438431971
-initialsnap=
-yyyyyyyyyyyyyintital is null
-RemoteAsk destroysnaps forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending destroysnaps forreplic
-10.3.2.8 1438432019 destroysnaps forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438432019 ask destroysnaps forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438425820 reply ready
-afterAsk=ready flagcount=11
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf 3338 10.3.2.7 10.3.2.8
-10.3.2.8 1438432041 replidf 3338 10.3.2.7 10.3.2.8 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438432041 ask replidf 3338 10.3.2.7 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438425848 reply ready
-afterAsk=ready flagcount=17
-RemoteAsk replidf 3338 10.3.2.7 10.3.2.8
-zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438431971
-/sbin/zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438431971 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
-After=ready flagcount=0
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438432132 Repli.Minutely.3.2.na.na.1438432132 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438432132 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438432132 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438425933 reply found
-afterAsk=found flagcount=12
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-10.3.2.8 1438432156 RemoteGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438432156 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438425957 reply nothing
-afterAsk=nothing flagcount=12
-ll= spot
-targetsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438432132
-initialsnap=
-yyyyyyyyyyyyyintital is null
-RemoteAsk destroysnaps forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending destroysnaps forreplic
-10.3.2.8 1438432179 destroysnaps forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438432179 ask destroysnaps forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438425980 reply ready
-afterAsk=ready flagcount=11
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf 3338 10.3.2.7 10.3.2.8
-10.3.2.8 1438432201 replidf 3338 10.3.2.7 10.3.2.8 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438432201 ask replidf 3338 10.3.2.7 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438426007 reply ready
-afterAsk=ready flagcount=16
-RemoteAsk replidf 3338 10.3.2.7 10.3.2.8
-zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438432132
-/sbin/zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438432132 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
-After=ready flagcount=0
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438432653 Repli.Minutely.3.2.na.na.1438432653 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438432653 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438432653 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438426455 reply found
-afterAsk=found flagcount=12
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-10.3.2.8 1438432676 RemoteGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438432676 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438426480 reply nothing
-afterAsk=nothing flagcount=14
-ll= spot
-targetsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438432653
-initialsnap=
-yyyyyyyyyyyyyintital is null
-RemoteAsk destroysnaps forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending destroysnaps forreplic
-10.3.2.8 1438432702 destroysnaps forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438432702 ask destroysnaps forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438426504 reply ready
-afterAsk=ready flagcount=13
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf 3338 10.3.2.7 10.3.2.8
-10.3.2.8 1438432726 replidf 3338 10.3.2.7 10.3.2.8 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438432726 ask replidf 3338 10.3.2.7 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438426534 reply ready
-afterAsk=ready flagcount=19
-RemoteAsk replidf 3338 10.3.2.7 10.3.2.8
-zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438432653
-/sbin/zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438432653 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
-After=ready flagcount=0
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438435146 Repli.Minutely.3.2.na.na.1438435146 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438435146 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438435146 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438449233 reply found
-afterAsk=found flagcount=4
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-10.3.2.8 1438435161 RemoteGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438435161 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438449248 reply nothing
-afterAsk=nothing flagcount=3
-ll= spot
-targetsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438435146
-initialsnap=
-yyyyyyyyyyyyyintital is null
-RemoteAsk destroysnaps forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending destroysnaps forreplic
-10.3.2.8 1438435175 destroysnaps forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438435175 ask destroysnaps forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438449262 reply ready
-afterAsk=ready flagcount=3
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf 3338 10.3.2.7 10.3.2.8
-10.3.2.8 1438435189 replidf 3338 10.3.2.7 10.3.2.8 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438435189 ask replidf 3338 10.3.2.7 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438449277 reply ready
-afterAsk=ready flagcount=3
-RemoteAsk replidf 3338 10.3.2.7 10.3.2.8
-zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438435146
-/sbin/zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438435146 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
-After=ready flagcount=0
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438435247 Repli.Minutely.3.2.na.na.1438435247 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438435247 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438435247 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438449336 reply no
-afterAsk=no flagcount=3
-volfound=no
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf 3338 10.3.2.7 10.3.2.8
-10.3.2.8 1438435261 replidf 3338 10.3.2.7 10.3.2.8 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438435261 ask replidf 3338 10.3.2.7 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438449351 reply ready
-afterAsk=ready flagcount=3
-zfs -D Data/forreplic@Repli.Minutely.3.2.na.na.1438435247
-/sbin/zfs send -D Data/forreplic@Repli.Minutely.3.2.na.na.1438435247 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
-After=ready flagcount=0
-zfs RR=ready
-RemoteAsk GetSnaplist hi
-POR=3336 Compelete
-finishedddddddddddddddddddddddddddddddddddddddddddddddddd
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending localGetSnaplist forreplic
-10.3.2.8 1438435275 localGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438435275 ask localGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438449366 reply ready
-afterAsk=ready flagcount=3
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438436391 Repli.Minutely.3.2.na.na.1438436391 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438436392 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438436392 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438450524 reply no
-afterAsk=no flagcount=3
-volfound=no
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf 3338 10.3.2.7 10.3.2.8
-10.3.2.8 1438436406 replidf 3338 10.3.2.7 10.3.2.8 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438436406 ask replidf 3338 10.3.2.7 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-Failed_Communication
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438436542 Repli.Minutely.3.2.na.na.1438436542 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438436542 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438436542 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438450681 reply no
-afterAsk=no flagcount=4
-volfound=no
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf 3338 10.3.2.7 10.3.2.8
-10.3.2.8 1438436557 replidf 3338 10.3.2.7 10.3.2.8 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438436557 ask replidf 3338 10.3.2.7 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-Failed_Communication
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438436680 Repli.Minutely.3.2.na.na.1438436680 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438436680 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438436680 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438450824 reply no
-afterAsk=no flagcount=4
-volfound=no
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf 3338 10.3.2.7 10.3.2.8
-10.3.2.8 1438436695 replidf 3338 10.3.2.7 10.3.2.8 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438436695 ask replidf 3338 10.3.2.7 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-Failed_Communication
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438437151 Repli.Minutely.3.2.na.na.1438437151 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438437152 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438437152 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438451312 reply no
-afterAsk=no flagcount=4
-volfound=no
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf 3338 10.3.2.7 10.3.2.8
-10.3.2.8 1438437167 replidf 3338 10.3.2.7 10.3.2.8 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438437167 ask replidf 3338 10.3.2.7 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-Failed_Communication
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438437902 Repli.Minutely.3.2.na.na.1438437902 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438437903 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438437903 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438452096 reply no
-afterAsk=no flagcount=8
-volfound=no
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf 3338 10.3.2.7 10.3.2.8
-10.3.2.8 1438437922 replidf 3338 10.3.2.7 10.3.2.8 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438437922 ask replidf 3338 10.3.2.7 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438452116 reply ready
-afterAsk=ready flagcount=9
-zfs -D Data/forreplic@Repli.Minutely.3.2.na.na.1438437902
-/sbin/zfs send -D Data/forreplic@Repli.Minutely.3.2.na.na.1438437902 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
-After=ready flagcount=0
-zfs RR=ready
-RemoteAsk GetSnaplist hi
-POR=3336 Compelete
-finishedddddddddddddddddddddddddddddddddddddddddddddddddd
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending localGetSnaplist forreplic
-10.3.2.8 1438437952 localGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438437952 ask localGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438452151 reply ready
-afterAsk=ready flagcount=12
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438438103 Repli.Minutely.3.2.na.na.1438438103 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438438103 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438438103 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438452304 reply found
-afterAsk=found flagcount=8
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-10.3.2.8 1438438122 RemoteGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438438122 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438452322 reply nothing
-afterAsk=nothing flagcount=7
-ll= spot
-targetsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438438103
-initialsnap=
-yyyyyyyyyyyyyintital is null
-RemoteAsk destroysnaps forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending destroysnaps forreplic
-10.3.2.8 1438438141 destroysnaps forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438438141 ask destroysnaps forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438452340 reply ready
-afterAsk=ready flagcount=6
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf 3338 10.3.2.7 10.3.2.8
-10.3.2.8 1438438158 replidf 3338 10.3.2.7 10.3.2.8 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438438158 ask replidf 3338 10.3.2.7 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438452365 reply ready
-afterAsk=ready flagcount=12
-RemoteAsk replidf 3338 10.3.2.7 10.3.2.8
-zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438438103
-/sbin/zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438438103 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
-After=ready flagcount=0
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438438284 Repli.Minutely.3.2.na.na.1438438284 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438438284 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438438284 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438452490 reply found
-afterAsk=found flagcount=8
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-10.3.2.8 1438438303 RemoteGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438438303 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438452509 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438438103 Data/forreplic@Repli.Minutely.3.2.na.na.1438437902 Data/forreplic@Repli.Minutely.3.2.na.na.1438437896
-afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438438103 Data/forreplic@Repli.Minutely.3.2.na.na.1438437902 Data/forreplic@Repli.Minutely.3.2.na.na.1438437896 flagcount=7
-ll=Data/forreplic@Repli.Minutely.3.2.na.na.1438438103 Data/forreplic@Repli.Minutely.3.2.na.na.1438437902 Data/forreplic@Repli.Minutely.3.2.na.na.1438437896 spot
-targetsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438438284
-initialsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438438103
-RemoteAsk replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438438103
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438438103
-10.3.2.8 1438438321 replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438438103 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438438321 ask replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438438103 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438452530 reply ready
-afterAsk=ready flagcount=9
-zfs send -R -I Data/forreplic@Repli.Minutely.3.2.na.na.1438438103 Data/forreplic@Repli.Minutely.3.2.na.na.1438438284 to txt/c
-/sbin/zfs send -R -I Data/forreplic@Repli.Minutely.3.2.na.na.1438438103 Data/forreplic@Repli.Minutely.3.2.na.na.1438438284 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
+zfs send -DR Data/forreplic@Repli.Minutely.3.2.na.na.1438458266
+/sbin/zfs send -DR Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
 After=ready flagcount=0
 RemoteAsk GetSnaplist hi
 POR=3336 Compelete
 finishedddddddddddddddddddddddddddddddddddddddddddddddddd
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending localGetSnaplist forreplic
-10.3.2.8 1438438352 localGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438438352 ask localGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
+10.3.2.8 1438458333 localGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
+10.3.2.8 1438458333 ask localGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
 reply is
-10.3.2.7 1438452566 reply ready
-afterAsk=ready flagcount=13
+10.3.2.7 1438458345 reply ready
+afterAsk=ready flagcount=46723
 Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438439072 Repli.Minutely.3.2.na.na.1438439072 Data forreplic 10.3.2.7 3336 10.3.2.8 local
+Roperands=10.3.2.7 txt/RemoteSnapshotCreateOnce.txt mezo..1438458864 Data forreplic 10.3.2.7 3336 10.3.2.8 local
 RemoteAsk RemoteVolSearch forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteVolSearch forreplic
-10.3.2.8 1438439072 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438439072 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
+10.3.2.8 1438458864 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
+10.3.2.8 1438458864 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
 reply is
-10.3.2.7 1438453304 reply found
-afterAsk=found flagcount=4
+10.3.2.7 1438458874 reply found
+afterAsk=found flagcount=38171
 volfound=found
 foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteGetSnaplist forreplic
-10.3.2.8 1438439087 RemoteGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438439087 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
+10.3.2.8 1438458878 RemoteGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
+10.3.2.8 1438458878 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
 reply is
-10.3.2.7 1438453319 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438438284 Data/forreplic@Repli.Minutely.3.2.na.na.1438438103 Data/forreplic@Repli.Minutely.3.2.na.na.1438437902
-afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438438284 Data/forreplic@Repli.Minutely.3.2.na.na.1438438103 Data/forreplic@Repli.Minutely.3.2.na.na.1438437902 flagcount=3
-ll=Data/forreplic@Repli.Minutely.3.2.na.na.1438438284 Data/forreplic@Repli.Minutely.3.2.na.na.1438438103 Data/forreplic@Repli.Minutely.3.2.na.na.1438437902 spot
-targetsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438439072
-initialsnap=
-yyyyyyyyyyyyyintital is null
-RemoteAsk destroysnaps forreplic
+10.3.2.7 1438458889 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 Data/forreplic@Repli.Minutely.3.2.na.na.1438457377
+afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 Data/forreplic@Repli.Minutely.3.2.na.na.1438457377 flagcount=42174
+ll=Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 Data/forreplic@Repli.Minutely.3.2.na.na.1438457377 spot
+targetsnap=Data/forreplic@mezo..1438458864
+initialsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438458266
+RemoteAsk replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438458266
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending destroysnaps forreplic
-10.3.2.8 1438439102 destroysnaps forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438439102 ask destroysnaps forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
+sending replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438458266
+10.3.2.8 1438458892 replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 | nc -w 4 10.3.2.7 3337
+10.3.2.8 1438458892 ask replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
 reply is
-10.3.2.7 1438453334 reply ready
-afterAsk=ready flagcount=4
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf 3338 10.3.2.7 10.3.2.8
-10.3.2.8 1438439117 replidf 3338 10.3.2.7 10.3.2.8 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438439117 ask replidf 3338 10.3.2.7 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438453350 reply ready
-afterAsk=ready flagcount=4
-RemoteAsk replidf 3338 10.3.2.7 10.3.2.8
-zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438439072
-/sbin/zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438439072 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
-After=ready flagcount=0
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438455127 Repli.Minutely.3.2.na.na.1438455127 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438455127 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438455127 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438455137 reply found
-afterAsk=found flagcount=4
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-10.3.2.8 1438455142 RemoteGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438455142 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438455153 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438439071 Data/forreplic@Repli.Minutely.3.2.na.na.1438439072
-afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438439071 Data/forreplic@Repli.Minutely.3.2.na.na.1438439072 flagcount=4
-ll=Data/forreplic@Repli.Minutely.3.2.na.na.1438439071 Data/forreplic@Repli.Minutely.3.2.na.na.1438439072 spot
-targetsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438455127
-initialsnap=
-yyyyyyyyyyyyyintital is null
-RemoteAsk destroysnaps forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending destroysnaps forreplic
-10.3.2.8 1438455158 destroysnaps forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438455158 ask destroysnaps forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438455168 reply ready
-afterAsk=ready flagcount=4
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf 3338 10.3.2.7 10.3.2.8
-10.3.2.8 1438455173 replidf 3338 10.3.2.7 10.3.2.8 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438455173 ask replidf 3338 10.3.2.7 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438455183 reply ready
-afterAsk=ready flagcount=4
-RemoteAsk replidf 3338 10.3.2.7 10.3.2.8
-zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438455127
-/sbin/zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438455127 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
-After=ready flagcount=0
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438455322 Repli.Minutely.3.2.na.na.1438455322 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438455322 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438455322 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-Failed_Communication
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438455374 Repli.Minutely.3.2.na.na.1438455374 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438455374 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438455374 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438455384 reply found
-afterAsk=found flagcount=6188
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-10.3.2.8 1438455388 RemoteGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438455388 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438455399 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438455127 Data/forreplic@Repli.Minutely.3.2.na.na.1438439073 Data/forreplic@Repli.Minutely.3.2.na.na.1438439072
-afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438455127 Data/forreplic@Repli.Minutely.3.2.na.na.1438439073 Data/forreplic@Repli.Minutely.3.2.na.na.1438439072 flagcount=4869
-ll=Data/forreplic@Repli.Minutely.3.2.na.na.1438455127 Data/forreplic@Repli.Minutely.3.2.na.na.1438439073 Data/forreplic@Repli.Minutely.3.2.na.na.1438439072 spot
-targetsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438455374
-initialsnap=
-yyyyyyyyyyyyyintital is null
-RemoteAsk destroysnaps forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending destroysnaps forreplic
-10.3.2.8 1438455402 destroysnaps forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438455402 ask destroysnaps forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438455413 reply ready
-afterAsk=ready flagcount=6912
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf 3338 10.3.2.7 10.3.2.8
-10.3.2.8 1438455417 replidf 3338 10.3.2.7 10.3.2.8 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438455417 ask replidf 3338 10.3.2.7 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438455427 reply ready
-afterAsk=ready flagcount=6282
-RemoteAsk replidf 3338 10.3.2.7 10.3.2.8
-zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438455374
-/sbin/zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438455374 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
-After=ready flagcount=0
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438455481 Repli.Minutely.3.2.na.na.1438455481 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438455481 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438455481 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438455491 reply found
-afterAsk=found flagcount=46856
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-10.3.2.8 1438455495 RemoteGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438455495 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438455505 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438455374 Data/forreplic@Repli.Minutely.3.2.na.na.1438455322 Data/forreplic@Repli.Minutely.3.2.na.na.1438455309
-afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438455374 Data/forreplic@Repli.Minutely.3.2.na.na.1438455322 Data/forreplic@Repli.Minutely.3.2.na.na.1438455309 flagcount=47345
-ll=Data/forreplic@Repli.Minutely.3.2.na.na.1438455374 Data/forreplic@Repli.Minutely.3.2.na.na.1438455322 Data/forreplic@Repli.Minutely.3.2.na.na.1438455309 spot
-targetsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438455481
-initialsnap=
-yyyyyyyyyyyyyintital is null
-RemoteAsk destroysnaps forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending destroysnaps forreplic
-10.3.2.8 1438455509 destroysnaps forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438455509 ask destroysnaps forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438455519 reply ready
-afterAsk=ready flagcount=56635
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf 3338 10.3.2.7 10.3.2.8
-10.3.2.8 1438455523 replidf 3338 10.3.2.7 10.3.2.8 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438455523 ask replidf 3338 10.3.2.7 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438455534 reply ready
-afterAsk=ready flagcount=49507
-RemoteAsk replidf 3338 10.3.2.7 10.3.2.8
-zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438455481
-/sbin/zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438455481 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
-After=ready flagcount=0
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438456047 Repli.Minutely.3.2.na.na.1438456047 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438456047 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438456047 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438456058 reply found
-afterAsk=found flagcount=50621
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-10.3.2.8 1438456062 RemoteGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438456062 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438456072 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438455481 Data/forreplic@Repli.Minutely.3.2.na.na.1438455374 Data/forreplic@Repli.Minutely.3.2.na.na.1438455322
-afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438455481 Data/forreplic@Repli.Minutely.3.2.na.na.1438455374 Data/forreplic@Repli.Minutely.3.2.na.na.1438455322 flagcount=48134
-ll=Data/forreplic@Repli.Minutely.3.2.na.na.1438455481 Data/forreplic@Repli.Minutely.3.2.na.na.1438455374 Data/forreplic@Repli.Minutely.3.2.na.na.1438455322 spot
-targetsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438456047
-initialsnap=
-yyyyyyyyyyyyyintital is null
-RemoteAsk destroysnaps forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending destroysnaps forreplic
-10.3.2.8 1438456076 destroysnaps forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438456076 ask destroysnaps forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438456086 reply ready
-afterAsk=ready flagcount=52451
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf 3338 10.3.2.7 10.3.2.8
-10.3.2.8 1438456090 replidf 3338 10.3.2.7 10.3.2.8 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438456090 ask replidf 3338 10.3.2.7 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438456100 reply ready
-afterAsk=ready flagcount=59745
-RemoteAsk replidf 3338 10.3.2.7 10.3.2.8
-zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438456047
-/sbin/zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438456047 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
-After=ready flagcount=0
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438456321 Repli.Minutely.3.2.na.na.1438456321 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438456322 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438456322 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438456332 reply found
-afterAsk=found flagcount=45799
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-10.3.2.8 1438456336 RemoteGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438456336 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438456346 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438456047 Data/forreplic@Repli.Minutely.3.2.na.na.1438455481 Data/forreplic@Repli.Minutely.3.2.na.na.1438455374
-afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438456047 Data/forreplic@Repli.Minutely.3.2.na.na.1438455481 Data/forreplic@Repli.Minutely.3.2.na.na.1438455374 flagcount=57074
-ll=Data/forreplic@Repli.Minutely.3.2.na.na.1438456047 Data/forreplic@Repli.Minutely.3.2.na.na.1438455481 Data/forreplic@Repli.Minutely.3.2.na.na.1438455374 spot
-targetsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438456321
-initialsnap=
-yyyyyyyyyyyyyintital is null
-RemoteAsk destroysnaps forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending destroysnaps forreplic
-10.3.2.8 1438456350 destroysnaps forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438456350 ask destroysnaps forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438456360 reply ready
-afterAsk=ready flagcount=56058
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf 3338 10.3.2.7 10.3.2.8
-10.3.2.8 1438456364 replidf 3338 10.3.2.7 10.3.2.8 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438456364 ask replidf 3338 10.3.2.7 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438456375 reply ready
-afterAsk=ready flagcount=56084
-RemoteAsk replidf 3338 10.3.2.7 10.3.2.8
-zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438456321
-/sbin/zfs send -R Data/forreplic@Repli.Minutely.3.2.na.na.1438456321 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
-After=ready flagcount=0
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438456495 Repli.Minutely.3.2.na.na.1438456495 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438456495 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438456495 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438456505 reply found
-afterAsk=found flagcount=44858
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-10.3.2.8 1438456509 RemoteGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438456509 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438456519 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438456321 Data/forreplic@Repli.Minutely.3.2.na.na.1438456300 Data/forreplic@Repli.Minutely.3.2.na.na.1438456296
-afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438456321 Data/forreplic@Repli.Minutely.3.2.na.na.1438456300 Data/forreplic@Repli.Minutely.3.2.na.na.1438456296 flagcount=47779
-ll=Data/forreplic@Repli.Minutely.3.2.na.na.1438456321 Data/forreplic@Repli.Minutely.3.2.na.na.1438456300 Data/forreplic@Repli.Minutely.3.2.na.na.1438456296 spot
-targetsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438456495
-initialsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438456321
-RemoteAsk replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438456321
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438456321
-10.3.2.8 1438456523 replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438456321 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438456523 ask replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438456321 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438456533 reply ready
-afterAsk=ready flagcount=51024
-zfs send -R -I Data/forreplic@Repli.Minutely.3.2.na.na.1438456321 Data/forreplic@Repli.Minutely.3.2.na.na.1438456495 to txt/c
-/sbin/zfs send -R -I Data/forreplic@Repli.Minutely.3.2.na.na.1438456321 Data/forreplic@Repli.Minutely.3.2.na.na.1438456495 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
+10.3.2.7 1438458904 reply ready
+afterAsk=ready flagcount=59144
+zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@mezo..1438458864 to txt/c
+/sbin/zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@mezo..1438458864 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
 After=ready flagcount=0
 RemoteAsk GetSnaplist hi
 POR=3336 Compelete
 finishedddddddddddddddddddddddddddddddddddddddddddddddddd
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending localGetSnaplist forreplic
-10.3.2.8 1438456547 localGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438456547 ask localGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
+10.3.2.8 1438458918 localGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
+10.3.2.8 1438458918 ask localGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
 reply is
-10.3.2.7 1438456557 reply ready
-afterAsk=ready flagcount=52816
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438456694 Repli.Minutely.3.2.na.na.1438456694 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438456694 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438456694 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438456704 reply found
-afterAsk=found flagcount=54557
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-10.3.2.8 1438456708 RemoteGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438456708 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438456718 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438456495 Data/forreplic@Repli.Minutely.3.2.na.na.1438456321 Data/forreplic@Repli.Minutely.3.2.na.na.1438456300
-afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438456495 Data/forreplic@Repli.Minutely.3.2.na.na.1438456321 Data/forreplic@Repli.Minutely.3.2.na.na.1438456300 flagcount=56369
-ll=Data/forreplic@Repli.Minutely.3.2.na.na.1438456495 Data/forreplic@Repli.Minutely.3.2.na.na.1438456321 Data/forreplic@Repli.Minutely.3.2.na.na.1438456300 spot
-targetsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438456694
-initialsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438456495
-RemoteAsk replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438456495
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438456495
-10.3.2.8 1438456722 replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438456495 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438456722 ask replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438456495 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438456732 reply ready
-afterAsk=ready flagcount=45812
-zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438456495 Data/forreplic@Repli.Minutely.3.2.na.na.1438456694 to txt/c
-/sbin/zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438456495 Data/forreplic@Repli.Minutely.3.2.na.na.1438456694 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
-After=ready flagcount=0
-RemoteAsk GetSnaplist hi
-POR=3336 Compelete
-finishedddddddddddddddddddddddddddddddddddddddddddddddddd
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending localGetSnaplist forreplic
-10.3.2.8 1438456746 localGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438456746 ask localGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438456756 reply ready
-afterAsk=ready flagcount=47230
+10.3.2.7 1438458929 reply ready
+afterAsk=ready flagcount=41382
