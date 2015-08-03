@@ -45,7 +45,7 @@ do
      issender=`cat partners.txt | grep "$newsender" | grep sender`; 
      sendertun=`echo $issender | awk '{print $1}'`
     else
-     issender=`cat txt/sender | grep "$newsender"`; 
+     issender=`cat txt/peer | grep "$newsender"`; 
      sendertun=`echo $issender | awk '{print $3}'`
     fi
     echo $newsender >> tmprunthis 

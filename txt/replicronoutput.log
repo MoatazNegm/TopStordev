@@ -1,20 +1,23 @@
-oper=Data/forreplic Minutely.3.2.na.na 10.3.2.7
+oper=Data/forreplic Minutely.6.2.na.na 1032_7
 oper1=Data/forreplic
-oper2=Minutely.3.2.na.na
-stamp=1438458266
-keep=3
-currentsnaps=Data/forreplic@Repli.Minutely.3.2.na.na.1438457342
-Data/forreplic@Repli.Minutely.3.2.na.na.1438457377
-Data/forreplic@Repli.Minutely.3.2.na.na.1438457395
-oldsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438457342
-countsnap=       3
-countsnapplus=4
-keeppluszero=3
-{"Date":"08/01/2015","time":"22:44:26","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/forreplic@Repli.Minutely.3.2.na.na.1438457342"}
-newsnap2=Repli.Minutely.3.2.na.na.1438458266
-newsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438458266
-./ProxyReplicate 10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438458266 Repli.Minutely.3.2.na.na.1438458266 Data forreplic 10.3.2.7 3336 10.3.2.8 local
+oper2=Minutely.6.2.na.na
+stamp=1438630560
+keep=6
+currentsnaps=Data/forreplic@Repli.Minutely.6.2.na.na.1438629720
+Data/forreplic@Repli.Minutely.6.2.na.na.1438629840
+Data/forreplic@Repli.Minutely.6.2.na.na.1438630080
+Data/forreplic@Repli.Minutely.6.2.na.na.1438630200
+Data/forreplic@Repli.Minutely.6.2.na.na.1438630320
+Data/forreplic@Repli.Minutely.6.2.na.na.1438630440
+oldsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438629720
+countsnap=       6
+countsnapplus=7
+keeppluszero=6
+{"Date":"08/03/2015","time":"22:36:00","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/forreplic@Repli.Minutely.6.2.na.na.1438629720"}
+newsnap2=Repli.Minutely.6.2.na.na.1438630560
+newsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438630560
+./ProxyReplicate 1032_7 txt/RemoteSnapshotnowSystem.txt1438630560 Repli.Minutely.6.2.na.na.1438630560 Data forreplic 2236 1032_8 proxy
 snapshotresult :
-filenameis=txt/RemoteSnapshotnowSystem.txt1438458266
-{"Date":"08/01/2015","time":"22:45:33","msg":"info","user":"System","data":"Success_Replicating_Snapshot:Data/forreplic@Repli.Minutely.3.2.na.na.1438458266"}
-./ProxyReplicate 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1438458864 mezo..1438458864 Data forreplic 10.3.2.7 3336 10.3.2.8 local
+Failed_Communication
+filenameis=txt/RemoteSnapshotnowSystem.txt1438630560
+{"Date":"08/03/2015","time":"22:36:35","msg":"error","user":"System","data":"Failed_ReplicatingData/forreplic@Repli.Minutely.6.2.na.na.1438630560:"}
