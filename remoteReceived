@@ -9,8 +9,9 @@ request=`echo $line | awk '{print $5}'`
 pp=`echo $line | awk '{print $7}'`
 passphrase=`echo $line | awk '{print $8}'`
 islicense=`cat licenses | grep  -w "$license" | wc -c`
-if [[ $islicense -le 1 ]]; then; exit; fi;
 revbothsd=${dst}"__"$so;
+if [[ $islicense -le 1 ]]; then; exit; fi;
+if [[ $request == "ProxyUpdate" ]]; then; ./remoteData $bothsd $revbothsd $pp; exit; fi;
 ./remoteData $bothsd $revbothsd $pp
 vpnpls=0;
 pvpnpls=0;
@@ -75,11 +76,13 @@ if [[ $vpnpls -ne 0 || $pvpnpls -ne 0 ]];
 then
  if [[ $vpnpls == 1 ]];
  then  
+  kill -KILL `ps -axw | grep -w "$so" | grep openvpn` 2>/dev/null;
   /usr/local/sbin/openvpn --daemon $so --cd /TopStor/txt --config ${bothsd}_openvpn.conf --script-security 2 --client-connect "/TopStor/remoteClientconnected $license $bothsd $revbothsd"; 
  echo  /usr/local/sbin/openvpn --daemon $so --cd /TopStor/txt --config ${bothsd}_openvpn.conf --script-security 2 --client-connect "/TopStor/remoteClientconnected $license $bothsd $revbothsd" >> tmprr; 
  fi
  if [[ $pvpnpls == 1 ]];
  then  
+  kill -KILL `ps -axw | grep -w "$dst" | grep openvpn` 2>/dev/null;
   /usr/local/sbin/openvpn --daemon $dst --cd /TopStor/txt --config ${revbothsd}_openvpn.conf --script-security 2 --client-connect "/TopStor/remoteClientconnected $license $revbothsd $bothsd"; 
  fi 
 fi
