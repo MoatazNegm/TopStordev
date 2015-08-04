@@ -1,36 +1,3 @@
-not valid command forreplic
-isvalidcome=forreplic txt/runthislocallocalforrepli RemoteVolSearch 
-isvalidcome=RemoteVolSearch txt/runthis1438458267localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply found
-isvalidcome=RemoteGetSnaplist txt/runthis1438458281localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/forreplic@Repli.Minutely.3.2.na.na.1438456694 Data/forreplic@Repli.Minutely.3.2.na.na.1438456495 Data/forreplic@Repli.Minutely.3.2.na.na.1438456321
-isvalidcome=destroysnaps txt/runthis1438458295localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=replidf txt/runthis1438458309localforrepli local 3338 10.3.2.7 10.3.2.8
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=localGetSnaplist txt/runthis1438458333localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=RemoteVolSearch txt/runthis1438458864localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply found
-isvalidcome=RemoteGetSnaplist txt/runthis1438458878localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 Data/forreplic@Repli.Minutely.3.2.na.na.1438457377
-isvalidcome=replivol txt/runthis1438458892localforrepli local 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438458266
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=localGetSnaplist txt/runthis1438458918localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-not valid command
-isvalidcome= txt/runthislocalforrepli  
-isvalidcome=RemoteVolSearch txt/runthis1438464318localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply found
-isvalidcome=RemoteGetSnaplist txt/runthis1438464332localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 Data/forreplic@Repli.Minutely.3.2.na.na.1438457377
-isvalidcome=replivol txt/runthis1438464346localforrepli local 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@mezo..1438458864
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-isvalidcome=localGetSnaplist txt/runthis1438464370localforrepli local forreplic
-Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
-<<<<<<< HEAD
-=======
->>>>>>> d0fc6597f32ae9eaea6e0c003ef617bd09304645
 not valid command
 isvalidcome= txt/runthislocalforrepli  
 not valid command
@@ -39,4 +6,31 @@ not valid command
 isvalidcome= txt/runthislocalforrepli  
 not valid command
 isvalidcome= txt/runthislocalforrepli  
->>>>>>> 60df1c127dad16d8f2f3d0587c4337573a0a378b
+not valid command
+isvalidcome= txt/runthislocalforrepli  
+isvalidcome=RemoteVolSearch txt/runthis1438712023localforrepli proxy forreplic
+Askreply 1032_7 10.173.232.10 2237 proxy reply found
+isvalidcome=RemoteGetSnaplist txt/runthis1438712048localforrepli proxy forreplic
+Askreply 1032_7 10.173.232.10 2237 proxy reply Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395
+isvalidcome=replivol txt/runthis1438712074localforrepli proxy 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
+Askreply 1032_7 10.173.232.10 2237 proxy reply ready
+isvalidcome=localGetSnaplist txt/runthis1438712101localforrepli proxy forreplic
+Askreply 1032_7 10.173.232.10 2237 proxy reply ready
+isvalidcome=localGetSnaplist txt/runthis1438712126localforrepli proxy forreplic
+Askreply 1032_7 10.173.232.10 2237 proxy reply ready
+isvalidcome=RemoteVolSearch txt/runthis1438712160localforrepli proxy forreplic
+Askreply 1032_7 10.173.232.10 2237 proxy reply found
+isvalidcome=RemoteGetSnaplist txt/runthis1438712185localforrepli proxy forreplic
+Askreply 1032_7 10.173.232.10 2237 proxy reply Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395
+isvalidcome=replivol txt/runthis1438712209localforrepli proxy 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
+Askreply 1032_7 10.173.232.10 2237 proxy reply ready
+isvalidcome=localGetSnaplist txt/runthis1438712235localforrepli proxy forreplic
+Askreply 1032_7 10.173.232.10 2237 proxy reply ready
+isvalidcome=RemoteVolSearch txt/runthis1438712280localforrepli proxy forreplic
+Askreply 1032_7 10.173.232.10 2237 proxy reply found
+isvalidcome=RemoteGetSnaplist txt/runthis1438712304localforrepli proxy forreplic
+Askreply 1032_7 10.173.232.10 2237 proxy reply Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395
+isvalidcome=replivol txt/runthis1438712329localforrepli proxy 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
+Askreply 1032_7 10.173.232.10 2237 proxy reply ready
+isvalidcome=localGetSnaplist txt/runthis1438712354localforrepli proxy forreplic
+Askreply 1032_7 10.173.232.10 2237 proxy reply ready

@@ -12,6 +12,7 @@ stamp=`echo  $@ | awk '{print $7}'`;
 localrep=`echo  $@ | awk '{print $8}'`;
 newcom=`echo  $@ | awk '{print $9}'`;
 param=`echo  $@ | awk '{$1=$2=$3=$4=$5=$6=$7=$8=$9="";print substr($0,10)}'`;
+notvalid=0;
 # packet : sender stamp command
 fileres='txt/runthis'$stamp
 case "$newcom" in 
@@ -22,10 +23,11 @@ case "$newcom" in
  destroysnaps) ./destroysnaps.sh ${fileres} $param ;;
  RemoteGetSnaplist) ./RemoteGetSnaplist ${fileres} $param ;;
  localGetSnaplist) ./localGetSnaplist ${fileres} $param ;;
- *) echo not valid command $newcom >> tmp2runthis
+ *) notvalid=1; echo not valid command $newcom >> tmp2runthis;;
 esac;
 validcom=${newcom}" "${fileres}"localforrepli "${localrep}" "$param;
 echo isvalidcome=$validcom  >> tmp2runthis 
+if [[ $notvalid -ne 0 ]]; then exit 0; fi;
 #./$validcom 2>> tmp2runthis
 while [[ ! -a $fileres ]];  
 do
