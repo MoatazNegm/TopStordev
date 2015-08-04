@@ -1,19 +1,22 @@
 oper=Data/forreplic Minutely.6.2.na.na 1032_7
 oper1=Data/forreplic
 oper2=Minutely.6.2.na.na
-stamp=1438712760
+stamp=1438716960
 keep=6
-currentsnaps=Data/forreplic@Repli.Minutely.6.2.na.na.1438712040
-Data/forreplic@Repli.Minutely.6.2.na.na.1438712160
-Data/forreplic@Repli.Minutely.6.2.na.na.1438712280
-Data/forreplic@Repli.Minutely.6.2.na.na.1438712400
-Data/forreplic@Repli.Minutely.6.2.na.na.1438712520
-Data/forreplic@Repli.Minutely.6.2.na.na.1438712640
-oldsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438712040
+currentsnaps=Data/forreplic@Repli.Minutely.6.2.na.na.1438716240
+Data/forreplic@Repli.Minutely.6.2.na.na.1438716360
+Data/forreplic@Repli.Minutely.6.2.na.na.1438716480
+Data/forreplic@Repli.Minutely.6.2.na.na.1438716600
+Data/forreplic@Repli.Minutely.6.2.na.na.1438716720
+Data/forreplic@Repli.Minutely.6.2.na.na.1438716840
+oldsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438716240
 countsnap=       6
 countsnapplus=7
 keeppluszero=6
-{"Date":"08/04/2015","time":"21:26:00","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/forreplic@Repli.Minutely.6.2.na.na.1438712040"}
-newsnap2=Repli.Minutely.6.2.na.na.1438712760
-newsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438712760
-./ProxyReplicate 1032_7 txt/RemoteSnapshotnowSystem.txt1438712760 Repli.Minutely.6.2.na.na.1438712760 Data forreplic 10.176.214.6 2236 1032_8 proxy
+{"Date":"08/04/2015","time":"22:36:00","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/forreplic@Repli.Minutely.6.2.na.na.1438716240"}
+newsnap2=Repli.Minutely.6.2.na.na.1438716960
+newsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438716960
+snapshotresult :
+Cancelled as there is another replication is running
+filenameis=txt/RemoteSnapshotnowSystem.txt1438716960
+{"Date":"08/04/2015","time":"22:36:00","msg":"error","user":"System","data":"Failed_ReplicatingData/forreplic@Repli.Minutely.6.2.na.na.1438716960:"}

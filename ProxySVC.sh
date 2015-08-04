@@ -3,14 +3,24 @@ cd /TopStor
 openvpnflag=0
 stamp=`date +%s`;
 proxycurrent=`cat proxy.txt | awk '{print $1}'`;
+proxyname=`cat proxy.txt | awk '{print $3}'`;
+isproxy="";
 while true;
 do
  proxyser=`cat proxy.txt | awk '{print $1}'`;
  license=` cat proxy.txt | awk '{print $2}'`;
- if [[ $proxycurrent != $proxyser ]];
+ newproxy=` cat proxy.txt | awk '{print $3}'`;
+ if [[ -a txt/PartnerDel ]]; 
+ then PartnerDel=`cat txt/PartnerDel`;
+  isproxy=`echo $PartnerDel | awk '{print $3}'`;
+  echo to kill again >> tmptokill
+ fi
+ if [[ $proxycurrent != $proxyser || $newproxy != $proxyname || -a txt/PartnerDel ]];
  then
   openvpnflag=0;
+  rm txt/PartnerDel 2>/dev/null 
   proxycurrent=$proxyser;
+  proxyname=$newporxy;
   killall openvpn 2>/dev/null;
   kill -KILL `ps -axw | grep ProxyncSVC | awk '{print $1}'` 2>/dev/null;
   kill -KILL `ps -axw | grep Askrcv | awk '{print $1}'` 2>/dev/null;
@@ -63,7 +73,7 @@ do
     ps -auxw | grep ProxyncSVC > /dev/null 2>&1;
     if [[ $? -ne 0 ]];
     then
-     ./ProxyncSVC $pp $tun sender &;
+     ./ProxyncSVC $pp $tun peer &;
     fi
     router=`echo $tun | awk -F. '{print $1"."$2"."$3".1"}'`
     /sbin/ping -c 3 $router >/dev/null 2>&1

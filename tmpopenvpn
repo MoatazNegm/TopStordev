@@ -1,1 +1,0 @@
-/usr/local/sbin/openvpn --daemon 1032_7 --cd /TopStor/txt --config 1032_8_1032_7_openvpn.conf

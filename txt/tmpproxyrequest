@@ -2364,3 +2364,36 @@ RemoteAsk RemoteVolSearch forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteVolSearch forreplic
 proxy is proxy
+1032_8 1438712760 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
+reply is
+1032_7 1438712780 reply found
+afterAsk=found flagcount=54256
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+proxy is proxy
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438715760 Repli.Minutely.6.2.na.na.1438715760 Data forreplic 10.173.232.10 2236 1032_8 proxy
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+proxy is proxy
+1032_8 1438715760 ask RemoteVolSearch forreplic | nc -w 4 10.173.232.10 2237
+Failed_Communication
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438715880 Repli.Minutely.6.2.na.na.1438715880 Data forreplic 10.173.232.10 2236 1032_8 proxy
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+proxy is proxy
+1032_8 1438715880 ask RemoteVolSearch forreplic | nc -w 4 10.173.232.10 2237
+Failed_Communication
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438716000 Repli.Minutely.6.2.na.na.1438716000 Data forreplic 10.173.232.10 2236 1032_8 proxy
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+proxy is proxy
+1032_8 1438716000 ask RemoteVolSearch forreplic | nc -w 4 10.173.232.10 2237
+Failed_Communication
