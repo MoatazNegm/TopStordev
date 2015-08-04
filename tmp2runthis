@@ -42,3 +42,5 @@ isvalidcome=replivol txt/runthis1438712569localforrepli proxy 2238 10.176.214.6 
 Askreply 1032_7 10.173.232.10 2237 proxy reply ready
 isvalidcome=localGetSnaplist txt/runthis1438712594localforrepli proxy forreplic
 Askreply 1032_7 10.173.232.10 2237 proxy reply ready
+isvalidcome=RemoteVolSearch txt/runthis1438712760localforrepli proxy forreplic
+Askreply 1032_7 10.173.232.10 2237 proxy reply found

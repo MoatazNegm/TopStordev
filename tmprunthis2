@@ -30,3 +30,4 @@ OMÉñµ 1032_7 2237 2237 10.176.214.6 proxy
 ./runthis 10.173.232.10 1032_8 1032_7 2237 2237 10.176.214.6 1438712544 proxy RemoteGetSnaplist forreplic
 ./runthis 10.173.232.10 1032_8 1032_7 2237 2237 10.176.214.6 1438712569 proxy replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
 ./runthis 10.173.232.10 1032_8 1032_7 2237 2237 10.176.214.6 1438712594 proxy localGetSnaplist forreplic
+./runthis 10.173.232.10 1032_8 1032_7 2237 2237 10.176.214.6 1438712760 proxy RemoteVolSearch forreplic

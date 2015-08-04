@@ -63,7 +63,7 @@ do
     ps -auxw | grep ProxyncSVC > /dev/null 2>&1;
     if [[ $? -ne 0 ]];
     then
-     ./ProxyncSVC $pp $tun sender &;
+     ./ProxyncSVC $pp $tun peer &;
     fi
     router=`echo $tun | awk -F. '{print $1"."$2"."$3".1"}'`
     /sbin/ping -c 3 $router >/dev/null 2>&1
