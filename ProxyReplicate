@@ -19,13 +19,14 @@ function RemoteAsk() {
  echo sending $msg >> txt/tmpproxyrequest
 # echo Asksend $SEND $msg >> txt/tmpproxyrequest; 
 # ./Asksend $SEND $msg 2>/dev/null ; 
- echo $SO $stamp $@ \| nc -w 4  $REMOTETUN $PPSEND >> txt/tmpproxyrequest
- echo $SO $stamp ask $@ \| openssl enc -a -A -aes-256-cbc -k SuperSecretPWD \| gzip -cf \| nc -w 4  $REMOTETUN $PPSEND >> txt/tmpproxyrequest
+ echo proxy is $LOCALREP  >> txt/tmpproxyrequest
  if [[ $LOCALREP == "proxy" ]];
  then
-  echo $SO $stamp $@ | nc -w 20  $REMOTETUN $PPSEND
+  echo $SO $stamp ask $@ | nc -w 20  $REMOTETUN $PPSEND;
+  echo $SO $stamp ask $@ \| nc -w 4  $REMOTETUN $PPSEND >> txt/tmpproxyrequest;
  else
-  echo $SO $stamp ask $@ | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf |  nc -w 10 $REMOTETUN $PPSEND
+  echo $SO $stamp ask $@ | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf |  nc -w 10 $REMOTETUN $PPSEND;
+ echo $SO $stamp ask $@ \| openssl enc -a -A -aes-256-cbc -k SuperSecretPWD \| gzip -cf \| nc -w 4  $REMOTETUN $PPSEND >> txt/tmpproxyrequest;
  fi
  flagcount=0;
  while [[ $flagcount -le 300000 ]];
@@ -81,6 +82,7 @@ function Sendzfs () {
 #########################################################################
 ## ./Asksend 1032_8($11) 10.176.214.6($9) 15737($10) RemoteVolSearch sdk
 ### $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pooli $vol $remotetun $pp $so
+## 1032_7 txt/RemoteSnapshotnowSystem.txt1438711440 Repli.Minutely.6.2.na.na.1438711440 Data forreplic 10.176.214.6 2236 1032_8 porxy
 ###############################################################################
 SO=`echo $@ | awk '{print $8}'`;
 DST=`echo $@ | awk '{print $1}'`;

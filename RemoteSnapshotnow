@@ -86,9 +86,15 @@ then
   remotetun=`cat txt/peer | grep "$oper3" | awk '{print $3}'`
   pp=`cat workingpp | awk '{print $1}'` 
   /sbin/zfs set repli:sender=$so $newsnap; 
-echo ./ProxyReplicate $oper3 txt/${0:2}${userreq}.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so proxy >> $cronout
-./ProxyReplicate $oper3 txt/${0:2}${userreq}.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so porxy
-
+ ps -axuw | grep ProxyReplicate >/dev/null 2>&1
+ if [[ $? -eq 0 ]];
+ then
+  echo ./ProxyReplicate $oper3 txt/${0:2}${userreq}.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so proxy >> $cronout
+  ./ProxyReplicate $oper3 txt/${0:2}${userreq}.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so proxy
+ else
+  echo Cancelled as there is another replication is running >> txt/${0:2}${userreq}.txt$stamp 
+ fi
+ 
 ##########noproxy####################################################
  else
   so=$hostip
@@ -100,6 +106,8 @@ echo ./ProxyReplicate $oper3 txt/${0:2}${userreq}.txt$stamp $newsnap2 $pool $vol
   then 
    echo ./ProxyReplicate $oper3 txt/${0:2}${userreq}.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so local>> $cronout
    ./ProxyReplicate $oper3 txt/${0:2}${userreq}.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so local
+  else
+   echo Cancelled as there is another replication is running >> txt/${0:2}${userreq}.txt$stamp 
   fi
  fi;
  #echo donereplicating

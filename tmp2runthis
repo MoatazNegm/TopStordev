@@ -34,3 +34,11 @@ isvalidcome=replivol txt/runthis1438712329localforrepli proxy 2238 10.176.214.6 
 Askreply 1032_7 10.173.232.10 2237 proxy reply ready
 isvalidcome=localGetSnaplist txt/runthis1438712354localforrepli proxy forreplic
 Askreply 1032_7 10.173.232.10 2237 proxy reply ready
+isvalidcome=RemoteVolSearch txt/runthis1438712520localforrepli proxy forreplic
+Askreply 1032_7 10.173.232.10 2237 proxy reply found
+isvalidcome=RemoteGetSnaplist txt/runthis1438712544localforrepli proxy forreplic
+Askreply 1032_7 10.173.232.10 2237 proxy reply Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395
+isvalidcome=replivol txt/runthis1438712569localforrepli proxy 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
+Askreply 1032_7 10.173.232.10 2237 proxy reply ready
+isvalidcome=localGetSnaplist txt/runthis1438712594localforrepli proxy forreplic
+Askreply 1032_7 10.173.232.10 2237 proxy reply ready
