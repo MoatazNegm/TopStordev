@@ -1,23 +1,22 @@
 oper=Data/forreplic Minutely.6.2.na.na 1032_7
 oper1=Data/forreplic
 oper2=Minutely.6.2.na.na
-stamp=1438630560
+stamp=1438712280
 keep=6
-currentsnaps=Data/forreplic@Repli.Minutely.6.2.na.na.1438629720
-Data/forreplic@Repli.Minutely.6.2.na.na.1438629840
-Data/forreplic@Repli.Minutely.6.2.na.na.1438630080
-Data/forreplic@Repli.Minutely.6.2.na.na.1438630200
-Data/forreplic@Repli.Minutely.6.2.na.na.1438630320
-Data/forreplic@Repli.Minutely.6.2.na.na.1438630440
-oldsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438629720
+currentsnaps=Data/forreplic@Repli.Minutely.6.2.na.na.1438711800
+Data/forreplic@Repli.Minutely.6.2.na.na.1438711920
+Data/forreplic@Repli.Minutely.6.2.na.na.1438711929
+Data/forreplic@Repli.Minutely.6.2.na.na.1438712023
+Data/forreplic@Repli.Minutely.6.2.na.na.1438712040
+Data/forreplic@Repli.Minutely.6.2.na.na.1438712160
+oldsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438711800
 countsnap=       6
 countsnapplus=7
 keeppluszero=6
-{"Date":"08/03/2015","time":"22:36:00","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/forreplic@Repli.Minutely.6.2.na.na.1438629720"}
-newsnap2=Repli.Minutely.6.2.na.na.1438630560
-newsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438630560
-./ProxyReplicate 1032_7 txt/RemoteSnapshotnowSystem.txt1438630560 Repli.Minutely.6.2.na.na.1438630560 Data forreplic 2236 1032_8 proxy
+{"Date":"08/04/2015","time":"21:18:00","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/forreplic@Repli.Minutely.6.2.na.na.1438711800"}
+newsnap2=Repli.Minutely.6.2.na.na.1438712280
+newsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438712280
+./ProxyReplicate 1032_7 txt/RemoteSnapshotnowSystem.txt1438712280 Repli.Minutely.6.2.na.na.1438712280 Data forreplic 10.176.214.6 2236 1032_8 proxy
 snapshotresult :
-Failed_Communication
-filenameis=txt/RemoteSnapshotnowSystem.txt1438630560
-{"Date":"08/03/2015","time":"22:36:35","msg":"error","user":"System","data":"Failed_ReplicatingData/forreplic@Repli.Minutely.6.2.na.na.1438630560:"}
+filenameis=txt/RemoteSnapshotnowSystem.txt1438712280
+{"Date":"08/04/2015","time":"21:19:14","msg":"info","user":"System","data":"Success_Replicating_Snapshot:Data/forreplic@Repli.Minutely.6.2.na.na.1438712280"}
