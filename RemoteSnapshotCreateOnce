@@ -1,4 +1,4 @@
-#! /usr/local/bin/zsh
+#!/usr/local/bin/zsh
 cd /TopStor
 web='/usr/local/www/apache24/data/des19/Data/Replicatestatus.log';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log';

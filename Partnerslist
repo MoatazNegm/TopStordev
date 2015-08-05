@@ -1,4 +1,4 @@
-#! /usr/local/bin/zsh
+#!/usr/local/bin/zsh
 webpartner='/usr/local/www/apache24/data/des19/Data/Partnerslist.txt';
 resweb='/usr/local/www/apache24/data/des19/Data/Partnerslist.txtupdated'
 result="[";

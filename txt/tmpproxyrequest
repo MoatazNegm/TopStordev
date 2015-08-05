@@ -1,2212 +1,210 @@
 Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438457395 Repli.Minutely.3.2.na.na.1438457395 Data forreplic 10.3.2.7 3336 10.3.2.8 local
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438734407 Repli.Minutely.6.2.na.na.1438734407 Data forreplic 10.176.214.6 2236 1032_8 proxy
 RemoteAsk RemoteVolSearch forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteVolSearch forreplic
-10.3.2.8 1438457396 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438457396 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-Failed_Communication
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438458266 Repli.Minutely.3.2.na.na.1438458266 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438458267 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438458267 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
+proxy is proxy
+1032_8 1438734407 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
 reply is
-10.3.2.7 1438458277 reply found
-afterAsk=found flagcount=43830
+1032_7 1438734428 reply found
+afterAsk=found flagcount=58091
 volfound=found
 foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteGetSnaplist forreplic
-10.3.2.8 1438458281 RemoteGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438458281 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
+proxy is proxy
+1032_8 1438734432 ask RemoteGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
 reply is
-10.3.2.7 1438458291 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438456694 Data/forreplic@Repli.Minutely.3.2.na.na.1438456495 Data/forreplic@Repli.Minutely.3.2.na.na.1438456321
-afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438456694 Data/forreplic@Repli.Minutely.3.2.na.na.1438456495 Data/forreplic@Repli.Minutely.3.2.na.na.1438456321 flagcount=41084
-ll=Data/forreplic@Repli.Minutely.3.2.na.na.1438456694 Data/forreplic@Repli.Minutely.3.2.na.na.1438456495 Data/forreplic@Repli.Minutely.3.2.na.na.1438456321 spot
-targetsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438458266
+1032_7 1438734453 reply Data/forreplic@Repli.Minutely.6.2.na.na.1438733280 Data/forreplic@Repli.Minutely.6.2.na.na.1438733160 Data/forreplic@Repli.Minutely.6.2.na.na.1438733040 Data/forreplic@Repli.Minutely.6.2.na.na.1438732920 Data/forreplic@Repli.Minutely.6.2.na.na.1438732907 Data/forreplic@Repli.Minutely.6.2.na.na.1438732800 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395
+afterAsk=Data/forreplic@Repli.Minutely.6.2.na.na.1438733280 Data/forreplic@Repli.Minutely.6.2.na.na.1438733160 Data/forreplic@Repli.Minutely.6.2.na.na.1438733040 Data/forreplic@Repli.Minutely.6.2.na.na.1438732920 Data/forreplic@Repli.Minutely.6.2.na.na.1438732907 Data/forreplic@Repli.Minutely.6.2.na.na.1438732800 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 flagcount=47126
+ll=Data/forreplic@Repli.Minutely.6.2.na.na.1438733280 Data/forreplic@Repli.Minutely.6.2.na.na.1438733160 Data/forreplic@Repli.Minutely.6.2.na.na.1438733040 Data/forreplic@Repli.Minutely.6.2.na.na.1438732920 Data/forreplic@Repli.Minutely.6.2.na.na.1438732907 Data/forreplic@Repli.Minutely.6.2.na.na.1438732800 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 spot
+targetsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438734407
+initialsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
+proxy is proxy
+1032_8 1438734457 ask replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 | nc -w 4 10.176.214.6 2237
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438734480 Repli.Minutely.6.2.na.na.1438734480 Data forreplic 10.176.214.6 2236 1032_8 proxy
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+proxy is proxy
+reply is
+1032_7 1438734478 reply ready
+afterAsk=ready flagcount=47686
+zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@Repli.Minutely.6.2.na.na.1438734407 to txt/c
+/sbin/zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@Repli.Minutely.6.2.na.na.1438734407 | nc -w 10 10.176.214.6 2238
+After=ready flagcount=0
+RemoteAsk GetSnaplist hi
+POR=2236 Compelete
+finishedddddddddddddddddddddddddddddddddddddddddddddddddd
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending localGetSnaplist forreplic
+proxy is proxy
+1032_8 1438734481 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
+1032_8 1438734492 ask localGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
+reply is
+reply is
+1032_7 1438734501 reply found
+1032_7 1438734501 reply found
+afterAsk=found flagcount=26975
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+afterAsk=found flagcount=25728
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+proxy is proxy
+1032_8 1438734505 ask RemoteGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
+reply is
+1032_7 1438734526 reply Data/forreplic@Repli.Minutely.6.2.na.na.1438734407 Data/forreplic@Repli.Minutely.6.2.na.na.1438734360 Data/forreplic@Repli.Minutely.6.2.na.na.1438734328 Data/forreplic@Repli.Minutely.6.2.na.na.1438734269 Data/forreplic@Repli.Minutely.6.2.na.na.1438734266 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395
+afterAsk=Data/forreplic@Repli.Minutely.6.2.na.na.1438734407 Data/forreplic@Repli.Minutely.6.2.na.na.1438734360 Data/forreplic@Repli.Minutely.6.2.na.na.1438734328 Data/forreplic@Repli.Minutely.6.2.na.na.1438734269 Data/forreplic@Repli.Minutely.6.2.na.na.1438734266 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 flagcount=47207
+ll=Data/forreplic@Repli.Minutely.6.2.na.na.1438734407 Data/forreplic@Repli.Minutely.6.2.na.na.1438734360 Data/forreplic@Repli.Minutely.6.2.na.na.1438734328 Data/forreplic@Repli.Minutely.6.2.na.na.1438734269 Data/forreplic@Repli.Minutely.6.2.na.na.1438734266 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 spot
+targetsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438734480
+initialsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438734407
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.6.2.na.na.1438734407
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.6.2.na.na.1438734407
+proxy is proxy
+1032_8 1438734530 ask replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.6.2.na.na.1438734407 | nc -w 4 10.176.214.6 2237
+reply is
+1032_7 1438734550 reply ready
+afterAsk=ready flagcount=46034
+zfs send -DR -I Data/forreplic@Repli.Minutely.6.2.na.na.1438734407 Data/forreplic@Repli.Minutely.6.2.na.na.1438734480 to txt/c
+/sbin/zfs send -DR -I Data/forreplic@Repli.Minutely.6.2.na.na.1438734407 Data/forreplic@Repli.Minutely.6.2.na.na.1438734480 | nc -w 10 10.176.214.6 2238
+After=ready flagcount=0
+RemoteAsk GetSnaplist hi
+POR=2236 Compelete
+finishedddddddddddddddddddddddddddddddddddddddddddddddddd
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending localGetSnaplist forreplic
+proxy is proxy
+1032_8 1438734564 ask localGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
+reply is
+1032_7 1438734585 reply ready
+afterAsk=ready flagcount=48088
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438735200 Repli.Minutely.6.2.na.na.1438735200 Data forreplic 10.176.214.6 2236 1032_8 proxy
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+proxy is proxy
+1032_8 1438735201 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
+reply is
+1032_7 1438735221 reply found
+afterAsk=found flagcount=45866
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+proxy is proxy
+1032_8 1438735225 ask RemoteGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
+reply is
+1032_7 1438735245 reply Data/forreplic@Repli.Minutely.6.2.na.na.1438734480 Data/forreplic@Repli.Minutely.6.2.na.na.1438734407 Data/forreplic@Repli.Minutely.6.2.na.na.1438734360 Data/forreplic@Repli.Minutely.6.2.na.na.1438734328 Data/forreplic@Repli.Minutely.6.2.na.na.1438734269 Data/forreplic@Repli.Minutely.6.2.na.na.1438734266 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395
+afterAsk=Data/forreplic@Repli.Minutely.6.2.na.na.1438734480 Data/forreplic@Repli.Minutely.6.2.na.na.1438734407 Data/forreplic@Repli.Minutely.6.2.na.na.1438734360 Data/forreplic@Repli.Minutely.6.2.na.na.1438734328 Data/forreplic@Repli.Minutely.6.2.na.na.1438734269 Data/forreplic@Repli.Minutely.6.2.na.na.1438734266 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 flagcount=48809
+ll=Data/forreplic@Repli.Minutely.6.2.na.na.1438734480 Data/forreplic@Repli.Minutely.6.2.na.na.1438734407 Data/forreplic@Repli.Minutely.6.2.na.na.1438734360 Data/forreplic@Repli.Minutely.6.2.na.na.1438734328 Data/forreplic@Repli.Minutely.6.2.na.na.1438734269 Data/forreplic@Repli.Minutely.6.2.na.na.1438734266 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 spot
+targetsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438735200
+initialsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
+proxy is proxy
+1032_8 1438735249 ask replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 | nc -w 4 10.176.214.6 2237
+reply is
+1032_7 1438735270 reply ready
+afterAsk=ready flagcount=47794
+zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@Repli.Minutely.6.2.na.na.1438735200 to txt/c
+/sbin/zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@Repli.Minutely.6.2.na.na.1438735200 | nc -w 10 10.176.214.6 2238
+After=ready flagcount=0
+RemoteAsk GetSnaplist hi
+POR=2236 Compelete
+finishedddddddddddddddddddddddddddddddddddddddddddddddddd
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending localGetSnaplist forreplic
+proxy is proxy
+1032_8 1438735284 ask localGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
+reply is
+1032_7 1438735305 reply ready
+afterAsk=ready flagcount=50523
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438809960 Repli.Minutely.6.2.na.na.1438809960 Data forreplic 10.176.214.6 2236 1032_8 proxy
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+proxy is proxy
+1032_8 1438809960 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438809980 Repli.Minutely.6.2.na.na.1438809980 Data forreplic 10.176.214.6 2236 1032_8 proxy
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+proxy is proxy
+reply is
+1032_7 1438736270 reply found
+afterAsk=found flagcount=53069
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+proxy is proxy
+1032_8 1438809982 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
+1032_8 1438809985 ask RemoteGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
+reply is
+1032_7 1438736291 reply found
+afterAsk=found flagcount=20690
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+proxy is proxy
+1032_8 1438810007 ask RemoteGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
+reply is
+reply is
+1032_7 1438736317 reply Data/forreplic@Repli.Minutely.6.2.na.na.1438735200 Data/forreplic@Repli.Minutely.6.2.na.na.1438735080 Data/forreplic@Repli.Minutely.6.2.na.na.1438734960 Data/forreplic@Repli.Minutely.6.2.na.na.1438734840 Data/forreplic@Repli.Minutely.6.2.na.na.1438734720 Data/forreplic@Repli.Minutely.6.2.na.na.1438734600 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395
+afterAsk=Data/forreplic@Repli.Minutely.6.2.na.na.1438735200 Data/forreplic@Repli.Minutely.6.2.na.na.1438735080 Data/forreplic@Repli.Minutely.6.2.na.na.1438734960 Data/forreplic@Repli.Minutely.6.2.na.na.1438734840 Data/forreplic@Repli.Minutely.6.2.na.na.1438734720 Data/forreplic@Repli.Minutely.6.2.na.na.1438734600 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 flagcount=53640
+ll=Data/forreplic@Repli.Minutely.6.2.na.na.1438735200 Data/forreplic@Repli.Minutely.6.2.na.na.1438735080 Data/forreplic@Repli.Minutely.6.2.na.na.1438734960 Data/forreplic@Repli.Minutely.6.2.na.na.1438734840 Data/forreplic@Repli.Minutely.6.2.na.na.1438734720 Data/forreplic@Repli.Minutely.6.2.na.na.1438734600 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 spot
+targetsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438809980
+initialsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
+proxy is proxy
+afterAsk= flagcount=275360
+ll= spot
+targetsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438809960
 initialsnap=
 yyyyyyyyyyyyyintital is null
 RemoteAsk destroysnaps forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending destroysnaps forreplic
-10.3.2.8 1438458295 destroysnaps forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438458295 ask destroysnaps forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
+proxy is proxy
+1032_8 1438810032 ask destroysnaps forreplic | nc -w 4 10.176.214.6 2237
+1032_8 1438810032 ask replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 | nc -w 4 10.176.214.6 2237
 reply is
-10.3.2.7 1438458305 reply ready
-afterAsk=ready flagcount=48607
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replidf 3338 10.3.2.7 10.3.2.8
-10.3.2.8 1438458309 replidf 3338 10.3.2.7 10.3.2.8 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438458309 ask replidf 3338 10.3.2.7 10.3.2.8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
 reply is
-10.3.2.7 1438458320 reply ready
-afterAsk=ready flagcount=32901
-RemoteAsk replidf 3338 10.3.2.7 10.3.2.8
-zfs send -DR Data/forreplic@Repli.Minutely.3.2.na.na.1438458266
-/sbin/zfs send -DR Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
-After=ready flagcount=0
-RemoteAsk GetSnaplist hi
-POR=3336 Compelete
-finishedddddddddddddddddddddddddddddddddddddddddddddddddd
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending localGetSnaplist forreplic
-10.3.2.8 1438458333 localGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438458333 ask localGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438458345 reply ready
-afterAsk=ready flagcount=46723
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotCreateOnce.txt mezo..1438458864 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438458864 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438458864 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438458874 reply found
-afterAsk=found flagcount=38171
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-10.3.2.8 1438458878 RemoteGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438458878 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438458889 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 Data/forreplic@Repli.Minutely.3.2.na.na.1438457377
-afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 Data/forreplic@Repli.Minutely.3.2.na.na.1438457377 flagcount=42174
-ll=Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 Data/forreplic@Repli.Minutely.3.2.na.na.1438457377 spot
-targetsnap=Data/forreplic@mezo..1438458864
-initialsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438458266
-RemoteAsk replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438458266
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438458266
-10.3.2.8 1438458892 replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438458892 ask replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438458904 reply ready
-afterAsk=ready flagcount=59144
-zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@mezo..1438458864 to txt/c
-/sbin/zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@mezo..1438458864 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
-After=ready flagcount=0
-RemoteAsk GetSnaplist hi
-POR=3336 Compelete
-finishedddddddddddddddddddddddddddddddddddddddddddddddddd
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending localGetSnaplist forreplic
-10.3.2.8 1438458918 localGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438458918 ask localGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438458929 reply ready
-afterAsk=ready flagcount=41382
-Replicate=
-Roperands=10.3.2.7 txt/RemoteSnapshotnowSystem.txt1438464317 Repli.Minutely.3.2.na.na.1438464317 Data forreplic 10.3.2.7 3336 10.3.2.8 local
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-10.3.2.8 1438464318 RemoteVolSearch forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438464318 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438464328 reply found
-afterAsk=found flagcount=47351
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-10.3.2.8 1438464332 RemoteGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438464332 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438464342 reply Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 Data/forreplic@Repli.Minutely.3.2.na.na.1438457377
-afterAsk=Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 Data/forreplic@Repli.Minutely.3.2.na.na.1438457377 flagcount=49012
-ll=Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 Data/forreplic@Repli.Minutely.3.2.na.na.1438457377 spot
-targetsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
-initialsnap=Data/forreplic@mezo..1438458864
-RemoteAsk replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@mezo..1438458864
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@mezo..1438458864
-10.3.2.8 1438464346 replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@mezo..1438458864 | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438464346 ask replivol 3338 10.3.2.7 10.3.2.8 Data forreplic Data/forreplic@mezo..1438458864 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438464356 reply ready
-afterAsk=ready flagcount=53360
-zfs send -DR -I Data/forreplic@mezo..1438458864 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 to txt/c
-/sbin/zfs send -DR -I Data/forreplic@mezo..1438458864 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10 10.3.2.7 3338
-After=ready flagcount=0
-RemoteAsk GetSnaplist hi
-POR=3336 Compelete
-finishedddddddddddddddddddddddddddddddddddddddddddddddddd
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending localGetSnaplist forreplic
-10.3.2.8 1438464370 localGetSnaplist forreplic | nc -w 4 10.3.2.7 3337
-10.3.2.8 1438464370 ask localGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.3.2.7 3337
-reply is
-10.3.2.7 1438464381 reply ready
-afterAsk=ready flagcount=54832
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438464450 Repli.Minutely.6.2.na.na.1438464450 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438464450 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438464450 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438464480 Repli.Minutely.6.2.na.na.1438464480 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438464480 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438464480 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438464600 Repli.Minutely.6.2.na.na.1438464600 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438464600 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438464600 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438464720 Repli.Minutely.6.2.na.na.1438464720 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438464720 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438464720 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438464840 Repli.Minutely.6.2.na.na.1438464840 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438464840 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438464840 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438464960 Repli.Minutely.6.2.na.na.1438464960 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438464960 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438464960 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438465080 Repli.Minutely.6.2.na.na.1438465080 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438465080 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438465080 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438465200 Repli.Minutely.6.2.na.na.1438465200 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438465200 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438465200 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438465320 Repli.Minutely.6.2.na.na.1438465320 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438465320 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438465320 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438465440 Repli.Minutely.6.2.na.na.1438465440 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438465440 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438465440 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438465560 Repli.Minutely.6.2.na.na.1438465560 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438465560 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438465560 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438465680 Repli.Minutely.6.2.na.na.1438465680 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438465680 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438465680 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438465800 Repli.Minutely.6.2.na.na.1438465800 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438465800 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438465800 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438465920 Repli.Minutely.6.2.na.na.1438465920 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438465920 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438465920 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438466040 Repli.Minutely.6.2.na.na.1438466040 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438466040 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438466040 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438466160 Repli.Minutely.6.2.na.na.1438466160 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438466160 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438466160 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438466280 Repli.Minutely.6.2.na.na.1438466280 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438466280 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438466280 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438466400 Repli.Minutely.6.2.na.na.1438466400 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438466400 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438466400 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438466520 Repli.Minutely.6.2.na.na.1438466520 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438466520 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438466520 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438466640 Repli.Minutely.6.2.na.na.1438466640 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438466640 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438466640 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438466760 Repli.Minutely.6.2.na.na.1438466760 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438466760 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438466760 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438466880 Repli.Minutely.6.2.na.na.1438466880 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438466880 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438466880 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438467000 Repli.Minutely.6.2.na.na.1438467000 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438467000 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438467000 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438467120 Repli.Minutely.6.2.na.na.1438467120 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438467120 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438467120 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438467240 Repli.Minutely.6.2.na.na.1438467240 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438467240 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438467240 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438467360 Repli.Minutely.6.2.na.na.1438467360 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438467361 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438467361 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438467480 Repli.Minutely.6.2.na.na.1438467480 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438467480 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438467480 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438467600 Repli.Minutely.6.2.na.na.1438467600 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438467600 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438467600 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438467720 Repli.Minutely.6.2.na.na.1438467720 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438467720 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438467720 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438467840 Repli.Minutely.6.2.na.na.1438467840 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438467840 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438467840 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438467960 Repli.Minutely.6.2.na.na.1438467960 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438467960 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438467960 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438468080 Repli.Minutely.6.2.na.na.1438468080 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438468080 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438468080 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438468200 Repli.Minutely.6.2.na.na.1438468200 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438468200 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438468200 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438468320 Repli.Minutely.6.2.na.na.1438468320 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438468320 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438468320 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438545720 Repli.Minutely.6.2.na.na.1438545720 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438545720 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438545720 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438545840 Repli.Minutely.6.2.na.na.1438545840 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438545840 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438545840 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438545960 Repli.Minutely.6.2.na.na.1438545960 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438545960 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438545960 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438546080 Repli.Minutely.6.2.na.na.1438546080 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438546080 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438546080 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438546200 Repli.Minutely.6.2.na.na.1438546200 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438546200 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438546200 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438546320 Repli.Minutely.6.2.na.na.1438546320 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438546320 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438546320 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438546440 Repli.Minutely.6.2.na.na.1438546440 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438546440 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438546440 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438546560 Repli.Minutely.6.2.na.na.1438546560 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438546560 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438546560 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438546680 Repli.Minutely.6.2.na.na.1438546680 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438546680 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438546680 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438546800 Repli.Minutely.6.2.na.na.1438546800 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438546800 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438546800 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438546920 Repli.Minutely.6.2.na.na.1438546920 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438546920 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438546920 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438547040 Repli.Minutely.6.2.na.na.1438547040 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438547040 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438547040 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438547160 Repli.Minutely.6.2.na.na.1438547160 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438547160 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438547160 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438547280 Repli.Minutely.6.2.na.na.1438547280 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438547280 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438547280 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438547400 Repli.Minutely.6.2.na.na.1438547400 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438547400 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438547400 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438547520 Repli.Minutely.6.2.na.na.1438547520 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438547520 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438547520 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438547640 Repli.Minutely.6.2.na.na.1438547640 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438547640 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438547640 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438547760 Repli.Minutely.6.2.na.na.1438547760 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438547760 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438547760 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438547880 Repli.Minutely.6.2.na.na.1438547880 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438547880 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438547880 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438548120 Repli.Minutely.6.2.na.na.1438548120 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438548120 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438548120 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438548240 Repli.Minutely.6.2.na.na.1438548240 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438548240 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438548240 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438548360 Repli.Minutely.6.2.na.na.1438548360 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438548360 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438548360 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438548480 Repli.Minutely.6.2.na.na.1438548480 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438548480 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438548480 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438548600 Repli.Minutely.6.2.na.na.1438548600 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438548600 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438548600 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438548720 Repli.Minutely.6.2.na.na.1438548720 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438548720 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438548720 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438548840 Repli.Minutely.6.2.na.na.1438548840 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438548840 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438548840 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438548960 Repli.Minutely.6.2.na.na.1438548960 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438548960 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438548960 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438549080 Repli.Minutely.6.2.na.na.1438549080 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438549080 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438549080 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438549200 Repli.Minutely.6.2.na.na.1438549200 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438549200 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438549200 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438549320 Repli.Minutely.6.2.na.na.1438549320 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438549320 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438549320 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438549440 Repli.Minutely.6.2.na.na.1438549440 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438549440 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438549440 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438549560 Repli.Minutely.6.2.na.na.1438549560 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438549560 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438549560 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438549680 Repli.Minutely.6.2.na.na.1438549680 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438549680 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438549680 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438549800 Repli.Minutely.6.2.na.na.1438549800 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438549800 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438549800 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438549920 Repli.Minutely.6.2.na.na.1438549920 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438549920 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438549920 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438550040 Repli.Minutely.6.2.na.na.1438550040 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438550040 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438550040 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438550160 Repli.Minutely.6.2.na.na.1438550160 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438550160 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438550160 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438550280 Repli.Minutely.6.2.na.na.1438550280 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438550280 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438550280 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438550400 Repli.Minutely.6.2.na.na.1438550400 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438550400 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438550400 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438550520 Repli.Minutely.6.2.na.na.1438550520 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438550520 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438550520 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438620840 Repli.Minutely.6.2.na.na.1438620840 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438620841 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438620841 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438620960 Repli.Minutely.6.2.na.na.1438620960 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438620960 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438620960 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438621080 Repli.Minutely.6.2.na.na.1438621080 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438621080 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438621080 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438621320 Repli.Minutely.6.2.na.na.1438621320 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438621320 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438621320 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438621440 Repli.Minutely.6.2.na.na.1438621440 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438621440 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438621440 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438621680 Repli.Minutely.6.2.na.na.1438621680 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438621680 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438621680 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438621800 Repli.Minutely.6.2.na.na.1438621800 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438621800 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438621800 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438621920 Repli.Minutely.6.2.na.na.1438621920 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438621920 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438621920 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438622040 Repli.Minutely.6.2.na.na.1438622040 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438622040 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438622040 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438622160 Repli.Minutely.6.2.na.na.1438622160 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438622160 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438622160 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438622280 Repli.Minutely.6.2.na.na.1438622280 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438622280 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438622280 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438622400 Repli.Minutely.6.2.na.na.1438622400 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438622400 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438622400 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438622640 Repli.Minutely.6.2.na.na.1438622640 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438622640 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438622640 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438622760 Repli.Minutely.6.2.na.na.1438622760 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438622760 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438622760 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438622880 Repli.Minutely.6.2.na.na.1438622880 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438622880 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438622880 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438623000 Repli.Minutely.6.2.na.na.1438623000 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438623000 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438623000 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438623240 Repli.Minutely.6.2.na.na.1438623240 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438623240 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438623240 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438623360 Repli.Minutely.6.2.na.na.1438623360 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438623360 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438623360 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438623480 Repli.Minutely.6.2.na.na.1438623480 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438623480 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438623480 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438623600 Repli.Minutely.6.2.na.na.1438623600 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438623600 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438623600 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438623720 Repli.Minutely.6.2.na.na.1438623720 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438623721 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438623721 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438623840 Repli.Minutely.6.2.na.na.1438623840 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438623840 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438623840 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438623960 Repli.Minutely.6.2.na.na.1438623960 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438623960 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438623960 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438624080 Repli.Minutely.6.2.na.na.1438624080 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438624080 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438624080 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438624320 Repli.Minutely.6.2.na.na.1438624320 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438624320 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438624320 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438624440 Repli.Minutely.6.2.na.na.1438624440 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438624440 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438624440 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438624560 Repli.Minutely.6.2.na.na.1438624560 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438624560 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438624560 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438624800 Repli.Minutely.6.2.na.na.1438624800 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438624800 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438624800 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438624920 Repli.Minutely.6.2.na.na.1438624920 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438624920 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438624920 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438625040 Repli.Minutely.6.2.na.na.1438625040 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438625040 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438625040 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438625160 Repli.Minutely.6.2.na.na.1438625160 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438625160 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438625160 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438625280 Repli.Minutely.6.2.na.na.1438625280 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438625280 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438625280 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438625400 Repli.Minutely.6.2.na.na.1438625400 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438625401 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438625401 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438625520 Repli.Minutely.6.2.na.na.1438625520 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438625520 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438625520 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438625640 Repli.Minutely.6.2.na.na.1438625640 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438625640 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438625640 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438625760 Repli.Minutely.6.2.na.na.1438625760 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438625760 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438625760 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438625880 Repli.Minutely.6.2.na.na.1438625880 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438625880 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438625880 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438626120 Repli.Minutely.6.2.na.na.1438626120 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438626120 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438626120 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438626240 Repli.Minutely.6.2.na.na.1438626240 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438626240 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438626240 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438626360 Repli.Minutely.6.2.na.na.1438626360 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438626360 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438626360 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438626480 Repli.Minutely.6.2.na.na.1438626480 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438626480 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438626480 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438626600 Repli.Minutely.6.2.na.na.1438626600 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438626600 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438626600 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438626720 Repli.Minutely.6.2.na.na.1438626720 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438626721 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438626721 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438626840 Repli.Minutely.6.2.na.na.1438626840 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438626840 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438626840 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438627080 Repli.Minutely.6.2.na.na.1438627080 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438627080 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438627080 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438627200 Repli.Minutely.6.2.na.na.1438627200 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438627200 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438627200 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438627320 Repli.Minutely.6.2.na.na.1438627320 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438627320 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438627320 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438627440 Repli.Minutely.6.2.na.na.1438627440 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438627440 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438627440 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438627560 Repli.Minutely.6.2.na.na.1438627560 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438627560 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438627560 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438627680 Repli.Minutely.6.2.na.na.1438627680 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438627680 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438627680 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438627800 Repli.Minutely.6.2.na.na.1438627800 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438627800 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438627800 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438627920 Repli.Minutely.6.2.na.na.1438627920 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438627920 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438627920 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438628040 Repli.Minutely.6.2.na.na.1438628040 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438628040 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438628040 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438628160 Repli.Minutely.6.2.na.na.1438628160 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438628160 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438628160 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438628280 Repli.Minutely.6.2.na.na.1438628280 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438628280 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438628280 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438628400 Repli.Minutely.6.2.na.na.1438628400 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438628400 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438628400 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438628520 Repli.Minutely.6.2.na.na.1438628520 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438628520 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438628520 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438628640 Repli.Minutely.6.2.na.na.1438628640 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438628640 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438628640 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438628880 Repli.Minutely.6.2.na.na.1438628880 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438628880 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438628880 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438629000 Repli.Minutely.6.2.na.na.1438629000 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438629000 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438629000 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438629120 Repli.Minutely.6.2.na.na.1438629120 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438629120 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438629120 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438629240 Repli.Minutely.6.2.na.na.1438629240 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438629240 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438629240 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438629360 Repli.Minutely.6.2.na.na.1438629360 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438629360 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438629360 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438629480 Repli.Minutely.6.2.na.na.1438629480 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438629480 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438629480 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438629600 Repli.Minutely.6.2.na.na.1438629600 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438629600 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438629600 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438629720 Repli.Minutely.6.2.na.na.1438629720 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438629720 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438629720 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438629840 Repli.Minutely.6.2.na.na.1438629840 Data forreplic 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-porxy 1438629840 RemoteVolSearch forreplic | nc -w 4 2236 10329
-porxy 1438629840 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 2236 10329
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438630080 Repli.Minutely.6.2.na.na.1438630080 Data forreplic 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-porxy 1438630080 RemoteVolSearch forreplic | nc -w 4 2236 10329
-porxy 1438630080 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 2236 10329
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438630200 Repli.Minutely.6.2.na.na.1438630200 Data forreplic 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-porxy 1438630200 RemoteVolSearch forreplic | nc -w 4 2236 10329
-porxy 1438630200 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 2236 10329
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438630320 Repli.Minutely.6.2.na.na.1438630320 Data forreplic 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-porxy 1438630320 RemoteVolSearch forreplic | nc -w 4 2236 10329
-porxy 1438630320 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 2236 10329
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438630440 Repli.Minutely.6.2.na.na.1438630440 Data forreplic 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-porxy 1438630440 RemoteVolSearch forreplic | nc -w 4 2236 10329
-porxy 1438630440 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 2236 10329
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438630560 Repli.Minutely.6.2.na.na.1438630560 Data forreplic 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-porxy 1438630560 RemoteVolSearch forreplic | nc -w 4 2236 10329
-porxy 1438630560 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 2236 10329
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438630680 Repli.Minutely.6.2.na.na.1438630680 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438630680 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438630680 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438630800 Repli.Minutely.6.2.na.na.1438630800 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438630800 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438630800 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438630920 Repli.Minutely.6.2.na.na.1438630920 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438630920 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438630920 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438631040 Repli.Minutely.6.2.na.na.1438631040 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438631040 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438631040 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438631160 Repli.Minutely.6.2.na.na.1438631160 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438631160 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438631160 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438631280 Repli.Minutely.6.2.na.na.1438631280 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438631280 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438631280 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438631400 Repli.Minutely.6.2.na.na.1438631400 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438631400 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438631400 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438631520 Repli.Minutely.6.2.na.na.1438631520 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438631520 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438631520 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438631640 Repli.Minutely.6.2.na.na.1438631640 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438631640 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438631640 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438631760 Repli.Minutely.6.2.na.na.1438631760 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438631760 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438631760 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438631880 Repli.Minutely.6.2.na.na.1438631880 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438631880 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438631880 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438632000 Repli.Minutely.6.2.na.na.1438632000 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438632000 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438632000 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438632120 Repli.Minutely.6.2.na.na.1438632120 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438632120 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438632120 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438632240 Repli.Minutely.6.2.na.na.1438632240 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438632241 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438632241 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438632360 Repli.Minutely.6.2.na.na.1438632360 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438632360 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438632360 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438632480 Repli.Minutely.6.2.na.na.1438632480 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438632480 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438632480 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438632600 Repli.Minutely.6.2.na.na.1438632600 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438632600 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438632600 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438632720 Repli.Minutely.6.2.na.na.1438632720 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438632720 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438632720 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438632840 Repli.Minutely.6.2.na.na.1438632840 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438632840 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438632840 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438632960 Repli.Minutely.6.2.na.na.1438632960 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438632960 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438632960 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438633200 Repli.Minutely.6.2.na.na.1438633200 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438633200 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438633200 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438633440 Repli.Minutely.6.2.na.na.1438633440 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438633440 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438633440 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438633560 Repli.Minutely.6.2.na.na.1438633560 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438633560 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438633560 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438633680 Repli.Minutely.6.2.na.na.1438633680 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438633680 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438633680 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438633800 Repli.Minutely.6.2.na.na.1438633800 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438633800 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438633800 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438633920 Repli.Minutely.6.2.na.na.1438633920 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438633920 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438633920 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438634040 Repli.Minutely.6.2.na.na.1438634040 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438634040 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438634040 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438634160 Repli.Minutely.6.2.na.na.1438634160 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438634160 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438634160 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438634280 Repli.Minutely.6.2.na.na.1438634280 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438634280 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438634280 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438634400 Repli.Minutely.6.2.na.na.1438634400 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438634400 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438634400 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438634520 Repli.Minutely.6.2.na.na.1438634520 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438634520 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438634520 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438634640 Repli.Minutely.6.2.na.na.1438634640 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438634640 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438634640 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438634760 Repli.Minutely.6.2.na.na.1438634760 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438634760 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438634760 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438634880 Repli.Minutely.6.2.na.na.1438634880 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438634881 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438634881 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438635000 Repli.Minutely.6.2.na.na.1438635000 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438635000 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438635000 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438635120 Repli.Minutely.6.2.na.na.1438635120 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438635120 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438635120 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438635240 Repli.Minutely.6.2.na.na.1438635240 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438635240 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438635240 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438635360 Repli.Minutely.6.2.na.na.1438635360 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438635360 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438635360 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438635480 Repli.Minutely.6.2.na.na.1438635480 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438635480 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438635480 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438635600 Repli.Minutely.6.2.na.na.1438635600 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438635600 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438635600 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438635720 Repli.Minutely.6.2.na.na.1438635720 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438635720 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438635720 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438635840 Repli.Minutely.6.2.na.na.1438635840 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438635840 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438635840 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438635960 Repli.Minutely.6.2.na.na.1438635960 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438635960 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438635960 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438636080 Repli.Minutely.6.2.na.na.1438636080 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438636080 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438636080 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438636200 Repli.Minutely.6.2.na.na.1438636200 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438636200 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438636200 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438636320 Repli.Minutely.6.2.na.na.1438636320 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438636320 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438636320 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438705320 Repli.Minutely.6.2.na.na.1438705320 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438705320 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438705320 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438705440 Repli.Minutely.6.2.na.na.1438705440 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438705440 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438705440 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438705560 Repli.Minutely.6.2.na.na.1438705560 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438705560 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438705560 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438705680 Repli.Minutely.6.2.na.na.1438705680 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438705680 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438705680 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438705800 Repli.Minutely.6.2.na.na.1438705800 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438705801 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438705801 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438705920 Repli.Minutely.6.2.na.na.1438705920 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438705920 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438705920 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438706040 Repli.Minutely.6.2.na.na.1438706040 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438706040 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438706040 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438706160 Repli.Minutely.6.2.na.na.1438706160 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438706160 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438706160 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438706280 Repli.Minutely.6.2.na.na.1438706280 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438706280 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438706280 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438706400 Repli.Minutely.6.2.na.na.1438706400 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438706400 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438706400 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438706520 Repli.Minutely.6.2.na.na.1438706520 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438706520 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438706520 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438706640 Repli.Minutely.6.2.na.na.1438706640 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438706640 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438706640 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438706760 Repli.Minutely.6.2.na.na.1438706760 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438706760 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438706760 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438706880 Repli.Minutely.6.2.na.na.1438706880 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438706881 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438706881 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438707000 Repli.Minutely.6.2.na.na.1438707000 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438707000 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438707000 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438707120 Repli.Minutely.6.2.na.na.1438707120 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438707120 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438707120 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438707360 Repli.Minutely.6.2.na.na.1438707360 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438707360 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438707360 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438707480 Repli.Minutely.6.2.na.na.1438707480 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438707480 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438707480 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438707600 Repli.Minutely.6.2.na.na.1438707600 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438707600 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438707600 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438707720 Repli.Minutely.6.2.na.na.1438707720 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438707720 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438707720 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438707840 Repli.Minutely.6.2.na.na.1438707840 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438707840 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438707840 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438708080 Repli.Minutely.6.2.na.na.1438708080 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438708080 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438708080 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438708200 Repli.Minutely.6.2.na.na.1438708200 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438708200 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438708200 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438708320 Repli.Minutely.6.2.na.na.1438708320 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438708320 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438708320 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438708440 Repli.Minutely.6.2.na.na.1438708440 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438708440 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438708440 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438708560 Repli.Minutely.6.2.na.na.1438708560 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438708560 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438708560 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438708680 Repli.Minutely.6.2.na.na.1438708680 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438708680 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438708680 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438708800 Repli.Minutely.6.2.na.na.1438708800 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438708800 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438708800 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438708920 Repli.Minutely.6.2.na.na.1438708920 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438708920 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438708920 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438709040 Repli.Minutely.6.2.na.na.1438709040 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438709040 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438709040 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438709160 Repli.Minutely.6.2.na.na.1438709160 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438709160 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438709160 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438709400 Repli.Minutely.6.2.na.na.1438709400 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438709400 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438709400 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438709520 Repli.Minutely.6.2.na.na.1438709520 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438709520 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438709520 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438709640 Repli.Minutely.6.2.na.na.1438709640 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438709640 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438709640 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438709760 Repli.Minutely.6.2.na.na.1438709760 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438709760 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438709760 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438709880 Repli.Minutely.6.2.na.na.1438709880 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438709880 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438709880 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438710000 Repli.Minutely.6.2.na.na.1438710000 Data forreplic 10.235.246.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438710000 RemoteVolSearch forreplic | nc -w 4 10.235.246.6 2237
-1032_8 1438710000 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.235.246.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438710120 Repli.Minutely.6.2.na.na.1438710120 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438710121 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438710121 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438710240 Repli.Minutely.6.2.na.na.1438710240 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438710240 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438710240 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438710250 Repli.Minutely.6.2.na.na.1438710250 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438710250 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438710250 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438710360 Repli.Minutely.6.2.na.na.1438710360 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438710360 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438710360 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438710480 Repli.Minutely.6.2.na.na.1438710480 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438710480 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438710480 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438710600 Repli.Minutely.6.2.na.na.1438710600 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438710600 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438710600 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438710720 Repli.Minutely.6.2.na.na.1438710720 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438710720 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438710720 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-reply is
-1032_7 1438710717 reply found
-afterAsk=found flagcount=0
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-1032_8 1438710730 RemoteGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438710730 ask RemoteGetSnaplist forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438710840 Repli.Minutely.6.2.na.na.1438710840 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438710840 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438710840 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438710960 Repli.Minutely.6.2.na.na.1438710960 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438710960 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438710960 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438711080 Repli.Minutely.6.2.na.na.1438711080 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438711080 RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438711080 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438711130 Repli.Minutely.6.2.na.na.1438711130 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438711130 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438711130 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438711200 Repli.Minutely.6.2.na.na.1438711200 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438711200 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438711200 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438711201 Repli.Minutely.6.2.na.na.1438711201 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438711201 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438711201 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438711307 Repli.Minutely.6.2.na.na.1438711307 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438711307 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438711307 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438711320 Repli.Minutely.6.2.na.na.1438711320 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438711320 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438711320 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438711421 Repli.Minutely.6.2.na.na.1438711421 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438711422 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438711440 Repli.Minutely.6.2.na.na.1438711440 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438711440 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438711560 Repli.Minutely.6.2.na.na.1438711560 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438711560 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438711680 Repli.Minutely.6.2.na.na.1438711680 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438711680 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438711800 Repli.Minutely.6.2.na.na.1438711800 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-1032_8 1438711800 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438711920 Repli.Minutely.6.2.na.na.1438711920 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438711929 Repli.Minutely.6.2.na.na.1438711929 Data forreplic 10.176.214.6 2236 1032_8 porxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-proxy is porxy
-1032_8 1438711920 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-1032_8 1438711929 ask RemoteVolSearch forreplic | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 10.176.214.6 2237
-Failed_Communication
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438712023 Repli.Minutely.6.2.na.na.1438712023 Data forreplic 10.176.214.6 2236 1032_8 proxy
+1032_7 1438736344 reply ready
+afterAsk=ready flagcount=46215
+zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@Repli.Minutely.6.2.na.na.1438809980 to txt/c
+/sbin/zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@Repli.Minutely.6.2.na.na.1438809980 | nc -w 10 10.176.214.6 2238
+1032_7 1438736344 reply ready
+afterAsk=ready flagcount=35521
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replidf 2238 10.176.214.6 1032_8
+proxy is proxy
+1032_8 1438810059 ask replidf 2238 10.176.214.6 1032_8 | nc -w 4 10.176.214.6 2237
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438810080 Repli.Minutely.6.2.na.na.1438810080 Data forreplic 10.176.214.6 2236 1032_8 proxy
 RemoteAsk RemoteVolSearch forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteVolSearch forreplic
 proxy is proxy
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438712040 Repli.Minutely.6.2.na.na.1438712040 Data forreplic 10.176.214.6 2236 1032_8 proxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-proxy is proxy
-1032_8 1438712023 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438712040 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
 reply is
-reply is
-1032_7 1438712043 reply found
-afterAsk=found flagcount=21714
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-proxy is proxy
-afterAsk= flagcount=40273
-volfound=
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-proxy is proxy
-1032_8 1438712048 ask RemoteGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
-1032_8 1438712048 ask RemoteGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
-reply is
-reply is
-1032_7 1438712070 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395
-1032_7 1438712070 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395
-afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 flagcount=39554
-afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 flagcount=38032
-ll=Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 spot
-ll=Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 spot
-targetsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438712040
-initialsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
-RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
-targetsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438712023
-initialsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
-RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
-proxy is proxy
-sending replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
-proxy is proxy
-1032_8 1438712074 ask replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 | nc -w 4 10.176.214.6 2237
-1032_8 1438712074 ask replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 | nc -w 4 10.176.214.6 2237
-reply is
-reply is
-1032_7 1438712097 reply ready
-1032_7 1438712097 reply ready
-afterAsk=ready flagcount=31466
-zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@Repli.Minutely.6.2.na.na.1438712023 to txt/c
-/sbin/zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@Repli.Minutely.6.2.na.na.1438712023 | nc -w 10 10.176.214.6 2238
-afterAsk=ready flagcount=38734
-zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@Repli.Minutely.6.2.na.na.1438712040 to txt/c
-/sbin/zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@Repli.Minutely.6.2.na.na.1438712040 | nc -w 10 10.176.214.6 2238
+1032_7 1438736369 reply ready
+afterAsk=ready flagcount=48187
+RemoteAsk replidf 2238 10.176.214.6 1032_8
+zfs send -DR Data/forreplic@Repli.Minutely.6.2.na.na.1438809960
+/sbin/zfs send -DR Data/forreplic@Repli.Minutely.6.2.na.na.1438809960 | nc -w 10 10.176.214.6 2238
 After=ready flagcount=0
 RemoteAsk GetSnaplist hi
 POR=2236 Compelete
@@ -2214,53 +212,47 @@ finishedddddddddddddddddddddddddddddddddddddddddddddddddd
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending localGetSnaplist forreplic
 proxy is proxy
-1032_8 1438712101 ask localGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
-reply is
-1032_7 1438712121 reply ready
-afterAsk=ready flagcount=49038
-After=ready flagcount=24
+After=ready flagcount=31
 RemoteAsk GetSnaplist hi
 POR=2236 Compelete
 finishedddddddddddddddddddddddddddddddddddddddddddddddddd
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending localGetSnaplist forreplic
 proxy is proxy
-1032_8 1438712126 ask localGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
+1032_8 1438810082 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
+1032_8 1438810084 ask localGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
+1032_8 1438810101 ask localGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
 reply is
-1032_7 1438712146 reply ready
-afterAsk=ready flagcount=50556
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438712160 Repli.Minutely.6.2.na.na.1438712160 Data forreplic 10.176.214.6 2236 1032_8 proxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-proxy is proxy
-1032_8 1438712160 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
 reply is
-1032_7 1438712180 reply found
-afterAsk=found flagcount=55384
+reply is
+1032_7 1438736392 reply found
+1032_7 1438736392 reply found
+1032_7 1438736392 reply found
+afterAsk=found flagcount=10910
+afterAsk=found flagcount=26580
 volfound=found
 foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteGetSnaplist forreplic
 proxy is proxy
-1032_8 1438712185 ask RemoteGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
+afterAsk= flagcount=21794
+1032_8 1438810107 ask RemoteGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
 reply is
-1032_7 1438712205 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395
-afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 flagcount=51046
-ll=Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 spot
-targetsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438712160
-initialsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
-RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
+1032_7 1438736417 reply Data/forreplic@Repli.Minutely.6.2.na.na.1438809980 Data/forreplic@Repli.Minutely.6.2.na.na.1438809960 Data/forreplic@Repli.Minutely.6.2.na.na.1438809953 Data/forreplic@Repli.Minutely.6.2.na.na.1438809933 Data/forreplic@Repli.Minutely.6.2.na.na.1438809840 Data/forreplic@Repli.Minutely.6.2.na.na.1438809720 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395
+afterAsk=Data/forreplic@Repli.Minutely.6.2.na.na.1438809980 Data/forreplic@Repli.Minutely.6.2.na.na.1438809960 Data/forreplic@Repli.Minutely.6.2.na.na.1438809953 Data/forreplic@Repli.Minutely.6.2.na.na.1438809933 Data/forreplic@Repli.Minutely.6.2.na.na.1438809840 Data/forreplic@Repli.Minutely.6.2.na.na.1438809720 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 flagcount=49189
+ll=Data/forreplic@Repli.Minutely.6.2.na.na.1438809980 Data/forreplic@Repli.Minutely.6.2.na.na.1438809960 Data/forreplic@Repli.Minutely.6.2.na.na.1438809953 Data/forreplic@Repli.Minutely.6.2.na.na.1438809933 Data/forreplic@Repli.Minutely.6.2.na.na.1438809840 Data/forreplic@Repli.Minutely.6.2.na.na.1438809720 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 spot
+targetsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438810080
+initialsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438809980
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.6.2.na.na.1438809980
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.6.2.na.na.1438809980
 proxy is proxy
-1032_8 1438712209 ask replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 | nc -w 4 10.176.214.6 2237
+1032_8 1438810132 ask replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.6.2.na.na.1438809980 | nc -w 4 10.176.214.6 2237
 reply is
-1032_7 1438712231 reply ready
-afterAsk=ready flagcount=57112
-zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@Repli.Minutely.6.2.na.na.1438712160 to txt/c
-/sbin/zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@Repli.Minutely.6.2.na.na.1438712160 | nc -w 10 10.176.214.6 2238
+1032_7 1438736441 reply ready
+afterAsk=ready flagcount=46133
+zfs send -DR -I Data/forreplic@Repli.Minutely.6.2.na.na.1438809980 Data/forreplic@Repli.Minutely.6.2.na.na.1438810080 to txt/c
+/sbin/zfs send -DR -I Data/forreplic@Repli.Minutely.6.2.na.na.1438809980 Data/forreplic@Repli.Minutely.6.2.na.na.1438810080 | nc -w 10 10.176.214.6 2238
 After=ready flagcount=0
 RemoteAsk GetSnaplist hi
 POR=2236 Compelete
@@ -2268,42 +260,42 @@ finishedddddddddddddddddddddddddddddddddddddddddddddddddd
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending localGetSnaplist forreplic
 proxy is proxy
-1032_8 1438712235 ask localGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
+1032_8 1438810167 ask localGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
 reply is
-1032_7 1438712255 reply ready
-afterAsk=ready flagcount=57766
+1032_7 1438736476 reply ready
+afterAsk=ready flagcount=51331
 Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438712280 Repli.Minutely.6.2.na.na.1438712280 Data forreplic 10.176.214.6 2236 1032_8 proxy
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438810320 Repli.Minutely.6.2.na.na.1438810320 Data forreplic 10.176.214.6 2236 1032_8 proxy
 RemoteAsk RemoteVolSearch forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteVolSearch forreplic
 proxy is proxy
-1032_8 1438712280 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
+1032_8 1438810320 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
 reply is
-1032_7 1438712300 reply found
-afterAsk=found flagcount=53256
+1032_7 1438736629 reply found
+afterAsk=found flagcount=59710
 volfound=found
 foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteGetSnaplist forreplic
 proxy is proxy
-1032_8 1438712304 ask RemoteGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
+1032_8 1438810344 ask RemoteGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
 reply is
-1032_7 1438712325 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395
-afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 flagcount=51993
-ll=Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 spot
-targetsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438712280
-initialsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
-RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
+1032_7 1438736654 reply Data/forreplic@Repli.Minutely.6.2.na.na.1438810080 Data/forreplic@Repli.Minutely.6.2.na.na.1438809980 Data/forreplic@Repli.Minutely.6.2.na.na.1438809960 Data/forreplic@Repli.Minutely.6.2.na.na.1438809953 Data/forreplic@Repli.Minutely.6.2.na.na.1438809933 Data/forreplic@Repli.Minutely.6.2.na.na.1438809840 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395
+afterAsk=Data/forreplic@Repli.Minutely.6.2.na.na.1438810080 Data/forreplic@Repli.Minutely.6.2.na.na.1438809980 Data/forreplic@Repli.Minutely.6.2.na.na.1438809960 Data/forreplic@Repli.Minutely.6.2.na.na.1438809953 Data/forreplic@Repli.Minutely.6.2.na.na.1438809933 Data/forreplic@Repli.Minutely.6.2.na.na.1438809840 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 flagcount=53782
+ll=Data/forreplic@Repli.Minutely.6.2.na.na.1438810080 Data/forreplic@Repli.Minutely.6.2.na.na.1438809980 Data/forreplic@Repli.Minutely.6.2.na.na.1438809960 Data/forreplic@Repli.Minutely.6.2.na.na.1438809953 Data/forreplic@Repli.Minutely.6.2.na.na.1438809933 Data/forreplic@Repli.Minutely.6.2.na.na.1438809840 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 spot
+targetsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438810320
+initialsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438810080
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.6.2.na.na.1438810080
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.6.2.na.na.1438810080
 proxy is proxy
-1032_8 1438712329 ask replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 | nc -w 4 10.176.214.6 2237
+1032_8 1438810369 ask replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.6.2.na.na.1438810080 | nc -w 4 10.176.214.6 2237
 reply is
-1032_7 1438712350 reply ready
-afterAsk=ready flagcount=47334
-zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@Repli.Minutely.6.2.na.na.1438712280 to txt/c
-/sbin/zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@Repli.Minutely.6.2.na.na.1438712280 | nc -w 10 10.176.214.6 2238
+1032_7 1438736679 reply ready
+afterAsk=ready flagcount=51890
+zfs send -DR -I Data/forreplic@Repli.Minutely.6.2.na.na.1438810080 Data/forreplic@Repli.Minutely.6.2.na.na.1438810320 to txt/c
+/sbin/zfs send -DR -I Data/forreplic@Repli.Minutely.6.2.na.na.1438810080 Data/forreplic@Repli.Minutely.6.2.na.na.1438810320 | nc -w 10 10.176.214.6 2238
 After=ready flagcount=0
 RemoteAsk GetSnaplist hi
 POR=2236 Compelete
@@ -2311,89 +303,23 @@ finishedddddddddddddddddddddddddddddddddddddddddddddddddd
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending localGetSnaplist forreplic
 proxy is proxy
-1032_8 1438712354 ask localGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
+1032_8 1438810404 ask localGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
 reply is
-1032_7 1438712374 reply ready
-afterAsk=ready flagcount=48955
+1032_7 1438736713 reply ready
+afterAsk=ready flagcount=51535
 Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438712520 Repli.Minutely.6.2.na.na.1438712520 Data forreplic 10.176.214.6 2236 1032_8 proxy
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438811173 Repli.Minutely.6.2.na.na.1438811173 Data forreplic 10.176.214.6 2236 1032_8 proxy
 RemoteAsk RemoteVolSearch forreplic
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteVolSearch forreplic
 proxy is proxy
-1032_8 1438712520 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
+1032_8 1438811174 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
 reply is
-1032_7 1438712540 reply found
-afterAsk=found flagcount=52515
+1032_7 1438737483 reply found
+afterAsk=found flagcount=51010
 volfound=found
 foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
 RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteGetSnaplist forreplic
 proxy is proxy
-1032_8 1438712544 ask RemoteGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
-reply is
-1032_7 1438712565 reply Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395
-afterAsk=Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 flagcount=49850
-ll=Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 spot
-targetsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438712520
-initialsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
-RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
-proxy is proxy
-1032_8 1438712569 ask replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 | nc -w 4 10.176.214.6 2237
-reply is
-1032_7 1438712589 reply ready
-afterAsk=ready flagcount=50658
-zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@Repli.Minutely.6.2.na.na.1438712520 to txt/c
-/sbin/zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@Repli.Minutely.6.2.na.na.1438712520 | nc -w 10 10.176.214.6 2238
-After=ready flagcount=0
-RemoteAsk GetSnaplist hi
-POR=2236 Compelete
-finishedddddddddddddddddddddddddddddddddddddddddddddddddd
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending localGetSnaplist forreplic
-proxy is proxy
-1032_8 1438712594 ask localGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
-reply is
-1032_7 1438712614 reply ready
-afterAsk=ready flagcount=50515
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438712760 Repli.Minutely.6.2.na.na.1438712760 Data forreplic 10.176.214.6 2236 1032_8 proxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-proxy is proxy
-1032_8 1438712760 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
-reply is
-1032_7 1438712780 reply found
-afterAsk=found flagcount=54256
-volfound=found
-foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteGetSnaplist forreplic
-proxy is proxy
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438715760 Repli.Minutely.6.2.na.na.1438715760 Data forreplic 10.173.232.10 2236 1032_8 proxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-proxy is proxy
-1032_8 1438715760 ask RemoteVolSearch forreplic | nc -w 4 10.173.232.10 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438715880 Repli.Minutely.6.2.na.na.1438715880 Data forreplic 10.173.232.10 2236 1032_8 proxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-proxy is proxy
-1032_8 1438715880 ask RemoteVolSearch forreplic | nc -w 4 10.173.232.10 2237
-Failed_Communication
-Replicate=
-Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438716000 Repli.Minutely.6.2.na.na.1438716000 Data forreplic 10.173.232.10 2236 1032_8 proxy
-RemoteAsk RemoteVolSearch forreplic
-RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-sending RemoteVolSearch forreplic
-proxy is proxy
-1032_8 1438716000 ask RemoteVolSearch forreplic | nc -w 4 10.173.232.10 2237
-Failed_Communication
+1032_8 1438811198 ask RemoteGetSnaplist forreplic | nc -w 4 10.176.214.6 2237

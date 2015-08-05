@@ -1,4 +1,4 @@
-#! /usr/local/bin/zsh
+#!/usr/local/bin/zsh
 web='/usr/local/www/apache24/data/des19/Data/Hostprop.txt';
 hostn=`/bin/hostname`;
 hostip=`ifconfig em1 | grep "inet " | awk '{print $2}'`;

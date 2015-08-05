@@ -1,4 +1,4 @@
-#! /usr/local/bin/zsh
+#!/usr/local/bin/zsh
 cd /TopStor/
 traf='/usr/local/www/apache24/data/des19/Data/disklist.txt';
 trafdate='/usr/local/www/apache24/data/des19/Data/disklist.txtupdated';

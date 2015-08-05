@@ -1,4 +1,4 @@
-#! /usr/local/bin/zsh
+#!/usr/local/bin/zsh
 cd /TopStor/;
 websnaps='/usr/local/www/apache24/data/des19/Data/Vollist.txt';
 quota=`/sbin/zfs get -Hp quota | grep Data/ | grep -v @ | awk -v CONVFMT=%.3g '{gsub($3,$3/1000000000); print $1" "$3}'`;

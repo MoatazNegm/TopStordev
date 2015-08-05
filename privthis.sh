@@ -1,4 +1,4 @@
-#! /usr/local/bin/zsh
+#!/usr/local/bin/zsh
 # needed the operands to be like : one:two:three:four
 userreq=` echo $@ | awk '{print $2}'`;
 modpriv=` echo $@ | awk '{print $1}'`;
