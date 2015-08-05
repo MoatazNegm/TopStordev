@@ -87,7 +87,7 @@ then
   pp=`cat workingpp | awk '{print $1}'` 
   /sbin/zfs set repli:sender=$so $newsnap; 
  ps -axuw | grep ProxyReplicate >/dev/null 2>&1
- if [[ $? -eq 0 ]];
+ if [[ $? -ne 0 ]];
  then
   echo ./ProxyReplicate $oper3 txt/${0:2}${userreq}.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so proxy >> $cronout
   ./ProxyReplicate $oper3 txt/${0:2}${userreq}.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so proxy
@@ -117,7 +117,7 @@ then
  err=`wc -c  txt/${0:2}${userreq}.txt$stamp | awk '{print $1}'`;
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
  if [[ $err -ge  4  ]]; then
-	fialed=`cat txt/${0:2}${userreq}.txt$stamp`
+	failed=`cat txt/${0:2}${userreq}.txt$stamp`
 	echo $failed  > $web;
 	logdata='Failed_Replicating'${newsnap}':'$failed;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;

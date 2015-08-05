@@ -1,4 +1,4 @@
-#! /usr/local/bin/zsh
+#!/usr/local/bin/zsh
 cd /TopStor
 #replierpp=`echo  $@ | awk '{print $1}'`;
 tun=`echo  $@ | awk '{print $2}'`;

@@ -1,4 +1,4 @@
-#! /usr/local/bin/zsh
+#!/usr/local/bin/zsh
 web="/usr/local/www/apache24/data/des19/Data/poolstatus.txt";
 pstatus=` /sbin/zpool list | grep Data `;
 isok=` echo $pstatus | wc -c | awk '{print $1}'`;

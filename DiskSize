@@ -1,4 +1,4 @@
-#! /usr/local/bin/zsh
+#!/usr/local/bin/zsh
 web="/usr/local/www/apache24/data/des19";
 loc=`echo $@ | awk '{print $1}'`;
 disks=(`/sbin/sysctl kern.disks | sed -e 's/cd0 //g' -e 's/ada0//g' -e 's/kern.disks: //g'`);

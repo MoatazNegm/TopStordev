@@ -1,4 +1,4 @@
-#! /usr/local/bin/zsh
+#!/usr/local/bin/zsh
 # needed the operands to be like : Date time info/warning/error _message info_
 str=$@;
 oper4=`echo $@ | awk -F_ '{print $2}'`;

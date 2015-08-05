@@ -1,4 +1,4 @@
-#! /usr/local/bin/zsh
+#!/usr/local/bin/zsh
 cd /TopStor
 ClearExit() {
 	echo got a signal > /TopStor/txt/sigstatusremote.txt

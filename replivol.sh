@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/usr/local/bin/zsh
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 res=`echo $@ | awk '{print $1}'`;
 localrep=`echo $@ | awk '{print $2}'`;

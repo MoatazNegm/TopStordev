@@ -1,4 +1,4 @@
-#! /usr/local/bin/zsh
+#!/usr/local/bin/zsh
 cd /TopStor
 traf='/usr/local/www/apache24/data/des19/Data/ctr.log'
 disks=`/sbin/sysctl kern.disks | awk '{$1=$2=$3=""; print}'`

@@ -1,4 +1,4 @@
-#! /usr/local/bin/zsh
+#!/usr/local/bin/zsh
 echo starting reply > tmpreply
 so=`echo  $@ | awk '{print $1}'`;
 dst=`echo  $@ | awk '{print $2}'`;

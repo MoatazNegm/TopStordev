@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/usr/local/bin/zsh
 web='/usr/local/www/apache24/data/des19/Data/'$0'status.log';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log';
 domain=`echo $@ | awk '{ print $1 }' `;

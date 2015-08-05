@@ -1,4 +1,4 @@
-#! /usr/local/bin/zsh
+#!/usr/local/bin/zsh
 cd /TopStor
 # command is newcom paramaters (at least one)
 echo $@ > tmprep2

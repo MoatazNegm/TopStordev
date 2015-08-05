@@ -1,4 +1,4 @@
-#! /usr/local/bin/zsh
+#!/usr/local/bin/zsh
 webproxy='/usr/local/www/apache24/data/des19/Data/Proxylist.txt';
 resweb='/usr/local/www/apache24/data/des19/Data/Proxylist.txtupdated'
 web='/usr/local/www/apache24/data/des19/Data/Proxystatus.log';
