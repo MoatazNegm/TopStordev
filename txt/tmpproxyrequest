@@ -323,3 +323,99 @@ RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 sending RemoteGetSnaplist forreplic
 proxy is proxy
 1032_8 1438811198 ask RemoteGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
+reply is
+1032_7 1438737508 reply Data/forreplic@Repli.Minutely.6.2.na.na.1438810320 Data/forreplic@Repli.Minutely.6.2.na.na.1438810200 Data/forreplic@Repli.Minutely.6.2.na.na.1438810080 Data/forreplic@Repli.Minutely.6.2.na.na.1438809980 Data/forreplic@Repli.Minutely.6.2.na.na.1438809960 Data/forreplic@Repli.Minutely.6.2.na.na.1438809953 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395
+afterAsk=Data/forreplic@Repli.Minutely.6.2.na.na.1438810320 Data/forreplic@Repli.Minutely.6.2.na.na.1438810200 Data/forreplic@Repli.Minutely.6.2.na.na.1438810080 Data/forreplic@Repli.Minutely.6.2.na.na.1438809980 Data/forreplic@Repli.Minutely.6.2.na.na.1438809960 Data/forreplic@Repli.Minutely.6.2.na.na.1438809953 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 flagcount=47020
+ll=Data/forreplic@Repli.Minutely.6.2.na.na.1438810320 Data/forreplic@Repli.Minutely.6.2.na.na.1438810200 Data/forreplic@Repli.Minutely.6.2.na.na.1438810080 Data/forreplic@Repli.Minutely.6.2.na.na.1438809980 Data/forreplic@Repli.Minutely.6.2.na.na.1438809960 Data/forreplic@Repli.Minutely.6.2.na.na.1438809953 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 spot
+targetsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438811173
+initialsnap=Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317
+proxy is proxy
+1032_8 1438811223 ask replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 | nc -w 4 10.176.214.6 2237
+reply is
+1032_7 1438737533 reply ready
+afterAsk=ready flagcount=49642
+zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@Repli.Minutely.6.2.na.na.1438811173 to txt/c
+/sbin/zfs send -DR -I Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@Repli.Minutely.6.2.na.na.1438811173 | nc -w 10 10.176.214.6 2238
+After=ready flagcount=0
+RemoteAsk GetSnaplist hi
+POR=2236 Compelete
+finishedddddddddddddddddddddddddddddddddddddddddddddddddd
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending localGetSnaplist forreplic
+proxy is proxy
+1032_8 1438811258 ask localGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
+reply is
+1032_7 1438737568 reply ready
+afterAsk=ready flagcount=57896
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438811400 Repli.Minutely.6.2.na.na.1438811400 Data forreplic 10.176.214.6 2236 1032_8 proxy
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+proxy is proxy
+1032_8 1438811400 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
+reply is
+1032_7 1438737709 reply found
+afterAsk=found flagcount=45507
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+proxy is proxy
+1032_8 1438811424 ask RemoteGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
+reply is
+1032_7 1438737734 reply Data/forreplic@Repli.Minutely.6.2.na.na.1438811173 Data/forreplic@Repli.Minutely.6.2.na.na.1438811160 Data/forreplic@Repli.Minutely.6.2.na.na.1438811040 Data/forreplic@Repli.Minutely.6.2.na.na.1438810920 Data/forreplic@Repli.Minutely.6.2.na.na.1438810800 Data/forreplic@Repli.Minutely.6.2.na.na.1438810680 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395
+afterAsk=Data/forreplic@Repli.Minutely.6.2.na.na.1438811173 Data/forreplic@Repli.Minutely.6.2.na.na.1438811160 Data/forreplic@Repli.Minutely.6.2.na.na.1438811040 Data/forreplic@Repli.Minutely.6.2.na.na.1438810920 Data/forreplic@Repli.Minutely.6.2.na.na.1438810800 Data/forreplic@Repli.Minutely.6.2.na.na.1438810680 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 flagcount=51339
+ll=Data/forreplic@Repli.Minutely.6.2.na.na.1438811173 Data/forreplic@Repli.Minutely.6.2.na.na.1438811160 Data/forreplic@Repli.Minutely.6.2.na.na.1438811040 Data/forreplic@Repli.Minutely.6.2.na.na.1438810920 Data/forreplic@Repli.Minutely.6.2.na.na.1438810800 Data/forreplic@Repli.Minutely.6.2.na.na.1438810680 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 spot
+targetsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438811400
+initialsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438811173
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.6.2.na.na.1438811173
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.6.2.na.na.1438811173
+proxy is proxy
+1032_8 1438811449 ask replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.6.2.na.na.1438811173 | nc -w 4 10.176.214.6 2237
+reply is
+1032_7 1438737759 reply ready
+afterAsk=ready flagcount=50107
+zfs send -DR -I Data/forreplic@Repli.Minutely.6.2.na.na.1438811173 Data/forreplic@Repli.Minutely.6.2.na.na.1438811400 to txt/c
+/sbin/zfs send -DR -I Data/forreplic@Repli.Minutely.6.2.na.na.1438811173 Data/forreplic@Repli.Minutely.6.2.na.na.1438811400 | nc -w 10 10.176.214.6 2238
+After=ready flagcount=0
+RemoteAsk GetSnaplist hi
+POR=2236 Compelete
+finishedddddddddddddddddddddddddddddddddddddddddddddddddd
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending localGetSnaplist forreplic
+proxy is proxy
+1032_8 1438811484 ask localGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
+reply is
+1032_7 1438737794 reply ready
+afterAsk=ready flagcount=50292
+Replicate=
+Roperands=1032_7 txt/RemoteSnapshotnowSystem.txt1438811520 Repli.Minutely.6.2.na.na.1438811520 Data forreplic 10.176.214.6 2236 1032_8 proxy
+RemoteAsk RemoteVolSearch forreplic
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteVolSearch forreplic
+proxy is proxy
+1032_8 1438811520 ask RemoteVolSearch forreplic | nc -w 4 10.176.214.6 2237
+reply is
+1032_7 1438737829 reply found
+afterAsk=found flagcount=50362
+volfound=found
+foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending RemoteGetSnaplist forreplic
+proxy is proxy
+1032_8 1438811544 ask RemoteGetSnaplist forreplic | nc -w 4 10.176.214.6 2237
+reply is
+1032_7 1438737854 reply Data/forreplic@Repli.Minutely.6.2.na.na.1438811400 Data/forreplic@Repli.Minutely.6.2.na.na.1438811280 Data/forreplic@Repli.Minutely.6.2.na.na.1438811173 Data/forreplic@Repli.Minutely.6.2.na.na.1438811160 Data/forreplic@Repli.Minutely.6.2.na.na.1438811040 Data/forreplic@Repli.Minutely.6.2.na.na.1438810920 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395
+afterAsk=Data/forreplic@Repli.Minutely.6.2.na.na.1438811400 Data/forreplic@Repli.Minutely.6.2.na.na.1438811280 Data/forreplic@Repli.Minutely.6.2.na.na.1438811173 Data/forreplic@Repli.Minutely.6.2.na.na.1438811160 Data/forreplic@Repli.Minutely.6.2.na.na.1438811040 Data/forreplic@Repli.Minutely.6.2.na.na.1438810920 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 flagcount=50264
+ll=Data/forreplic@Repli.Minutely.6.2.na.na.1438811400 Data/forreplic@Repli.Minutely.6.2.na.na.1438811280 Data/forreplic@Repli.Minutely.6.2.na.na.1438811173 Data/forreplic@Repli.Minutely.6.2.na.na.1438811160 Data/forreplic@Repli.Minutely.6.2.na.na.1438811040 Data/forreplic@Repli.Minutely.6.2.na.na.1438810920 Data/forreplic@Repli.Minutely.3.2.na.na.1438464317 Data/forreplic@mezo..1438458864 Data/forreplic@mezo..1438458789 Data/forreplic@Repli.Minutely.3.2.na.na.1438458266 Data/forreplic@Repli.Minutely.3.2.na.na.1438457395 spot
+targetsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438811520
+initialsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438811400
+RemoteAsk replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.6.2.na.na.1438811400
+RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+sending replivol 2238 10.176.214.6 1032_8 Data forreplic Data/forreplic@Repli.Minutely.6.2.na.na.1438811400
+proxy is proxy
