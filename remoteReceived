@@ -1,4 +1,4 @@
-#! /usr/local/bin/zsh
+#!/usr/local/bin/zsh
 cd /TopStor
 line=`cat tmplineremote`;
 so=`echo $line | awk '{print $1}'`
@@ -10,9 +10,11 @@ pp=`echo $line | awk '{print $7}'`
 passphrase=`echo $line | awk '{print $8}'`
 islicense=`cat licenses | grep  -w "$license" | wc -c`
 revbothsd=${dst}"__"$so;
+echo $@ > tmpReceived
 if [[ $islicense -le 1 ]]; then; exit; fi;
 if [[ $request == "ProxyUpdate" ]]; then; ./remoteData $bothsd $revbothsd $pp; exit; fi;
 ./remoteData $bothsd $revbothsd $pp
+echo remoteData $bothsd $revbothsd $pp >> tmprcv
 vpnpls=0;
 pvpnpls=0;
 isconnection1=`cat txt/clientconnections | grep "$bothsd": `
@@ -42,7 +44,7 @@ then
  oldpp=`echo $isconn | awk '{print $4}'`;
  ps -p $oldpid > /dev/null 2>&1
  psn=$?;
- if [[ $psn -eq 0 && $oldpp != $pp ]]; then kill -TERM $oldpid; fi
+ if [[ $psn -eq 0 && $oldpp != $pp ]]; then kill -TERM $oldpid >/dev/null; fi
  if [[ $psn -ne 0 ||  $oldpp != $pp ]]; 
  then 
   sed -e "s/$oldpp/$pp/g" txt/${bothsd}_openvpn.conf > txt/tmp_${bothsd}_openvpn.conf
@@ -77,12 +79,12 @@ then
  if [[ $vpnpls == 1 ]];
  then  
   kill -KILL `ps -axw | grep -w "$so" | grep openvpn` 2>/dev/null;
-  /usr/local/sbin/openvpn --daemon $so --cd /TopStor/txt --config ${bothsd}_openvpn.conf --script-security 2 --client-connect "/TopStor/remoteClientconnected $license $bothsd $revbothsd"; 
+  /usr/local/sbin/openvpn --daemon $so --cd /TopStor/txt --config ${bothsd}_openvpn.conf --script-security 2 --client-connect "/TopStor/remoteClientconnected $license $bothsd $revbothsd" 2>/dev/null; 
  echo  /usr/local/sbin/openvpn --daemon $so --cd /TopStor/txt --config ${bothsd}_openvpn.conf --script-security 2 --client-connect "/TopStor/remoteClientconnected $license $bothsd $revbothsd" >> tmprr; 
  fi
  if [[ $pvpnpls == 1 ]];
  then  
   kill -KILL `ps -axw | grep -w "$dst" | grep openvpn` 2>/dev/null;
-  /usr/local/sbin/openvpn --daemon $dst --cd /TopStor/txt --config ${revbothsd}_openvpn.conf --script-security 2 --client-connect "/TopStor/remoteClientconnected $license $revbothsd $bothsd"; 
+  /usr/local/sbin/openvpn --daemon $dst --cd /TopStor/txt --config ${revbothsd}_openvpn.conf --script-security 2 --client-connect "/TopStor/remoteClientconnected $license $revbothsd $bothsd" 2>/dev/null; 
  fi 
 fi
