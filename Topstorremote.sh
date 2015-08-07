@@ -9,7 +9,7 @@ trap ClearExit HUP
 /sbin/sysctl net.inet.tcp.msl=2500 >/dev/null
 while true; do
 {
-nc -ld 2234 | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD > /tmp/msgremotefile & 
+(nc -ld 2234 | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD > /tmp/msgremotefile ) 2>/dev/null & 
 read line < /tmp/msgremotefile;
 echo $line > /TopStor/tmplineremote;
  remoteinit=` echo $line | grep Proxy | wc -c `;
