@@ -2,7 +2,7 @@
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 res=`echo $@ | awk '{print $1}'`;
 localrep=`echo $@ | awk '{print $2}'`;
-#pp=`echo $@ | awk '{print $2}'`;
+#pp=`echo $localrep | awk '{print $2}'`;
 if [[ $localrep == "proxy" ]];
 then
  pp=`cat workingpp | awk '{print $1}'`;
@@ -13,10 +13,11 @@ pp=$((pp+2));
 tun=`echo $@ | awk '{print $4 }'`;
 partner=`echo $@ | awk '{print $5 }'`;
 pool='Data';
+echo $localrep >> tmp2repli
 if [[ $localrep == "proxy" ]];
 then
  echo /usr/bin/nc -ld $tun $pp \|  zfs receive -dF  $pool > tmprepli;
- /usr/bin/nc -ld $tun $pp |  zfs receive -dF  $pool &;
+ /usr/bin/nc -ld $tun $pp |  zfs receive -dF  $pool 2>>tmprepli &;
 else
  nc -ld $tun $pp | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD |zfs receive -dF  $pool 2>tmprepli &;
  echo nc -ld $tun $pp \| gunzip \| openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD \|zfs receive -dF  $pool >>tmprepli;

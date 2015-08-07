@@ -1,19 +1,23 @@
 oper=Data/forreplic Minutely.6.2.na.na 1032_7
 oper1=Data/forreplic
 oper2=Minutely.6.2.na.na
-stamp=1438811520
+stamp=1438968360
 keep=6
-currentsnaps=Data/forreplic@Repli.Minutely.6.2.na.na.1438810920
-Data/forreplic@Repli.Minutely.6.2.na.na.1438811040
-Data/forreplic@Repli.Minutely.6.2.na.na.1438811160
-Data/forreplic@Repli.Minutely.6.2.na.na.1438811173
-Data/forreplic@Repli.Minutely.6.2.na.na.1438811280
-Data/forreplic@Repli.Minutely.6.2.na.na.1438811400
-oldsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438810920
+currentsnaps=Data/forreplic@Repli.Minutely.6.2.na.na.1438956600
+Data/forreplic@Repli.Minutely.6.2.na.na.1438956840
+Data/forreplic@Repli.Minutely.6.2.na.na.1438956960
+Data/forreplic@Repli.Minutely.6.2.na.na.1438957080
+Data/forreplic@Repli.Minutely.6.2.na.na.1438968000
+Data/forreplic@Repli.Minutely.6.2.na.na.1438968240
+oldsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438956600
 countsnap=       6
 countsnapplus=7
 keeppluszero=6
-{"Date":"08/06/2015","time":"00:52:00","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/forreplic@Repli.Minutely.6.2.na.na.1438810920"}
-newsnap2=Repli.Minutely.6.2.na.na.1438811520
-newsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438811520
-./ProxyReplicate 1032_7 txt/RemoteSnapshotnowSystem.txt1438811520 Repli.Minutely.6.2.na.na.1438811520 Data forreplic 10.176.214.6 2236 1032_8 proxy
+{"Date":"08/07/2015","time":"20:26:00","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/forreplic@Repli.Minutely.6.2.na.na.1438956600"}
+newsnap2=Repli.Minutely.6.2.na.na.1438968360
+newsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438968360
+./ProxyReplicate 1032_7 txt/RemoteSnapshotnowSystem.txt1438968360 Repli.Minutely.6.2.na.na.1438968360 Data forreplic 10.235.246.6 2236 1032_8 proxy
+snapshotresult :
+Failed_Communication
+filenameis=txt/RemoteSnapshotnowSystem.txt1438968360
+{"Date":"08/07/2015","time":"20:26:44","msg":"error","user":"System","data":"Failed_ReplicatingData/forreplic@Repli.Minutely.6.2.na.na.1438968360:Failed_Communication"}

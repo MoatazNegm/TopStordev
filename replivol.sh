@@ -2,11 +2,14 @@
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 res=`echo $@ | awk '{print $1}'`;
 localrep=`echo $@ | awk '{print $2}'`;
-if [[ $localrep == "proxy" ]];
+echo $@ > tmp2repli
+if [[ $localrep == 'proxy' ]];
 then
  pp=`cat workingpp | awk '{print $1}'`;
+ echo local=${localrep}hi >> tmp2repli;
 else
  pp=`cat workingpplocal | awk '{print $1}'`;
+ echo itislocal=${localrep}hi >> tmp2repli;
 fi
 #pp=`echo $@ | awk '{print $2}'`;
 pp=$((pp+2));
@@ -15,11 +18,12 @@ partner=`echo $@ | awk '{print $5 }'`;
 pool=`echo $@ | awk '{print $6 }'`;
 vol=`echo $@ | awk '{print $7 }'`;
 initsnap=`echo $@ | awk '{print $8 }'`;
+echo oper=$@ >> tmp2repli
 zfs rollback -Rf $initsnap 2>/dev/null;
-if [[ $localrep == "proxy" ]];
+if [[ $localrep == 'proxy' ]];
 then
  echo /usr/bin/nc -ld $tun $pp \|  zfs receive -dF  $pool > tmprepli
- /usr/bin/nc -ld $tun $pp |  zfs receive -dF  $pool &
+ /usr/bin/nc -ld $tun $pp |  zfs receive -dF  $pool 2>>tmprepli&
 else
  nc -ld $tun $pp | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD |zfs receive -dF  $pool 2>tmprepli &
  echo nc -ld $tun $pp \| gunzip \| openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD \|zfs receive -dF  $pool >>tmprepli
