@@ -5,6 +5,7 @@ stamp=`date +%s`;
 proxycurrent=`cat proxy.txt | awk '{print $1}'`;
 proxyname=`cat proxy.txt | awk '{print $3}'`;
 isproxy="";
+pingrouter=0
 while true;
 do
  proxyser=`cat proxy.txt | awk '{print $1}'`;
@@ -15,22 +16,14 @@ do
   isproxy=`echo $PartnerDel | awk '{print $3}'`;
   echo to kill again >> tmptokill
  fi
- if [[ $proxycurrent != $proxyser || $newproxy != $proxyname || -a txt/PartnerDel ]];
+ if [[ $proxycurrent != $proxyser || $newproxy != $proxyname || -a txt/PartnerDel || -a txt/proxyreinit ]];
  then
   openvpnflag=0;
   rm txt/PartnerDel 2>/dev/null 
+  rm txt/proxyreinit 2>/dev/null 
   proxycurrent=$proxyser;
-  proxyname=$newporxy;
-  killall openvpn 2>/dev/null;
-  kill -KILL `ps -axw | grep ProxyncSVC | awk '{print $1}'` 2>/dev/null;
-  kill -KILL `ps -axw | grep Askrcv | awk '{print $1}'` 2>/dev/null;
-  kill -KILL `ps -axw | grep nc | grep 3336 | awk '{print $1}'` 2>/dev/null;
-  kill -KILL `ps -axw | grep nc | grep 3337 | awk '{print $1}'` 2>/dev/null;
-  kill -KILL `ps -axw | grep nc | grep 2236 | awk '{print $1}'` 2>/dev/null;
-  kill -KILL `ps -axw | grep nc | grep 2237 | awk '{print $1}'` 2>/dev/null;
-  kill -KILL `ps -axw | grep zfs | grep send | awk '{print $1}'` 2>/dev/null;
-  kill -KILL `ps -axw | grep zfs | grep receive | awk '{print $1}'` 2>/dev/null;
-  kill -KILL `ps -axw | grep nc | grep 2238 | awk '{print $1}'` 2>/dev/null;
+  proxyname=$newproxy;
+  ./pump.sh clearSVC all new;
  fi
  while read line;
  do
@@ -76,33 +69,25 @@ do
      ./ProxyncSVC $pp $tun peer &;
     fi
     router=`echo $tun | awk -F. '{print $1"."$2"."$3".1"}'`
-    /sbin/ping -c 3 $router >/dev/null 2>&1
+    /sbin/ping -c 10 $router >/dev/null 2>&1
     if [[ $? -ne 0 ]];
     then
-     openvpnflag=0;
-     killall openvpn;
-     kill -KILL `ps -axw | grep ProxyncSVC | awk '{print $1}'` 2>/dev/null;
-     kill -KILL `ps -axw | grep Askrcv | awk '{print $1}'` 2>/dev/null;
-     kill -KILL `ps -axw | grep nc | grep 3336 | awk '{print $1}'` 2>/dev/null;
-     kill -KILL `ps -axw | grep nc | grep 3337 | awk '{print $1}'` 2>/dev/null;
-     kill -KILL `ps -axw | grep nc | grep 2236 | awk '{print $1}'` 2>/dev/null;
-     kill -KILL `ps -axw | grep nc | grep 2237 | awk '{print $1}'` 2>/dev/null;
-     kill -KILL `ps -axw | grep zfs | grep send | awk '{print $1}'` 2>/dev/null;
-     kill -KILL `ps -axw | grep zfs | grep receive | awk '{print $1}'` 2>/dev/null;
-     kill -KILL `ps -axw | grep nc | grep 2238 | awk '{print $1}'` 2>/dev/null;
+     if [[ pingrouter -eq 1 ]]; then echo routerproblem >tmpProxySVC; ./pump.sh clearSVC all no ping router; fi
+    else
+     pingrouter=1;
     fi
    fi
   fi
   if [[ $localrep == "proxy" ]];
   then
-   if [[ openvpnflag -eq 0 ]];
+   if [[ $openvpnflag -eq 0 ]];
    then 
-    openvpnflag=1;
+    echo $so $stamp $dst $license ProxyInit $so $pp $passphrase $dst  \| openssl enc -a -A -aes-256-cbc -k SuperSecretPWD \| gzip -cf \| nc -w 4 -N $proxyser 2234 > tmpproxyinit
     echo $so $stamp $dst $license ProxyInit $so $pp $passphrase $dst  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 -N $proxyser 2234 2>/dev/null
    fi 
    ispid=`ps -axw | grep openvpn | grep "$dst"`
    ispidn=`echo $ispid | wc -c `
-   if [[ -a txt/$pp && $ispidn -ge 5 ]]; then kill -KILL `echo $ispid | awk '{ print $1}'`; fi
+#   if [[ -a txt/$pp && $ispidn -ge 5 ]]; then kill -KILL `echo $ispid | awk '{ print $1}'`; fi
    if [[ -a txt/$pp || $ispidn -le 3 ]];
    then
     rm txt/$pp 2>/dev/null;  
@@ -110,6 +95,7 @@ do
     port=$pp;
     sed -e "s/PROXY/$proxy/g" -e "s/PORT/$port/g" openvpn.conf > txt/${so}_${dst}_openvpn.conf;
     /usr/local/sbin/openvpn --daemon $dst --cd /TopStor/txt --config ${so}_${dst}_openvpn.conf; 
+    sleep 10;
    fi
   fi
   if [[ $istunn -ge 5 ]];

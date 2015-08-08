@@ -1,23 +1,15 @@
-oper=Data/forreplic Minutely.6.2.na.na 1032_7
+oper=Data/forreplic Minutely.2.2.na.na 1032_7
 oper1=Data/forreplic
-oper2=Minutely.6.2.na.na
-stamp=1438968360
-keep=6
-currentsnaps=Data/forreplic@Repli.Minutely.6.2.na.na.1438956600
-Data/forreplic@Repli.Minutely.6.2.na.na.1438956840
-Data/forreplic@Repli.Minutely.6.2.na.na.1438956960
-Data/forreplic@Repli.Minutely.6.2.na.na.1438957080
-Data/forreplic@Repli.Minutely.6.2.na.na.1438968000
-Data/forreplic@Repli.Minutely.6.2.na.na.1438968240
-oldsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438956600
-countsnap=       6
-countsnapplus=7
-keeppluszero=6
-{"Date":"08/07/2015","time":"20:26:00","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/forreplic@Repli.Minutely.6.2.na.na.1438956600"}
-newsnap2=Repli.Minutely.6.2.na.na.1438968360
-newsnap=Data/forreplic@Repli.Minutely.6.2.na.na.1438968360
-./ProxyReplicate 1032_7 txt/RemoteSnapshotnowSystem.txt1438968360 Repli.Minutely.6.2.na.na.1438968360 Data forreplic 10.235.246.6 2236 1032_8 proxy
-snapshotresult :
-Failed_Communication
-filenameis=txt/RemoteSnapshotnowSystem.txt1438968360
-{"Date":"08/07/2015","time":"20:26:44","msg":"error","user":"System","data":"Failed_ReplicatingData/forreplic@Repli.Minutely.6.2.na.na.1438968360:Failed_Communication"}
+oper2=Minutely.2.2.na.na
+stamp=1438992360
+keep=2
+currentsnaps=Data/forreplic@Repli.Minutely.2.2.na.na.1438992184
+Data/forreplic@Repli.Minutely.2.2.na.na.1438992240
+oldsnap=Data/forreplic@Repli.Minutely.2.2.na.na.1438992184
+countsnap=       2
+countsnapplus=3
+keeppluszero=2
+{"Date":"08/08/2015","time":"03:06:00","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/forreplic@Repli.Minutely.2.2.na.na.1438992184"}
+newsnap2=Repli.Minutely.2.2.na.na.1438992360
+newsnap=Data/forreplic@Repli.Minutely.2.2.na.na.1438992360
+./ProxyReplicate 1032_7 txt/RemoteSnapshotnowSystem.txt1438992360 Repli.Minutely.2.2.na.na.1438992360 Data forreplic 10.176.214.6 2236 1032_8 proxy

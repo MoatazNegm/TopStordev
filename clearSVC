@@ -1,0 +1,16 @@
+#!/usr/local/bin/zsh
+cd /TopStor
+  
+  kill -KILL `ps -axw | grep ProxySVC | awk '{print $1}'` 2>/dev/null;
+  killall openvpn 2>/dev/null;
+  kill -KILL `ps -axw | grep ProxyncSVC | grep peer | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep Askrcv | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep nc | grep 3336 | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep nc | grep 3337 | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep nc | grep 2236 | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep nc | grep 2237 | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep zfs | grep send | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep zfs | grep receive | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep nc | grep 2238 | awk '{print $1}'` 2>/dev/null;
+  ./ProxySVC.sh &
+
