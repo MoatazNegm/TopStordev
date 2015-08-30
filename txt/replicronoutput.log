@@ -1,21 +1,21 @@
 oper=Data/forreplic Minutely.5.2.na.na 10.3.2.7
 oper1=Data/forreplic
 oper2=Minutely.5.2.na.na
-stamp=1440855840
+stamp=1440939240
 keep=5
-currentsnaps=Data/forreplic@Repli.Minutely.5.2.na.na.1440855240
-Data/forreplic@Repli.Minutely.5.2.na.na.1440855360
-Data/forreplic@Repli.Minutely.5.2.na.na.1440855480
-Data/forreplic@Repli.Minutely.5.2.na.na.1440855600
-Data/forreplic@Repli.Minutely.5.2.na.na.1440855720
-oldsnap=Data/forreplic@Repli.Minutely.5.2.na.na.1440855240
+currentsnaps=Data/forreplic@Repli.Minutely.5.2.na.na.1440938640
+Data/forreplic@Repli.Minutely.5.2.na.na.1440938760
+Data/forreplic@Repli.Minutely.5.2.na.na.1440938880
+Data/forreplic@Repli.Minutely.5.2.na.na.1440939000
+Data/forreplic@Repli.Minutely.5.2.na.na.1440939120
+oldsnap=Data/forreplic@Repli.Minutely.5.2.na.na.1440938640
 countsnap=       5
 countsnapplus=6
 keeppluszero=5
-{"Date":"08/29/2015","time":"16:44:00","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/forreplic@Repli.Minutely.5.2.na.na.1440855240"}
-newsnap2=Repli.Minutely.5.2.na.na.1440855840
-newsnap=Data/forreplic@Repli.Minutely.5.2.na.na.1440855840
-./ProxyReplicate 10.3.2.7 txt/RemoteSnapshotnowSystem.txt1440855840 Repli.Minutely.5.2.na.na.1440855840 Data forreplic 10.3.2.7 3336 10.3.2.8 local
+{"Date":"08/30/2015","time":"15:54:00","msg":"info","user":"System","data":"Success_Deleting_Snapshot:Data/forreplic@Repli.Minutely.5.2.na.na.1440938640"}
+newsnap2=Repli.Minutely.5.2.na.na.1440939240
+newsnap=Data/forreplic@Repli.Minutely.5.2.na.na.1440939240
+./ProxyReplicate 10.3.2.7 txt/RemoteSnapshotnowSystem.txt1440939240 Repli.Minutely.5.2.na.na.1440939240 Data forreplic 10.3.2.7 3336 10.3.2.8 local
 snapshotresult :
-filenameis=txt/RemoteSnapshotnowSystem.txt1440855840
-{"Date":"08/29/2015","time":"16:44:17","msg":"info","user":"System","data":"Success_Replicating_Snapshot:Data/forreplic@Repli.Minutely.5.2.na.na.1440855840"}
+filenameis=txt/RemoteSnapshotnowSystem.txt1440939240
+{"Date":"08/30/2015","time":"15:54:22","msg":"info","user":"System","data":"Success_Replicating_Snapshot:Data/forreplic@Repli.Minutely.5.2.na.na.1440939240"}

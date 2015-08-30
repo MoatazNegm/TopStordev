@@ -1,8 +1,7 @@
 #!/usr/local/bin/zsh
-device=` echo $@ | awk '{print $1}'`;
-date=` echo $@ | awk '{print $2}'`;
-traf=` echo $@ | awk '{print $3}'`;
-search1=`./searchdevice.sh $device $traf`
+device=$1
+date=$2
+search1=`./searchdevice.sh $device`
 search1=`echo $search1 | awk 'NR==2{printf"%s",$1}'`
 dates=`echo $search1 | /usr/local/bin/jq -c '.[]'| awk 'NR==2{printf"%s",$1}'| /usr/local/bin/jq -c '.[]|.[]|.[]|.Date'| sed 's:"::' | sed 's:"::'`
 json=`echo $search1 | /usr/local/bin/jq -c '.[]'| awk 'NR==2{printf"%s",$1}'| /usr/local/bin/jq -c '.[]|.[]|.[]'`
@@ -20,15 +19,15 @@ echo $json1 |grep $date | grep "times" > /dev/null 2>&1
 search=`echo $search`
 pre=`echo $json1 | grep -B99999999 $date| grep -v $date | tr "\n" "," | sed 's:\[,:\[:'` 
 post=`echo $json1 | grep -A99999999 $date| grep -v $date| tr "\n" ","|sed 's:^:,:'|sed 's:,]}]},$:]}]}:'`
-#echo $pre
-#echo $search
-#echo $post
+echo $pre
+echo $search
+echo $post
 else
 json=`echo $json`
 pre=`echo "{\"name\":\"$device\",\"stats\":[{\"Dates\":[\n"$json"\n"|tr "\n" ","| sed 's:\[,:\[:' | sed 's:\]},,:]},:'| sed 's:\[,,:[:' `
 search=`echo "{\"Date\":\"$date\",\"times\":[]}"`
 post=`echo "]}]}"`
-#echo $pre
-#echo $search
-#echo $post
+echo $pre
+echo $search
+echo $post
 fi

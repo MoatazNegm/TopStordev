@@ -1,0 +1,80 @@
+#!/usr/local/bin/zsh
+export PRE; export POST; export SEARCHY;
+
+function searchdevice() {
+ device=$1
+ logs=$2
+ devices=`cat $logs | jq '.[]|.[] | .name'| sed 's:"::' | sed 's:"::'`
+ json=`cat $logs | jq  -c '.[]'`
+ json1=`echo $json | jq -c '.[]'`
+ json2=`echo "{\"device\":[\n"$json1"\n]}"`
+ echo $devices | grep $device  > /dev/null 2>&1
+ if [ $? -ne 1 ]
+ then
+  search=`echo $json2 | grep $device`
+  pre=`echo $json2 | grep -B99999999 $device| grep -v $device | tr "\n" "," | sed 's:\[,:\[:'`
+  post=`echo $json2 | grep -A99999999 $device| grep -v $device| tr "\n" ","|sed 's:^:,:'|sed 's:,]},$:]}:'`
+ else
+  json2=`echo "{\"device\":[\n"$json1"\n"`
+  pre=`echo $json2 |tr "\n" "," | sed 's:\[,:\[:'`
+  search=`echo "{\"name\":\"$device\",\"stats\":[]}"`
+  post=`echo "]}"`
+ fi
+ PRE=$pre; POST=$post; SEARCHY=$search
+}
+
+function searchdate() {
+ device=$1
+ date=$2
+ traf=$3
+ searchdevice $device $traf
+ search1=$SEARCHY; 
+ dates=`echo $search1 | jq -c '.[]'| awk 'NR==2{printf"%s",$1}'|jq -c '.[]|.[]|.[]|.Date'| sed 's:"::' | sed 's:"::'`
+ json=`echo $search1 | jq -c '.[]'| awk 'NR==2{printf"%s",$1}'|jq -c '.[]|.[]|.[]'`
+ echo $dates | grep $date > /dev/null 2>&1
+ if [ $? -ne 1 ]
+ then
+  json1=`echo "{\"name\":\"$device\",\"stats\":[{\"Dates\":[\n"$json"\n]}]}"`
+  echo $json1 |grep $date | grep "times" > /dev/null 2>&1
+  if [ $? -ne 1 ]
+  then
+   search=`echo $json1 | grep $date`
+  else
+   search=`echo  "{\"Date\":\"$date\",\"times\":[]}"`
+  fi
+  pre=`echo $json1 | grep -B99999999 $date| grep -v $date | tr "\n" "," | sed 's:\[,:\[:'`
+  post=`echo $json1 | grep -A99999999 $date| grep -v $date| tr "\n" ","|sed 's:^:,:'|sed 's:,]}]},$:]}]}:'`
+ else
+  json=`echo $json`
+  pre=`echo "{\"name\":\"$device\",\"stats\":[{\"Dates\":[\n"$json"\n"|tr "\n" ","| sed 's:\[,:\[:' | sed 's:\]},,:]},:'| sed 's:\[,,:[:' `
+  search=`echo "{\"Date\":\"$date\",\"times\":[]}"`
+  post=`echo "]}]}"`
+ fi
+ PRE=$pre; POST=$post; SEARCHY=$search
+}
+
+device=` echo $@ | awk '{print $1}'`;
+date=` echo $@ | awk '{print $2}'`;
+traf=` echo $@ | awk '{print $3}'`;
+oper=` echo $@ | awk '{$1=$2=$3="";print substr($0,4)}'`;
+searchdate $device $date $traf;
+search=$SEARCHY; pre=$PRE; post=$POST
+search1=`echo $search | jq -c '.[]' |awk 'NR==2{printf"%s",$1}'|jq -c '.[]'`
+searchdevice $device $traf
+pre=$PRE; post=$POST
+echo $search1 | grep time > /dev/null 2>&1
+if [ $? -ne 1 ]
+then
+ search=`echo $search | sed "s/]}/,$oper]}/"`
+ afteradd=`echo -n $pre ; echo -n $search ; echo $post;`
+ search=`echo $afteradd`
+ end=`echo -n $pre ; echo -n $search ; echo $post;`
+ echo $end  
+else
+ search=`echo $search | sed "s/]}/$oper]}/"`
+ afteradd=`echo -n $pre ; echo -n $search ; echo $post;`
+ search=`echo $afteradd`
+ end=`echo -n $pre ; echo -n $search ; echo $post;`
+ echo $end 
+fi  
+

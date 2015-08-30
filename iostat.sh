@@ -11,16 +11,16 @@
 #- IOSTAT  is  used  to report about disk I/O activity and throughput.	 -#
 #--------------------------BEGIN PROGRAM----------------------------------#
 
-which iostat > /dev/null 2>&1
+#which iostat > /dev/null 2>&1
 if [ $? -ne 0 ]
 then
-#  echo "iostat command not found!"
+  echo "iostat command not found!"
   exit 0
 fi
 
 if [ $# -lt 1 ]
 then
-#  echo "diskname argument not specified!"
+  echo "diskname argument not specified!"
   exit
 fi
 os=`uname`
@@ -35,10 +35,10 @@ awk -F" " '
 		cmd2="date +%H:%M:%S"
 		}
 		{ cmd1|getline date; cmd2|getline time;\
-		printf("%-8s|%s|%s|%-8.3f|%-8.3f|%-8.3f|%-8.3f|%-8d",$1,date,time,$9,$2,$3,$7,$6)
+		printf(" %-8s| %s | %s | %-8.3f| %-8.3f| %-8.3f| %-8.3f| %-8d|\n",$1,date,time,$9,$2,$3,$7,$6)
 		close(cmd1)
 		close(cmd2)
 
-	     }' 
+	     }'
 
 
