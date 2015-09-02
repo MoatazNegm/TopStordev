@@ -35,8 +35,9 @@ else
 echo \# start${name}_only >> /etc/exports
 echo /$DG/$name >> /etc/exports
 echo  \# stop${name}_only >> /etc/exports
-service mountd restart > txt/${0:2}$userreq.txt 
-service nfsd restart >> txt/${0:2}$userreq.txt
+service mountd restart > /dev/null 2>txt/${0:2}$userreq.txt 
+service nfsd restart > /dev/null 2>>txt/${0:2}$userreq.txt
+cat txt/${0:2}$userreq.txt | grep -v such > txt/${0:2}$userreq.txt
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 err=`wc -c  txt/${0:2}$userreq.txt | awk '{print $1}'`;
 if [[ $err -ge  4  ]]; then
