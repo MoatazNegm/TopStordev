@@ -1,2 +1,0 @@
-10.3.2.7 receiver false admin
-1032_7 receiver true Mezo2 15146
