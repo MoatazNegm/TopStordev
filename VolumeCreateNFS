@@ -32,6 +32,7 @@ then
 else
 /sbin/zfs create -o quota=$quota -o dedup=on -o compression=lz4  $DG/$name 2> txt/${0:2}$userreq.txt 
 /sbin/zfs set prot:kind=NFS $DG/$name
+chmod 777 /$DG/$name
 echo \# start${name}_only >> /etc/exports
 echo /$DG/$name >> /etc/exports
 echo  \# stop${name}_only >> /etc/exports

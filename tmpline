@@ -1,1 +1,1 @@
-GetDisklist Data/disklist.txt
+VolumeCreateNFS Data mezotest2 3G admin
