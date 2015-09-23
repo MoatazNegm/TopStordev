@@ -23,7 +23,7 @@ do
   rm txt/proxyreinit 2>/dev/null 
   proxycurrent=$proxyser;
   proxyname=$newproxy;
-  ./pump.sh clearSVC all new $newproxy  $proxyser;
+  ./pump.sh clearSVC all new ;
  fi
  while read line;
  do

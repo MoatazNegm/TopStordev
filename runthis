@@ -2,6 +2,12 @@
 cd /TopStor
 # command is newcom paramaters (at least one)
 echo $@ > tmprep2
+function RemoteVolSearch() {
+ vol=`echo $@ | awk '{print $2}'`;
+ count=`/sbin/zfs list | grep -w "$vol" | wc -l`;
+ count=$((count+0));
+ if [[ $count == 1 ]]; then echo found ; else echo no; fi;
+}
 sendertun=`echo  $@ | awk '{print $1}'`;
 sender=`echo  $@ | awk '{print $2}'`;
 replier=`echo  $@ | awk '{print $3}'`;
