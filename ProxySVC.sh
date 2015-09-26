@@ -36,9 +36,9 @@ do
      /sbin/ping -c 10 $proxyser >/dev/null 2>&1
      if [[ $? -ne 0 ]];
      then
-      proxyrun=0; sleep 5;
+      proxyrun=1; sleep 5;
      else
-      proxyrun=1; 
+      proxyrun=0; 
      fi
    fi
    dst=`echo $line | awk '{print $1}'`;
@@ -91,6 +91,7 @@ do
      fi
     fi
    fi
+   echo localrep=$localrep proxyrun=$proxyrun openvpnflag=$openvpnflag > tmpproxy
    if [[ $localrep == "proxy" && $proxyrun -ne 1 ]];
    then
     if [[ $openvpnflag -eq 0 ]];
