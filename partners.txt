@@ -1,1 +1,1 @@
-TopStor2 receiver true Mezo2 15887
+10.3.2.8 sender false admin

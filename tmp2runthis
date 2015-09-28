@@ -1,0 +1,6 @@
+isvalidcome=RemoteVolSearch txt/runthis1443469196localforrepli local forreplic
+Askreply 10.3.2.7 10.3.2.8 3337 local reply no
+isvalidcome=replidf txt/runthis1443469201localforrepli local 3338 10.3.2.7 10.3.2.8
+Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
+isvalidcome=localGetSnaplist txt/runthis1443469210localforrepli local forreplic
+Askreply 10.3.2.7 10.3.2.8 3337 local reply ready

@@ -2117,3 +2117,4 @@ Cancelled as there is another replication is running
 filenameis=txt/RemoteSnapshotnowSystem.txt1440956787
 {"Date":"08/30/2015","time":"20:47:03","msg":"info","user":"System","data":"Success_Replicating_Snapshot:Data/forreplic@Repli.Minutely.5.2.na.na.1440956785"}
 {"Date":"08/30/2015","time":"20:47:04","msg":"error","user":"System","data":"Failed_ReplicatingData/forreplic@Repli.Minutely.5.2.na.na.1440956787:"}
+./ProxyReplicate null txt/RemoteSnapshotnowOnce.txt1443469807 dsfsd..1443469807 Data clonedimg null 3336 10.3.2.7 local
