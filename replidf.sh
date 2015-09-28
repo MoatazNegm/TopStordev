@@ -26,6 +26,7 @@ fi
 prot=`zfs get -H prot:kind $vol/$pool | awk '{print $3}'`
 if [[ $prot == "CIFS" ]]; then ./RepliCIFS $vol;fi
 if [[ $prot == "NFS" ]];  then ./RepliNFS $vol;fi
+./GetPoolVollist;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Receiving_new_snapshot_for:'$vol'_from:'$partner;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $partner data $logdata`;
