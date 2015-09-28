@@ -1,0 +1,15 @@
+#!/usr/local/bin/zsh
+web='/usr/local/www/apache24/data/des19/Data/NFSstatus.log';
+logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
+cd /TopStor
+name=`echo $@ | awk '{print $1}'`;
+DG="Data";
+g=`cat /etc/exports | grep ${name}_only | wc -c`; if [[ g -le 4 ]];
+then
+ chmod 777 /$DG/$name
+ echo \# start${name}_only >> /etc/exports
+ echo /$DG/$name >> /etc/exports
+ echo  \# stop${name}_only >> /etc/exports
+ service mountd restart > /dev/null 2> /dev/null; 
+ service nfsd restart > /dev/null 2> /dev/null;
+fi

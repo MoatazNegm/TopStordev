@@ -2117,6 +2117,12 @@ Cancelled as there is another replication is running
 filenameis=txt/RemoteSnapshotnowSystem.txt1440956787
 {"Date":"08/30/2015","time":"20:47:03","msg":"info","user":"System","data":"Success_Replicating_Snapshot:Data/forreplic@Repli.Minutely.5.2.na.na.1440956785"}
 {"Date":"08/30/2015","time":"20:47:04","msg":"error","user":"System","data":"Failed_ReplicatingData/forreplic@Repli.Minutely.5.2.na.na.1440956787:"}
+<<<<<<< HEAD
 ./ProxyReplicate 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1443466683 start1..1443466683 Data forreplic 10.3.2.7 3336 10.3.2.8 local
 ./ProxyReplicate 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1443468657 start1..1443468657 Data Topimg 10.3.2.7 3336 10.3.2.8 local
 ./ProxyReplicate 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1443469196 start1..1443469196 Data forreplic 10.3.2.7 3336 10.3.2.8 local
+=======
+./ProxyReplicate null txt/RemoteSnapshotnowOnce.txt1443469807 dsfsd..1443469807 Data clonedimg null 3336 10.3.2.7 local
+>>>>>>> 17f7932ff9a7d38dcbc1b537790e68a80e84c333
+./ProxyReplicate 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1443473035 startty2..1443473035 Data forreplic 10.3.2.7 3336 10.3.2.8 local
+./ProxyReplicate 10.3.2.7 txt/RemoteSnapshotnowOnce.txt1443473219 mezo33..1443473219 Data forreplic 10.3.2.7 3336 10.3.2.8 local
