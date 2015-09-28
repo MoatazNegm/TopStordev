@@ -16,5 +16,5 @@ else
 timenow=`date`
 echo $timenow: DONE...Snapshot $newsnap is created >> $web; 
 fi;
-sleep 2;
+#sleep 2;
 ./GetSnaplist

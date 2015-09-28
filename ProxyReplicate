@@ -19,16 +19,18 @@ function RemoteAsk() {
  echo sending $msg >> txt/tmpproxyrequest
 # echo Asksend $SEND $msg >> txt/tmpproxyrequest; 
 # ./Asksend $SEND $msg 2>/dev/null ; 
+astartsec=`date +%s`
  echo proxy is $LOCALREP  >> txt/tmpproxyrequest
  if [[ $LOCALREP == "proxy" ]];
  then
-  echo $SO $stamp ask $@ | nc -w 20  $REMOTETUN $PPSEND;
-  echo $SO $stamp ask $@ \| nc -w 4  $REMOTETUN $PPSEND >> txt/tmpproxyrequest;
+  echo $SO $stamp ask $@ \| nc -w 2 $REMOTETUN $PPSEND >>txt/tmpproxyrequest;
+  echo $SO $stamp ask $@ | nc -w 2  $REMOTETUN $PPSEND;
  else
-  echo $SO $stamp ask $@ | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf |  nc -w 10 $REMOTETUN $PPSEND;
- echo $SO $stamp ask $@ \| openssl enc -a -A -aes-256-cbc -k SuperSecretPWD \| gzip -cf \| nc -w 4  $REMOTETUN $PPSEND >> txt/tmpproxyrequest;
+ echo $SO $stamp ask $@ \| openssl enc -a -A -aes-256-cbc -k SuperSecretPWD \| gzip -cf \| nc -w 1  $REMOTETUN $PPSEND >> txt/tmpproxyrequest;
+  echo $SO $stamp ask $@ | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf |  nc -w 1 $REMOTETUN $PPSEND;
  fi
  flagcount=0;
+ echo start flagcount >> txt/tmpproxyrequest;
  while [[ $flagcount -le 300000 ]];
  do
 #  echo finished Ask >> txt/tmpproxyrequest
@@ -49,6 +51,9 @@ function RemoteAsk() {
  fi
 
  echo afterAsk=$RR flagcount=$flagcount >> txt/tmpproxyrequest
+aendsec=`date +%s`
+adifsec=$((aendsec-astartsec));
+echo $astartsec $aendsec $adifsec >> txt/tmpproxyrequest
 }
 ###############################################################################
 function Sendzfs () {
@@ -58,19 +63,18 @@ function Sendzfs () {
 # echo \/sbin\/zfs send  $@ \|  nc -w 10 $REMOTETUN $PORzfs
  if [[ $LOCALREP == "proxy" ]];
  then
-  echo /sbin/zfs send $@ \|  nc -w 10 $REMOTETUN $PORzfs >> txt/tmpproxyrequest;
-  /sbin/zfs send $@ |  nc -w 10 $REMOTETUN $PORzfs;
+  echo /sbin/zfs send $@ \|  nc -w 2 $REMOTETUN $PORzfs >> txt/tmpproxyrequest;
+  /sbin/zfs send $@ |  nc -w 2 $REMOTETUN $PORzfs;
   
  else
-  echo /sbin/zfs send $@  \| openssl enc -a -A -aes-256-cbc -k SuperSecretPWD \| gzip -cf \| nc -w 10 $REMOTETUN $PORzfs >> txt/tmpproxyrequest
-  /sbin/zfs send $@  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 10  $REMOTETUN $PORzfs
+  echo /sbin/zfs send $@  \| openssl enc -a -A -aes-256-cbc -k SuperSecretPWD \| gzip -cf \| nc -w 1 $REMOTETUN $PORzfs >> txt/tmpproxyrequest
+  /sbin/zfs send $@  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 1  $REMOTETUN $PORzfs
  fi
  flagcount=0;
- while [[ $flagcount -le 30 ]];
+ while [[ $flagcount -le 300000 ]];
  do
   if [[ -a txt/remotereply$DST ]]; then break; fi
   flagcount=$((flagcount+1));
-  sleep 1;
  done
  if [[ -a txt/remotereply$DST ]];
  then
@@ -84,6 +88,7 @@ function Sendzfs () {
 ### $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pooli $vol $remotetun $pp $so
 ## 1032_7 txt/RemoteSnapshotnowSystem.txt1438711440 Repli.Minutely.6.2.na.na.1438711440 Data forreplic 10.176.214.6 2236 1032_8 porxy
 ###############################################################################
+startsec=`date +%s`
 SO=`echo $@ | awk '{print $8}'`;
 DST=`echo $@ | awk '{print $1}'`;
 REMOTETUN=`echo $@ | awk '{print $6}'`;
@@ -156,5 +161,8 @@ fi
 echo RemoteAsk GetSnaplist hi  >> txt/tmpproxyrequest 
 RemoteAsk localGetSnaplist $vol & 
  echo POR=$POR Compelete  >> txt/tmpproxyrequest ; 
-# RemoteAsk done  & ; 
+# RemoteAsk done  & 
+endsec=`date +%s`
+difsec=$((endsec-startsec));
+echo $startsec $endsec $difsec >> txt/tmpproxyrequest
 echo finishedddddddddddddddddddddddddddddddddddddddddddddddddd >> txt/tmpproxyrequest

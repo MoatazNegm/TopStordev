@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 1032_7 1443044554 1032_8 iwiwiw ProxyInit 1032_7 15463 Mezo2 1032_8 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 -N 10.3.2.6 2234
+=======
+1032_8 1440956935 1032_7 iwiwiw ProxyInit 1032_8 15146 Mezo2 1032_7 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 -N 10.3.2.6 2234
+>>>>>>> fb889d984c137ac556eef11a027e926cb093579f

@@ -34,7 +34,7 @@ else
 echo $stamp Authorized received | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 ;
 fi
 echo $reqparam > msgfiletmp;
-sleep 1;
+#sleep 1;
 #echo done | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 & ;
 else
 echo $stamp Not Authorized:$line | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $request 2235 & ;

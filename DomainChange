@@ -11,7 +11,7 @@ domcont=` echo $@ | awk '{ print $4 }'`
 userreq=` echo $@ | awk '{ print $5 }'`;
 privilege="Active_Directory";
 contrun=`./privthis.sh $privilege $userreq`;
-if [ $contrun == "true" ]
+if [[ $contrun == "true" ]];
 then
 echo contrun $contrun
 domcontip=` host $domcont.$doms | awk '{print $NF}'`

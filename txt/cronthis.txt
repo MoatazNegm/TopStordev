@@ -1,1 +1,1 @@
-*/2 * * * * /TopStor/pump.sh RemoteSnapshotnow Data/forreplic Minutely.6.2.na.na 1032_7
+*/2 * * * * /TopStor/pump.sh RemoteSnapshotnow Data/forreplic Minutely.5.2.na.na 10.3.2.7
