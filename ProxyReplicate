@@ -110,9 +110,10 @@ volfound=$RR;
 echo volfound=$volfound >> txt/tmpproxyrequest
 ps -axw | grep zfs | grep send >/dev/null 2>&1
 if [[ $? -eq 0 ]]; then echo another replication is wokring.. canceled this > $FILELOG; echo another replication is wokring.. canceled this >> txt/tmpproxyrequest; exit 0 ; fi 
+prot=`/sbin/zfs get -H prot:kind $pool/$vol | awk '{print $3}'`
 if [[ $volfound == "no" ]];
 then
- RemoteAsk replidf $PORzfs $REMOTETUN $SO $vol
+ RemoteAsk replidf $PORzfs $REMOTETUN $SO $prot $vol
  
  echo zfs -DR $pool/$vol@$snap  >> txt/tmpproxyrequest;
  Sendzfs  -DR $pool/$vol@$snap ;
@@ -142,8 +143,8 @@ else
   echo yyyyyyyyyyyyyintital is null >> txt/tmpproxyrequest 
   echo RemoteAsk destroysnaps $vol >> txt/tmpproxyrequest;
   RemoteAsk destroysnaps $vol ;
-  RemoteAsk replidf $PORzfs $REMOTETUN $SO $vol
-  echo RemoteAsk replidf $PORzfs $REMOTETUN $SO $vol >> txt/tmpproxyrequest
+  RemoteAsk replidf $PORzfs $REMOTETUN $SO $prot $vol
+  echo RemoteAsk replidf $PORzfs $REMOTETUN $SO $prot $vol >> txt/tmpproxyrequest
 #  echo RemoteAsk replivol $PORzfs $REMOTETUN $SO $pool $vol nothing >> txt/tmpproxyrequest;
 #  RemoteAsk replivol $PORzfs $REMOTETUN $SO $pool $vol nothing;
 #echo exit  >> txt/tmpproxyrequest
