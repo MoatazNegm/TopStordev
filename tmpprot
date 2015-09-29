@@ -1,0 +1,9 @@
+start
+zfs get -H prot:kind Data/forreplic | awk '{print 3338 10.3.2.7 10.3.2.8 forreplic}'
+
+start
+/sbin/zfs get -H prot:kind Data/forreplic | grep CIFS
+
+start
+/sbin/zfs get -H prot:kind Data/Topimg | grep CIFS
+

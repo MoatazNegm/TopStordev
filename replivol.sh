@@ -25,8 +25,8 @@ then
  echo /usr/bin/nc -ld $tun $pp \|  zfs receive -dF  $pool > tmprepli
  /usr/bin/nc -ld $tun $pp |  zfs receive -dF  $pool 2>>tmprepli&
 else
- nc -ld $tun $pp | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD |zfs receive -dF  $pool 2>tmprepli &
- echo nc -ld $tun $pp \| gunzip \| openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD \|zfs receive -dF  $pool >>tmprepli
+ echo nc -ld $tun $pp \| gunzip \| openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD \|zfs receive -dF  $pool >tmprepli
+ nc -ld $tun $pp | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD |zfs receive -dF  $pool 2>>tmprepli &
 fi
 ./GetPoolVollist
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;

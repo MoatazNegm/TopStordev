@@ -2,14 +2,37 @@
 web='/usr/local/www/apache24/data/des19/Data/CIFSstatus.log';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 cd /TopStor
-name=`echo $@ | awk '{print $1}'`;
-g=`cat smb4.confcurrent | grep ${name}_only | wc -c`; if [[ g -le 4 ]];
+localrep=`echo $@ | awk '{print $2}'`;
+prot=`echo $@ | awk '{print $6}'`;
+vol=`echo $@ | awk '{print $7}'`;
+partner=`echo $@ | awk '{print $5 }'`;
+tun=`echo $@ | awk '{print $4 }'`;
+partner=`echo $@ | awk '{print $5 }'`;
+pool='Data';
+
+if [[ $localrep == "proxy" ]];
+then
+ pp=`cat workingpp | awk '{print $1}'`;
+else
+ pp=`cat workingpplocal | awk '{print $1}'`;
+fi
+pp=$((pp+2));
+if [[ $localrep == "proxy" ]];
+then
+ echo /usr/bin/nc -ld $tun $pp \|  zfs receive -dF  $pool > tmprepli;
+ /usr/bin/nc -ld $tun $pp |  zfs receive -dF  $pool 2>>tmprepli ;
+else
+ echo nc -ld $tun $pp \| gunzip \| openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD \|zfs receive -dF  $pool >tmprepli;
+  nc -ld $tun $pp | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD |zfs receive -dF  $pool 2>>tmprepli;
+fi
+g=`cat smb4.confcurrent | grep ${vol}_only | wc -c`; if [[ g -le 4 ]];
 then
  cp /usr/local/etc/smb4.conf smb4.confcurrent;
  sleep 1;
- sed -e "s/NAMECIFS/$name/g" sharecifs.txt > $name.txt;
- cat $name.txt >> smb4.confcurrent;
- cat $name.txt >> CIFSshares.txt;
- cat $name.txt >> /usr/local/etc/smb4.conf ;
+ sed -e "s/NAMECIFS/$vol/g" sharecifs.txt > $vol.txt;
+ cat $vol.txt >> smb4.confcurrent;
+ cat $vol.txt >> CIFSshares.txt;
+ cat $vol.txt >> /usr/local/etc/smb4.conf ;
  service samba_server restart;
 fi
+./GetPoolVollist
