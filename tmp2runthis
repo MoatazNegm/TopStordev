@@ -4,3 +4,15 @@ isvalidcome=replidf txt/runthis1443469201localforrepli local 3338 10.3.2.7 10.3.
 Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
 isvalidcome=localGetSnaplist txt/runthis1443469210localforrepli local forreplic
 Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
+isvalidcome=RemoteVolSearch txt/runthis1443473035localforrepli local forreplic
+Askreply 10.3.2.7 10.3.2.8 3337 local reply no
+isvalidcome=replidf txt/runthis1443473040localforrepli local 3338 10.3.2.7 10.3.2.8 forreplic
+Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
+isvalidcome=localGetSnaplist txt/runthis1443473049localforrepli local forreplic
+Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
+isvalidcome=RemoteVolSearch txt/runthis1443473219localforrepli local forreplic
+Askreply 10.3.2.7 10.3.2.8 3337 local reply no
+isvalidcome=replidf txt/runthis1443473224localforrepli local 3338 10.3.2.7 10.3.2.8 forreplic
+Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
+isvalidcome=localGetSnaplist txt/runthis1443473234localforrepli local forreplic
+Askreply 10.3.2.7 10.3.2.8 3337 local reply ready

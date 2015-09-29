@@ -28,6 +28,7 @@ else
  nc -ld $tun $pp | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD |zfs receive -dF  $pool 2>tmprepli &
  echo nc -ld $tun $pp \| gunzip \| openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD \|zfs receive -dF  $pool >>tmprepli
 fi
+./GetPoolVollist
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Receiving_new_snapshot_for:'$vol'_from:'$partner;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $partner data $logdata`;
