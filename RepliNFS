@@ -2,14 +2,38 @@
 web='/usr/local/www/apache24/data/des19/Data/NFSstatus.log';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 cd /TopStor
-name=`echo $@ | awk '{print $1}'`;
-DG="Data";
-g=`cat /etc/exports | grep ${name}_only | wc -c`; if [[ g -le 4 ]];
+localrep=`echo $@ | awk '{print $2}'`;
+prot=`echo $@ | awk '{print $6}'`;
+vol=`echo $@ | awk '{print $7}'`;
+partner=`echo $@ | awk '{print $5 }'`;
+tun=`echo $@ | awk '{print $4 }'`;
+partner=`echo $@ | awk '{print $5 }'`;
+pool='Data';
+
+if [[ $localrep == "proxy" ]];
 then
- chmod 777 /$DG/$name
- echo \# start${name}_only >> /etc/exports
- echo /$DG/$name >> /etc/exports
- echo  \# stop${name}_only >> /etc/exports
+ pp=`cat workingpp | awk '{print $1}'`;
+else
+ pp=`cat workingpplocal | awk '{print $1}'`;
+fi
+pp=$((pp+2));
+if [[ $localrep == "proxy" ]];
+then
+ echo /usr/bin/nc -ld $tun $pp \|  zfs receive -dF  $pool > tmprepli;
+ /usr/bin/nc -ld $tun $pp |  zfs receive -dF  $pool 2>>tmprepli ;
+else
+ echo nc -ld $tun $pp \| gunzip \| openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD \|zfs receive -dF  $pool >tmprepli;
+  nc -ld $tun $pp | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD |zfs receive -dF  $pool 2>>tmprepli;
+fi
+g=`cat /etc/exports | grep ${vol}_only | wc -c`; 
+
+if [[ $g -le 4 ]];
+then
+ chmod 777 /$pool/$vol
+ echo \# start${vol}_only >> /etc/exports
+ echo /$pool/$vol >> /etc/exports
+ echo  \# stop${vol}_only >> /etc/exports
  service mountd restart > /dev/null 2> /dev/null; 
  service nfsd restart > /dev/null 2> /dev/null;
 fi
+./GetPoolVollist

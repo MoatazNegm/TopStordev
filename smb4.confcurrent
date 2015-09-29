@@ -53,3 +53,14 @@ map archive = yes
 inherit acls = Yes
 ##########################
 
+;;;;;;;;         startforry_only
+[forry]
+path = /Data/forry
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+;;;;;;;;;;;;;;;;;;;;   stopforry_only
