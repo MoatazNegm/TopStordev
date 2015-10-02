@@ -8,7 +8,10 @@ s=0
 while (( $s < $noofdisks )) 
 do
 disknow=` echo $disks | awk '{print $1}'`;
+if [[ $disknow != "cd0" ]];
+then
 nice -19 ./addtime.sh  $disknow $traf;
+fi;
 disks=` echo $disks | awk '{$1=""; print }'`;
 s=$(( s+1 ));
 done
