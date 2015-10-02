@@ -1,9 +1,1 @@
-<<<<<<< HEAD
-RemoteGetSnaplist a
-=======
-<<<<<<< HEAD
-VolumeDeleteNFS Data gnuradio NFS admin
-=======
-RemoteSnapshotCreateOnce mezo4 Data gnuradio 10.3.2.7 admin
->>>>>>> 77ed35c5d8e4450418a8fe729d8049d89b820306
->>>>>>> 3458a679ccea24b24f8fa095ab8e1f0b6ef01564
+GetDisklist Data/disklist.txt
