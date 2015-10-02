@@ -1,1 +1,1 @@
-clearSVC all new
+GetDisklist Data/disklist.txt

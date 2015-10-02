@@ -1,5 +1,8 @@
 #!/usr/local/bin/zsh
 cd /TopStor
+rm /tmp/msgfile 2>/dev/null
+rm /tmp/msgrack 2>/dev/null
+rm /tmp/msgremotefile 2>/dev/null
 mkfifo -m 660 /tmp/msgfile 2>/dev/null
 mkfifo -m 600 /tmp/msgrack 2>/dev/null
 mkfifo -m 600 /tmp/msgremotefile 2>/dev/null
