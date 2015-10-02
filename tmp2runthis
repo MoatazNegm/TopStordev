@@ -159,3 +159,33 @@ isvalidcome=replivol txt/runthis1443808138localforrepli local 3338 10.3.2.7 10.3
 Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
 isvalidcome=localGetSnaplist txt/runthis1443808145localforrepli local forry
 Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
+isvalidcome=RemoteVolSearch txt/runthis1443810641localforrepli local gnuradio
+Askreply 10.3.2.7 10.3.2.8 3337 local reply found
+isvalidcome=RemoteGetSnaplist txt/runthis1443810647localforrepli local gnuradio
+Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/gnuradio@mezo4..1443489349 Data/gnuradio@mezo4..1443488039 Data/gnuradio@mezo2..1443487895 Data/gnuradio@mezo2..1443487890 Data/gnuradio@mezo..1443487765 Data/gnuradio@sysms..1443487712 Data/gnuradio@sysms..1443487709 Data/gnuradio@sysms..1443487705 Data/gnuradio@sysms..1443487676 Data/gnuradio@trial12..1443306729 Data/gnuradio@trial11..1443306483
+isvalidcome=replivol txt/runthis1443810652localforrepli local 3338 10.3.2.7 10.3.2.8 Data gnuradio Data/gnuradio@mezo4..1443489349
+Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
+isvalidcome=RemoteGetSnaplist txt/runthis1443810659localforrepli local gnuradio
+Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/gnuradio@42355..1443810641 Data/gnuradio@42355..1443810630 Data/gnuradio@mezo4..1443489349 Data/gnuradio@mezo4..1443488039 Data/gnuradio@mezo2..1443487895 Data/gnuradio@mezo2..1443487890 Data/gnuradio@mezo..1443487765 Data/gnuradio@sysms..1443487712 Data/gnuradio@sysms..1443487709 Data/gnuradio@sysms..1443487705 Data/gnuradio@sysms..1443487676 Data/gnuradio@trial12..1443306729 Data/gnuradio@trial11..1443306483
+isvalidcome=localGetSnaplist txt/runthis1443810665localforrepli local gnuradio
+Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
+isvalidcome=RemoteVolSearch txt/runthis1443811214localforrepli local gnuradio
+Askreply 10.3.2.7 10.3.2.8 3337 local reply found
+isvalidcome=RemoteGetSnaplist txt/runthis1443811219localforrepli local gnuradio
+Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/gnuradio@42355..1443810641 Data/gnuradio@42355..1443810630 Data/gnuradio@mezo4..1443489349 Data/gnuradio@mezo4..1443488039 Data/gnuradio@mezo2..1443487895 Data/gnuradio@mezo2..1443487890 Data/gnuradio@mezo..1443487765 Data/gnuradio@sysms..1443487712 Data/gnuradio@sysms..1443487709 Data/gnuradio@sysms..1443487705 Data/gnuradio@sysms..1443487676 Data/gnuradio@trial12..1443306729 Data/gnuradio@trial11..1443306483
+isvalidcome=replivol txt/runthis1443811225localforrepli local 3338 10.3.2.7 10.3.2.8 Data gnuradio Data/gnuradio@42355..1443810641
+Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
+isvalidcome=RemoteGetSnaplist txt/runthis1443811233localforrepli local gnuradio
+Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/gnuradio@try111..1443811214 Data/gnuradio@try111..1443811054 Data/gnuradio@42355..1443810641 Data/gnuradio@42355..1443810630 Data/gnuradio@mezo4..1443489349 Data/gnuradio@mezo4..1443488039 Data/gnuradio@mezo2..1443487895 Data/gnuradio@mezo2..1443487890 Data/gnuradio@mezo..1443487765 Data/gnuradio@sysms..1443487712 Data/gnuradio@sysms..1443487709 Data/gnuradio@sysms..1443487705 Data/gnuradio@sysms..1443487676 Data/gnuradio@trial12..1443306729 Data/gnuradio@trial11..1443306483
+isvalidcome=localGetSnaplist txt/runthis1443811238localforrepli local gnuradio
+Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
+isvalidcome=RemoteVolSearch txt/runthis1443811288localforrepli local gnuradio
+Askreply 10.3.2.7 10.3.2.8 3337 local reply found
+isvalidcome=RemoteGetSnaplist txt/runthis1443811295localforrepli local gnuradio
+Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/gnuradio@try111..1443811214 Data/gnuradio@try111..1443811054 Data/gnuradio@42355..1443810641 Data/gnuradio@42355..1443810630 Data/gnuradio@mezo4..1443489349 Data/gnuradio@mezo4..1443488039 Data/gnuradio@mezo2..1443487895 Data/gnuradio@mezo2..1443487890 Data/gnuradio@mezo..1443487765 Data/gnuradio@sysms..1443487712 Data/gnuradio@sysms..1443487709 Data/gnuradio@sysms..1443487705 Data/gnuradio@sysms..1443487676 Data/gnuradio@trial12..1443306729 Data/gnuradio@trial11..1443306483
+isvalidcome=replivol txt/runthis1443811300localforrepli local 3338 10.3.2.7 10.3.2.8 Data gnuradio Data/gnuradio@try111..1443811214
+Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
+isvalidcome=RemoteGetSnaplist txt/runthis1443811312localforrepli local gnuradio
+Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/gnuradio@try22..1443811288 Data/gnuradio@try111..1443811214 Data/gnuradio@try111..1443811054 Data/gnuradio@42355..1443810641 Data/gnuradio@42355..1443810630 Data/gnuradio@mezo4..1443489349 Data/gnuradio@mezo4..1443488039 Data/gnuradio@mezo2..1443487895 Data/gnuradio@mezo2..1443487890 Data/gnuradio@mezo..1443487765 Data/gnuradio@sysms..1443487712 Data/gnuradio@sysms..1443487709 Data/gnuradio@sysms..1443487705 Data/gnuradio@sysms..1443487676 Data/gnuradio@trial12..1443306729 Data/gnuradio@trial11..1443306483
+isvalidcome=localGetSnaplist txt/runthis1443811318localforrepli local gnuradio
+Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
