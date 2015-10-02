@@ -22,12 +22,13 @@ echo oper=$@ >> tmp2repli
 zfs rollback -Rf $initsnap 2>/dev/null;
 if [[ $localrep == 'proxy' ]];
 then
- echo /usr/bin/nc -ld $tun $pp \|  zfs receive -dF  $pool > tmprepli
- /usr/bin/nc -ld $tun $pp |  zfs receive -dF  $pool 2>>tmprepli&
+ echo /usr/bin/nc -ld $tun $pp \|  zfs receive -dvF  $pool > tmprepli
+# /usr/bin/nc -ld $tun $pp |  zfs receive -dvF  $pool >zfsrec 2>>tmprepli&
 else
- echo nc -ld $tun $pp \| gunzip \| openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD \|zfs receive -dF  $pool >tmprepli
- nc -ld $tun $pp | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD |zfs receive -dF  $pool 2>>tmprepli &
+ echo nc -ld $tun $pp \| gunzip \| openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD \|zfs receive -dvF  $pool >zfsrec 2>>tmprepli
+# nc -ld $tun $pp | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD |zfs receive -dvF  $pool >zfsrec 2>>tmprepli &
 fi
+./RepliVolall $@ &
 ./GetPoolVollist
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Receiving_new_snapshot_for:'$vol'_from:'$partner;

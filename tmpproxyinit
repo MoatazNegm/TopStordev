@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-1032_8 1443788906 TopStor2 iwiwiw ProxyInit 1032_8 15887 Mezo2 TopStor2 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 -N ec2-52-88-255-207.us-west-2.compute.amazonaws.com 2234
-=======
-1032_8 1443796917 TopStor2 iwiwiw ProxyInit 1032_8 15887 Mezo2 TopStor2 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 -N ec2-52-88-255-207.us-west-2.compute.amazonaws.com 2234
->>>>>>> 561e3257ffba8c000867c8919ba941332cb6e8fb
+1032_8 1443812558 TopStor2 iwiwiw ProxyInit 1032_8 15652 Mezo2 TopStor2 | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 -N ec2-52-88-255-207.us-west-2.compute.amazonaws.com 2234

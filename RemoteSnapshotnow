@@ -116,10 +116,12 @@ then
  cat $filelog >> $cronout 
  echo filenameis=$filelog >> $cronout
  err=`cat $filelog | wc -c  `;
+ err2=`cat txt/repliresult 2>/dev/null`;
+ rm txt/repliresult 2>/dev/null;
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
- if [[ $err -ge  4  ]]; then
+ if [[ $err -ge  4  || $err2 != "success" ]]; then
 	failed=`cat $filelog`
-	echo $failed  > $web;
+	echo 'Failed_Replicating'${newsnap}':'$failed > $web ;
 	logdata='Failed_Replicating'${newsnap}':'$failed;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
 	echo $logthis >> $cronout
