@@ -145,3 +145,7 @@ isvalidcome=replidf txt/runthis1443489355localforrepli local 3338 10.3.2.7 10.3.
 Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
 isvalidcome=localGetSnaplist txt/runthis1443489374localforrepli local gnuradio
 Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
+not valid command
+isvalidcome= txt/runthislocalforrepli  
+not valid command
+isvalidcome= txt/runthislocalforrepli  

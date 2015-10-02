@@ -72,3 +72,5 @@
 ./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1443489349 local RemoteVolSearch gnuradio
 ./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1443489355 local replidf 3338 10.3.2.7 10.3.2.8 NFS gnuradio
 ./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1443489374 local localGetSnaplist gnuradio
+./runthis 10.244.34.6 1032_8 2237 2237 10.172.168.6 proxy
+./runthis 10.3.2.8 3337 3337 10.3.2.8 local
