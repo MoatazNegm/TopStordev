@@ -74,3 +74,8 @@
 ./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1443489374 local localGetSnaplist gnuradio
 ./runthis 10.244.34.6 1032_8 2237 2237 10.172.168.6 proxy
 ./runthis 10.3.2.8 3337 3337 10.3.2.8 local
+./runthis 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1443807728 local RemoteVolSearch forry
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1443808127 local RemoteVolSearch forry
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1443808133 local RemoteGetSnaplist forry
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1443808138 local replivol 3338 10.3.2.7 10.3.2.8 Data forry Data/forry@dss..1443487577
+./runthis 10.3.2.8 10.3.2.8 10.3.2.7 3337 3337 10.3.2.7 1443808145 local localGetSnaplist forry

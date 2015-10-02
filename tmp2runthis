@@ -149,3 +149,13 @@ not valid command
 isvalidcome= txt/runthislocalforrepli  
 not valid command
 isvalidcome= txt/runthislocalforrepli  
+not valid command forry
+isvalidcome=forry txt/runthislocallocalforrepli RemoteVolSearch 
+isvalidcome=RemoteVolSearch txt/runthis1443808127localforrepli local forry
+Askreply 10.3.2.7 10.3.2.8 3337 local reply found
+isvalidcome=RemoteGetSnaplist txt/runthis1443808133localforrepli local forry
+Askreply 10.3.2.7 10.3.2.8 3337 local reply Data/forry@dss..1443487577 Data/forry@dss..1443487520
+isvalidcome=replivol txt/runthis1443808138localforrepli local 3338 10.3.2.7 10.3.2.8 Data forry Data/forry@dss..1443487577
+Askreply 10.3.2.7 10.3.2.8 3337 local reply ready
+isvalidcome=localGetSnaplist txt/runthis1443808145localforrepli local forry
+Askreply 10.3.2.7 10.3.2.8 3337 local reply ready

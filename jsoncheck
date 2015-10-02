@@ -4,14 +4,14 @@ novalid=`cat $1 | grep --regexp={"::",",,","\"\"",",:",":,","{{","{}","}{","}}",
 echo novalid=$novalid 
 nuoflines=`cat $ff | wc -l`
 echo nuoflines=$nuoflines
-noquotes=`sed 's/"[a-zA-Z0-9:./]*"//g' $ff`
+noquotes=`sed 's/"[a-zA-Z0-9:_./]*"//g' $ff`
 echo noquotes=$noquotes
 onlychars=`echo $noquotes | sed 's/[,:",{\[]*//g' | sed 's/[]]//g' | sed 's/}//g'`
 echo onlychars=$onlychars
-br_r=`sed 's/[a-zA-Z0-9:./",}{\]]*//g' $ff | wc -c`
-br_l=`sed 's/[a-zA-Z0-9:./",}{\[]*//g' $ff | wc -c`
-race_r=`sed 's/[a-zA-Z0-9:./",}\[\]]*//g' $ff | wc -c`
-race_l=`sed 's/[a-zA-Z0-9:./",{[]*//g' $ff | sed 's/[]]//g' | wc -c`
+br_r=`sed 's/[a-zA-Z0-9:_./",}{\]]*//g' $ff | wc -c`
+br_l=`sed 's/[a-zA-Z0-9:_./",}{\[]*//g' $ff | wc -c`
+race_r=`sed 's/[a-zA-Z0-9:_./",}\[\]]*//g' $ff | wc -c`
+race_l=`sed 's/[a-zA-Z0-9:_./",{[]*//g' $ff | sed 's/[]]//g' | wc -c`
 echo $br_r
 echo $br_l
 echo $race_r

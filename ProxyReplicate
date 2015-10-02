@@ -158,6 +158,9 @@ else
   Sendzfs  -DR -I $initialsnap  $targetsnap ;
  fi
 fi
+ RemoteAsk RemoteGetSnaplist $vol;
+ echo $RR | grep $snap;
+ if [[ $? -ne 0 ]]; then echo failed > txt/repliresult; else echo success > txt/repliresult; fi 
 ./GetSnaplist & 
 echo RemoteAsk GetSnaplist hi  >> txt/tmpproxyrequest 
 RemoteAsk localGetSnaplist $vol & 

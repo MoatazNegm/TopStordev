@@ -21979,6 +21979,8 @@ starting
 starting
 starting
 starting
+<<<<<<< HEAD
+=======
 starting
 starting
 starting
@@ -179545,6 +179547,7 @@ starting
 starting
 starting
 starting
+<<<<<<< HEAD
 starting
 starting
 readthis 10.3.2.7 1443808129 reply found
@@ -179554,4 +179557,53 @@ starting
 readthis 10.3.2.7 1443808140 reply ready
 starting
 readthis 10.3.2.7 1443808147 reply ready
+=======
+>>>>>>> 561e3257ffba8c000867c8919ba941332cb6e8fb
+starting
+readthis 10.3.2.8 1443807728 ask RemoteVolSearch forry
+starting
+starting
+starting
+readthis 10.3.2.8 1443808127 ask RemoteVolSearch forry
+starting
+readthis 10.3.2.8 1443808133 ask RemoteGetSnaplist forry
+starting
+readthis 10.3.2.8 1443808138 ask replivol 3338 10.3.2.7 10.3.2.8 Data forry Data/forry@dss..1443487577
+starting
+readthis 10.3.2.8 1443808145 ask localGetSnaplist forry
+>>>>>>> 1725e2a2d46396d618ece3e9e788981c64593557
+starting
+starting
+starting
+starting
+starting
+readthis 10.3.2.7 1443810643 reply found
+starting
+readthis 10.3.2.7 1443810648 reply Data/gnuradio@mezo4..1443489349 Data/gnuradio@mezo4..1443488039 Data/gnuradio@mezo2..1443487895 Data/gnuradio@mezo2..1443487890 Data/gnuradio@mezo..1443487765 Data/gnuradio@sysms..1443487712 Data/gnuradio@sysms..1443487709 Data/gnuradio@sysms..1443487705 Data/gnuradio@sysms..1443487676 Data/gnuradio@trial12..1443306729 Data/gnuradio@trial11..1443306483
+starting
+readthis 10.3.2.7 1443810654 reply ready
+starting
+readthis 10.3.2.7 1443810660 reply Data/gnuradio@42355..1443810641 Data/gnuradio@42355..1443810630 Data/gnuradio@mezo4..1443489349 Data/gnuradio@mezo4..1443488039 Data/gnuradio@mezo2..1443487895 Data/gnuradio@mezo2..1443487890 Data/gnuradio@mezo..1443487765 Data/gnuradio@sysms..1443487712 Data/gnuradio@sysms..1443487709 Data/gnuradio@sysms..1443487705 Data/gnuradio@sysms..1443487676 Data/gnuradio@trial12..1443306729 Data/gnuradio@trial11..1443306483
+starting
+readthis 10.3.2.7 1443810668 reply ready
+starting
+readthis 10.3.2.7 1443811215 reply found
+starting
+readthis 10.3.2.7 1443811221 reply Data/gnuradio@42355..1443810641 Data/gnuradio@42355..1443810630 Data/gnuradio@mezo4..1443489349 Data/gnuradio@mezo4..1443488039 Data/gnuradio@mezo2..1443487895 Data/gnuradio@mezo2..1443487890 Data/gnuradio@mezo..1443487765 Data/gnuradio@sysms..1443487712 Data/gnuradio@sysms..1443487709 Data/gnuradio@sysms..1443487705 Data/gnuradio@sysms..1443487676 Data/gnuradio@trial12..1443306729 Data/gnuradio@trial11..1443306483
+starting
+readthis 10.3.2.7 1443811228 reply ready
+starting
+readthis 10.3.2.7 1443811234 reply Data/gnuradio@try111..1443811214 Data/gnuradio@try111..1443811054 Data/gnuradio@42355..1443810641 Data/gnuradio@42355..1443810630 Data/gnuradio@mezo4..1443489349 Data/gnuradio@mezo4..1443488039 Data/gnuradio@mezo2..1443487895 Data/gnuradio@mezo2..1443487890 Data/gnuradio@mezo..1443487765 Data/gnuradio@sysms..1443487712 Data/gnuradio@sysms..1443487709 Data/gnuradio@sysms..1443487705 Data/gnuradio@sysms..1443487676 Data/gnuradio@trial12..1443306729 Data/gnuradio@trial11..1443306483
+starting
+readthis 10.3.2.7 1443811242 reply ready
+starting
+readthis 10.3.2.7 1443811290 reply found
+starting
+readthis 10.3.2.7 1443811296 reply Data/gnuradio@try111..1443811214 Data/gnuradio@try111..1443811054 Data/gnuradio@42355..1443810641 Data/gnuradio@42355..1443810630 Data/gnuradio@mezo4..1443489349 Data/gnuradio@mezo4..1443488039 Data/gnuradio@mezo2..1443487895 Data/gnuradio@mezo2..1443487890 Data/gnuradio@mezo..1443487765 Data/gnuradio@sysms..1443487712 Data/gnuradio@sysms..1443487709 Data/gnuradio@sysms..1443487705 Data/gnuradio@sysms..1443487676 Data/gnuradio@trial12..1443306729 Data/gnuradio@trial11..1443306483
+starting
+readthis 10.3.2.7 1443811307 reply ready
+starting
+readthis 10.3.2.7 1443811313 reply Data/gnuradio@try22..1443811288 Data/gnuradio@try111..1443811214 Data/gnuradio@try111..1443811054 Data/gnuradio@42355..1443810641 Data/gnuradio@42355..1443810630 Data/gnuradio@mezo4..1443489349 Data/gnuradio@mezo4..1443488039 Data/gnuradio@mezo2..1443487895 Data/gnuradio@mezo2..1443487890 Data/gnuradio@mezo..1443487765 Data/gnuradio@sysms..1443487712 Data/gnuradio@sysms..1443487709 Data/gnuradio@sysms..1443487705 Data/gnuradio@sysms..1443487676 Data/gnuradio@trial12..1443306729 Data/gnuradio@trial11..1443306483
+starting
+readthis 10.3.2.7 1443811323 reply ready
 starting
