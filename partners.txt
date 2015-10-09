@@ -1,2 +1,2 @@
-TopStor2 receiver true Mezo2 15652
-10.3.2.7 receiver false Mezo2 15185
+10.3.2.7 receiver false admin
+TopStor2 receiver true Mezo2 15560

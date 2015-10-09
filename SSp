@@ -19,7 +19,7 @@ SSp_start()
 SSp_stop()
 {
 	echo " SSp is stopped thanking God"
-	pkill -HUP -f Topstor
+	pkill -HUP -f ssperf 
 	touch /TopStor/txt/flag
 }
 

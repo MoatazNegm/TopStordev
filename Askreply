@@ -9,11 +9,11 @@ stamp=`date +%s`
 # packet : sender stamp command
 if [[ $localrep == "proxy" ]];
 then
- echo $so $stamp $res \| nc -w 4  $dst $pp >> tmpreply
+# echo $so $stamp $res \| nc -w 4  $dst $pp >> tmpreply
  echo $so $stamp $res | nc -w 4  $dst $pp 2>/dev/null
  echo finished >> tmpreply
 else
- echo $so $stamp $res \| openssl enc -a -A -aes-256-cbc -k SuperSecretPWD \| gzip -cf \| nc -w 4  $dst $pp >tmpreply
+# echo $so $stamp $res \| openssl enc -a -A -aes-256-cbc -k SuperSecretPWD \| gzip -cf \| nc -w 4  $dst $pp >tmpreply
  echo $so $stamp $res | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -w 4 $dst $pp 2>/dev/null
- echo finisehd >> tmpreply
+# echo finisehd >> tmpreply
 fi

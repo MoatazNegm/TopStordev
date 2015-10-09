@@ -1,7 +1,7 @@
 #!/usr/local/bin/zsh
 cd /TopStor
 # command is newcom paramaters (at least one)
-echo $@ > tmprep2
+#echo $@ > tmprep2
 sendertun=`echo  $@ | awk '{print $1}'`;
 sender=`echo  $@ | awk '{print $2}'`;
 replier=`echo  $@ | awk '{print $3}'`;
@@ -18,15 +18,15 @@ fileres='txt/runthis'$stamp
 case "$newcom" in 
  RemoteVolSearch) ./RemoteVolSearch ${fileres} $param > $fileres;;
  replidf)  ./replidf.sh ${fileres} $localrep $param ;
-  echo  ./replidf.sh ${fileres} $localrep $param >> tmpreplidf ;;
+#  echo  ./replidf.sh ${fileres} $localrep $param >> tmpreplidf ;;
  replivol) ./replivol.sh ${fileres} $localrep  $param ;;
  destroysnaps) ./destroysnaps.sh ${fileres} $param ;;
  RemoteGetSnaplist) ./RemoteGetSnaplist ${fileres} $param ;;
  localGetSnaplist) ./localGetSnaplist ${fileres} $param ;;
- *) notvalid=1; echo not valid command $newcom >> tmp2runthis;;
+ *) notvalid=1; #echo not valid command $newcom >> tmp2runthis;;
 esac;
 validcom=${newcom}" "${fileres}"localforrepli "${localrep}" "$param;
-echo isvalidcome=$validcom  >> tmp2runthis 
+#echo isvalidcome=$validcom  >> tmp2runthis 
 if [[ $notvalid -ne 0 ]]; then exit 0; fi;
 #./$validcom 2>> tmp2runthis
 while [[ ! -a $fileres ]];  
@@ -34,9 +34,9 @@ do
  c=0;  while [[ $c -le 30 ]]; do c=$((c+1)); done
 done
 res=`cat $fileres`
-echo res=$res >> tmp3runthis
+#echo res=$res >> tmp3runthis
 rm $fileres 2>/dev/null
 # ppp=$((senderpp+1));
 ppp=$senderpp
-echo Askreply $replier $sendertun $ppp $localrep reply $res >> tmp2runthis
+#echo Askreply $replier $sendertun $ppp $localrep reply $res >> tmp2runthis
 ./Askreply $replier $sendertun $ppp $localrep reply $res &

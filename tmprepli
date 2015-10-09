@@ -1,1 +1,0 @@
-nc -ld 10.3.2.7 3338 | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD |zfs receive -dF Data
