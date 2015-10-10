@@ -3,6 +3,8 @@ cd /TopStor
 ctr="/usr/local/www/apache24/data/des19/Data/ctr.log";
 ctr2="/usr/local/www/apache24/data/des19/Data/ctr.log.";
 info="/usr/local/www/apache24/data/des19/Data/currentinfo2.log";
+backlist=`ls ${ctr2}* | grep back | awk -F"back" '{print $1}' `; 
+echo $backlist | while read -r l; do; ./ssperfcheck $l; rm ${l}back 2>/dev/null; done;
 todayd=`date +%y%m%d`;
 todaylog=${ctr2}${todayd};
 if [[ -e $todaylog ]];
