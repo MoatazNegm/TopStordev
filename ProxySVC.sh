@@ -84,7 +84,7 @@ do
      /sbin/ping -c 10 $router >/dev/null 2>&1
      if [[ $? -ne 0 ]];
      then
-      pingrouter=`cat txt/pingrouter`;
+      pingrouter=`cat txt/pingrouter 2>/dev/null`;
       if [[ pingrouter -eq 1 ]]; then echo routerproblem >tmpProxySVC; echo 0 > txt/pingrouter; ./pump.sh clearSVC all no ping router;  fi
      else
       pingrouter=1;
