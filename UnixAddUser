@@ -4,7 +4,7 @@ logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log';
 username=`echo $@ | awk '{print $1}'`;
 userpass=`echo $@ | awk '{print $2}'`;
 userreq=`echo $@  | awk '{print $3}'`;
-echo 1001: $username > $web;
+echo Unlin1017:$username > $web;
 echo $ussername, $userpass _ $userreq > tmpnow
 privilege="Box_Users";
 contrun=`./privthis.sh $privilege $userreq`;
@@ -12,7 +12,8 @@ if [[ $contrun == 'true' ]]
 then
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='adding_user:'$username;
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Unlin1018@@@$username`;
+echo Unlin1018@$datenow@$timenow@$username > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 ( echo $userpass | pw useradd  $username -m -h 0 -c "TopStor" -s /usr/sbin/nologin) 2> txt/${0:2}$userreq.txt;
 ( echo $userpass; echo $userpass) | /usr/local/bin/smbpasswd -s -a $username 2>> txt/${0:2}$userreq.txt;
@@ -20,22 +21,22 @@ mkdir /Data/Common/$username;
 chown $username /Data/Common/$username;
 err=`wc -c  txt/${0:2}$userreq.txt | awk '{print $1}'`;
 if [[ $err -ge  4  ]]; then
-	echo 11000: $username> $web;
+	echo Unlin1019:$username> $web;
 	cat txt/${0:2}$userreq.txt > ${web}internal;
 	errdata=`1002:faile_adding_user:`$username;
 	datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $errdata`
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $errdata code Unlin1020@@@$username`
+echo Unlin1020@$datenow@$timenow@$username > ${logging}2
 else 
  openssl rsautl -encrypt -inkey key/public_key.pem -pubin -in <( echo $userpass) -out key/$username;  
  chmod 400 key/$username;
- echo 1003: $username > $web; 
+ echo Unlin1021:$username > $web; 
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
  logdata='1004:success_adding_user:'$username;
- logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data "$logdata"`;
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data "$logdata" code Unlin1022@@@$username`;
+echo Unlin1021@$datenow@$timenow@$username > ${logging}2
 fi 
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 ./UnixListUsers;
 fi
 rm txt/${0:2}$userreq.txt;
-bb=`cat $web`;
-echo $datenow $timenow :$bb > ${logging}2

@@ -9,7 +9,7 @@ if [[ $prot == "CIFS" ]]; then ./RepliCIFS $@ &; fi
 if [[ $prot == "NFS" ]]; then ./RepliNFS $@ &; fi
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Receiving_new_snapshot_for:'$vol'_from:'$partner;
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $partner data $logdata`;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $partner data $logdata code Replidf1000@@@$vol@$partner`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-echo $datenow $timenow :$logdata > ${logging}2
+echo Replidf1000@$datenow@$timenow@$logdata > ${logging}2
 echo ready > $res

@@ -2,13 +2,14 @@
 web='/usr/local/www/apache24/data/des19/Data/Usersstatus.log';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log';
 resweb='/usr/local/www/apache24/data/des19/Data/userpass.txtupdated';
-echo Changing user password by $username > $web
 userpass=`echo $@ | awk '{print $1}'`;
 username=`echo $@ | awk '{print $2}'`;
 userreq=`echo $@  | awk '{print $3}'`;
+echo Unlin1011:$username > $web
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='user_change_password_by:'$username;
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Unlin1012@@@$username`;
+echo Unlin1012@$datenow@$timenow@$username > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 cp txt/logthis.log $logging; rm txt/logthis.log;
 if [[ $username == "admin" ]]; then
@@ -20,23 +21,24 @@ fi
 cat txt/$0userreq.txt >> txt/passchange
 err=`wc -c  txt/${0:2}$userreq.txt | awk '{print $1}'`;
 if [[ $err -ge  4  ]]; then
-	cat txt/${0:2}$userreq.txt > $web;
+	echo Unlin1014:$username > $web;
+	cat txt/${0:2}$userreq.txt > ${web}internal;
 	errdata=`faile_changing_password_by:`$username;
 	datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $errdata`
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $errdata code Unlin1013@@@$username`
+echo Unlin1013@$datenow@$timenow@$username > ${logging}2
 else 
  rm key/$username;
  openssl rsautl -encrypt -inkey key/public_key.pem -pubin -in <( echo $userpass) -out key/$username;  
  chmod 400 key/$username;
- echo DONE...user $username changed password > $web; 
+ echo Unlin10016:$username > $web; 
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
  logdata='success_changing_password_by:'$username;
- logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data "$logdata"`;
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data "$logdata" code Unlin1015@@@$username`;
+echo Unlin1015@$datenow@$timenow@$username > ${logging}2
 fi 
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 rm txt/${0:2}$userreq.txt;
 resdate=`date +%s`;
 resjson=`./jsonthis3.sh updated $resdate`;
 echo $resjson > $resweb;
-bb=`cat $web`;
-echo $datenow $timenow :$bb > ${logging}2
