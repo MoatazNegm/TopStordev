@@ -51,7 +51,7 @@ service ntpdate restart;
 err=`cat  txt/${0:2}$userreq.txt | grep Failed | wc -c `;
 if [ $err -ge  4  ]; then
 	echo Domain1001:$domain > $web;
-	cat txt/${0:2}$userreq.txt > $web{internal};
+	cat txt/${0:2}$userreq.txt > ${web}internal;
 	logdata='failed_changing_domain:'$domain;
 else 
  echo Domain1002:$domain > $web; 

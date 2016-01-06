@@ -32,7 +32,7 @@ fi
 ./GetPoolVollist
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Receiving_new_snapshot_for:'$vol'_from:'$partner;
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $partner data $logdata`;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $partner data $logdata code Replivol1000@@@$vol@$partner`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-echo $datenow $timenow :$logdata > ${logging}2
+echo Replivol1000@$datenow@$timenow@$vol@$partner > ${logging}2
 echo ready > $res

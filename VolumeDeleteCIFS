@@ -23,7 +23,7 @@ err=$((err+1));
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 if [[ $err -ge  4  ]]; then
 	echo CIFS1006:$DG/$volname > $web;
-	cat txt/${0:2}$userreq.txt > $web{internal};
+	cat txt/${0:2}$userreq.txt > ${web}internal;
 	logdata='failed_deleting_volume:'$DG/$volname;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
 else 

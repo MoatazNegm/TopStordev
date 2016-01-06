@@ -24,7 +24,7 @@ err=`wc -c  txt/${0:2}$userreq.txt | awk '{print $1}'`;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 if [[ $err -ge  4  ]]; then
 	echo Replica1010: > $web;
-	cat txt/${0:2}$userreq.txt > $web{internal};
+	cat txt/${0:2}$userreq.txt > ${web}internal;
 	logdata='Failed_Creating_Hourly_replication_Period:'$DG/$FileS'_for_'$partner;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
 else 
