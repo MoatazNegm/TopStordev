@@ -9,7 +9,7 @@ privilege="Proxy";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
 then
-echo Adding Alias $aliasname for this storage... > $web;
+echo Replica1022:$aliasname > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='adding_Alias:'$aliasname;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
@@ -30,7 +30,7 @@ echo $result >$webproxy
 resdate=`date +%s`;
 res=` ./jsonthis3.sh updated $resdate`;
 echo $res > $resweb;
-echo Success Adding $aliasname for this storage > $web;
+echo Replica1023:$aliasname > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='success_adding_Proxy:'$proxyname;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;

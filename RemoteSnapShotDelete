@@ -12,16 +12,17 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Deleting_Snapshot:'$snapdel;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-echo Deleteing Snapshot $snapdel.... > $web;
+echo Replica1000:$snapdel > $web;
 /sbin/zfs destroy $snapdel  2>txt/${0:2}$userreq.txt;
 err=`wc -c  txt/${0:2}$userreq.txt | awk '{print $1}'`;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 if [[ $err -ge  4  ]]; then
-	cat txt/${0:2}$userreq.txt > $web;
+	echo Replica1001:$snapdel > $web;
+	cat txt/${0:2}$userreq.txt > $web{internal};
 	logdata='Failed_Deleting_Snapshot:'$snapdel;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
 else 
-	 echo DONE...Snapshot $snapdel is deleted > $web; 
+	 echo Replica1002:$snapdel > $web; 
 	logdata='Success_Deleting_Snapshot:'$snapdel;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 fi;

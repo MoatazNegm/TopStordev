@@ -13,7 +13,7 @@ privilege="Replication";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
 then
-echo Adding partner $Partnername.... > $web;
+echo Parnter1000:$Partnername > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='adding_'$type'_partner:'$Partnername;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
@@ -21,7 +21,7 @@ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $
 isthere=`cat partners.txt | grep "$Partnername $type" | wc -c `
 isthere=$((isthere+0));
 if [[ $isthere -ge 2 ]]; then
-echo Adding partner..Already there.... > $web;
+echo Partner1001:$Partnername > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='adding_'$type'_partner_already_there:'$Partnername;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata`;
@@ -53,7 +53,7 @@ echo $result >$webpartner;
 resdate=`date +%s`;
 res=` ./jsonthis3.sh updated $resdate`;
 echo $res > $resweb;
-echo Success Adding $newtype partner $Partnername > $web;
+echo Partner1002:$Partnername:$newtype > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='success_adding_'$type'_partner:'$Partnername;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
