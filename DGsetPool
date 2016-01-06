@@ -8,7 +8,7 @@ privilege="DISK_Groups"
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
 then
-echo "creating Pool $1...." > $web
+echo DG1003:$1 > $web
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Creating_Pool:Data_with_RAID_'$raid;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
@@ -21,12 +21,13 @@ fi
 err=`wc -c txt/${0:2}$userreq.txt | awk '{print $1}'`;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 if [[ err -ge 3 ]]; then
-	cat txt/${0:2}$userreq.txt > $web;
+	echo DG1004:$1 > $web;
+	cat txt/${0:2}$userreq.txt > $web{internal};
 	logdata='Failed_Creating_Pool:Data_with_RAID_'$raid;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
 	
 else
-	echo Success creating Data with Raid $raid > $web;
+	echo DG1005:$1:$raid > $web;
 	logdata='Success_Creating_Pool:Data_with_RAID_'$raid;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 fi 

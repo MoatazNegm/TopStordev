@@ -1,7 +1,7 @@
 #!/usr/local/bin/zsh
 web='/usr/local/www/apache24/data/des19/Data/Snapsstatus.log';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
-echo Creating  snapshot.... > $web;
+echo Snap1012: > $web;
 name=`echo $@ | awk '{print $1}'`;
 DG=`echo $@ | awk '{print $2}'`;
 FileS=` echo $@ | awk '{print $3}'`;
@@ -10,6 +10,7 @@ privilege="SnapShots";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
 then
+echo Snap1013:$DG/$FileS > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Creating_Snapshot:'$DG/$FileS@$name;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
@@ -18,11 +19,12 @@ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $
 err=`wc -c  txt/${0:2}$userreq.txt | awk '{print $1}'`;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 if [[ $err -ge  4  ]]; then
+	echo Snap1014:$DG/$FileS > $web;
 	cat txt/${0:2}$userreq.txt > $web;
 	logdata='Failed_Creating_Snapshot:'$DG/$FileS@$name;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
 else 
- 	echo DONE...Snapshot $DG/$FileS$name.$now1 is added > $web; 
+ 	echo Snap1015:$DG/$FileS$name.$now1 > $web; 
 	logdata='Success_Creating_Snapshot:'$DG/$FileS@$name;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 fi;

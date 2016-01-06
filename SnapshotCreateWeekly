@@ -14,7 +14,7 @@ privilege="SnapShots";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
 then
-echo Adding snapshot schedule.... > $web;
+echo Snap1019:$DG/$FileS > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Creating_WeeklyPreiod:'$DG/$FileS;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
@@ -25,11 +25,12 @@ crontab txt/cronthis.txt 2>>txt/${0:2}$userreq.txt
 err=`wc -c  txt/${0:2}$userreq.txt | awk '{print $1}'`;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 if [[ $err -ge  4  ]]; then
-	cat txt/${0:2}$userreq.txt > $web;
+	echo Snap1020:$DG/$FileS > $web;
+	cat txt/${0:2}$userreq.txt > $web{internal};
 	logdata='Failed_Creating_WeeklyPeriod:'$DG/$FileS;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
 else 
-	echo DONE...Snapshot Weekly.$hr.$min.$every.$keep is added > $web; 
+	echo Snap1021:Weekly.$hr.$min.$every.$keep:$DG/$FileS > $web; 
 	logdata='Success_Creating_WeeklyPeriod:'$DG/$FileS;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 fi;
