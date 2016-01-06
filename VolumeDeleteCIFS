@@ -2,13 +2,13 @@
 cd /TopStor
 web='/usr/local/www/apache24/data/des19/Data/CIFSstatus.log';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
-echo Deleteing  $@.... > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 rm txt/err2.txt;
 volname=`echo $@ | awk '{print $2}'`;
 DG=`echo $@ | awk '{print $1}'`;
 pro=`echo $@ | awk '{print $3}'`;
 userreq=` echo $@ | awk '{print $4}'`;
+echo CIFS1005:$DG/$volname > $web;
 privilege=$pro;
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
@@ -22,7 +22,8 @@ err=`wc -c  txt/${0:2}$userreq.txt | awk '{print $1}'`;
 err=$((err+1));
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 if [[ $err -ge  4  ]]; then
-	cat txt/${0:2}$userreq.txt > $web;
+	echo CIFS1006:$DG/$volname > $web;
+	cat txt/${0:2}$userreq.txt > $web{internal};
 	logdata='failed_deleting_volume:'$DG/$volname;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
 else 
@@ -32,7 +33,7 @@ cp /usr/local/etc/smb4.conf smb4.confcurrent;
  ./delblock.sh start${volname}_only stop${volname}_only CIFSshares.txt  ;
  cp smb4.confcurrent /usr/local/etc/smb4.conf;
  service samba_server restart;
- echo DONE...volume $volname is deleted > $web; 
+ echo CIFS1007:$DG/$volname > $web; 
  logdata='success_deleting_volume'$DG/$volname;
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
 fi;

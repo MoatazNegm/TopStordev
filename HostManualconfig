@@ -11,7 +11,7 @@ privilege="Error";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]];
 then
-echo changing box name and ips.... > $web;
+echo HostManual1000: > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='changing_box_to:'$hostn'_'$hostip'_'$hostrout'_'$hostdns;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
@@ -25,7 +25,7 @@ resolvconf -u
 /etc/rc.d/netif restart && /etc/rc.d/routing restart;
 route delete default;
 route add default $hostrout
-echo changes are done.. some moments and will see them > $web
+echo HostManual1001: > $web
 logdata='success_changing_box_to:'$hostn'_'$hostip'_'$hostrout'_'$hostdns;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;

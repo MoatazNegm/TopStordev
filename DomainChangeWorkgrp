@@ -1,5 +1,5 @@
 #!/usr/local/bin/zsh
-web='/usr/local/www/apache24/data/des19/Data/'$0'status.log';
+web='/usr/local/www/apache24/data/des19/Data/DomainChangestatus.log';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log';
 domain=`echo $@ | awk '{ print $1 }' `;
 domc=`echo $domain | tr '[:lower:]' '[:upper:]'`;
@@ -19,7 +19,7 @@ ip1=` echo $domcontip | awk -F. '{print $1}'`;
 ip2=` echo $domcontip | awk -F. '{print $2}'`;
 ip3=` echo $domcontip | awk -F. '{print $3}'`;
 ip4=` echo $domcontip | awk -F. '{print $4}'`;
-echo changing Domain to Workgroup $domain.... > $web;
+echo Domain1010:$domain > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Domain_change:'$domain;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq`;
@@ -43,7 +43,7 @@ cp txt/smb4.conf /usr/local/etc/smb4.conf;
 #sed -e "s/DOMC/$domc/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMSH/$domshort/g" -e "s/CONT/$domcont/g" krb5.conf > txt/krb5.conf;
 #cp txt/krb5.conf /etc/ ;
 service samba_server restart;
-echo DONE...Workgroup $doms  > $web;
+echo Domain1011:$domain  > $web;
 logdata='success_changing_Wrokgroup:'$domain;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq`;
