@@ -19,7 +19,7 @@ ip1=` echo $domcontip | awk -F. '{print $1}'`;
 ip2=` echo $domcontip | awk -F. '{print $2}'`;
 ip3=` echo $domcontip | awk -F. '{print $3}'`;
 ip4=` echo $domcontip | awk -F. '{print $4}'`;
-echo changing Domain to $domain.... > $web;
+echo Domain1000:$domain > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Domain_change:'$domain;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq`;
@@ -50,10 +50,11 @@ service ntpdate restart;
 /usr/local/bin/net ads join  -U $admin%$pass > txt/${0:2}$userreq.txt ;
 err=`cat  txt/${0:2}$userreq.txt | grep Failed | wc -c `;
 if [ $err -ge  4  ]; then
-	cat txt/${0:2}$userreq.txt > $web;
+	echo Domain1001:$domain > $web;
+	cat txt/${0:2}$userreq.txt > $web{internal};
 	logdata='failed_changing_domain:'$domain;
 else 
- echo DONE...Domain $doms is joined > $web; 
+ echo Domain1002:$domain > $web; 
  logdata='success_changing_domain:'$domain;
 fi;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
