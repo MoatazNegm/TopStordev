@@ -1,6 +1,6 @@
 #! /usr/local/bin/zsh
 cd /TopStor
-web='/usr/local/www/apache24/data/des19/Data/currentinfo2.log2';
+web2='/usr/local/www/apache24/data/des19/Data/currentinfo2.log2';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 stamp=`date +%s`;
 cronout='txt/replicronoutput.log';
@@ -45,21 +45,21 @@ then
   counter=$((counter+1));
 #	echo $timenow: have to delete $oldsnap > $web;
   logdata='Deleting_Snapshot:'$oldsnap;
-  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1022@@@$oldsnap`;
   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
   /sbin/zfs destroy $oldsnap 2>$filelog
   err=`cat $filelog | wc -c `;
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   if [[ $err -ge  4  ]]; then
-   cat $filelog > $web;
+   echo Snap1028@$datenow@$timenow@$oldsnap  > $web2;
    logdata='Difficulty_Deleting_Snapshot:'$oldsnap;
-   logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata`;
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata code Snap1028@@@$oldsnap`;
   echo $logthis >> $cronout
   counter=$((snapsc+3));
   else
-   echo $datenow $timenow: DONE...Replication $@ is created > $web;
+   echo Snap1025@$datenow@$timenow@$oldsnap > $web2;
    logdata='Success_Deleting_Snapshot:'$oldsnap;
-   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1025@@@$oldsnap`;
    echo $logthis >> $cronout
   fi;
   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
@@ -71,12 +71,13 @@ then
  newsnap=`echo $oper1@$newsnap2`;
  echo newsnap=$newsnap >> $cronout
  logdata='Creating_Snapshot:'$newsnap;
- logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata Snap1026@@@$newsnap`;
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
  /sbin/zfs snapshot $newsnap > $filelog 2>&1;
  /sbin/zfs set repli:sender=$hostip $newsnap;
  /sbin/zfs set repli:receiver=$oper3 $newsnap;
  #echo $hostip $oper3 $newsnap2 $pool $vol 
+ echo Repli1003@$datenow@$timenow@$newsnap@$oper3 > $web2
  isproxy=`cat partners.txt | grep $oper3 | awk '{print $3}'`;
  if [[ $isproxy == "true" ]];
  then
@@ -121,17 +122,17 @@ then
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
  if [[ $err -ge  4  || $err2 != "success" ]]; then
 	failed=`cat $filelog`
-	echo 'Failed_Replicating'${newsnap}':'$failed > $web ;
-	logdata='Failed_Replicating'${newsnap}':'$failed;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
+	echo Repli1005@$datenow@$timenow@${newsnap}@$oper3 > $web2 ;
+	echo 'Failed_Replicating'${newsnap}':'$failed > ${web2}internal ;
+	logdata='Failed_Replicating'${newsnap};
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Repli1005@@@$newsnap@$oper3`;
 	echo $logthis >> $cronout
  else 
-	echo $datenow $timenow: DONE...Replication $@ is created > $web; 
+	echo Repli1006@$datenow@$timenow@$newsnap$oper3 > $web2; 
 	logdata='Success_Replicating_Snapshot:'$newsnap;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Repli1006@@@$newsnap@$oper3`;
 	echo $logthis >> $cronout
  fi;
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 fi
-echo $datenow $timenow :$logdata > ${logging}2
 rm $filelog 2>/dev/null

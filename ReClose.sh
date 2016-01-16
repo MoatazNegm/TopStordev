@@ -16,7 +16,7 @@ rm txt/out$pp;
 rm txt/in$pp;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Closing Session';
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $partner data $logdata`;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $partner data $logdata ReClose1000@@@.`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-echo $datenow $timenow :$logdata > ${logging}2
+echo ReClose1000@$datenow@$timenow@. > ${logging}2
 #echo $pp;

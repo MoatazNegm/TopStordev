@@ -14,7 +14,8 @@ then
 echo HostManual1000: > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='changing_box_to:'$hostn'_'$hostip'_'$hostrout'_'$hostdns;
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code HostManual1002@@@.`;
+echo HostManual1002@$datenow@$timenow@. > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
 echo name_servers=\"$hostdns\" > txt/resolvconf.conf
 sed -e "s/HOSTNAME/$hostn/g" -e "s/IPADD/$hostip/g" -e "s/ROUTE/$hostrout/g" rc.conf > txt/rc.conf
@@ -28,10 +29,9 @@ route add default $hostrout
 echo HostManual1001: > $web
 logdata='success_changing_box_to:'$hostn'_'$hostip'_'$hostrout'_'$hostdns;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code HostManual1003@@@.`;
+echo HostManual1003@$datenow@$timenow@. > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
 fi
-bb=`cat $web`;
-echo $datenow $timenow :$bb > ${logging}2
 reboot;
 

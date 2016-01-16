@@ -14,7 +14,8 @@ then
 echo Partner1003:$Partnername > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Deleting_partner:'$Partnername;
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Partner1005@@@$Partnername`;
+echo Partner1005@$datenow@$timenow@$Partnername > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 partnerlist=`cat partners.txt `;
 echo $partnerlist | grep "$Partnername" > txt/PartnerDel
@@ -35,8 +36,7 @@ echo $res > $resweb;
 echo Partner1004:$Partnername > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='success_Deleting_partner:'$Partnername;
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Partner1006@@@$Partnername`;
+echo Partner1006@$datenow@$timenow@$Partnername > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
-bb=`cat $web`;
-echo $datenow $timenow :$bb > ${logging}2
 fi

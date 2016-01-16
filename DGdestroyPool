@@ -9,7 +9,8 @@ then
 	echo DG1000:Data > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Deleting_Pool:Data';
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DG1009@@@Data`;
+echo DG1009@$datenow@$timenow@Data > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 zpool destroy Data 2>txt/${0:2}$userreq.txt
 crontab -r 2>>txt/${0:2}$userreq.txt
@@ -19,14 +20,14 @@ if [[ err -ge 4 ]]; then
 	echo DG1001:Data > $web;
 	cat txt/${0:2}$userreq.txt > ${web}internal;
 	logdata='failed_Deleting_Pool:Data';
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code DG1010@@@Data`;
+echo DG1010@$datenow@$timenow@Data > ${logging}2
 else
 	echo Data1002:Data > $web;
 	logdata='Success_Deleting_Pool:Data';
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata `;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DG1011@@@Data `;
+echo DG1011@$datenow@$timenow@Data > ${logging}2
 fi 
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 rm txt/${0:2}$userreq.txt
 fi
-bb=`cat $web`;
-echo $datenow $timenow :$bb > ${logging}2

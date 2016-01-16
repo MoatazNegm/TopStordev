@@ -26,12 +26,17 @@ else
  echo nc -ld $tun $pp \| gunzip \| openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD \|zfs receive -dvF  $pool >tmprepli;
   nc -ld $tun $pp | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD |zfs receive -dvF  $pool >$logf 2>>tmprepli;
 fi
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 cat $logf | grep -w received;
 if [[ $? -ne 0 ]];  
 then
  logdata='Failed_Receiving_new_snapshot_for:'$vol'_from:'$partner;
+ code='Repli1001@@@'$vol'@'$partner
+ codedate='Repli1001@'$datenow'@'$timenow'@'$vol'@'$partner
 else
  logdata='Success_Receiving_new_snapshot_for:'$vol'_from:'$partner;
+ code='Repli1002@@@'$vol'@'$partner
+ codedate='Repli1002@'$datenow'@'$timenow'@'$vol'@'$partner
  g=`cat /etc/exports | grep ${vol}_only | wc -c`; 
  if [[ $g -le 4 ]];
  then
@@ -44,7 +49,6 @@ else
  fi
  ./GetPoolVollist
 fi
-datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $partner data $logdata`;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $partner data $logdata code $code`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-echo $datenow $timenow :$logdata > ${logging}2
+echo $codedate > ${logging}2

@@ -10,7 +10,8 @@ if [[ $contrun == 'true' ]]
 then
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Deleting_Period:'$periodel;
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1045@@@$periodel`;
+echo Replica1045@$datenow@$timenow@$periodel > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 echo Replica1003:$periodel > $web
 /usr/bin/crontab -l | grep -v "$periodel" | /usr/bin/crontab -  2>txt/${0:2}$userreq.txt
@@ -20,15 +21,15 @@ if [[ $err -ge  4  ]]; then
         echo Replica1004:$periodel > $web;
         cat txt/${0:2}$userreq.txt > ${web}internal;
         logdata='Failed_Deleting_Period:'$periodel;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1046@@@$periodel`;
+echo Replica1046@$datenow@$timenow@$periodel > ${logging}2
 else
 	 echo Replica1005:$periodel > $web;
         logdata='success_Deleting_Period:'$periodel;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1047@@@$periodel`;
+echo Replica1047@$datenow@$timenow@$periodel > ${logging}2
 fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 rm txt/${0:2}$userreq.txt
 ./RemoteGetPoolperiodlist &
 fi
-bb=`cat $web`;
-echo $datenow $timenow :$bb > ${logging}2

@@ -12,9 +12,9 @@ then
  ./ReClose.sh $pp &
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
  logdata='Initializing_new_session';
- logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $partner data $logdata`;
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $partner data $logdata code Reinit@@@`;
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
- echo $datenow $timenow :$logdata > ${logging}2
+ echo Reinit1000@$datenow@$timenow@. > ${logging}2
  #echo $pp;
  echo $pp;
 else

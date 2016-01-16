@@ -10,7 +10,8 @@ if [[ $contrun == 'true' ]]
 then
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Rollingback_Snapshot:'$snaprol;
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1042@@@$snaprol`;
+echo Replica1042@$datenow@$timenow@$snaprol > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 echo Replica1006:$snaprol > $web;
 /sbin/zfs rollback -r  $snaprol  2>txt/${0:2}$userreq.txt;
@@ -20,15 +21,15 @@ if [[ $err -ge  4  ]]; then
 	echo Replica1007:$snaprol > $web;
 	cat txt/${0:2}$userreq.txt > ${web}internal;
 	logdata='Failed_Rollingback_Snapshot:'$snaprol;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Replica1043@@@$snaprol`;
+echo Replica1043@$datenow@$timenow@$snaprol > ${logging}2
 else 
 	echo Replica1008:$snaprol > $web; 
 	logdata='Success_Rollingback_Snapshot:'$snaprol;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1044@@@$snaprol`;
+echo Replica1044@$datenow@$timenow@$snaprol > ${logging}2
 fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 rm txt/${0:2}$userreq.txt
 ./GetSnaplist
 fi
-bb=`cat $web`;
-echo $datenow $timenow :$bb > ${logging}2
