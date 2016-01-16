@@ -10,7 +10,8 @@ if [[ $contrun == 'true' ]]
 then
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Deleting_Snapshot:'$snapdel;
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1022@@@$snapdel`;
+echo Snap1022@$datenow@$timenow@$snapdel > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 echo Snap1000:$snapdel > $web;
 /sbin/zfs destroy $snapdel  2>txt/${0:2}$userreq.txt;
@@ -20,15 +21,15 @@ if [[ $err -ge  4  ]]; then
 	echo Snap1001:$snapdel > $web;
 	cat txt/${0:2}$userreq.txt > ${web}internal;
 	logdata='Failed_Deleting_Snapshot:'$snapdel;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Snap1023@@@$snapdel`;
+echo Snap1023@$datenow@$timenow@$snapdel > ${logging}2
 else 
 	 echo Snap1002:$snapdel > $web; 
 	logdata='Success_Deleting_Snapshot:'$snapdel;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1025@@@$snapdel`;
+echo Snap1025@$datenow@$timenow@$snapdel > ${logging}2
 fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 rm txt/${0:2}$userreq.txt
 ./GetSnaplist
 fi
-bb=`cat $web`;
-echo $datenow $timenow :$bb > ${logging}2

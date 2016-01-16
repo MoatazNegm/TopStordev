@@ -13,8 +13,9 @@ if [[ $contrun == 'true' ]]
 then
 echo Snap1009: > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-logdata='Creating_HourlyPeriod:'$DG/$FileS@$name;
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+logdata='Creating_HourlyPeriod:'$DG/$FileS;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1037@@@.`;
+echo Snap1037@$datenow@$timenow@. > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 crontab -l > txt/cronthis.txt
 echo $min  "*"/$every "*" "*" "*"  /TopStor/pump.sh Snapshotnow $DG/$FileS hourly.$keep.$min.$every.na 2> txt/err.txt >> txt/cronthis.txt
@@ -24,16 +25,16 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 if [[ $err -ge  4  ]]; then
 	echo Snap1010: > $web;
 	cat txt/${0:2}$userreq.txt > ${web}internal;
-	logdata='Failed_Creating_HourlyPeriod:'$DG/$FileS@$name;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
+	logdata='Failed_Creating_HourlyPeriod:'$DG/$FileS;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata Snap1038@@@.`;
+echo Snap1038@$datenow@$timenow@. > ${logging}2
 else 
  	echo Snap1011:hourly.$min.$every.$keep > $web; 
-	logdata='Success_Creating_HourlyPeriod:'$DG/$FileS@$name;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+	logdata='Success_Creating_HourlyPeriod:'$DG/$FileS;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1039@@@hourly.$min.$every.$keep/$DG/$FileS`;
+echo Snap1039@$datenow@$timenow@hourly.$min.$every.$keep/$DG/$FileS > ${logging}2
 fi
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 rm txt/${0:2}$userreq.txt
 ./GetPoolperiodlist
 fi
-bb=`cat $web`;
-echo $datenow $timenow :$bb > ${logging}2

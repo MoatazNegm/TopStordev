@@ -13,7 +13,8 @@ then
 echo Snap1013:$DG/$FileS > $web;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Creating_Snapshot:'$DG/$FileS@$name;
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1026@@@$DG/$FileS@name`;
+echo Snap1026@$datenow@$timenow@$DG/$FileS@$name > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 /TopStor/SnapshotnowOnce $DG/$FileS $name. 2> txt/${0:2}$userreq.txt 
 err=`wc -c  txt/${0:2}$userreq.txt | awk '{print $1}'`;
@@ -22,15 +23,15 @@ if [[ $err -ge  4  ]]; then
 	echo Snap1014:$DG/$FileS > $web;
 	cat txt/${0:2}$userreq.txt > $web;
 	logdata='Failed_Creating_Snapshot:'$DG/$FileS@$name;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata Snap1028@@@$DG/$FileS@$name`;
+echo Snap1028@$datenow@$timenow@$DG/$FileS@$name > ${logging}2
 else 
  	echo Snap1015:$DG/$FileS$name.$now1 > $web; 
 	logdata='Success_Creating_Snapshot:'$DG/$FileS@$name;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1030@@@$DG/$FileS@$name`;
+echo Snap1030@$datenow@$timenow@$DG/$FileS@$name > ${logging}2
 fi;
 rm txt/${0:2}$userreq.txt
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 ./GetSnaplist
 fi
-bb=`cat $web`;
-echo $datenow $timenow :$bb > ${logging}2
