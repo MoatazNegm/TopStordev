@@ -1,13 +1,14 @@
 [global]
 workgroup = DOMSH
-#netbios name = MYNAME
-server role = standalone server
+netbios name = MYNAME
+#server role = standalone server
 load printers = no
 server string = FreeBSD Client %v
+passdb backend = tdbsam
 max protocol = NT1
-encrypt passwords = yes
-socket options = TCP_NODELAY SO_RCVBUF=8192 SO_SNDBUF=8192
-dns proxy = yes
+wins support = yes
+wins proxy = yes
+dns proxy = no
 smb ports = 139
 template homedir = /home/%U
 template shell = /usr/local/bin/bash

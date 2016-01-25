@@ -1,0 +1,2 @@
+sed: 1: "s/MYNAME/REPLI2/g-e
+": bad flag in substitute command: '-'
