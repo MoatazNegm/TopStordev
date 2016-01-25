@@ -1,1 +1,1 @@
-localrep=proxy proxyrun=1 openvpnflag=0
+localrep=local proxyrun=1 openvpnflag=0

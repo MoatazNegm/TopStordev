@@ -1,8 +1,10 @@
 [global]
-workgroup = SIMPLEGROUP
-netbios name = MYNAME
+workgroup = TEMP3
+#netbios name = MYNAME
+server role = standalone server
 load printers = no
 server string = FreeBSD Client %v
+max protocol = NT1
 encrypt passwords = yes
 socket options = TCP_NODELAY SO_RCVBUF=8192 SO_SNDBUF=8192
 dns proxy = yes
@@ -313,3 +315,36 @@ writeable - Yes
 nt acl support - yes
 inherit acls = Yes
 ;;;;;;;;;;;;;;;;;;;;   stopdss_only
+;;;;;;;;         starttemp1_only
+[temp1]
+path = /Data/temp1
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+;;;;;;;;;;;;;;;;;;;;   stoptemp1_only
+;;;;;;;;         startttt_only
+[ttt]
+path = /Data/ttt
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+;;;;;;;;;;;;;;;;;;;;   stopttt_only
+;;;;;;;;         startsdd_only
+[sdd]
+path = /Data/sdd
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+;;;;;;;;;;;;;;;;;;;;   stopsdd_only

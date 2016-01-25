@@ -1,8 +1,10 @@
 [global]
 workgroup = DOMSH
-netbios name = MYNAME
+#netbios name = MYNAME
+server role = standalone server
 load printers = no
 server string = FreeBSD Client %v
+max protocol = NT1
 encrypt passwords = yes
 socket options = TCP_NODELAY SO_RCVBUF=8192 SO_SNDBUF=8192
 dns proxy = yes
