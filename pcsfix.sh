@@ -6,6 +6,7 @@ ClearExit() {
 	exit 0;
 }
 trap ClearExit HUP
+sleep 20
 while true; do 
 {
 sleep 5

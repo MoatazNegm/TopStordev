@@ -1,6 +1,6 @@
 #!/usr/local/bin/zsh
-web='/usr/local/www/apache24/data/des19/Data/'$0'status.log';
-logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log';
+web='/var/www/html/des20/Data/'$0'status.log';
+logging='/var/www/html/des20/Data/currentinfo2.log';
 domain=`echo $@ | awk '{ print $1 }' `;
 domc=`echo $domain | tr '[:lower:]' '[:upper:]'`;
 doms=`echo $domain | tr '[:upper:]' '[:lower:]'`;
@@ -27,9 +27,9 @@ echo Domain1003@$datenow@$timenow@$domain > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 echo $pass > txt/pass;
 hostn=`hostname | awk -F. '{print $1}'`;
-sed "1s/.*/hostname=\"$hostn\.$doms\"/" /etc/rc.conf > txt/rc.conf;
+#sed "1s/.*/hostname=\"$hostn\.$doms\"/" /etc/rc.conf > txt/rc.conf;
 hostname $hostn.$doms;
-cp txt/rc.conf /etc/rc.conf;
+#cp txt/rc.conf /etc/rc.conf;
 /usr/bin/sed -e "s/DOMSMALL/${doms}/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" dhclient.conf > txt/dhclient.conf 2>txt/err.txt
 cp txt/dhclient.conf /etc/dhclient.conf
 #echo search_domains=\"$doms\" > txt/resolvconf.conf
@@ -40,15 +40,15 @@ cp txt/dhclient.conf /etc/dhclient.conf
 #resolvconf -u;
 sed -e "s/CONT/$domcont/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMC/$domc/g" -e "s/DOMSH/$domshort/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" smb4.conf > txt/smb4.conf 2>txt/err.txt ; 
 cat CIFSshares.txt >> txt/smb4.conf;
-cp txt/smb4.conf /usr/local/etc/smb4.conf;
+cp txt/smb4.conf /etc/samba/smb.conf;
 sed -e "s/DOMC/$domc/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMSH/$domshort/g" -e "s/CONT/$domcont/g" krb5.conf > txt/krb5.conf;
 cp txt/krb5.conf /etc/ ;
 sed -e "s/CONT/$domcont\.$doms/g" -e "s/DOMSMALL/$doms/g" ntp.conf > txt/ntp.conf ;
-service samba_server restart;
-cp txt/ntp.conf /etc/
-service ntpd stop;
-service ntpdate restart;
-/usr/local/bin/net ads join  -U $admin%$pass > txt/${0:2}$userreq.txt ;
+systemctl restart smb;
+#cp txt/ntp.conf /etc/
+#service ntpd stop;
+#service ntpdate restart;
+realm join --user=$admin@$domc $domc  2> txt/${0:2}$userreq.txt ;
 err=`cat  txt/${0:2}$userreq.txt | grep Failed | wc -c `;
 if [ $err -ge  4  ]; then
 	echo Domain1001:$domain > $web;

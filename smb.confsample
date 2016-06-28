@@ -1,0 +1,29 @@
+[global] 
+workgroup = MYDOMAINLOCAL 
+server string = Samba Server Version %v  
+# Add the IPs / subnets allowed acces to the server in general. 
+# The following allows local and 10.0.*.* 
+#access hosts allow = 127. 10.0.  
+# log files split per-machine: 
+log file = /var/log/samba/log.%m 
+# enable the following line to debug: 
+# log level =3 
+# maximum size of 50KB per log file, then rotate: 
+max log size = 50  
+# Here comes the juicy part! 
+security = ads 
+encrypt passwords = yes 
+passdb backend = tdbsam 
+realm = MYDOMAIN.LOCAL  
+# Not interested in printers 
+load printers = no 
+cups options = raw  
+# This stops an annoying message from appearing in logs 
+printcap name = /dev/null  
+[myshare] 
+comment = My shared 
+path = /home/common
+public = yes
+writable = yes 
+guest ok = no 
+#valid users = @"adgroup@mydomain.local" 

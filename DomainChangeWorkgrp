@@ -1,6 +1,6 @@
 #!/usr/local/bin/zsh
-web='/usr/local/www/apache24/data/des19/Data/DomainChangestatus.log';
-logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log';
+web='/var/www/html/des20/Data/DomainChangestatus.log';
+logging='/var/www/html/des20/Data/currentinfo2.log';
 domain=`echo $@ | awk '{ print $1 }' `;
 domc=`echo $domain | tr '[:lower:]' '[:upper:]'`;
 doms=`echo $domain | tr '[:upper:]' '[:lower:]'`;
@@ -9,6 +9,7 @@ admin=`echo $@ | awk '{ print $2 }'`;
 pass=`echo $@ | awk '{ print $3 }'`;
 domcont=` echo $@ | awk '{ print $4 }'`
 userreq=` echo $@ | awk '{ print $5 }'`;
+echo $@ > /TopStordata/domworkgrp
 privilege="Active_Directory";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == "true" ]];
@@ -28,9 +29,9 @@ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $
 echo $pass > txt/pass;
 hostn=`hostname | awk -F. '{print $1}'`;
 hostnc=`echo $hostn | tr '[:lower:]' '[:upper:]'`;
-sed "1s/.*/hostname=\"$hostn\.$doms\"/" /etc/rc.conf > txt/rc.conf;
+#sed "1s/.*/hostname=\"$hostn\.$doms\"/" /etc/rc.conf > txt/rc.conf;
 hostname $hostn.$doms;
-cp txt/rc.conf /etc/rc.conf;
+#cp txt/rc.conf /etc/rc.conf;
 #/usr/bin/sed -e "s/DOMSMALL/${doms}/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" dhclient.conf > txt/dhclient.conf 2>txt/err.txt
 #cp txt/dhclient.conf /etc/dhclient.conf
 #echo search_domains=\"$doms\" > txt/resolvconf.conf
@@ -39,17 +40,17 @@ cp txt/rc.conf /etc/rc.conf;
 #cat /etc/resolv.conf >> txt/resolv.conf;
 #cp txt/resolvconf.conf /etc/resolvconf.conf;
 #resolvconf -u;
-sed -e "s/CONT/$domcont/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMC/$domc/g" -e "s/DOMSH/$domshort/g" -e "s/MYNAME/$hostnc/g"-e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" smb4.confWorkgrp > txt/smb4.conf 2>txt/err.txt ; 
+sed -e "s/CONT/$domcont/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMC/$domc/g" -e "s/DOMSH/$domshort/g" -e "s/MYNAME/$hostnc/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" smb4.confWorkgrp > txt/smb4.conf 2>txt/err.txt ; 
 cat CIFSshares.txt >> txt/smb4.conf;
-cp txt/smb4.conf /usr/local/etc/smb4.conf;
-hostip=`ifconfig em1 | grep "inet " | awk '{print $2}'`
-hosts=`cat /etc/hosts | grep -v "$hostn"`;
-echo $hosts > /etc/hosts
-echo $hostip   $hostn >> /etc/hosts
-echo $hostip   $hostn.$doms >> /etc/hosts
+cp txt/smb4.conf /etc/samba/smb.conf;
+#hostip=`ifconfig em1 | grep "inet " | awk '{print $2}'`
+#hosts=`cat /etc/hosts | grep -v "$hostn"`;
+#echo $hosts > /etc/hosts
+#echo $hostip   $hostn >> /etc/hosts
+#echo $hostip   $hostn.$doms >> /etc/hosts
 #sed -e "s/DOMC/$domc/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMSH/$domshort/g" -e "s/CONT/$domcont/g" krb5.conf > txt/krb5.conf;
 #cp txt/krb5.conf /etc/ ;
-service samba_server restart;
+systemctl restart smb
 echo Domain1011:$domain  > $web;
 logdata='success_changing_Wrokgroup:'$domain;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;

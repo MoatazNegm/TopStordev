@@ -1,8 +1,16 @@
 #!/usr/local/bin/zsh
-web='/usr/local/www/apache24/data/des19/Data/Hostprop.txt';
-hostn=`/bin/hostname`;
-hostip=`ifconfig em1 | grep "inet " | awk '{print $2}'`;
-hostrout=`netstat -rn | grep default | awk '{print $2}'`;
+cd /TopStor
+web='/var/www/html/des20/Data/Hostprop.txt';
+if [ ! -f /TopStordata/hostname ]; then echo NONE >> /TopStordata/hostname; fi
+hostn=`cat /TopStordata/hostname`
+allips=""
+ips=(`pcs resource | grep IPaddr | awk '{print $1}'`)
+for CC in "${ips[@]}"; do
+ hostip=`pcs resource show $CC | grep Attributes | awk '{print $2}' | awk -F= '{print $2}'`
+ allips=$allips"_"$hostip
+done
+allips=`echo $allips | awk -F_ '{$1="";print}'`
+hostrout=`netstat -rn | awk '{print $2}' | grep -v "Gateway" | grep -v "IP" | grep -v "0.0.0.0"`;
 hostdns=` cat /etc/resolv.conf | grep nameserver | awk '{print $2}'`;
-jsonips=`/usr/local/bin/zsh jsonthis3.sh name $hostn addr $hostip rout $hostrout dns $hostdns`;
+jsonips=`/usr/local/bin/zsh jsonthis3.sh name $hostn addr $allips rout $hostrout dns $hostdns`;
 echo $jsonips > $web; 

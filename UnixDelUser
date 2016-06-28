@@ -1,6 +1,6 @@
 #!/usr/local/bin/zsh
-web="/usr/local/www/apache24/data/des19/Data/Usersstatus.log";
-logging="/usr/local/www/apache24/data/des19/Data/currentinfo2.log";
+web="/var/www/html/des20/Data/Usersstatus.log";
+logging="/var/www/html/des20/data/des19/Data/currentinfo2.log";
 username=`echo $@ | awk '{print $1}'`;
 userreq=`echo $@ | awk '{print $2}'`;
 privilege="Box_Users";
@@ -13,9 +13,8 @@ logdata='Deleting_user:'$username;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq code Unlin1004@@@$username`;
 echo Unlin1004@$datenow@$timenow@$username > ${logging}2
 oldlog=`cat $logging | sed 's/]//g' `; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-/usr/local/bin/smbpasswd -d $username;
-pw user del $username -r  2>txt/${0:2}$userreq.txt;
-rm -R  /Data/Common/$username;
+/bin/smbpasswd -d $username;
+userdel -r  $username 2>txt/${0:2}$userreq.txt;
 rm key/$username;
 err=`wc -c txt/${0:2}$userreq.txt | awk '{print $1}'`;
 datenow=`date +%m/%d/%Y`;timenow=`date +%T`;

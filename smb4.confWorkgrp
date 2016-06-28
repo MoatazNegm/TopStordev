@@ -3,30 +3,18 @@ workgroup = DOMSH
 netbios name = MYNAME
 #server role = standalone server
 load printers = no
-server string = FreeBSD Client %v
+server string = TopStor server %v
 passdb backend = tdbsam
-max protocol = NT1
-wins support = yes
-wins proxy = yes
-dns proxy = no
-smb ports = 139
+log file = /var/log/samba/log.%
 template homedir = /home/%U
-template shell = /usr/local/bin/bash
-interfaces = em1
-client ntlmv2 auth = yes
-;winbind use default domain = yes
-restrict anonymous = 2
-disable netbios = no
-dos charset = ASCII
-unix charset = UTF8
-name resolve order = wins bcast host
-bind interfaces only = yes
-vfs objects = acl_xattr
-map acl inherit = Yes
-store dos attributes = Yes
-acl group control = Yes
-acl map full control = true
-dos filemode = Yes
+security = ads
+encrypt passwords = yes
+realm = DOMSH
+[homes] 
+comment = Home Directories 
+valid users = %S 
+read only = No 
+browseable = No  
 [common]
 path = /home/common
 #read only = no
@@ -34,15 +22,10 @@ browsable = yes
 write list = @everyone
 admin users = administrator
 writeable = Yes
-nt acl support = yes
-inherit acls = Yes
-
+guest ok = yes
 [homes]
 root preexec = /TopStor/sambaconnect %S
 writeable = Yes
-nt acl support = yes
 admin users = %S
 browsable = no
-map archive = yes
-inherit acls = Yes
 ##########################
