@@ -1,7 +1,8 @@
 #!/usr/local/bin/zsh
-web='/usr/local/www/apache24/data/des19/Data/'$0'status.log';
-logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log';
-rm txt/err; 
+cd /TopStor/
+web='/var/www/html/des20/Data/HostManualconfigstatus.log';
+logging='/var/www/html/des20/Data/currentinfo2.log';
+rm txt/err &>/dev/null; 
 hostn=`echo $@ | awk '{ print $1 }' `;
 hostip=`echo $@ | awk '{ print $2 }'`;
 hostrout=`echo $@ | awk '{ print $3 }'`;
@@ -17,15 +18,15 @@ logdata='changing_box_to:'$hostn'_'$hostip'_'$hostrout'_'$hostdns;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code HostManual1002@@@.`;
 echo HostManual1002@$datenow@$timenow@. > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
-echo name_servers=\"$hostdns\" > txt/resolvconf.conf
-sed -e "s/HOSTNAME/$hostn/g" -e "s/IPADD/$hostip/g" -e "s/ROUTE/$hostrout/g" rc.conf > txt/rc.conf
-cp txt/resolvconf.conf /etc/
-cp txt/rc.conf /etc/
-hostname $hostn
-resolvconf -u
-/etc/rc.d/netif restart && /etc/rc.d/routing restart;
-route delete default;
-route add default $hostrout
+sed -i "/nameserver/c\nameserver $hostdns" /etc/resolv.conf
+grep GATEWAY /etc/sysconfig/network-scripts/ifcf* | awk -F: '{print $1}' | sort -u | xargs sed -i "/GATEWAYc\GATEWAY\=$hostrout"  2>/dev/null
+#sed -e "s/HOSTNAME/$hostn/g" -e "s/IPADD/$hostip/g" -e "s/ROUTE/$hostrout/g" rc.conf > txt/rc.conf
+sed -ri  "s/(https:\/\/)[^=]*$/\1$hostip\//g" /etc/httpd/conf.d/sshhttp.conf 
+CC=`pcs resource | grep IPaddr | grep $(hostname) | awk '{print $1}'`
+pcs resource update $CC ip=$hostip
+pcs resource debug-stop $CC
+pcs resource debug-start $CC
+echo $hostn > /TopStordata/hostname
 echo HostManual1001: > $web
 logdata='success_changing_box_to:'$hostn'_'$hostip'_'$hostrout'_'$hostdns;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
@@ -33,5 +34,4 @@ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data 
 echo HostManual1003@$datenow@$timenow@. > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
 fi
-reboot;
-
+reboot
