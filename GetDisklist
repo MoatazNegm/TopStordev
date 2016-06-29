@@ -1,13 +1,20 @@
 #!/usr/local/bin/zsh
 cd /TopStor/
+iscsitargets='/pace/iscsitargets'
+runningpools='/pacedata/pools/runningpools'
+iscsimapping='/pacedata/iscsimapping'
 traf='/var/www/html/des20/Data/disklist.txt';
 trafupdate='/var/www/html/des20/Data/disklist.txtupdated';
+gpool=("")
 traffic="";
 s=1
-disks=(`lsblk -Sn | grep LIO-ORG | awk '{print $1}'`)
-for disknow in "${disks[@]}"; do
- traffic=$traffic' disk'$s' '$disknow
- s=$(( s+1 ));
+hostns=(`cat $iscsimapping | grep -v notconn | awk '{print $1}'`)
+for hostn in "${hostns[@]}"; do
+ poollist=(`cat $runningpools | grep $hostn | awk '{print $NF":"$2}'`);
+ gpool=( ${gpool[@]} ${poollist[@]} ); 
+done
+for poolnow in "${gpool[@]}"; do
+ traffic=$traffic' '$poolnow 
 done
 jsontraffic=`./jsonthis3.sh $traffic`;
 echo $jsontraffic > $traf
