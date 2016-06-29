@@ -1,5 +1,6 @@
 #!/usr/local/bin/zsh
-web='/usr/local/www/apache24/data/des19/Data/isuser.txt';
+web='/var/www/html/des20/Data/isuser.txt';
+cd /TopStor
 rm key/*chk
 rm $web
 resulting="not found";
