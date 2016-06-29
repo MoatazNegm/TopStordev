@@ -1,23 +1,16 @@
 #!/usr/local/bin/zsh
 cd /TopStor/
-traf='/usr/local/www/apache24/data/des19/Data/disklist.txt';
-trafdate='/usr/local/www/apache24/data/des19/Data/disklist.txtupdated';
-disks=`sysctl kern.disks | awk '{$1=""; print}'`
-noofdisks=`echo $disks | wc -w `;
+traf='/var/www/html/des20/Data/disklist.txt';
+trafupdate='/var/www/html/des20/Data/disklist.txtupdated';
 traffic="";
-s=0
-while (( $s < $noofdisks )) 
-do
-disknow=` echo $disks | awk '{print $1}'`;
-if [[ $disknow != "cd0" ]];
-then
- traffic=`echo $traffic disk$s $disknow`;
+s=1
+disks=(`lsblk -Sn | grep LIO-ORG | awk '{print $1}'`)
+for disknow in "${disks[@]}"; do
+ traffic=$traffic' disk'$s' '$disknow
  s=$(( s+1 ));
-fi
-disks=` echo $disks | awk '{$1=""; print }'`;
 done
 jsontraffic=`./jsonthis3.sh $traffic`;
 echo $jsontraffic > $traf
-trafdate=`date +$s`;
+trafdate=`/bin/date +%s`;
 jsontrafdate=` ./jsonthis3.sh update $trafdate `
-echo $jsontrafdate > $trafdate;
+echo $jsontrafdate > $trafupdate;
