@@ -1,3 +1,34 @@
+[global]
+workgroup = FFWORK
+netbios name = TOPSTORLIN
+#server role = standalone server
+load printers = no
+server string = TopStor server %v
+passdb backend = tdbsam
+log file = /var/log/samba/log.%
+template homedir = /home/%U
+security = ads
+encrypt passwords = yes
+realm = FFWORK
+[homes] 
+comment = Home Directories 
+valid users = %S 
+read only = No 
+browseable = No  
+[common]
+path = /home/common
+#read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable = Yes
+guest ok = yes
+[homes]
+root preexec = /TopStor/sambaconnect %S
+writeable = Yes
+admin users = %S
+browsable = no
+##########################
 
 ;;;;;;;;         startmezotmp_only
 [mezotmp]
@@ -8,7 +39,6 @@ write list = @everyone
 admin users = administrator
 writeable = Yes
 ;;;;;;;;;;;;;;;;;;;;   stopmezotmp_only
-
 ;;;;;;;;         starttmpvol3_only
 [tmpvol3]
 path = /p1/tmpvol3

@@ -42,7 +42,7 @@ for poolnow in "${gpool[@]}"; do
 	nf=`echo $NFSshare | grep -w "$line" | awk '{print $2}'`;
 	ci=`echo $CIFSshare | grep -w "$line" | awk '{print $2}'`;
 	qu=`echo $quota | grep -w "$line" | awk '{print $2}'`;
-	subres=`./jsonthis3.sh host $sshost Pool ${hostnam}':'$pool name $line volsize $q volact $lo available $av useddata $usd usedsnaps $uss crdate $cr compress $co dedup $de quota $qu protocol $ci$nf` ;
+	subres=`./jsonthis3.sh host $sshost class ${hostnam}'_'$pool Pool ${hostnam}':'$pool name $line volsize $q volact $lo available $av useddata $usd usedsnaps $uss crdate $cr compress $co dedup $de quota $qu protocol $ci$nf` ;
 	result=$result$subres,
  done;
 done

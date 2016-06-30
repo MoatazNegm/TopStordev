@@ -1,61 +1,71 @@
 #!/usr/local/bin/zsh
-web='/usr/local/www/apache24/data/des19/Data/NFSstatus.log';
-logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
+cd /TopStor
+web='/var/www/html/des20/Data/NFSstatus.log';
+logging='/var/www/html/des20/Data/currentinfo2.log'
+runningpools='/pacedata/pools/runningpools'
 name=`echo $@ | awk '{print $2}'`;
-DG=`echo $@ | awk '{print $1}'`;
+pDG=`echo $@ | awk '{print $1}'`;
 quota=`echo $@ | awk '{print $3}'`;
 userreq=` echo $@ | awk '{print $4}'`;
-echo CIFS1001:$DG/$name > $web;
+DG=`echo $pDG | awk -F_ '{print $2}'`;
+hostnam=`echo $pDG | awk -F_ '{print $1}'`;
+echo $hostnam
+sshost=`cat $runningpools | grep $hostnam | awk '{print $1}'`;
+echo sshost = $sshost
+echo CIFS1001:$hostnam/$DG/$name > $web;
 privilege="CIFS";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
 then
-oldname=` zfs list | grep -w "$name" | wc -c `;
+oldname=` ssh $sshost /sbin/zfs list | grep -w "$name" | wc -c `;
+echo $oldname
 if [[ $oldname -ge 4 ]];
 then
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-logdata='Creating_Volume:'$DG/$name'already_there';
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata code NFS1003@@@$DG/$name`;
-echo NFS1003@$datenow@$timenow@$DG/$name > ${logging}2
+logdata='Creating_Volume:'$hostnam/$DG/$name'already_there';
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata code NFS1003@@@$hostnam/$DG/$name`;
+echo NFS1003@$datenow@$timenow@$hostnam/$DG/$name > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-echo NFS1003@$datenow@$timenow@$DG/$name > ${logging}2
-echo CIFS1002:$DG/$name > $web;
+echo NFS1003@$datenow@$timenow@$hostnam/$DG/$name > ${logging}2
+echo CIFS1002:$hostnam/$DG/$name > $web;
 else
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-logdata='Creating_Volume:'$DG/$name;
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code NFS1004@@@$DG/$name`;
-echo NFS1004@$datenow@$timenow@$DG/$name > ${logging}2
+logdata='Creating_Volume:'$hostnam/$DG/$name;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code NFS1004@@@$hostnam/$DG/$name`;
+echo NFS1004@$datenow@$timenow@$hostnam/$DG/$name > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
-g=`cat /etc/exports | grep ${name}_only | wc -c`; if [[ $g -ge 4 ]];
+g=`ssh $sshost cat /etc/exports | grep ${name}_only | wc -c`; 
+if [[ $g -ge 4 ]];
 then
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
- logdata='Creating_Volume_already_there:'$DG/$name;
- logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata NFS1003@@@$DG/$name`;
-echo NFS1003@$datenow@$timenow@$DG/$name > ${logging}2
+ logdata='Creating_Volume_already_there:'$hostnam/$DG/$name;
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata NFS1003@@@$hostnam/$DG/$name`;
+echo NFS1003@$datenow@$timenow@$hostnam/$DG/$name > ${logging}2
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
 else
-/sbin/zfs create -o quota=$quota -o dedup=on -o compression=lz4  $DG/$name 2> txt/${0:2}$userreq.txt 
-/sbin/zfs set prot:kind=NFS $DG/$name
-chmod 777 /$DG/$name
-echo \# start${name}_only >> /etc/exports
-echo /$DG/$name >> /etc/exports
-echo  \# stop${name}_only >> /etc/exports
-service mountd restart > /dev/null 2>txt/${0:2}$userreq.txt 
-service nfsd restart > /dev/null 2>>txt/${0:2}$userreq.txt
-cat txt/${0:2}$userreq.txt | grep -v such > txt/${0:2}$userreq.txt
+ssh $sshost " cd /TopStor &&
+ /sbin/zfs create -o quota=$quota -o dedup=on -o compression=lz4  $DG/$name 2> txt/${0:2}$userreq.txt &&
+ /sbin/zfs set prot:kind=NFS $DG/$name &&
+ chmod 777 /$DG/$name &&
+ echo \# start${name}_only >> /etc/exports &&
+ echo /$DG/$name \*\(rw,sync,insecure,no_root_squash,no_all_squash\) >> /etc/exports &&
+ echo  \# stop${name}_only >> /etc/exports
+"
+ ssh $sshost systemctl restart nfs-server  > /dev/null 2>txt/${0:2}$userreq.txt 
+ cat txt/${0:2}$userreq.txt | grep -v such > txt/${0:2}$userreq.txt
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 err=`wc -c  txt/${0:2}$userreq.txt | awk '{print $1}'`;
 if [[ $err -ge  4  ]]; then
-	echo CIFS1003:$DG/$name > $web;
+	echo CIFS1003:$hostnam/$DG/$name > $web;
 	cat txt/${0:2}$userreq.txt > ${web}internal;
-	logdata='Failed_Creating__Volume:'$DG/$name;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code NFS1005@@@$DG/$name`;
-echo NFS1005@$datenow@$timenow@$DG/$name > ${logging}2
+	logdata='Failed_Creating__Volume:'$hostnam/$DG/$name;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code NFS1005@@@$hostnam/$DG/$name`;
+echo NFS1005@$datenow@$timenow@$hostnam/$DG/$name > ${logging}2
 else 
- echo CIFS1004:$DG/$name > $web; 
-	logdata='success_Creating__Volume:'$DG/$name;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code NFS1006@@@$DG/name`;
-echo NFS1006@$datenow@$timenow@$DG/$name > ${logging}2
+ echo CIFS1004:$hostnam/$DG/$name > $web; 
+	logdata='success_Creating__Volume:'$hostnam/$DG/$name;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code NFS1006@@@$hostnam/$DG/name`;
+echo NFS1006@$datenow@$timenow@$hostnam/$DG/$name > ${logging}2
 fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
 rm txt/${0:2}$userreq.txt

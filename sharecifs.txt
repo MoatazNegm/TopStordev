@@ -1,0 +1,10 @@
+;;;;;;;;         startNAMECIFS_only
+[NAMECIFS]
+path = /POOL/NAMECIFS
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable = Yes
+;;;;;;;;;;;;;;;;;;;;   stopNAMECIFS_only
+
