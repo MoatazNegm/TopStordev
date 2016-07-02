@@ -1,0 +1,10 @@
+;;;;;;;;         startcifs2_only
+[cifs2]
+path = /p1/cifs2
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable = Yes
+;;;;;;;;;;;;;;;;;;;;   stopcifs2_only
+

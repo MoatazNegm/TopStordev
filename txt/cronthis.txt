@@ -1,0 +1,4 @@
+57 19 * * Sat /TopStor/pump.sh Snapshotnow nfs33/admin Weekly.1.19.57.Sat
+4 */5 * * * /TopStor/pump.sh Snapshotnow mezo2_p1/nfs33 hourly.3.4.5.na
+4 */5 * * * /TopStor/pump.sh Snapshotnow mezo2_p1/nfs33 hourly.3.4.5.na
+4 */5 * * * /TopStor/pump.sh Snapshotnow mezo2_p1/nfs33 hourly.3.4.5.na
