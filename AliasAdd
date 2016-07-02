@@ -1,8 +1,9 @@
 #!/usr/local/bin/zsh
-webproxy='/usr/local/www/apache24/data/des19/Data/Proxylist.txt';
-resweb='/usr/local/www/apache24/data/des19/Data/Proxylist.txtupdated'
-web='/usr/local/www/apache24/data/des19/Data/Proxystatus.log';
-logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log';
+webproxy='/var/www/html/des20/Data/Proxylist.txt';
+resweb='/var/www/html/des20/Data/Proxylist.txtupdated'
+web='/var/www/html/des20/Data/Proxystatus.log';
+logging='/var/www/html/des20/Data/currentinfo2.log';
+proxy='/TopStordata/proxy.txt'
 aliasname=`echo $@ | awk '{print $1}'`;
 userreq=`echo $@  | awk '{print $2}'`;
 privilege="Proxy";
@@ -15,7 +16,7 @@ logdata='adding_Alias:'$aliasname;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1055@@@$aliasname`;
 echo Replica1055@$datenow@$timenow@$aliasname > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
-isthere=`cat proxy.txt `
+isthere=`cat $proxy `
 istheren=` echo $isthere | wc -c `
 istheren=$((istheren+0));
 if [[ $istheren -le 2 ]]; then
@@ -24,7 +25,7 @@ fi
 proxyname=`echo $isthere | awk '{print $1}'`
 licensename=`echo $isthere | awk '{print $2}'`
 newproxy=${proxyname}' '${licensename}' '${aliasname};
-echo $newproxy > proxy.txt
+echo $newproxy > $proxy
 subres=`./jsonthis3.sh Proxyurl $proxyname License $licensename Alias $aliasname`
 result='['${subres}']' ;
 echo $result >$webproxy
