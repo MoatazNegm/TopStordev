@@ -1,7 +1,7 @@
 #!/usr/local/bin/zsh
 cd /TopStor
-web='/usr/local/www/apache24/data/des19/Data/Snapsstatus.log'
-logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
+web='/var/www/html/des20/Data/Snapsstatus.log'
+logging='/var/www/html/des20/Data/currentinfo2.log'
 periodel=` echo $@ | awk '{print $1}'`;
 userreq=` echo $@ | awk '{print $2}'`;
 privilege="SnapShots";
