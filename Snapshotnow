@@ -1,7 +1,7 @@
 #!/usr/local/bin/zsh
 cd /TopStor
-web='/usr/local/www/apache24/data/des19/Data/currentinfo2.log2';
-logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
+web='/var/www/html/des20/Data/currentinfo2.log2';
+logging='/var/www/html/des20/Data/currentinfo2.log'
 stamp=`date +%s`;
 cronout='txt/cronoutput.log';
 #echo System is creating Snapshot $@.... > $web;
@@ -9,6 +9,9 @@ oper=$@;
 echo oper=$oper > $cronout
 oper1=`echo $oper | awk '{print $1}'`;
 oper2=`echo $oper | awk '{print $2}'`;
+hostnam=`cat /TopStordata/hostname`
+txtres=txt/`basename $0`$userreq.txt
+rm $txtres 2>/dev/null
 echo oper1=$oper1 >> $cronout;
 echo oper2=$oper2 >> $cronout;
 echo stamp=$stamp >> $cronout
@@ -30,22 +33,22 @@ userreq='System';
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 if (( $countsnap >  $keep )); then 
 #	echo $timenow: have to delete $oldsnap > $web;
-        	logdata='Deleting_Snapshot:'$oldsnap;
-        	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1022@@@$oldsnap`;
+        	logdata='Deleting_Snapshot:'$hostnam/$oldsnap;
+        	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1022@@@$hostnam/$oldsnap`;
 		oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-	/sbin/zfs destroy $oldsnap 2>txt/${0:2}${userreq}.txt$stamp
-	err=`wc -c  txt/${0:2}${userreq}.txt$stamp | awk '{print $1}'`;
+	/sbin/zfs destroy $oldsnap 2>${txtres}$stamp
+	err=`wc -c  ${txtres}$stamp | awk '{print $1}'`;
 	datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 	if [[ $err -ge  4  ]]; then
-        	echo Snap1001:$oldsnap > $web;
-        	cat txt/${0:2}${userreq}.txt$stamp > ${web}internal;
+        	echo Snap1001:$hostnam/$oldsnap > $web;
+        	cat ${txtres}$stamp > ${web}internal;
         	logdata='Difficulty_Deleting_Snapshot:'$oldsnap;
-        	logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata Snap1023@@@$oldsnap`;
+        	logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata Snap1023@@@$hostnam/$oldsnap`;
         echo $logthis >> $cronout
 	else
         echo Snap1024:$@ > $web;
-        	logdata='Success_Deleting_Snapshot:'$oldsnap;
-        	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1025@@@$oldsnap`;
+        	logdata='Success_Deleting_Snapshot:'$hostnam/$oldsnap;
+        	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1025@@@$hostnam/$oldsnap`;
         	echo $logthis >> $cronout
 	fi;
 	oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
@@ -54,27 +57,26 @@ newsnap2=`echo $oper2.$stamp`;
 echo newsnap2=$newsnap2 >> $cronout
 newsnap=`echo $oper1@$newsnap2`;
 echo newsnap=$newsnap >> $cronout
-logdata='Creating_Snapshot:'$newsnap;
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1026@@@$newsnap`;
+logdata='Creating_Snapshot:'$hostnam/$newsnap;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1026@@@$hostnam/$newsnap`;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-/sbin/zfs snapshot $newsnap &> txt/${0:2}${userreq}.txt$stamp
+/sbin/zfs snapshot $newsnap &> ${txtres}$stamp
 echo snapshotresult : >> $cronout
-cat txt/${0:2}${userreq}.txt$stamp >> $cronout 
-echo filenameis=txt/${0:2}${userreq}.txt$stamp >> $cronout
-err=`wc -c  txt/${0:2}${userreq}.txt$stamp | awk '{print $1}'`;
+cat ${txtres}$stamp >> $cronout 
+echo filenameis=${txtres}$stamp >> $cronout
+err=`wc -c  ${txtres}$stamp | awk '{print $1}'`;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 if [[ $err -ge  4  ]]; then
-	echo Snap1027:$newsnap > $web;
-	cat txt/${0:2}${userreq}.txt$stamp > $web;
-	logdata='Failed_Creating_Snapshot:'$newsnap;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Snap1028@@@$newsnap`;
+	echo Snap1027:$hostnam/$newsnap > $web;
+	cat ${txtres}$stamp > $web;
+	logdata='Failed_Creating_Snapshot:'$hostnam/$newsnap;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Snap1028@@@$hostnam/$newsnap`;
 	echo $logthis >> $cronout
 else 
 	echo Snap1029:$@ > $web; 
-	logdata='Success_Creating_Snapshot:'$newsnap;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1030@@@$newsnap`;
+	logdata='Success_Creating_Snapshot:'$hostnam/$newsnap;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1030@@@$hostnam/$newsnap`;
 	echo $logthis >> $cronout
 fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-rm txt/${0:2}${userreq}.txt$stamp
 ./GetSnaplist
