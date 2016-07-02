@@ -4,7 +4,7 @@ websnaps='/var/www/html/des20/Data/listsnaps.txt';
 resweb='/var/www/html/des20/Data/listsnaps.txtupdated';
 iscsimapping='/pacedata/iscsimapping';
 result='[';
-runhosts=`cat $iscsimapping | grep -v notconnected | awk '{print $1}'`
+runhosts=(`cat $iscsimapping | grep -v notconnected | awk '{print $1}'`)
 echo "$runhosts" | while read -r sshost
 do
  namearray=`ssh $sshost /sbin/zfs list -t snapshot -H -o name,creation,repli:sender,repli:receiver`; 
