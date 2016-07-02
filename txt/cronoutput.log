@@ -1,15 +1,16 @@
-oper= p1/nfs22 hourly.3.2.4.na
+oper= p1/nfs22 Minutely.6.5.na.na
 oper1=p1/nfs22
-oper2=hourly.3.2.4.na
-stamp=1467482521
-keep=3
-currentsnaps=
-oldsnap=
-countsnap=1
-countsnapplus=2
-keeppluszero=3
-newsnap2=hourly.3.2.4.na.1467482521
-newsnap=p1/nfs22@hourly.3.2.4.na.1467482521
+oper2=Minutely.6.5.na.na
+stamp=1467484202
+keep=6
+currentsnaps=p1/nfs22@Minutely.6.5.na.na.1467483301
+p1/nfs22@Minutely.6.5.na.na.1467483902
+oldsnap=p1/nfs22@Minutely.6.5.na.na.1467483301
+countsnap=2
+countsnapplus=3
+keeppluszero=6
+newsnap2=Minutely.6.5.na.na.1467484202
+newsnap=p1/nfs22@Minutely.6.5.na.na.1467484202
 snapshotresult :
-filenameis=txt/Snapshotnow.txt1467482521
-{"Date":"07/02/2016","time":"20:02:01","msg":"info","user":"System","data":"Success_Creating_Snapshot:mezo/p1/nfs22@hourly.3.2.4.na.1467482521","code":"Snap1030@@@mezo/p1/nfs22@hourly.3.2.4.na.1467482521"}
+filenameis=txt/Snapshotnow.txt1467484202
+{"Date":"07/02/2016","time":"20:30:03","msg":"info","user":"System","data":"Success_Creating_Snapshot:mezo/p1/nfs22@Minutely.6.5.na.na.1467484202","code":"Snap1030@@@mezo/p1/nfs22@Minutely.6.5.na.na.1467484202"}

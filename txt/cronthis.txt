@@ -1,3 +1,8 @@
 3 */6 * * * /TopStor/pump.sh Snapshotnowhost p1/mezo hourly.5.3.6.na
 */4 * * * * /TopStor/pump.sh Snapshotnowhost p1/mezo Minutely.4.4.na.na
 2 */4 * * * /TopStor/pump.sh Snapshotnowhost p1/nfs22 hourly.3.2.4.na
+*/5 * * * * /TopStor/pump.sh Snapshotnowhost p1/nfs22 Minutely.6.5.na.na
+59 19 * * Sat /TopStor/pump.sh Snapshotnowhost p1/nfs22 Weekly.3.19.59.Sat
+58 19 * * Tue /TopStor/pump.sh Snapshotnowhost p1/mezo Weekly.3.19.58.Tue
+*/12 * * * * /TopStor/pump.sh Snapshotnowhost p1/mezo Minutely.15.12.na.na
+*/12 * * * * /TopStor/pump.sh Snapshotnowhost p1/mezo Minutely.8.12.na.na

@@ -1,6 +1,6 @@
 #!/usr/local/bin/zsh
 cd /TopStor
-eb='/var/www/html/des20/Data/Snapsstatus.log';
+web='/var/www/html/des20/Data/Snapsstatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log'
 rm txt/cronthis.txt
 every=0; ev=`echo $@ | awk '{print $1}'`; every=$(($every+$ev)) ; if (($every < 1)); then every=1; fi
@@ -34,7 +34,7 @@ if [[ $err -ge  4  ]]; then
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Snap1035@@@Minutely.$every.$keep/$hostnam/$DG/$FileS`;
 echo Snap1035@${datenow}@${timenow}@Minutely.$every.$keep for $DG/$FileS > ${logging}2
 else 
- echo echo Snap1018:Minutely.$every.$keep for $hostnam/$DG/$FileS > $web; 
+ echo Snap1018:Minutely.$every.$keep : $hostnam/$DG/$FileS > $web; 
 	logdata='Success_Creating_MinutelyPeriod:'$hostnam/$DG/$FileS;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1036@@@Minutely.$every.$keep/$hostnam/$DG/$FileS`;
 echo Snap1036@${datenow}@${timenow}@Minutely.$every.$keep for $hostnam/$DG/$FileS > ${logging}2
