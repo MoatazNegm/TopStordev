@@ -1,0 +1,7 @@
+cannot open '/': invalid dataset name
+usage:
+	snapshot|snap [-r] [-o property=value] ... <filesystem|volume>@<snap> ...
+
+For the property list, run: zfs set|get
+
+For the delegated permission list, run: zfs allow|unallow
