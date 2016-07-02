@@ -1,8 +1,10 @@
 #!/usr/local/bin/zsh
-webpartner='/usr/local/www/apache24/data/des19/Data/Partnerslist.txt';
-resweb='/usr/local/www/apache24/data/des19/Data/Partnerslist.txtupdated'
-web='/usr/local/www/apache24/data/des19/Data/Partnersstatus.log';
-logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log';
+cd /TopStor
+webpartner='/var/www/html/des20/Data/Partnerslist.txt';
+resweb='/var/www/html/des20/Data/Partnerslist.txtupdated'
+web='/var/www/html/des20/Data/Partnersstatus.log';
+logging='/var/www/html/des20/Data/currentinfo2.log'
+partners='/TopStordata/partners.txt'
 echo $@ >> tmppartner
 Partnername=`echo $@ | awk '{print $1}'`;
 #type=`echo $@ | awk '{print $2}'`;
@@ -17,11 +19,11 @@ logdata='Deleting_partner:'$Partnername;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Partner1005@@@$Partnername`;
 echo Partner1005@$datenow@$timenow@$Partnername > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
-partnerlist=`cat partners.txt `;
+partnerlist=`cat $partners `;
 echo $partnerlist | grep "$Partnername" > txt/PartnerDel
-echo $partnerlist | grep -v "$Partnername" > partners.txt
+echo $partnerlist | grep -v "$Partnername" > $partners
 result="[";
-cat partners.txt | while read -r line ; do
+cat $partners | while read -r line ; do
   n=` echo $line | awk '{print $1}'`;  
   t=`echo $line | awk '{print $2}'`;
   p=`echo $line | awk '{print $3}'`;
