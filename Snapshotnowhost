@@ -1,0 +1,27 @@
+#!/usr/local/bin/zsh
+cd /TopStor
+web='/var/www/html/des20/Data/currentinfo2.log2';
+logging='/var/www/html/des20/Data/currentinfo2.log'
+runningpools='/pacedata/pools/runningpools'
+pDG=`echo $@ | awk '{print $1}'`;
+DG=`echo $@ | awk -F/ '{print $1}'`;
+echo DG=$DG
+myhost=`hostname`
+echo cat $runningpools  sort -u  grep $DG 
+sshost=`cat $runningpools | sort -u | grep $DG `
+if [ $? -eq 0 ]; then
+ sshost=`echo $sshost | awk '{print $1}'`
+ echo $sshost | grep $myhost
+ if [ $? -eq 0 ]; then
+  echo Snapshotnow $@
+ ./Snapshotnow $@
+ fi
+else
+ echo failed
+stamp=`date +%s`;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+	echo Snap1045:$newsnap > $web;
+	logdata='Failed to find running host for:'$newsnap;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Snap1045@@@$newsnap`;
+ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+fi

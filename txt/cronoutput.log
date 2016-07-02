@@ -1,0 +1,15 @@
+oper= p1/nfs22 hourly.3.2.4.na
+oper1=p1/nfs22
+oper2=hourly.3.2.4.na
+stamp=1467482521
+keep=3
+currentsnaps=
+oldsnap=
+countsnap=1
+countsnapplus=2
+keeppluszero=3
+newsnap2=hourly.3.2.4.na.1467482521
+newsnap=p1/nfs22@hourly.3.2.4.na.1467482521
+snapshotresult :
+filenameis=txt/Snapshotnow.txt1467482521
+{"Date":"07/02/2016","time":"20:02:01","msg":"info","user":"System","data":"Success_Creating_Snapshot:mezo/p1/nfs22@hourly.3.2.4.na.1467482521","code":"Snap1030@@@mezo/p1/nfs22@hourly.3.2.4.na.1467482521"}
