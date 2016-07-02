@@ -68,3 +68,23 @@ admin users = administrator
 writeable = Yes
 ;;;;;;;;;;;;;;;;;;;;   stopmezocifs_only
 
+;;;;;;;;         startmezo_only
+[mezo]
+path = /p1/mezo
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable = Yes
+;;;;;;;;;;;;;;;;;;;;   stopmezo_only
+
+;;;;;;;;         startpico_only
+[pico]
+path = /p1/pico
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable = Yes
+;;;;;;;;;;;;;;;;;;;;   stoppico_only
+
