@@ -1,11 +1,11 @@
 #!/usr/local/bin/zsh
 cd /TopStor
 rm /tmp/msgfile 2>/dev/null
-rm /tmp/msgrack 2>/dev/null
-rm /tmp/msgremotefile 2>/dev/null
+#rm /tmp/msgrack 2>/dev/null
+#rm /tmp/msgremotefile 2>/dev/null
 mkfifo -m 660 /tmp/msgfile 2>/dev/null
-mkfifo -m 600 /tmp/msgrack 2>/dev/null
-mkfifo -m 600 /tmp/msgremotefile 2>/dev/null
+#mkfifo -m 600 /tmp/msgrack 2>/dev/null
+#mkfifo -m 600 /tmp/msgremotefile 2>/dev/null
 export REMOTE=Topstor
 #./Topstorremote.sh &
 #./Topstorremoteack.sh &
@@ -16,8 +16,8 @@ echo $$ > /var/run/topstor.pid
 ClearExit() {
 	echo got a signal > /TopStor/txt/sigstatus.txt
 	rm /tmp/msgfile
-	rm /tmp/msgrack;
-	rm /tmp/msgremotefile;
+#	rm /tmp/msgrack;
+#	rm /tmp/msgremotefile;
 	rm /var/run/topstor.pid 
 #	ps -aux | grep /bin/nc | kill -9
 	exit 0;
