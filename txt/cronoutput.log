@@ -1,26 +1,21 @@
-oper= p1/mezo Minutely.3.10.na.na 1467486833
+oper= p1/nfs22 Minutely.6.5.na.na
 oper1=p1/nfs22
 oper2=Minutely.6.5.na.na
-stamp=1467541801
+stamp=1467544501
 keep=6
-oper1=p1/mezo
-oper2=Minutely.3.10.na.na
-stamp=1467541801
-keep=3
-currentsnaps=p1/mezo@Minutely.3.10.na.na.1467539402
-p1/mezo@Minutely.3.10.na.na.1467540001
-p1/mezo@Minutely.3.10.na.na.1467541202
-oldsnap=p1/mezo@Minutely.3.10.na.na.1467539402
-countsnap=3
-countsnapplus=4
-keeppluszero=3
-currentsnaps=p1/nfs22@Minutely.6.5.na.na.1467540001
-p1/nfs22@Minutely.6.5.na.na.1467540301
-p1/nfs22@Minutely.6.5.na.na.1467540602
-p1/nfs22@Minutely.6.5.na.na.1467540901
-p1/nfs22@Minutely.6.5.na.na.1467541202
-p1/nfs22@Minutely.6.5.na.na.1467541501
-oldsnap=p1/nfs22@Minutely.6.5.na.na.1467540001
+currentsnaps=p1/nfs22@Minutely.6.5.na.na.1467542402
+p1/nfs22@Minutely.6.5.na.na.1467542701
+p1/nfs22@Minutely.6.5.na.na.1467543002
+p1/nfs22@Minutely.6.5.na.na.1467543303
+p1/nfs22@Minutely.6.5.na.na.1467543901
+p1/nfs22@Minutely.6.5.na.na.1467544202
+oldsnap=p1/nfs22@Minutely.6.5.na.na.1467542402
 countsnap=6
 countsnapplus=7
 keeppluszero=6
+{"Date":"07/03/2016","time":"13:15:01","msg":"info","user":"System","data":"Success_Deleting_Snapshot:mezo/p1/nfs22@Minutely.6.5.na.na.1467542402","code":"Snap1025@@@mezo/p1/nfs22@Minutely.6.5.na.na.1467542402"}
+newsnap2=Minutely.6.5.na.na.1467544501
+newsnap=p1/nfs22@Minutely.6.5.na.na.1467544501
+snapshotresult :
+filenameis=txt/Snapshotnow.txt1467544501
+{"Date":"07/03/2016","time":"13:15:02","msg":"info","user":"System","data":"Success_Creating_Snapshot:mezo/p1/nfs22@Minutely.6.5.na.na.1467544501","code":"Snap1030@@@mezo/p1/nfs22@Minutely.6.5.na.na.1467544501"}
