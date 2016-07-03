@@ -24,9 +24,9 @@ then
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1033@@@$hostnam/$DG/$FileS@$partner`;
 echo Replica1033@$datenow@$timenow@$hostnam/$DG/$FileS@$partner > ${logging}2
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-# echo ./RemoteSnapshotnowOnce $hostnam/$DG/$FileS $name. $partner  $txtres 
+ echo ./RemoteSnapshotnowOnce $sshost $hostnam $DG/$FileS $name. $partner  $txtres 
  ./RemoteSnapshotnowOnce $sshost $hostnam $DG/$FileS $name. $partner $txtres; 
- errres=`cat $txtres 2/dev/null`;
+ errres=`cat $txtres 2>/dev/null`;
  errn=`echo $errres | wc -c`;
  err2=`cat txt/repliresult 2>/dev/null`;
  rm txt/repliresult 2>/dev/null;

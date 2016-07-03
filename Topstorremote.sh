@@ -19,7 +19,7 @@ while true; do
 {
 nc -l 2234 --ssl-cert /TopStor/key/TopStor.crt --ssl-key /TopStor/key/TopStor.key > /tmp/msgremotefile & 
 read line < /tmp/msgremotefile;
-echo $line > /TopStor/tmplineremote
+echo $line > /TopStordata/tmplineremote
 stamp=`echo $line | awk '{print $2}'`
 request=`echo $line | awk '{print $1}'`
 searsource=` cat $partners | grep "$request" | awk '{print $1}'`; 
