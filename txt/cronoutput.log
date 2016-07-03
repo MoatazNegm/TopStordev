@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 oper= p1/cifs2 Minutely.9.6.na.na
 currentsnaps=
 oldsnap=
@@ -40,3 +41,31 @@ newsnap=p1/cifs2@Minutely.9.6.na.na.1467541802
 snapshotresult :
 filenameis=txt/Snapshotnow.txt1467541802
 {"Date":"07/03/2016","time":"12:30:05","msg":"info","user":"System","data":"Success_Creating_Snapshot:mezo2/p1/cifs2@Minutely.9.6.na.na.1467541802","code":"Snap1030@@@mezo2/p1/cifs2@Minutely.9.6.na.na.1467541802"}
+=======
+oper= p1/mezo Minutely.3.10.na.na 1467486833
+oper1=p1/nfs22
+oper2=Minutely.6.5.na.na
+stamp=1467541801
+keep=6
+oper1=p1/mezo
+oper2=Minutely.3.10.na.na
+stamp=1467541801
+keep=3
+currentsnaps=p1/mezo@Minutely.3.10.na.na.1467539402
+p1/mezo@Minutely.3.10.na.na.1467540001
+p1/mezo@Minutely.3.10.na.na.1467541202
+oldsnap=p1/mezo@Minutely.3.10.na.na.1467539402
+countsnap=3
+countsnapplus=4
+keeppluszero=3
+currentsnaps=p1/nfs22@Minutely.6.5.na.na.1467540001
+p1/nfs22@Minutely.6.5.na.na.1467540301
+p1/nfs22@Minutely.6.5.na.na.1467540602
+p1/nfs22@Minutely.6.5.na.na.1467540901
+p1/nfs22@Minutely.6.5.na.na.1467541202
+p1/nfs22@Minutely.6.5.na.na.1467541501
+oldsnap=p1/nfs22@Minutely.6.5.na.na.1467540001
+countsnap=6
+countsnapplus=7
+keeppluszero=6
+>>>>>>> aecee15589354bf2d4539011e34c32ba89d84ede
