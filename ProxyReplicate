@@ -20,13 +20,17 @@ function RemoteAsk() {
 }
 
 function Sendzfs () {
- /sbin/zfs send $@  
  options=`echo $@ | awk '{print $1}'`
  snap=`echo $@ | awk '{print $2}'`
  sshost=`echo $@ | awk '{print $3}'`
- execafter=`echo $@ | awk '{print $4}'`
- execafter=
- snap=$pool/$vol@$snap $REMOTETUN replidf.sh;
+ target=`echo $@ | awk '{print $4}'`
+ execafter=`echo $@ | awk '{print $5}'`
+  zfs send $options $snap | ssh root@$sshost zfs receive -dvF $target
+echo RemoteSendxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx >> ${txt}tmpproxyrequest
+ echo Ask=$@  >> ${txt}tmpproxyrequest
+  zfs send $options $snap | ssh root@$sshost zfs receive -dvF $target
+  echo zfs send $options $snap \| ssh root@$sshost zfs receive -dvF $target >> ${txt}tmpproxyrequest
+ echo afterAsk=$RR  >> ${txt}tmpproxyrequest
 
 
 }
@@ -136,9 +140,8 @@ if [[ $volfound == "no" ]];
 then
  volsize=`/sbin/zfs get -t filesystem -Hp quota $pool/$vol | awk '{print$3}'` 
  RemoteAsk replipool.sh $vol $volsize
- 
- echo zfs -DR $pool/$vol@$snap  >> ${txt}tmpproxyrequest;
- Sendzfs  -DR $pool/$vol@$snap $REMOTETUN replidf.sh;
+ Sendzfs  -DR $pool/$vol@$snap $RR replidf.sh;
+ exit 0
  echo zfs RR=$RR >> ${txt}tmpproxyrequest
 else
  echo foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn >> ${txt}tmpproxyrequest
