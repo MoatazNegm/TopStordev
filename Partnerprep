@@ -1,0 +1,17 @@
+#!/usr/local/bin/zsh
+webpartner='/var/www/html/des20/Data/Partnerslist.txt';
+resweb='/var/www/html/des20/Data/Partnerslist.txtupdated'
+web='/var/www/html/des20/Data/Partnersstatus.log';
+logging='/var/www/html/des20/Data/currentinfo2.log';
+partners='/TopStordata/partners.txt'
+node=`echo $@ | awk '{print $1}'`
+securessh=$(expect -c "
+ set timeout 10
+ spawn ssh-copy-id root@$node 
+ expect \"*\?\"
+send \"yes\r\"
+expect \"*assowrd:\"
+send \"YousefNadody\r\"
+expect eof
+")
+echo $securessh

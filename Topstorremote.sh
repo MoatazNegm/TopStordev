@@ -1,5 +1,6 @@
 #!/usr/local/bin/zsh
 cd /TopStor
+partners='/TopStordata/partners.txt'
 rm /tmp/msgremotefile 2>/dev/null
 rm /tmp/msgrack 2>/dev/null
 mkfifo -m 600 /tmp/msgremotefile 2>/dev/null
@@ -16,12 +17,12 @@ trap ClearExit HUP
 #./ProxySVC.sh &
 while true; do
 {
-nc -ld 2234 --ssl-cert /TopStor/key/TopStor.crt --ssl-key /TopStor/key/TopStor.key > /tmp/msgremotefile & 
+nc -l 2234 --ssl-cert /TopStor/key/TopStor.crt --ssl-key /TopStor/key/TopStor.key > /tmp/msgremotefile & 
 read line < /tmp/msgremotefile;
 echo $line > /TopStor/tmplineremote
 stamp=`echo $line | awk '{print $2}'`
 request=`echo $line | awk '{print $1}'`
-searsource=` cat partners.txt | grep "$request" | awk '{print $1}'`; 
+searsource=` cat $partners | grep "$request" | awk '{print $1}'`; 
 echo $request $searcsource > txt/tmpreq
 ispartner=`echo $searsource | wc -c `
 if [[ $searsource == $request ]]; then

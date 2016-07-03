@@ -1,5 +1,5 @@
 #!/usr/local/bin/zsh
-logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
+logging='/var/www/html/des20/Data/currentinfo2.log'
 res=`echo $@ | awk '{print $1}'`;
 localrep=`echo $@ | awk '{print $2}'`;
 echo $@ > tmp2repli
@@ -22,10 +22,10 @@ echo oper=$@ >> tmp2repli
 zfs rollback -Rf $initsnap 2>/dev/null;
 if [[ $localrep == 'proxy' ]];
 then
- echo /usr/bin/nc -ld $tun $pp \|  zfs receive -dvF  $pool > tmprepli
+ echo /usr/bin/nc -l $tun $pp \|  zfs receive -dvF  $pool > tmprepli
 # /usr/bin/nc -ld $tun $pp |  zfs receive -dvF  $pool >zfsrec 2>>tmprepli&
 else
- echo nc -ld $tun $pp \| gunzip \| openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD \|zfs receive -dvF  $pool >zfsrec 2>>tmprepli
+ echo nc -l $tun $pp \|zfs receive -dvF  $pool >zfsrec 2>>tmprepli
 # nc -ld $tun $pp | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD |zfs receive -dvF  $pool >zfsrec 2>>tmprepli &
 fi
 ./RepliVolall $@ &

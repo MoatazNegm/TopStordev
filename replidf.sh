@@ -1,5 +1,6 @@
 #!/usr/local/bin/zsh
-logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
+cd /TopStor
+logging='/var/www/html/des20/Data/currentinfo2.log'
 res=`echo $@ | awk '{print $1}'`;
 prot=`echo $@ | awk '{print $6}'`;
 vol=`echo $@ | awk '{print $7}'`;
