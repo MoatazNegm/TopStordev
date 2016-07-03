@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 oper= p1/nfs22 Minutely.6.5.na.na
 oper1=p1/nfs22
 oper2=Minutely.6.5.na.na
@@ -19,3 +20,28 @@ newsnap=p1/nfs22@Minutely.6.5.na.na.1467544501
 snapshotresult :
 filenameis=txt/Snapshotnow.txt1467544501
 {"Date":"07/03/2016","time":"13:15:02","msg":"info","user":"System","data":"Success_Creating_Snapshot:mezo/p1/nfs22@Minutely.6.5.na.na.1467544501","code":"Snap1030@@@mezo/p1/nfs22@Minutely.6.5.na.na.1467544501"}
+=======
+oper= / Minutely.1.1.na.na
+oper1=/
+oper2=Minutely.1.1.na.na
+stamp=1467544621
+keep=1
+currentsnaps=
+oldsnap=
+countsnap=1
+countsnapplus=2
+keeppluszero=1
+{"Date":"07/03/2016","time":"13:17:01","msg":"warning","user":"System","data":"Difficulty_Deleting_Snapshot:"}
+newsnap2=Minutely.1.1.na.na.1467544621
+newsnap=/@Minutely.1.1.na.na.1467544621
+snapshotresult :
+cannot open '/': invalid dataset name
+usage:
+	snapshot|snap [-r] [-o property=value] ... <filesystem|volume>@<snap> ...
+
+For the property list, run: zfs set|get
+
+For the delegated permission list, run: zfs allow|unallow
+filenameis=txt/Snapshotnow.txt1467544621
+{"Date":"07/03/2016","time":"13:17:02","msg":"error","user":"System","data":"Failed_Creating_Snapshot:mezo2//@Minutely.1.1.na.na.1467544621","code":"Snap1028@@@mezo2//@Minutely.1.1.na.na.1467544621"}
+>>>>>>> 37cbc1cbf649c7707d880deaf3d81092720d99b7
