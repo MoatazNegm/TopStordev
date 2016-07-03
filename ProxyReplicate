@@ -19,6 +19,17 @@ function RemoteAsk() {
 
 }
 
+function Sendzfs () {
+ /sbin/zfs send $@  
+ options=`echo $@ | awk '{print $1}'`
+ snap=`echo $@ | awk '{print $2}'`
+ sshost=`echo $@ | awk '{print $3}'`
+ execafter=`echo $@ | awk '{print $4}'`
+ execafter=
+ snap=$pool/$vol@$snap $REMOTETUN replidf.sh;
+
+
+}
 function RemoteAsknc() {
  RR="failed";
  msg=$@;
@@ -65,7 +76,7 @@ adifsec=$((aendsec-astartsec));
 echo $astartsec $aendsec $adifsec >> ${txt}tmpproxyrequest
 }
 ###############################################################################
-function Sendzfs () {
+function Sendzfsnc () {
  msg=$@;
 # zfscom=`echo $msg | awk '{print $1}'`;
 # param=`echo $msg | awk '{$1=""; print substr($0,2)}'`;
@@ -123,10 +134,10 @@ if [[ $? -eq 0 ]]; then echo another replication is wokring.. canceled this > $F
 prot=`/sbin/zfs get -H prot:kind $pool/$vol | awk '{print $3}'`
 if [[ $volfound == "no" ]];
 then
- RemoteAsk replidf $PORzfs $REMOTETUN $SO $prot $vol
+ RemoteAsk replidf.sh $PORzfs $REMOTETUN $SO $prot $vol
  
  echo zfs -DR $pool/$vol@$snap  >> ${txt}tmpproxyrequest;
- Sendzfs  -DR $pool/$vol@$snap ;
+ Sendzfs  -DR $pool/$vol@$snap $REMOTETUN replidf.sh;
  echo zfs RR=$RR >> ${txt}tmpproxyrequest
 else
  echo foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn >> ${txt}tmpproxyrequest
