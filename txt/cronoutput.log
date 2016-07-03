@@ -1,21 +1,34 @@
 oper= p1/nfs22 Minutely.6.5.na.na
+currentsnaps=p1/mezo@Minutely.3.10.na.na.1467526201
+p1/mezo@Minutely.3.10.na.na.1467526801
+p1/mezo@Minutely.3.10.na.na.1467527401
+oldsnap=p1/mezo@Minutely.3.10.na.na.1467526201
+countsnap=3
+countsnapplus=4
+keeppluszero=3
 oper1=p1/nfs22
 oper2=Minutely.6.5.na.na
-stamp=1467522301
+stamp=1467528001
 keep=6
-currentsnaps=p1/nfs22@Minutely.6.5.na.na.1467520501
-p1/nfs22@Minutely.6.5.na.na.1467520801
-p1/nfs22@Minutely.6.5.na.na.1467521101
-p1/nfs22@Minutely.6.5.na.na.1467521402
-p1/nfs22@Minutely.6.5.na.na.1467521702
-p1/nfs22@Minutely.6.5.na.na.1467522002
-oldsnap=p1/nfs22@Minutely.6.5.na.na.1467520501
+currentsnaps=p1/nfs22@Minutely.6.5.na.na.1467526201
+p1/nfs22@Minutely.6.5.na.na.1467526502
+p1/nfs22@Minutely.6.5.na.na.1467526801
+p1/nfs22@Minutely.6.5.na.na.1467527101
+p1/nfs22@Minutely.6.5.na.na.1467527401
+p1/nfs22@Minutely.6.5.na.na.1467527702
+oldsnap=p1/nfs22@Minutely.6.5.na.na.1467526201
 countsnap=6
 countsnapplus=7
 keeppluszero=6
-{"Date":"07/03/2016","time":"07:05:02","msg":"info","user":"System","data":"Success_Deleting_Snapshot:mezo/p1/nfs22@Minutely.6.5.na.na.1467520501","code":"Snap1025@@@mezo/p1/nfs22@Minutely.6.5.na.na.1467520501"}
-newsnap2=Minutely.6.5.na.na.1467522301
-newsnap=p1/nfs22@Minutely.6.5.na.na.1467522301
+{"Date":"07/03/2016","time":"08:40:02","msg":"info","user":"System","data":"Success_Deleting_Snapshot:mezo/p1/mezo@Minutely.3.10.na.na.1467526201","code":"Snap1025@@@mezo/p1/mezo@Minutely.3.10.na.na.1467526201"}
+newsnap2=Minutely.3.10.na.na.1467528001
+newsnap=p1/mezo@Minutely.3.10.na.na.1467528001
+{"Date":"07/03/2016","time":"08:40:02","msg":"info","user":"System","data":"Success_Deleting_Snapshot:mezo/p1/nfs22@Minutely.6.5.na.na.1467526201","code":"Snap1025@@@mezo/p1/nfs22@Minutely.6.5.na.na.1467526201"}
+newsnap2=Minutely.6.5.na.na.1467528001
+newsnap=p1/nfs22@Minutely.6.5.na.na.1467528001
 snapshotresult :
-filenameis=txt/Snapshotnow.txt1467522301
-{"Date":"07/03/2016","time":"07:05:03","msg":"info","user":"System","data":"Success_Creating_Snapshot:mezo/p1/nfs22@Minutely.6.5.na.na.1467522301","code":"Snap1030@@@mezo/p1/nfs22@Minutely.6.5.na.na.1467522301"}
+filenameis=txt/Snapshotnow.txt1467528001
+{"Date":"07/03/2016","time":"08:40:02","msg":"info","user":"System","data":"Success_Creating_Snapshot:mezo/p1/mezo@Minutely.3.10.na.na.1467528001","code":"Snap1030@@@mezo/p1/mezo@Minutely.3.10.na.na.1467528001"}
+snapshotresult :
+filenameis=txt/Snapshotnow.txt1467528001
+{"Date":"07/03/2016","time":"08:40:03","msg":"info","user":"System","data":"Success_Creating_Snapshot:mezo/p1/nfs22@Minutely.6.5.na.na.1467528001","code":"Snap1030@@@mezo/p1/nfs22@Minutely.6.5.na.na.1467528001"}

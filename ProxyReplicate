@@ -12,6 +12,14 @@ export LOCALREP;
 export OPERS;
 #############################################################################33
 function RemoteAsk() {
+  RR=`ssh root@$REMOTETUN "cd /TopStor/; ./$@ "`
+ echo RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx >> ${txt}tmpproxyrequest
+ echo Ask=$@  >> ${txt}tmpproxyrequest
+ echo afterAsk=$RR  >> ${txt}tmpproxyrequest
+
+}
+
+function RemoteAsknc() {
  RR="failed";
  msg=$@;
  stamp=`date +%s`;
@@ -102,7 +110,7 @@ LOCALREP=` echo $@ | awk '{print $9}'`;
 #pp=$(( 3000+( $(od -An -N2 -i /dev/random) )%(4000-1024+1) ))
 PPSEND=$((pp));
 PORzfs=$((pp+1));
-echo Replicate=$RR >> ${txt}tmpproxyrequest
+echo "starting" > ${txt}tmpproxyrequest
 echo Roperands=$@ >> ${txt}tmpproxyrequest;
 POR=$pp;
 echo RemoveVol search for vol=$vol >> ${txt}tmpproxyrequest
@@ -154,8 +162,8 @@ else
   echo zfs send -DR   $targetsnap   >> ${txt}tmpproxyrequest;
   Sendzfs  -DR   $targetsnap ;
  else
-  echo RemoteAsk replivol $PORzfs $REMOTETUN $SO  $pool $vol $initialsnap >> ${txt}tmpproxyrequest
-  RemoteAsk replivol $PORzfs $REMOTETUN $SO  $pool $vol $initialsnap;
+  echo RemoteAsk replivol.sh $PORzfs $REMOTETUN $SO  $pool $vol $initialsnap >> ${txt}tmpproxyrequest
+  RemoteAsk replivol.sh $PORzfs $REMOTETUN $SO  $pool $vol $initialsnap;
   echo zfs send -DR -I $initialsnap  $targetsnap to ${txt}c$ppzfs >> ${txt}tmpproxyrequest;
   Sendzfs  -DR -I $initialsnap  $targetsnap ;
  fi
