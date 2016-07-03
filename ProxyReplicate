@@ -134,7 +134,8 @@ if [[ $? -eq 0 ]]; then echo another replication is wokring.. canceled this > $F
 prot=`/sbin/zfs get -H prot:kind $pool/$vol | awk '{print $3}'`
 if [[ $volfound == "no" ]];
 then
- RemoteAsk replidf.sh $PORzfs $REMOTETUN $SO $prot $vol
+ volsize=`/sbin/zfs get -t filesystem -Hp quota $pool/$vol | awk '{print$3}'` 
+ RemoteAsk replipool.sh $vol $volsize
  
  echo zfs -DR $pool/$vol@$snap  >> ${txt}tmpproxyrequest;
  Sendzfs  -DR $pool/$vol@$snap $REMOTETUN replidf.sh;
