@@ -48,16 +48,6 @@ admin users = administrator
 writeable = Yes
 ;;;;;;;;;;;;;;;;;;;;   stopmezo_only
 
-;;;;;;;;         startpico_only
-[pico]
-path = /p1/pico
-read only = no
-browsable = yes
-write list = @everyone
-admin users = administrator
-writeable = Yes
-;;;;;;;;;;;;;;;;;;;;   stoppico_only
-
 ;;;;;;;;         starttry1_only
 [try1]
 path = /p1/try1
@@ -77,4 +67,3 @@ write list = @everyone
 admin users = administrator
 writeable = Yes
 ;;;;;;;;;;;;;;;;;;;;   stopcifs2_only
-
