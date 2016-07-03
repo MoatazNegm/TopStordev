@@ -1,47 +1,21 @@
-<<<<<<< HEAD
 oper= p1/nfs22 Minutely.6.5.na.na
 oper1=p1/nfs22
 oper2=Minutely.6.5.na.na
-stamp=1467544501
+stamp=1467546901
 keep=6
-currentsnaps=p1/nfs22@Minutely.6.5.na.na.1467542402
-p1/nfs22@Minutely.6.5.na.na.1467542701
-p1/nfs22@Minutely.6.5.na.na.1467543002
-p1/nfs22@Minutely.6.5.na.na.1467543303
-p1/nfs22@Minutely.6.5.na.na.1467543901
-p1/nfs22@Minutely.6.5.na.na.1467544202
-oldsnap=p1/nfs22@Minutely.6.5.na.na.1467542402
+currentsnaps=p1/nfs22@Minutely.6.5.na.na.1467545101
+p1/nfs22@Minutely.6.5.na.na.1467545402
+p1/nfs22@Minutely.6.5.na.na.1467545702
+p1/nfs22@Minutely.6.5.na.na.1467546001
+p1/nfs22@Minutely.6.5.na.na.1467546301
+p1/nfs22@Minutely.6.5.na.na.1467546602
+oldsnap=p1/nfs22@Minutely.6.5.na.na.1467545101
 countsnap=6
 countsnapplus=7
 keeppluszero=6
-{"Date":"07/03/2016","time":"13:15:01","msg":"info","user":"System","data":"Success_Deleting_Snapshot:mezo/p1/nfs22@Minutely.6.5.na.na.1467542402","code":"Snap1025@@@mezo/p1/nfs22@Minutely.6.5.na.na.1467542402"}
-newsnap2=Minutely.6.5.na.na.1467544501
-newsnap=p1/nfs22@Minutely.6.5.na.na.1467544501
+{"Date":"07/03/2016","time":"13:55:02","msg":"info","user":"System","data":"Success_Deleting_Snapshot:mezo/p1/nfs22@Minutely.6.5.na.na.1467545101","code":"Snap1025@@@mezo/p1/nfs22@Minutely.6.5.na.na.1467545101"}
+newsnap2=Minutely.6.5.na.na.1467546901
+newsnap=p1/nfs22@Minutely.6.5.na.na.1467546901
 snapshotresult :
-filenameis=txt/Snapshotnow.txt1467544501
-{"Date":"07/03/2016","time":"13:15:02","msg":"info","user":"System","data":"Success_Creating_Snapshot:mezo/p1/nfs22@Minutely.6.5.na.na.1467544501","code":"Snap1030@@@mezo/p1/nfs22@Minutely.6.5.na.na.1467544501"}
-=======
-oper= / Minutely.1.1.na.na
-oper1=/
-oper2=Minutely.1.1.na.na
-stamp=1467544621
-keep=1
-currentsnaps=
-oldsnap=
-countsnap=1
-countsnapplus=2
-keeppluszero=1
-{"Date":"07/03/2016","time":"13:17:01","msg":"warning","user":"System","data":"Difficulty_Deleting_Snapshot:"}
-newsnap2=Minutely.1.1.na.na.1467544621
-newsnap=/@Minutely.1.1.na.na.1467544621
-snapshotresult :
-cannot open '/': invalid dataset name
-usage:
-	snapshot|snap [-r] [-o property=value] ... <filesystem|volume>@<snap> ...
-
-For the property list, run: zfs set|get
-
-For the delegated permission list, run: zfs allow|unallow
-filenameis=txt/Snapshotnow.txt1467544621
-{"Date":"07/03/2016","time":"13:17:02","msg":"error","user":"System","data":"Failed_Creating_Snapshot:mezo2//@Minutely.1.1.na.na.1467544621","code":"Snap1028@@@mezo2//@Minutely.1.1.na.na.1467544621"}
->>>>>>> 37cbc1cbf649c7707d880deaf3d81092720d99b7
+filenameis=txt/Snapshotnow.txt1467546901
+{"Date":"07/03/2016","time":"13:55:02","msg":"info","user":"System","data":"Success_Creating_Snapshot:mezo/p1/nfs22@Minutely.6.5.na.na.1467546901","code":"Snap1030@@@mezo/p1/nfs22@Minutely.6.5.na.na.1467546901"}
