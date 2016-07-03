@@ -1,11 +1,13 @@
 #!/usr/local/bin/zsh
 cd /TopStor
+partners='/TopStordata/partners.txt'
 oper=$@; 
-oper1=`echo $oper | awk '{print $1}'`;
-oper2=`echo $oper | awk '{print $2}'`;
-oper3=`echo $oper | awk '{print $3}'`;
-errf=`echo $oper | awk '{print $4}'`;
-hostip=`ifconfig em1 | grep "inet " | awk '{print $2}'`;
+sshost=`echo $@ | awk '{print $1}'`;
+hostnam=`echo $@ | awk '{print $2}'`;
+oper1=`echo $oper | awk '{print $3}'`;
+oper2=`echo $oper | awk '{print $4}'`;
+oper3=`echo $oper | awk '{print $5}'`;
+errf=`echo $oper | awk '{print $6}'`;
 pool=`echo $oper1 | awk -F/ '{print $1}'`;
 vol=`echo $oper1 | awk -F/ '{print $2}'`;
 cronout='txt/replicronoutput.log';
@@ -13,32 +15,36 @@ stamp=`date +%s`;
 newsnap2=`echo $oper2.$stamp`;
 newsnap=`echo $oper1@$newsnap2`;
 /sbin/zfs snapshot $newsnap; 
-/sbin/zfs set repli:sender=$hostip $newsnap;
+/sbin/zfs set repli:sender=$hostnam $newsnap;
 /sbin/zfs set repli:receiver=$oper3 $newsnap;
-isproxy=`cat partners.txt | grep $oper3 | awk '{print $3}'`;
+isproxy=`cat $partners | grep $oper3 | awk '{print $3}'`;
 if [[ $isproxy == "true" ]];
 then
 ##########with proxy##################################################o
-## $hostip $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pooli $vol $remotetun $pp $so
+## $sshost $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pooli $vol $remotetun $pp $so
 ############################################################3
   #./ProxysndSVC.sh
   so=`cat proxy.txt | awk '{print $3}'`
   remotetun=`cat txt/peer | grep "$oper3" | awk '{print $3}'`
   pp=`cat workingpp | awk '{print $1}'`
-  /sbin/zfs set repli:sender=$so $newsnap;
- echo  running ./ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so proxy >> txt/tmpproxyrequest;
- ./ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so proxy;
+  ssh root#$sshost " cd /TopStor &&
+    /sbin/zfs set repli:sender=$so $newsnap;
+    echo  running ./ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so proxy >> txt/tmpproxyrequest;
+  /TopStor/ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so proxy; 
+ "
 ##########noproxy####################################################
 else
- so=$hostip
+ so=$sshost
  remotetun=$oper3
  pp=`cat workingpplocal | awk '{print $1}'`
- /sbin/zfs set repli:sender=$so $newsnap;
- ps -axuw | grep  ProxyReplicate >/dev/null 2>&1
- if [[ $? -ne 0 ]];
- then
-  echo ./ProxyReplicate $oper3 txt/${0:2}${userreq}.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so local>> $cronout
-  ./ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so local
- fi
+ ssh root@sshost " cd /TopStor &&
+    /sbin/zfs set repli:sender=$so $newsnap;
+    ps -axuw | grep  ProxyReplicate >/dev/null 2>&1
+    if [[ $? -ne 0 ]];
+    then
+     echo ./ProxyReplicate $oper3 txt/${0:2}${userreq}.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so local>> $cronout
+    ./ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so local
+   fi
+ "
 fi
  #echo donereplicating

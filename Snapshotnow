@@ -79,4 +79,5 @@ else
 	echo $logthis >> $cronout
 fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+rm -rf ${txtres}$stamp
 ./GetSnaplist

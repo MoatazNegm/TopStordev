@@ -17,7 +17,7 @@ trap ClearExit HUP
 #./ProxySVC.sh &
 while true; do
 {
-nc -ld 2234 --ssl-cert /TopStor/key/TopStor.crt --ssl-key /TopStor/key/TopStor.key > /tmp/msgremotefile & 
+nc -l 2234 --ssl-cert /TopStor/key/TopStor.crt --ssl-key /TopStor/key/TopStor.key > /tmp/msgremotefile & 
 read line < /tmp/msgremotefile;
 echo $line > /TopStor/tmplineremote
 stamp=`echo $line | awk '{print $2}'`

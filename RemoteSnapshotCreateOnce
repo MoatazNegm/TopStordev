@@ -2,40 +2,45 @@
 cd /TopStor
 web='/var/www/html/des20/Data/Replicatestatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log';
+runningpools='/pacedata/pools/runningpools'
 echo Replica1012: > $web;
 name=`echo $@ | awk '{print $1}'`;
-DG=`echo $@ | awk '{print $2}'`;
+pDG=`echo $@ | awk '{print $2}'`;
 FileS=` echo $@ | awk '{print $3}'`;
 partner=` echo $@ | awk '{print $4}'`;
 userreq=` echo $@ | awk '{print $5}'`;
+txtres=txt/`basename $0`$userreq.txt
+rm $txtres 2>/dev/null
+DG=`echo $pDG | awk -F_ '{print $2}'`;
+hostnam=`echo $pDG | awk -F_ '{print $1}'`;
+sshost=`cat $runningpools | grep $hostnam | awk '{print $1}'`;
 privilege="Replication";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]];
 then
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
- echo Replica1013:$DG/$FileS:$partner > $web;
- logdata='Replicating_manually:'$DG/$FileS' to'$partner;
- logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1033@@@$DG/$FileS@$partner`;
-echo Replica1033@$datenow@$timenow@$DG/$FileS@$partner > ${logging}2
+ echo Replica1013:$hostnam/$DG/$FileS:$partner > $web;
+ logdata='Replicating_manually:'$hostnam/$DG/$FileS' to'$partner;
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1033@@@$hostnam/$DG/$FileS@$partner`;
+echo Replica1033@$datenow@$timenow@$hostnam/$DG/$FileS@$partner > ${logging}2
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-# echo ./RemoteSnapshotnowOnce $DG/$FileS $name. $partner  txt/${0:2}.txt 
- ./RemoteSnapshotnowOnce $DG/$FileS $name. $partner txt/${0:2}.txt; 
- errres=`cat txt/${0:2}.txt 2/dev/null`;
+# echo ./RemoteSnapshotnowOnce $hostnam/$DG/$FileS $name. $partner  $txtres 
+ ./RemoteSnapshotnowOnce $sshost $hostnam $DG/$FileS $name. $partner $txtres; 
+ errres=`cat $txtres 2/dev/null`;
  errn=`echo $errres | wc -c`;
  err2=`cat txt/repliresult 2>/dev/null`;
  rm txt/repliresult 2>/dev/null;
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
  if [[ $errn -ge  4  || $err2 != "success" ]]; then
-	echo Replica1014:$DG/$FileS:${partner}:$errres > $web ;
-	logdata='Failed_Replicating_manually:'$DG/$FileS' to'${partner}": "$errres;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata cdoe Replica1034@@@$DG/$FileS@$partner@$errres`;
-echo Replica1034@$datenow@$timenow@$DG/$FileS@$partner@$errres > ${logging}2
+	echo Replica1014:$hostnam/$DG/$FileS:${partner}:$errres > $web ;
+	logdata='Failed_Replicating_manually:'$hostnam/$DG/$FileS' to'${partner}": "$errres;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata cdoe Replica1034@@@$hostnam/$DG/$FileS@$partner@$errres`;
+echo Replica1034@$datenow@$timenow@$hostnam/$DG/$FileS@$partner@$errres > ${logging}2
  else 
- 	echo Replica1015:$DG/$FileS:$partner > $web; 
-	logdata='Success_Replicating_manually:'$DG/$FileS' to'$partner;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1035@@@$DG/$FileS@$partner`;
-echo Replica1035@$datenow@$timenow@$DG/$FileS@$partner > ${logging}2
+ 	echo Replica1015:$hostnam/$DG/$FileS:$partner > $web; 
+	logdata='Success_Replicating_manually:'$hostnam/$DG/$FileS' to'$partner;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1035@@@$hostnam/$DG/$FileS@$partner`;
+echo Replica1035@$datenow@$timenow@$hostnam/$DG/$FileS@$partner > ${logging}2
  fi;
- rm txt/${0:2}.txt
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 fi
