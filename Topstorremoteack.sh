@@ -13,6 +13,18 @@ trap ClearExit HUP
 #./ProxySVC.sh &
 while true; do
 {
-nc -l 2235 --ssl-cert /TopStor/key/TopStor.crt --ssl-key /TopStor/key/TopStor.key  > /tmp/msgrack
+#nc -l 2235 --ssl-cert /TopStor/key/TopStor.crt --ssl-key /TopStor/key/TopStor.key  > /tmp/msgrack
+egrep -E "Dual|receiver" /TopStordata/partners.txt &>/dev/null
+if [ $? -eq 0 ]; then
+hosts=(`egrep -E "Dual|receiver" /TopStordata/partners.txt | awk '{print $1}'`)
+ for host in "${hosts[@]}"; do
+  sshost=`echo $host | awk '{print $1}'`
+ ps -ef | grep "$sshost" | grep  root\@ | grep master  &>/dev/null
+ if [ $? -ne 0 ]; then
+  ssh -t -t -o ControlPath=~/.ssh/master-$sshost -o ControlMaster=auto -o ControlPersist=600000000000000 root@$sshost ""   & 
+ fi
+ done
+ sleep 5
+fi 
 }
 done;

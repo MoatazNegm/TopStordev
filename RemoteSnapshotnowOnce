@@ -10,7 +10,9 @@ oper3=`echo $oper | awk '{print $5}'`;
 errf=`echo $oper | awk '{print $6}'`;
 pool=`echo $oper1 | awk -F/ '{print $1}'`;
 vol=`echo $oper1 | awk -F/ '{print $2}'`;
-cronout='txt/replicronoutput.log';
+txtres='/TopStordata/replinow.'
+txt='/TopStordata/'
+cronout='/TopStordata/replicronoutput.log';
 stamp=`date +%s`;
 newsnap2=`echo $oper2.$stamp`;
 newsnap=`echo $oper1@$newsnap2`;
@@ -21,30 +23,24 @@ isproxy=`cat $partners | grep $oper3 | awk '{print $3}'`;
 if [[ $isproxy == "true" ]];
 then
 ##########with proxy##################################################o
-## $sshost $oper3 txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pooli $vol $remotetun $pp $so
+## $sshost $oper3 $txt/RemoteSnapshotnowOnce.txt$stamp $newsnap2 $pooli $vol $remotetun $pp $so
 ############################################################3
   #./ProxysndSVC.sh
   so=`cat proxy.txt | awk '{print $3}'`
-  remotetun=`cat txt/peer | grep "$oper3" | awk '{print $3}'`
+  remotetun=`none`
   pp=`cat workingpp | awk '{print $1}'`
   ssh root#$sshost " cd /TopStor &&
     /sbin/zfs set repli:sender=$so $newsnap;
-    echo  running ./ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so proxy >> txt/tmpproxyrequest;
+    echo  running ./ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so proxy >> $txt/tmpproxyrequest;
   /TopStor/ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so proxy; 
  "
 ##########noproxy####################################################
 else
  so=$sshost
  remotetun=$oper3
- pp=`cat workingpplocal | awk '{print $1}'`
- ssh root@sshost " cd /TopStor &&
-    /sbin/zfs set repli:sender=$so $newsnap;
-    ps -axuw | grep  ProxyReplicate >/dev/null 2>&1
-    if [[ $? -ne 0 ]];
-    then
-     echo ./ProxyReplicate $oper3 txt/${0:2}${userreq}.txt$stamp $newsnap2 $pool $vol $remotetun $pp $so local>> $cronout
-    ./ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so local
-   fi
- "
+ pp=`cat /TopStordata/workingpplocal | awk '{print $1}'`
+ echo ssh root\@$sshost /TopStor/ProxyReplipls $oper3 ${txtres}$stamp $newsnap2 $pool $vol $remotetun $pp $so $newsnap $cronout 
+
+ ssh root@$sshost /TopStor/ProxyReplipls $oper3 ${txtres}$stamp $newsnap2 $pool $vol $remotetun $pp $so $newsnap $cronout 
 fi
  #echo donereplicating

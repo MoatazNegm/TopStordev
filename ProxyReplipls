@@ -1,0 +1,21 @@
+#!/usr/local/bin/zsh
+oper3=`echo $@ | awk '{print $1}'`
+txtres=`echo $@ | awk '{print $2}'`
+newsnap2=`echo $@ | awk '{print $3}'`
+pool=`echo $@ | awk '{print $4}'`
+vol=`echo $@ | awk '{print $5}'`
+remotetun=`echo $@ | awk '{print $6}'`
+pp=`echo $@ | awk '{print $7}'`
+so=`echo $@ | awk '{print $8}'`
+newsnap=`echo $@ | awk '{print $9}'`
+cronout=`echo $@ | awk '{print $10}'`
+cd /TopStor 
+/sbin/zfs set repli:sender=$so $newsnap;
+ps -axuw | grep  ProxyReplicate | grep -v grep &>/dev/null 
+if [[ $? -ne 0 ]];
+then
+ echo ProxyReplicate $oper3 ${txtres}$stamp $newsnap2 $pool $vol $remotetun $pp $so local>> $cronout
+ echo ProxyReplicate $oper3 ${txtres}$stamp $newsnap2 $pool $vol $remotetun $pp $so local
+ ./ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so local
+fi
+

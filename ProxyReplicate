@@ -100,12 +100,13 @@ vol=`echo $@ | awk '{print $5}'`;
 pp=` echo $@ | awk '{print $7}'`;
 LOCALREP=` echo $@ | awk '{print $9}'`;
 #pp=$(( 3000+( $(od -An -N2 -i /dev/random) )%(4000-1024+1) ))
-PPSEND=$((pp+1));
-PORzfs=$((pp+2));
+PPSEND=$((pp));
+PORzfs=$((pp+1));
 echo Replicate=$RR >> ${txt}tmpproxyrequest
 echo Roperands=$@ >> ${txt}tmpproxyrequest;
 POR=$pp;
-echo RemoteAsk RemoteVolSearch $vol >> ${txt}tmpproxyrequest
+echo RemoveVol search for vol=$vol >> ${txt}tmpproxyrequest
+echo RemoteAsk RemoteVolSearch $pool/$vol >> ${txt}tmpproxyrequest
 RemoteAsk RemoteVolSearch $vol;
 volfound=$RR;
 echo volfound=$volfound >> ${txt}tmpproxyrequest
