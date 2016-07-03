@@ -1,16 +1,16 @@
 oper= / Minutely.1.1.na.na
 oper1=/
 oper2=Minutely.1.1.na.na
-stamp=1467544621
+stamp=1467547022
 keep=1
 currentsnaps=
 oldsnap=
 countsnap=1
 countsnapplus=2
 keeppluszero=1
-{"Date":"07/03/2016","time":"13:17:01","msg":"warning","user":"System","data":"Difficulty_Deleting_Snapshot:"}
-newsnap2=Minutely.1.1.na.na.1467544621
-newsnap=/@Minutely.1.1.na.na.1467544621
+{"Date":"07/03/2016","time":"13:57:03","msg":"warning","user":"System","data":"Difficulty_Deleting_Snapshot:"}
+newsnap2=Minutely.1.1.na.na.1467547022
+newsnap=/@Minutely.1.1.na.na.1467547022
 snapshotresult :
 cannot open '/': invalid dataset name
 usage:
@@ -19,5 +19,5 @@ usage:
 For the property list, run: zfs set|get
 
 For the delegated permission list, run: zfs allow|unallow
-filenameis=txt/Snapshotnow.txt1467544621
-{"Date":"07/03/2016","time":"13:17:02","msg":"error","user":"System","data":"Failed_Creating_Snapshot:mezo2//@Minutely.1.1.na.na.1467544621","code":"Snap1028@@@mezo2//@Minutely.1.1.na.na.1467544621"}
+filenameis=txt/Snapshotnow.txt1467547022
+{"Date":"07/03/2016","time":"13:57:03","msg":"error","user":"System","data":"Failed_Creating_Snapshot:mezo2//@Minutely.1.1.na.na.1467547022","code":"Snap1028@@@mezo2//@Minutely.1.1.na.na.1467547022"}
