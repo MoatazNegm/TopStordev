@@ -16,6 +16,6 @@ if [[ $? -ne 0 ]];
 then
  echo ProxyReplicate $oper3 ${txtres}$stamp $newsnap2 $pool $vol $remotetun $pp $so local>> $cronout
  echo ProxyReplicate $oper3 ${txtres}$stamp $newsnap2 $pool $vol $remotetun $pp $so local
- ./ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so local
+ ./ProxyReplicate $oper3 ${txtres}$stamp  $newsnap2 $pool $vol $remotetun $pp $so local
 fi
 
