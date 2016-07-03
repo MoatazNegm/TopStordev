@@ -1,30 +1,16 @@
-<<<<<<< HEAD
-oper= p1/cifs2 Minutely.9.6.na.na
+oper= / Minutely.1.1.na.na
+oper1=/
+oper2=Minutely.1.1.na.na
+stamp=1467544621
+keep=1
 currentsnaps=
 oldsnap=
 countsnap=1
 countsnapplus=2
 keeppluszero=1
-oper1=p1/cifs2
-oper2=Minutely.9.6.na.na
-stamp=1467541802
-keep=9
-currentsnaps=p1/cifs2@Minutely.9.6.na.na.1467537482
-p1/cifs2@Minutely.9.6.na.na.1467537842
-p1/cifs2@Minutely.9.6.na.na.1467538201
-p1/cifs2@Minutely.9.6.na.na.1467538562
-p1/cifs2@Minutely.9.6.na.na.1467538922
-p1/cifs2@Minutely.9.6.na.na.1467539281
-p1/cifs2@Minutely.9.6.na.na.1467540002
-p1/cifs2@Minutely.9.6.na.na.1467540723
-p1/cifs2@Minutely.9.6.na.na.1467541081
-oldsnap=p1/cifs2@Minutely.9.6.na.na.1467537482
-countsnap=9
-countsnapplus=10
-keeppluszero=9
-{"Date":"07/03/2016","time":"12:30:02","msg":"info","user":"System","data":"Success_Deleting_Snapshot:mezo2/","code":"Snap1025@@@mezo2/"}
-newsnap2=Minutely.1.1.na.na.1467541802
-newsnap=/@Minutely.1.1.na.na.1467541802
+{"Date":"07/03/2016","time":"13:17:01","msg":"warning","user":"System","data":"Difficulty_Deleting_Snapshot:"}
+newsnap2=Minutely.1.1.na.na.1467544621
+newsnap=/@Minutely.1.1.na.na.1467544621
 snapshotresult :
 cannot open '/': invalid dataset name
 usage:
@@ -33,39 +19,5 @@ usage:
 For the property list, run: zfs set|get
 
 For the delegated permission list, run: zfs allow|unallow
-filenameis=txt/Snapshotnow.txt1467541802
-{"Date":"07/03/2016","time":"12:30:03","msg":"error","user":"System","data":"Failed_Creating_Snapshot:mezo2//@Minutely.1.1.na.na.1467541802","code":"Snap1028@@@mezo2//@Minutely.1.1.na.na.1467541802"}
-{"Date":"07/03/2016","time":"12:30:04","msg":"info","user":"System","data":"Success_Deleting_Snapshot:mezo2/p1/cifs2@Minutely.9.6.na.na.1467537482","code":"Snap1025@@@mezo2/p1/cifs2@Minutely.9.6.na.na.1467537482"}
-newsnap2=Minutely.9.6.na.na.1467541802
-newsnap=p1/cifs2@Minutely.9.6.na.na.1467541802
-snapshotresult :
-filenameis=txt/Snapshotnow.txt1467541802
-{"Date":"07/03/2016","time":"12:30:05","msg":"info","user":"System","data":"Success_Creating_Snapshot:mezo2/p1/cifs2@Minutely.9.6.na.na.1467541802","code":"Snap1030@@@mezo2/p1/cifs2@Minutely.9.6.na.na.1467541802"}
-=======
-oper= p1/mezo Minutely.3.10.na.na 1467486833
-oper1=p1/nfs22
-oper2=Minutely.6.5.na.na
-stamp=1467541801
-keep=6
-oper1=p1/mezo
-oper2=Minutely.3.10.na.na
-stamp=1467541801
-keep=3
-currentsnaps=p1/mezo@Minutely.3.10.na.na.1467539402
-p1/mezo@Minutely.3.10.na.na.1467540001
-p1/mezo@Minutely.3.10.na.na.1467541202
-oldsnap=p1/mezo@Minutely.3.10.na.na.1467539402
-countsnap=3
-countsnapplus=4
-keeppluszero=3
-currentsnaps=p1/nfs22@Minutely.6.5.na.na.1467540001
-p1/nfs22@Minutely.6.5.na.na.1467540301
-p1/nfs22@Minutely.6.5.na.na.1467540602
-p1/nfs22@Minutely.6.5.na.na.1467540901
-p1/nfs22@Minutely.6.5.na.na.1467541202
-p1/nfs22@Minutely.6.5.na.na.1467541501
-oldsnap=p1/nfs22@Minutely.6.5.na.na.1467540001
-countsnap=6
-countsnapplus=7
-keeppluszero=6
->>>>>>> aecee15589354bf2d4539011e34c32ba89d84ede
+filenameis=txt/Snapshotnow.txt1467544621
+{"Date":"07/03/2016","time":"13:17:02","msg":"error","user":"System","data":"Failed_Creating_Snapshot:mezo2//@Minutely.1.1.na.na.1467544621","code":"Snap1028@@@mezo2//@Minutely.1.1.na.na.1467544621"}

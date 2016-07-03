@@ -18,7 +18,8 @@ echo ${pools[@]} | while read -r pool; do
  if [ $poolfree -gt $volsize ]; then
    sshost=`echo $pool | awk '{print $1}' `
    targetpool=`echo $pool | awk '{print $2}' `
-   echo $sshost  $targetpool 
+   targetip=` cat /etc/hosts | grep "$sshost" | awk '{print $1}'`
+   echo $targetip  $targetpool 
    exit 0;
  fi
 done
