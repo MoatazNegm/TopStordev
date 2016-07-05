@@ -19,3 +19,11 @@ usage:
 For the property list, run: zfs set|get
 
 For the delegated permission list, run: zfs allow|unallow
+missing snapshot argument
+usage:
+	receive [-vnFu] <filesystem|volume|snapshot>
+	receive [-vnFu] [-d | -e] <filesystem>
+
+For the property list, run: zfs set|get
+
+For the delegated permission list, run: zfs allow|unallow

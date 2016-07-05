@@ -338,3 +338,13 @@ admin users = administrator
 writeable = Yes
 ;;;;;;;;;;;;;;;;;;;;   stopcifs2_only
 
+;;;;;;;;         startpico_only
+[pico]
+path = /POOL/pico
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable = Yes
+;;;;;;;;;;;;;;;;;;;;   stoppico_only
+

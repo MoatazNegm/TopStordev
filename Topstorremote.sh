@@ -27,7 +27,7 @@ if [ $? -eq 0 ]; then
   ping -w 1 $sshost &>/dev/null
   if [ $? -eq 0 ]; then
    hostnam=`ssh root@$sshost cat /TopStordata/hostname`
-   scp $sshost:/pace/iscsitargets /TopStordata/partner_${sshost}_targets
+   scp $sshost:/pacedata/iscsitargets /TopStordata/partner_${sshost}_targets
    partnsers=(`cat /TopStordata/partner_${sshost}_targets | awk '{print $1}'`);
    echo ${partners[@]} | while read -r verhost; do
      /TopStor/Partnerprep $verhost &>/dev/null

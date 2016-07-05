@@ -1,6 +1,6 @@
 #!/usr/local/bin/zsh
 cd /TopStor/
-iscsitargets='/pace/iscsitargets'
+iscsitargets='/pacedata/iscsitargets'
 runningpools='/pacedata/pools/runningpools'
 iscsimapping='/pacedata/iscsimapping'
 traf='/var/www/html/des20/Data/disklist.txt';

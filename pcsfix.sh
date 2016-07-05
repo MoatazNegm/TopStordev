@@ -6,10 +6,9 @@ ClearExit() {
 	exit 0;
 }
 trap ClearExit HUP
-sleep 20
+sleep 10
 while true; do 
 {
-sleep 5
 pcsitems=`pcs resource`;
 echo $pcsitems | grep ocf | grep -v Started  &>/dev/null
 if [ $? -eq 0 ]; then
@@ -25,5 +24,6 @@ if [ $? -eq 0 ]; then
  fi
  
 fi  
+sleep 5
 }
 done;

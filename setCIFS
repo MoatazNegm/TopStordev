@@ -2,9 +2,7 @@
 web='/var/www/html/des20/Data/CIFSstatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log'
 cd /TopStor
-snap=`echo $@ | awk '{print $1}'`;
-pool=`echo $snap | awk -F'/' '{print $1}'`;
-vol=`echo $snap | awk -F'/' '{print $2}' | awk -F'@' '{print $1}'`;
+vol=`echo $@ | awk '{print $1}'`;
 partner=`echo $@ | awk '{print $2 }'`;
 logf=`echo $@ | awk '{print $3 }'`;
 
