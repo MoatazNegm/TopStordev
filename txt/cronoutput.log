@@ -1,21 +1,22 @@
-oper= p1/nfs22 Minutely.6.5.na.na
-oper1=p1/nfs22
-oper2=Minutely.6.5.na.na
-stamp=1467546901
-keep=6
-currentsnaps=p1/nfs22@Minutely.6.5.na.na.1467545101
-p1/nfs22@Minutely.6.5.na.na.1467545402
-p1/nfs22@Minutely.6.5.na.na.1467545702
-p1/nfs22@Minutely.6.5.na.na.1467546001
-p1/nfs22@Minutely.6.5.na.na.1467546301
-p1/nfs22@Minutely.6.5.na.na.1467546602
-oldsnap=p1/nfs22@Minutely.6.5.na.na.1467545101
-countsnap=6
-countsnapplus=7
-keeppluszero=6
-{"Date":"07/03/2016","time":"13:55:02","msg":"info","user":"System","data":"Success_Deleting_Snapshot:mezo/p1/nfs22@Minutely.6.5.na.na.1467545101","code":"Snap1025@@@mezo/p1/nfs22@Minutely.6.5.na.na.1467545101"}
-newsnap2=Minutely.6.5.na.na.1467546901
-newsnap=p1/nfs22@Minutely.6.5.na.na.1467546901
+oper= p1/mezo Minutely.15.12.na.na
+oper1=p1/mezo
+oper2=Minutely.15.12.na.na
+stamp=1467737281
+keep=15
+currentsnaps=
+oldsnap=
+countsnap=1
+countsnapplus=2
+keeppluszero=15
+newsnap2=Minutely.15.12.na.na.1467737281
+newsnap=p1/mezo@Minutely.15.12.na.na.1467737281
 snapshotresult :
-filenameis=txt/Snapshotnow.txt1467546901
-{"Date":"07/03/2016","time":"13:55:02","msg":"info","user":"System","data":"Success_Creating_Snapshot:mezo/p1/nfs22@Minutely.6.5.na.na.1467546901","code":"Snap1030@@@mezo/p1/nfs22@Minutely.6.5.na.na.1467546901"}
+cannot open 'p1/mezo': dataset does not exist
+usage:
+	snapshot|snap [-r] [-o property=value] ... <filesystem|volume>@<snap> ...
+
+For the property list, run: zfs set|get
+
+For the delegated permission list, run: zfs allow|unallow
+filenameis=txt/Snapshotnow.txt1467737281
+{"Date":"07/05/2016","time":"18:48:01","msg":"error","user":"System","data":"Failed_Creating_Snapshot:mezo/p1/mezo@Minutely.15.12.na.na.1467737281","code":"Snap1028@@@mezo/p1/mezo@Minutely.15.12.na.na.1467737281"}

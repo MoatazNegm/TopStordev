@@ -1,6 +1,6 @@
 #!/usr/local/bin/zsh
 cd /TopStor
-txt='/TopStordata/'
+txt='/TopStordata/'`basename $0`
 export POR;
 export DST; 
 export RR; 
@@ -13,9 +13,9 @@ export OPERS;
 #############################################################################33
 function RemoteAsk() {
   RR=`ssh root@$REMOTETUN "cd /TopStor/; ./$@ "`
- echo RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx >> ${txt}tmpproxyrequest
- echo Ask=$@  >> ${txt}tmpproxyrequest
- echo afterAsk=$RR  >> ${txt}tmpproxyrequest
+ echo RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx >> ${txt}
+ echo Ask=$@  >> ${txt}
+ echo afterAsk=$RR  >> ${txt}
 
 }
 
@@ -24,93 +24,18 @@ function Sendzfs () {
  snap=`echo $@ | awk '{print $2}'`
  shost=`echo $@ | awk '{print $3}'`
  target=`echo $@ | awk '{print $4}'`
- execafter=`echo $@ | awk '{print $5}'`
  sshost=`ls /TopStordata/partner* | grep "$REMOTETUN" | xargs cat | grep "$shost" | awk '{print $1}'`
-echo RemoteSendxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx >> ${txt}tmpproxyrequest
- echo Ask=$@  >> ${txt}tmpproxyrequest
-  echo zfs send $opt $snap \| ssh root@$sshost zfs receive -dvF $target >> ${txt}tmpproxyrequest
+echo RemoteSendxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx >> ${txt}
+ echo Ask=$@  >> ${txt}
+ echo zfs send $opt $snap \| ssh root\@$sshost zfs receive \-dvF $target >> ${txt}
   zfs send $opt $snap | ssh root@$sshost zfs receive -dvF $target
  if [ $? -eq 0 ]; then
-  RemoteAsk $execafter received
-  echo afterAsk:success=$RR  >> ${txt}tmpproxyrequest
+  RR=received
+  echo afterAsk:success=$RR  >> ${txt}
  else
-  RemoteAsk $execafter failed 
-  echo afterAsk:failed=$RR  >> ${txt}tmpproxyrequest
-  
-
-}
-function RemoteAsknc() {
- RR="failed";
- msg=$@;
- stamp=`date +%s`;
- echo RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx >> ${txt}tmpproxyrequest
- rm ${txt}remotereply$DST 2>/dev/null
- echo sending $msg >> ${txt}tmpproxyrequest
-# echo Asksend $SEND $msg >> ${txt}tmpproxyrequest; 
-# ./Asksend $SEND $msg 2>/dev/null ; 
-astartsec=`date +%s`
- echo proxy is $LOCALREP  >> ${txt}tmpproxyrequest
- if [[ $LOCALREP == "proxy" ]];
- then
-  echo $SO $stamp ask $@ \| nc -w 10 --ssl-cert /TopStor/key/TopStor.crt --ssl-key /TopStor/key/TopStor.key $REMOTETUN $PPSEND >>${txt}tmpproxyrequest;
-  echo $SO $stamp ask $@ | nc -w 10 --ssl-cert /TopStor/key/TopStor.crt --ssl-key /TopStor/key/TopStor.key $REMOTETUN $PPSEND;
- else
- echo $SO $stamp ask $@ \|  nc -w 10  $REMOTETUN $PPSEND >> ${txt}tmpproxyrequest;
-  echo $SO $stamp ask $@ \|  nc -w 10 $REMOTETUN $PPSEND;
+  RR=failed
+  echo afterAsk:failed=$RR  >> ${txt}
  fi
- flagcount=0;
- echo start flagcount >> ${txt}tmpproxyrequest;
- while [[ $flagcount -le 600000 ]];
- do
-#  echo finished Ask >> ${txt}tmpproxyrequest
-#  echo asking for ${txt}remoo tereply$DST  >> ${txt}tmpproxyrequest; 
-  c=0;  while [[ $c -le 30 ]]; do c=$((c+1)); done
-  if [[ -a ${txt}remotereply$DST ]]; then break; fi
-  flagcount=$((flagcount+1)); 
- done
- if [[ -a ${txt}remotereply$DST ]];
- then 
-  echo reply is >> ${txt}tmpproxyrequest
-  cat ${txt}remotereply$DST >> ${txt}tmpproxyrequest
-  RR=`cat ${txt}remotereply$DST | tail -1 | awk '{$1=$2=$3="";print substr($0,4)}'`;
- else
-  echo Failed_Communication >> $FILELOG;
-  echo Failed_Communication >> ${txt}tmpproxyrequest;
-  exit 0 ;
- fi
-
- echo afterAsk=$RR flagcount=$flagcount >> ${txt}tmpproxyrequest
-aendsec=`date +%s`
-adifsec=$((aendsec-astartsec));
-echo $astartsec $aendsec $adifsec >> ${txt}tmpproxyrequest
-}
-###############################################################################
-function Sendzfsnc () {
- msg=$@;
-# zfscom=`echo $msg | awk '{print $1}'`;
-# param=`echo $msg | awk '{$1=""; print substr($0,2)}'`;
-# echo \/sbin\/zfs send  $@ \|  nc -w 10 $REMOTETUN $PORzfs
- if [[ $LOCALREP == "proxy" ]];
- then
-  echo /sbin/zfs send $@ \|  nc -w 10 $REMOTETUN $PORzfs >> ${txt}tmpproxyrequest;
-  /sbin/zfs send $@ |  nc -w 10 --ssl-cert /TopStor/key/TopStor.crt --ssl-key /TopStor/key/TopStor.key $REMOTETUN $PORzfs;
-  
- else
-  echo /sbin/zfs send $@  \| nc -w 10 $REMOTETUN $PORzfs >> ${txt}tmpproxyrequest
-  /sbin/zfs send $@  | nc -w 10 --ssl-cert /TopStor/key/TopStor.crt --ssl-key /TopStor/key/TopStor.key $REMOTETUN $PORzfs
- fi
- flagcount=0;
- while [[ $flagcount -le 300000 ]];
- do
-  if [[ -a ${txt}remotereply$DST ]]; then break; fi
-  flagcount=$((flagcount+1));
- done
- if [[ -a ${txt}remotereply$DST ]];
- then
-  RR=`cat ${txt}remotereply$DST | tail -1 | awk '{print $4}'`;
- fi
- echo After=$RR flagcount=$flagcount >> ${txt}tmpproxyrequest
-
 }
 #########################################################################
 ## ./Asksend 1032_8($11) 10.176.214.6($9) 15737($10) RemoteVolSearch sdk
@@ -118,44 +43,45 @@ function Sendzfsnc () {
 ## 1032_7 ${txt}RemoteSnapshotnowSystem.txt1438711440 Repli.Minutely.6.2.na.na.1438711440 Data forreplic 10.176.214.6 2236 1032_8 porxy
 ###############################################################################
 startsec=`date +%s`
-SO=`echo $@ | awk '{print $8}'`;
 DST=`echo $@ | awk '{print $1}'`;
-REMOTETUN=`echo $@ | awk '{print $6}'`;
 FILELOG=`echo $@ | awk '{print $2}'`;
 snap=`echo $@ | awk '{print $3}'`
 pool=`echo $@ | awk '{print $4}'`;
 vol=`echo $@ | awk '{print $5}'`;
+REMOTETUN=`echo $@ | awk '{print $6}'`;
 pp=` echo $@ | awk '{print $7}'`;
+SO=`echo $@ | awk '{print $8}'`;
 LOCALREP=` echo $@ | awk '{print $9}'`;
-#pp=$(( 3000+( $(od -An -N2 -i /dev/random) )%(4000-1024+1) ))
-PPSEND=$((pp));
-PORzfs=$((pp+1));
-echo "starting" > ${txt}tmpproxyrequest
-echo Roperands=$@ >> ${txt}tmpproxyrequest;
+echo "starting" > ${txt}
+echo starting
+echo Roperands=$@ >> ${txt};
 POR=$pp;
-echo RemoveVol search for vol=$vol >> ${txt}tmpproxyrequest
-echo RemoteAsk RemoteVolSearch $pool/$vol >> ${txt}tmpproxyrequest
+echo RemoveVol search for vol=$vol >> ${txt}
+echo RemoteAsk RemoteVolSearch $pool/$vol >> ${txt}
 RemoteAsk RemoteVolSearch $vol;
 volfound=$RR;
-echo volfound=$volfound >> ${txt}tmpproxyrequest
+echo volfound=$volfound >> ${txt}
 ps -axw | grep zfs | grep send >/dev/null 2>&1
-if [[ $? -eq 0 ]]; then echo another replication is wokring.. canceled this > $FILELOG; echo another replication is wokring.. canceled this >> ${txt}tmpproxyrequest; exit 0 ; fi 
+if [[ $? -eq 0 ]]; then echo another replication is wokring.. canceled this > $FILELOG; echo another replication is wokring.. canceled this >> ${txt}; exit 0 ; fi 
 prot=`/sbin/zfs get -H prot:kind $pool/$vol | awk '{print $3}'`
 if [[ $volfound == "no" ]];
 then
+ echo nononononononononononnonononononononnonononononon >> ${txt}
+
  volsize=`/sbin/zfs get -t filesystem -Hp quota $pool/$vol | awk '{print$3}'` 
  RemoteAsk replipool.sh $vol $volsize
- Sendzfs  -DR $pool/$vol@$snap $RR replidf.sh;
+ Sendzfs  -DR $pool/$vol@$snap $RR set$prot;
+ RemoteAsk set$prot $vol $SO $RR
  exit 0
- echo zfs RR=$RR >> ${txt}tmpproxyrequest
+ echo zfs RR=$RR >> ${txt}
 else
- echo foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn >> ${txt}tmpproxyrequest
+ echo foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn >> ${txt}
  RemoteAsk RemoteGetSnaplist $vol;
  if [[ $RR == "nothing" ]];  then oldsnaps=""; else oldsnaps=$RR; fi;
  localsnaps=`./GetSnaplistlocal $vol`;
  ll=$oldsnaps;
  ll=${ll}' spot';
- echo ll=$ll >> ${txt}tmpproxyrequest
+ echo ll=$ll >> ${txt}
  lineupsnaps=`echo $ll | tr ' ' '\n' `
  initialsnap="";
  echo $lineupsnaps | while read -r line  
@@ -164,27 +90,27 @@ else
   then ; else initialsnap=$line;  break; fi;
  done;
  targetsnap=$pool/$vol@$snap
- echo targetsnap=$targetsnap >> ${txt}tmpproxyrequest
- echo initialsnap=$initialsnap >> ${txt}tmpproxyrequest
+ echo targetsnap=$targetsnap >> ${txt}
+ echo initialsnap=$initialsnap >> ${txt}
  if [[ $initialsnap == $targetsnap ]]; 
- then echo up-to-date >> ${txt}tmpproxyrequest; fi
+ then echo up-to-date >> ${txt}; fi
  if [[ $initialsnap == "" ]];
  then 
-  echo yyyyyyyyyyyyyintital is null >> ${txt}tmpproxyrequest 
-  echo RemoteAsk destroysnaps $vol >> ${txt}tmpproxyrequest;
+  echo yyyyyyyyyyyyyintital is null >> ${txt} 
+  echo RemoteAsk destroysnaps $vol >> ${txt};
   RemoteAsk destroysnaps $vol ;
   RemoteAsk replidf $PORzfs $REMOTETUN $SO $prot $vol
-  echo RemoteAsk replidf $PORzfs $REMOTETUN $SO $prot $vol >> ${txt}tmpproxyrequest
-#  echo RemoteAsk replivol $PORzfs $REMOTETUN $SO $pool $vol nothing >> ${txt}tmpproxyrequest;
+  echo RemoteAsk replidf $PORzfs $REMOTETUN $SO $prot $vol >> ${txt}
+#  echo RemoteAsk replivol $PORzfs $REMOTETUN $SO $pool $vol nothing >> ${txt};
 #  RemoteAsk replivol $PORzfs $REMOTETUN $SO $pool $vol nothing;
-#echo exit  >> ${txt}tmpproxyrequest
+#echo exit  >> ${txt}
 #exit
-  echo zfs send -DR   $targetsnap   >> ${txt}tmpproxyrequest;
+  echo zfs send -DR   $targetsnap   >> ${txt};
   Sendzfs  -DR   $targetsnap ;
  else
-  echo RemoteAsk replivol.sh $PORzfs $REMOTETUN $SO  $pool $vol $initialsnap >> ${txt}tmpproxyrequest
+  echo RemoteAsk replivol.sh $PORzfs $REMOTETUN $SO  $pool $vol $initialsnap >> ${txt}
   RemoteAsk replivol.sh $PORzfs $REMOTETUN $SO  $pool $vol $initialsnap;
-  echo zfs send -DR -I $initialsnap  $targetsnap to ${txt}c$ppzfs >> ${txt}tmpproxyrequest;
+  echo zfs send -DR -I $initialsnap  $targetsnap to ${txt}c$ppzfs >> ${txt};
   Sendzfs  -DR -I $initialsnap  $targetsnap ;
  fi
 fi
@@ -192,11 +118,11 @@ fi
  echo $RR | grep $snap;
  if [[ $? -ne 0 ]]; then echo failed > ${txt}repliresult; else echo success > ${txt}repliresult; fi 
 ./GetSnaplist & 
-echo RemoteAsk GetSnaplist hi  >> ${txt}tmpproxyrequest 
+echo RemoteAsk GetSnaplist hi  >> ${txt} 
 RemoteAsk localGetSnaplist $vol & 
- echo POR=$POR Compelete  >> ${txt}tmpproxyrequest ; 
+ echo POR=$POR Compelete  >> ${txt} ; 
 # RemoteAsk done  & 
 endsec=`date +%s`
 difsec=$((endsec-startsec));
-echo $startsec $endsec $difsec >> ${txt}tmpproxyrequest
-echo finishedddddddddddddddddddddddddddddddddddddddddddddddddd >> ${txt}tmpproxyrequest
+echo $startsec $endsec $difsec >> ${txt}
+echo finishedddddddddddddddddddddddddddddddddddddddddddddddddd >> ${txt}

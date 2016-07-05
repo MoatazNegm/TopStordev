@@ -78,3 +78,23 @@ admin users = administrator
 writeable = Yes
 ;;;;;;;;;;;;;;;;;;;;   stopcifs2_only
 
+;;;;;;;;         startpico_only
+[pico]
+path = /p1/pico
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable = Yes
+;;;;;;;;;;;;;;;;;;;;   stoppico_only
+
+;;;;;;;;         startnano226_only
+[nano226]
+path = /p1/nano226
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable = Yes
+;;;;;;;;;;;;;;;;;;;;   stopnano226_only
+
