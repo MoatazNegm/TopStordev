@@ -3,7 +3,7 @@ cd /TopStor
 web2='/usr/local/www/apache24/data/des19/Data/currentinfo2.log2';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 stamp=`date +%s`;
-cronout='txt/replicronoutput.log';
+cronout='/TopStordata/replicronoutput.log';
 #echo System is creating Snapshot $@.... > $web;
 oper=$@; 
 echo oper=$oper > $cronout

@@ -31,7 +31,7 @@ then
   pp=`cat workingpp | awk '{print $1}'`
   ssh root#$sshost " cd /TopStor &&
     /sbin/zfs set repli:sender=$so $newsnap;
-    echo  running ./ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so proxy >> $txt/tmpproxyrequest;
+    echo  running ./ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so proxy >> ${txt}tmpproxyrequest;
   /TopStor/ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so proxy; 
  "
 ##########noproxy####################################################
@@ -39,8 +39,8 @@ else
  so=$sshost
  remotetun=$oper3
  pp=`cat /TopStordata/workingpplocal | awk '{print $1}'`
- echo ssh root\@$sshost /TopStor/ProxyReplipls $oper3 ${txtres}$stamp $newsnap2 $pool $vol $remotetun $pp $so $newsnap $cronout 
+ echo ssh root\@$sshost /TopStor/ProxyReplipls $oper3 ${txtres}$stamp $newsnap2 $pool $vol $remotetun $pp $so $newsnap $cronout > ${txt}tmpproxrequest
 
- ssh root@$sshost /TopStor/ProxyReplipls $oper3 ${txtres}$stamp $newsnap2 $pool $vol $remotetun $pp $so $newsnap $cronout 
+ ssh root@$sshost /TopStor/ProxyReplipls $oper3 ${txtres}$stamp $newsnap2 $pool $vol $remotetun $pp $so $newsnap $cronout > $errf
 fi
  #echo donereplicating

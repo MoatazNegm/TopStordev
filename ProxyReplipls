@@ -11,11 +11,14 @@ newsnap=`echo $@ | awk '{print $9}'`
 cronout=`echo $@ | awk '{print $10}'`
 cd /TopStor 
 /sbin/zfs set repli:sender=$so $newsnap;
-ps -axuw | grep  ProxyReplicate | grep -v grep &>/dev/null 
+ps -axuw | grep  ProxyReplicate | grep -v grep | grep -v vim &>/dev/null 
 if [[ $? -ne 0 ]];
 then
  echo ProxyReplicate $oper3 ${txtres}$stamp $newsnap2 $pool $vol $remotetun $pp $so local>> $cronout
  echo ProxyReplicate $oper3 ${txtres}$stamp $newsnap2 $pool $vol $remotetun $pp $so local
  ./ProxyReplicate $oper3 ${txtres}$stamp  $newsnap2 $pool $vol $remotetun $pp $so local
+ if [ $? -eq 0 ]; then
+  echo success;
+ fi
 fi
 

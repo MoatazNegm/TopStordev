@@ -25,17 +25,15 @@ then
 echo Replica1033@$datenow@$timenow@$hostnam/$DG/$FileS@$partner > ${logging}2
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
  echo ./RemoteSnapshotnowOnce $sshost $hostnam $DG/$FileS $name. $partner  $txtres 
- ./RemoteSnapshotnowOnce $sshost $hostnam $DG/$FileS $name. $partner $txtres; 
- errres=`cat $txtres 2>/dev/null`;
- errn=`echo $errres | wc -c`;
- err2=`cat txt/repliresult 2>/dev/null`;
- rm txt/repliresult 2>/dev/null;
+ ./RemoteSnapshotnowOnce $sshost $hostnam $DG/$FileS $name. $partner  $txtres; 
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
- if [[ $errn -ge  4  || $err2 != "success" ]]; then
-	echo Replica1014:$hostnam/$DG/$FileS:${partner}:$errres > $web ;
-	logdata='Failed_Replicating_manually:'$hostnam/$DG/$FileS' to'${partner}": "$errres;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata cdoe Replica1034@@@$hostnam/$DG/$FileS@$partner@$errres`;
-echo Replica1034@$datenow@$timenow@$hostnam/$DG/$FileS@$partner@$errres > ${logging}2
+ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+ cat $txtres | grep success &>/dev/null
+ if [ $? -ne 0 ]; then
+	echo Replica1014:$hostnam/$DG/$FileS:${partner}:$txtres > $web ;
+	logdata='Failed_Replicating_manually:'$hostnam/$DG/$FileS' to'${partner}": "$txtres;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata cdoe Replica1034@@@$hostnam/$DG/$FileS@$partner@$$txtres`;
+echo Replica1034@$datenow@$timenow@$hostnam/$DG/$FileS@$partner@$txtres > ${logging}2
  else 
  	echo Replica1015:$hostnam/$DG/$FileS:$partner > $web; 
 	logdata='Success_Replicating_manually:'$hostnam/$DG/$FileS' to'$partner;
