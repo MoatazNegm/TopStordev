@@ -1,6 +1,6 @@
 ;;;;;;;;         startnano226_only
 [nano226]
-path = /p1/nano226
+path = /POOL/nano226
 read only = no
 browsable = yes
 write list = @everyone

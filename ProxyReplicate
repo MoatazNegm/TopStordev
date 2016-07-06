@@ -72,7 +72,6 @@ then
  RemoteAsk replipool.sh $vol $volsize
  Sendzfs  -DR $pool/$vol@$snap $RR set$prot;
  RemoteAsk set$prot $vol $SO $RR
- exit 0
  echo zfs RR=$RR >> ${txt}
 else
  echo foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn >> ${txt}
