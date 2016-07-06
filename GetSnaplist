@@ -13,13 +13,14 @@ do
   name=` echo $line | awk '{print $1}'`;
   onlyname=` echo $name | awk -F@ '{print $2}'`;
   father2=` echo $name | awk -F@ '{print $1}' | awk -F/ '{print $2}'`;
+  pool=` echo $name |  awk -F/ '{print $1}'`;
   creat=` echo $line | awk '{print $2" "$3" "$4"  "$5" "$6}' `; 
   creall=`/bin/date --date=$creat  +%m/%d/%y_%R`;
   creatform=` echo $creall | awk -F_ '{print $1}'`;
   time2=` echo $creall | awk -F_ '{print $2}'`;
   sender=`echo $line | awk '{print $7}'`;
   receiver=`echo $line | awk '{print $8}'`;
-  subres=`/usr/local/bin/zsh jsonthis3.sh name $name onlyname $onlyname father $father2 creation $creatform time $time2 sender $sender receiver $receiver `;
+  subres=`/usr/local/bin/zsh jsonthis3.sh name $name pool ${pool} onlyname $onlyname father $father2 creation $creatform time $time2 sender $sender receiver $receiver `;
   result=$result$subres,;
  done
 done
