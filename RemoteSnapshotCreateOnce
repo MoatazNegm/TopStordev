@@ -42,3 +42,4 @@ echo Replica1035@$datenow@$timenow@$hostnam/$DG/$FileS@$partner > ${logging}2
  fi;
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 fi
+./GetPoolVollist

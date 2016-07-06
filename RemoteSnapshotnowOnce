@@ -29,7 +29,7 @@ then
   so=`cat proxy.txt | awk '{print $3}'`
   remotetun=`none`
   pp=`cat workingpp | awk '{print $1}'`
-  ssh root#$sshost " cd /TopStor &&
+  ssh root@$sshost " cd /TopStor &&
     /sbin/zfs set repli:sender=$so $newsnap;
     echo  running ./ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so proxy >> ${txt}tmpproxyrequest;
   /TopStor/ProxyReplicate $oper3 $errf $newsnap2 $pool $vol $remotetun $pp $so proxy; 
