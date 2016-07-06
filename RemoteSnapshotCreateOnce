@@ -9,7 +9,7 @@ pDG=`echo $@ | awk '{print $2}'`;
 FileS=` echo $@ | awk '{print $3}'`;
 partner=` echo $@ | awk '{print $4}'`;
 userreq=` echo $@ | awk '{print $5}'`;
-txtres=/TopStordata/`basename $0`$userreq.txt
+txtres='/TopStordata/'`basename $0`$userreq'.txt'
 rm $txtres 2>/dev/null
 DG=`echo $pDG | awk -F_ '{print $2}'`;
 hostnam=`echo $pDG | awk -F_ '{print $1}'`;

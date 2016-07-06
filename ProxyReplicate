@@ -118,7 +118,7 @@ fi
  if [[ $? -ne 0 ]]; then echo failed > ${txt}repliresult; else echo success > ${txt}repliresult; fi 
 ./GetSnaplist & 
 echo RemoteAsk GetSnaplist hi  >> ${txt} 
-RemoteAsk localGetSnaplist $vol & 
+RemoteAsk GetSnaplist  & 
  echo POR=$POR Compelete  >> ${txt} ; 
 # RemoteAsk done  & 
 endsec=`date +%s`

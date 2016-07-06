@@ -1,6 +1,7 @@
 #!/usr/local/bin/zsh
 cd /TopStor
 web='/var/www/html/des20/Data/statusglobal.log';
+txtres='/TopStordata/'`basename $0`$userreq'.txt'
 oper=$@; 
 sshost=`echo $@ | awk '{print $1}'`;
 hostnam=`echo $@ | awk '{print $2}'`;
@@ -10,11 +11,11 @@ echo creating Snapshot $hostnam $oper1 $oper2.... > $web;
 stamp=`date +%s`;
 newsnap2=`echo $oper2.$stamp`;
 newsnap=`echo $oper1@$newsnap2`;
-echo ssh root@$sshost \"/sbin/zfs snapshot $newsnap\"  txt/err.txt
-ssh root@$sshost /sbin/zfs snapshot $newsnap 2>> txt/err.txt
-err=`wc -c  txt/err.txt | awk '{print $1}'`;
+echo ssh root@$sshost \"/sbin/zfs snapshot $newsnap\" $txtres 
+ssh root@$sshost /sbin/zfs snapshot $newsnap 2>> $txtres
+err=`wc -c  $txtres | awk '{print $1}'`;
 if [[ $err >  4  ]]; then
-	cat txt/err.txt >> $web;
+	cat $txtres >> $web;
 	cat txt/err.txt
 else 
 timenow=`/usr/bin/date`

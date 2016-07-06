@@ -1,2 +1,2 @@
 #!/usr/local/bin/zsh
-echo $@ > /tmp/msgfile;
+sudo -u apache echo $@ > /tmp2/msgfile;
