@@ -24,11 +24,12 @@ function Sendzfs () {
  snap=`echo $@ | awk '{print $2}'`
  shost=`echo $@ | awk '{print $3}'`
  target=`echo $@ | awk '{print $4}'`
+ intersnap=`echo $@ | awk '{print $5}'`
  sshost=`ls /TopStordata/partner* | grep "$REMOTETUN" | xargs cat | grep "$shost" | awk '{print $1}'`
 echo RemoteSendxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx >> ${txt}
  echo Ask=$@  >> ${txt}
- echo zfs send $opt $snap \| ssh root\@$sshost zfs receive \-dvF $target >> ${txt}
-  zfs send $opt $snap | ssh root@$sshost zfs receive -dvF $target
+ echo zfs send $opt $snap $intersnap \| ssh root\@$sshost zfs receive \-dvF $target >> ${txt}
+  zfs send $opt $snap $intersnap | ssh root@$sshost zfs receive -dvF $target
  if [ $? -eq 0 ]; then
   RR=received
   echo afterAsk:success=$RR  >> ${txt}
@@ -70,7 +71,7 @@ then
 
  volsize=`/sbin/zfs get -t filesystem -Hp quota $pool/$vol | awk '{print$3}'` 
  RemoteAsk replipool.sh $vol $volsize
- Sendzfs  -DR $pool/$vol@$snap $RR set$prot;
+ Sendzfs  -DR $pool/$vol@$snap $RR 
  RemoteAsk set$prot $vol $SO $RR
  echo zfs RR=$RR >> ${txt}
 else
@@ -97,20 +98,19 @@ else
  then 
   echo yyyyyyyyyyyyyintital is null >> ${txt} 
   echo RemoteAsk destroysnaps $vol >> ${txt};
-  RemoteAsk destroysnaps $vol ;
-  RemoteAsk replidf $PORzfs $REMOTETUN $SO $prot $vol
-  echo RemoteAsk replidf $PORzfs $REMOTETUN $SO $prot $vol >> ${txt}
+  RemoteAsk destroysnaps.sh $vol ;
+  RemoteAsk replipool.sh $vol none 
+  Sendzfs  -DR $pool/$vol@$snap $RR ;
+#  RemoteAsk set$prot $vol $SO $RR
 #  echo RemoteAsk replivol $PORzfs $REMOTETUN $SO $pool $vol nothing >> ${txt};
 #  RemoteAsk replivol $PORzfs $REMOTETUN $SO $pool $vol nothing;
 #echo exit  >> ${txt}
 #exit
-  echo zfs send -DR   $targetsnap   >> ${txt};
-  Sendzfs  -DR   $targetsnap ;
  else
   echo RemoteAsk replivol.sh $PORzfs $REMOTETUN $SO  $pool $vol $initialsnap >> ${txt}
-  RemoteAsk replivol.sh $PORzfs $REMOTETUN $SO  $pool $vol $initialsnap;
+  RemoteAsk replipool.sh $vol none 
   echo zfs send -DR -I $initialsnap  $targetsnap to ${txt}c$ppzfs >> ${txt};
-  Sendzfs  -DR -I $initialsnap  $targetsnap ;
+  Sendzfs  -DRI  $initialsnap $RR $targetsnap;
  fi
 fi
  RemoteAsk RemoteGetSnaplist $vol;
