@@ -4,7 +4,6 @@ web='/var/www/html/des20/Data/CIFSstatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log'
 runningpools='/pacedata/pools/runningpools'
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-rm txt/err2.txt 2>/dev/null
 volname=`echo $@ | awk '{print $2}'`;
 pDG=`echo $@ | awk '{print $1}'`;
 pro=`echo $@ | awk '{print $3}'`;
@@ -34,11 +33,11 @@ if [ $? -ne 0  ]; then
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code NFS1001@@@$hostnam/$DG/$volname`;
 echo NFS1001@$datenow@$timenow@$hostnam/$DG/$volname > ${logging}2
 else 
-cp /etc/samba/smb.conf smb.confcurrent;
- rm $volname.txt;
- ./delblock.sh start${volname}_only stop${volname}_only smb.confcurrent  ;
- ./delblock.sh start${volname}_only stop${volname}_only CIFSshares.txt  ;
- cp smb.confcurrent /etc/samba/smb.conf;
+cp /etc/samba/smb.conf /TopStordata/smb.confcurrent;
+ rm /TopStordata/$volname.txt;
+ ./delblock.sh start${volname}_only stop${volname}_only /TopStordata/smb.confcurrent  ;
+ ./delblock.sh start${volname}_only stop${volname}_only /TopStordata/CIFSshares.txt  ;
+ cp /TopStordata/smb.confcurrent /etc/samba/smb.conf;
  systemctl restart smb
  echo CIFS1007:$hostnam/$DG/$volname > $web; 
  logdata='success_deleting_volume'$hostnam/$DG/$volname;
