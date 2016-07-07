@@ -11,7 +11,6 @@ txtres='/TopStordata/'`basename $0`$userreq'.txt'
 rm $txtres 2>/dev/null
 hostnam=` echo $@ | awk -F_ '{print $1}'`;
 sshost=`cat $runningpools | grep $hostnam | awk '{print $1}'`;
-echo $@ > tmppp 
 privilege="SnapShots";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
