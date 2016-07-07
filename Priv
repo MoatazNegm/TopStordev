@@ -6,10 +6,10 @@ userreq=` echo $@ | awk '{print $NF}'`;
 contrun=` ./privthis.sh $privilege $userreq ` ;
 if [[ $contrun == 'true' ]] 
 then
-web='/usr/local/www/apache24/data/des19/Data/Privstatus.log';
-userpriv='/usr/local/www/apache24/data/des19/Data/userpriv.txt';
-resweb='/usr/local/www/apache24/data/des19/Data/userprivdate.txt';
-logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
+web='/var/www/html/des20/Data/Privstatus.log';
+userpriv='/var/www/html/des20/Data/userpriv.txt';
+resweb='/var/www/html/des20/Data/userprivdate.txt';
+logging='/var/www/html/des20/Data/currentinfo2.log'
 jsonthis=`./jsonthis3.sh $@`;
 userchange=` echo $@ | awk '{print $2}'`;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
@@ -19,18 +19,18 @@ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data 
 echo Priv1002@$datenow@$timenow@$userchange > ${logging}2;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 result="[";
-olduserpriv=`cat userpriv.txt | grep -v "$userchange"`;
+olduserpriv=`cat $userpriv | grep -v "$userchange"`;
 wold=` echo $olduserpriv | wc -c `;
 if [[ $wold -ge 5 ]] 
 then 
-echo $olduserpriv > userpriv.txt
-echo $jsonthis >> userpriv.txt
+echo $olduserpriv > $userpriv
+echo $jsonthis >> $userpriv
 else
- echo $jsonthis > userpriv.txt
+ echo $jsonthis > $userpriv
 fi
-cat userpriv.txt | while read -r line
+cat $userpriv | while read -r line
 do 
-result=$result$line,;
+result=${result}$line,;
 done
 result=`echo $result | rev | cut -c 2- | rev`];
 echo $result > $userpriv;

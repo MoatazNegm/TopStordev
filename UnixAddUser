@@ -6,7 +6,6 @@ username=`echo $@ | awk '{print $1}'`;
 userpass=`echo $@ | awk '{print $2}'`;
 userreq=`echo $@  | awk '{print $3}'`;
 echo Unlin1017:$username > $web;
-echo $username, $userpass _ $userreq > tmpnow
 privilege="Box_Users";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
