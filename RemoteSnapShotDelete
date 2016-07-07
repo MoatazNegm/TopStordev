@@ -14,6 +14,7 @@ echo Replica1000:$snapdel > $web;
 
 ./SnapShotDelete $pDG $snapdel $userreq 
 ./GetSnaplist
+ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 privilege="SnapShots";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
@@ -26,7 +27,6 @@ then
  contrun=`./privthis.sh $privilege $userreq`;
  echo success
 else
- datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 	echo Replica1001:$snapdel > $web;
 	echo 'Failed Deleteing Snapshot remote' > ${web}internal;
 	logdata='Failed_Deleting_Snapshot:'$snapdel;
