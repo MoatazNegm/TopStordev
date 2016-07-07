@@ -1,2 +1,2 @@
 #!/usr/local/bin/zsh
-echo $@ > /tmp/msgfile;
+echo $@ > /tmp2/msgfile;

@@ -4,7 +4,7 @@ web='/var/www/html/des20/Data/Snapsstatus.log'
 logging='/var/www/html/des20/Data/currentinfo2.log'
 periodel=` echo $@ | awk '{print $1}'`;
 userreq=` echo $@ | awk '{print $2}'`;
-txtres=txt/`basename $0`$userreq.txt
+txtres='/TopStordata/'`basename $0`$userreq'.txt'
 rm $txtres 2>/dev/null
 privilege="SnapShots";
 contrun=`./privthis.sh $privilege $userreq`;
