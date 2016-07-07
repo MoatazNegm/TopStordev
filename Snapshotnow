@@ -3,7 +3,7 @@ cd /TopStor
 web='/var/www/html/des20/Data/currentinfo2.log2';
 logging='/var/www/html/des20/Data/currentinfo2.log'
 stamp=`date +%s`;
-cronout='txt/cronoutput.log';
+cronout='/TopStordata/cronoutput.log';
 #echo System is creating Snapshot $@.... > $web;
 oper=$@; 
 echo oper=$oper > $cronout

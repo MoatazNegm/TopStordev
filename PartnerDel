@@ -20,7 +20,7 @@ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data 
 echo Partner1005@$datenow@$timenow@$Partnername > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 partnerlist=`cat $partners `;
-echo $partnerlist | grep "$Partnername" > txt/PartnerDel
+echo $partnerlist | grep "$Partnername" > /TopStordata/PartnerDel
 echo $partnerlist | grep -v "$Partnername" > $partners
 result="[";
 cat $partners | while read -r line ; do
