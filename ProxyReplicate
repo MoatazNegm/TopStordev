@@ -1,7 +1,12 @@
 #!/usr/local/bin/zsh
 cd /TopStor
+glog='/TopStordata/TopStor.log';
 txt='/TopStordata/'`basename $0`
 export POR;
+export HOSTNAM;
+export SNP;
+export POL;
+export VOL;
 export DST; 
 export RR; 
 export PPSEND; 
@@ -33,9 +38,13 @@ echo RemoteSendxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx >> ${txt}
  /usr/sbin/zfs send -p $opt $snap $intersnap | ssh -C root@$sshost "/usr/sbin/zfs receive -dvF $target" &> ${txt}.progress
  if [ $? -eq 0 ]; then
   RR=received
+  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+  echo $datenow $timenow info Replica1153@$datenow@$timenow@$HOSTNAM@$REMOTETUN@$POL/$VOL/$SNP >> $glog
   echo afterAsk:success=$RR  >> ${txt}
  else
   RR=failed
+  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+  echo $datenow $timenow info Replica1152@$datenow@$timenow@$HOSTNAM@$REMOTETUN@$POL/$VOL/$SNP >> $glog
   echo afterAsk:failed=$RR  >> ${txt}
  fi
  rm -rf ${txt}.pid >/dev/null
@@ -49,13 +58,19 @@ startsec=`date +%s`
 DST=`echo $@ | awk '{print $1}'`;
 FILELOG=`echo $@ | awk '{print $2}'`;
 snap=`echo $@ | awk '{print $3}'`
+SNP=`echo $@ | awk '{print $3}'`
 pool=`echo $@ | awk '{print $4}'`;
+POL=`echo $@ | awk '{print $4}'`;
 vol=`echo $@ | awk '{print $5}'`;
+VOL=`echo $@ | awk '{print $5}'`;
 REMOTETUN=`echo $@ | awk '{print $6}'`;
 pp=` echo $@ | awk '{print $7}'`;
 SO=`echo $@ | awk '{print $8}'`;
+HOSTNAM=`cat /TopStordata/hostname`
 LOCALREP=` echo $@ | awk '{print $9}'`;
 echo "starting" > ${txt}
+ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+echo $datenow $timenow info Replica1151@$datenow@$timenow@$HOSTNAM@$REMOTETUN@$POL/$VOL/$SNP >> $glog
 echo starting
 echo Roperands=$@ >> ${txt};
 POR=$pp;
