@@ -1,6 +1,7 @@
 #!/usr/local/bin/zsh
 cd /TopStor
 privilege="User_Priv";
+user=`echo $@ | awk '{print $2}'`
 contrun="false";
 userreq=` echo $@ | awk '{print $NF}'`;
 contrun=` ./privthis.sh $privilege $userreq ` ;
@@ -8,36 +9,30 @@ if [[ $contrun == 'true' ]]
 then
 web='/var/www/html/des20/Data/Privstatus.log';
 userpriv='/var/www/html/des20/Data/userpriv.txt';
+currentpriv='/TopStordata/userpriv.txt';
 resweb='/var/www/html/des20/Data/userprivdate.txt';
 logging='/var/www/html/des20/Data/currentinfo2.log'
-jsonthis=`./jsonthis3.sh $@`;
-userchange=` echo $@ | awk '{print $2}'`;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-logdata='changing_Privileges_of_user:'$userchange;
-echo Priv1000:$userchange  > $web
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Priv1002@@@$userchange`;
-echo Priv1002@$datenow@$timenow@$userchange > ${logging}2;
+logdata='changing_Privileges_of_user:'$user;
+echo Priv1000:$user  > $web
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Priv1002@@@$user`;
+echo Priv1002@$datenow@$timenow@$user > ${logging}2;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+touch $currentpriv
+cat $currentpriv | grep -v "$user" > $currentpriv.tmp  2>/dev/null
+mv $currentpriv.tmp $currentpriv
+echo $@ >> $currentpriv
 result="[";
-olduserpriv=`cat $userpriv | grep -v "$userchange"`;
-wold=` echo $olduserpriv | wc -c `;
-if [[ $wold -ge 5 ]] 
-then 
-echo $olduserpriv > $userpriv
-echo $jsonthis >> $userpriv
-else
- echo $jsonthis > $userpriv
-fi
-cat $userpriv | while read -r line
-do 
-result=${result}$line,;
-done
+while read -r line ; do
+ subres=`./jsonthis3.sh $line`
+ result=${result}$subres,
+done < $currentpriv
 result=`echo $result | rev | cut -c 2- | rev`];
 echo $result > $userpriv;
-logdata='Success_changing_UserPrivileges:'$userchange;
-echo Priv1001:$userchange > $web
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Priv1003@@@$userchange`;
-echo Priv1003@$datenow@$timenow@$userchange > ${logging}2;
+logdata='Success_changing_UserPrivileges:'$user;
+echo Priv1001:$user > $web
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Priv1003@@@$user`;
+echo Priv1003@$datenow@$timenow@$user > ${logging}2;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 resdate=`date +%s`;
 res=`./jsonthis3.sh updated $resdate`;

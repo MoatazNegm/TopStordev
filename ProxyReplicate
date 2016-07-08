@@ -25,11 +25,12 @@ function Sendzfs () {
  shost=`echo $@ | awk '{print $3}'`
  target=`echo $@ | awk '{print $4}'`
  intersnap=`echo $@ | awk '{print $5}'`
+ echo pid $$ > ${txt}.pid 
  sshost=`ls /TopStordata/partner* | grep "$REMOTETUN" | xargs cat | grep "$shost" | awk '{print $1}'`
 echo RemoteSendxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx >> ${txt}
  echo Ask=$@  >> ${txt}
- echo zfs send $opt $snap $intersnap \| ssh root\@$sshost zfs receive \-dvF $target >> ${txt}
-  zfs send $opt $snap $intersnap | ssh root@$sshost zfs receive -dvF $target
+ echo zfs send  -pv $opt $snap $intersnap \| ssh -C root\@$sshost zfs receive \-dvF $target >> ${txt}
+ /usr/sbin/zfs send -p $opt $snap $intersnap | ssh -C root@$sshost "/usr/sbin/zfs receive -dvF $target" &> ${txt}.progress
  if [ $? -eq 0 ]; then
   RR=received
   echo afterAsk:success=$RR  >> ${txt}
@@ -37,6 +38,7 @@ echo RemoteSendxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx >> ${txt}
   RR=failed
   echo afterAsk:failed=$RR  >> ${txt}
  fi
+ rm -rf ${txt}.pid >/dev/null
 }
 #########################################################################
 ## ./Asksend 1032_8($11) 10.176.214.6($9) 15737($10) RemoteVolSearch sdk

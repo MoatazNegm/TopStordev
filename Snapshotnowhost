@@ -5,16 +5,14 @@ logging='/var/www/html/des20/Data/currentinfo2.log'
 runningpools='/pacedata/pools/runningpools'
 pDG=`echo $@ | awk '{print $1}'`;
 DG=`echo $@ | awk -F/ '{print $1}'`;
-echo DG=$DG
 myhost=`hostname`
-echo cat $runningpools  sort -u  grep $DG 
 sshost=`cat $runningpools | sort -u | grep $DG `
 if [ $? -eq 0 ]; then
  sshost=`echo $sshost | awk '{print $1}'`
- echo $sshost | grep $myhost
+ echo $sshost | grep $myhost &>/dev/null
  if [ $? -eq 0 ]; then
-  echo Snapshotnow $@
- ./Snapshotnow $@
+ res=`./Snapshotnow $@`
+  echo $res
  fi
 else
  echo failed

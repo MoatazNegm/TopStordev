@@ -27,7 +27,7 @@ echo Snap1031@$datenow@$timenow@Weekly.$hr.$min.$every.$keep/$DG/$FileS > ${logg
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 stamp=`date +%s`;
 crontab -l > $cronthis
-echo $min  $hr "*" "*" $every  /TopStor/pump.sh Snapshotnowhost $DG/$FileS Weekly.$keep.$hr.$min.$every $stamp 2>txt/SnapshotnowSystem.txt >> $cronthis
+echo $min  $hr "*" "*" $every  /TopStor/pump.sh Snapshotnowhost $hostnam/$DG/$FileS Weekly.$keep.$hr.$min.$every $stamp 2>txt/SnapshotnowSystem.txt >> $cronthis
 crontab $cronthis 2>> $txtres
 err=`wc -c  $txtres | awk '{print $1}'`;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
