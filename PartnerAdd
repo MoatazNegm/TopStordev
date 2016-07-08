@@ -3,6 +3,7 @@ webpartner='/var/www/html/des20/Data/Partnerslist.txt';
 resweb='/var/www/html/des20/Data/Partnerslist.txtupdated'
 web='/var/www/html/des20/Data/Partnersstatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log';
+glog='/TopStordata/TopStor.log';
 partners='/TopStordata/partners.txt'
 Partnername=`echo $@ | awk '{print $1}'`;
 type=`echo $@ | awk '{print $2}'`;
@@ -19,6 +20,7 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='adding_'$type'_partner:'$Partnername;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Partner1007@@@$Partnername`;
 echo Partner1007@$datenow@$timenow@$Partnername > ${logging}2
+echo $datenow $timenow info Partner1007@$datenow@$timenow@$Partnername >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 isthere=`cat $partners | grep "$Partnername $type" | wc -c `
 isthere=$((isthere+0));
@@ -28,6 +30,7 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='adding_'$type'_partner_already_there:'$Partnername;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata code Partner1008@@@$Partnername`;
 echo Partner1008@$datenow@$timenow@$Partnername > ${logging}2
+echo $datenow $timenow warning Partner1008@$datenow@$timenow@$Partnername >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 else
 partnerlist=`cat $partners `;
@@ -62,6 +65,7 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='success_adding_'$type'_partner:'$Partnername;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Partner1009@@@$Partnername@$newtype`;
 echo Partner1009@$datenow@$timenow@$Partnername@$newtype > ${logging}2
+echo $datenow $timenow info Partner1009@$datenow@$timenow@$Partnername@$newtype >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 fi
 fi

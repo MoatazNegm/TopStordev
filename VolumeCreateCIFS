@@ -2,6 +2,7 @@
 cd /TopStor/
 web='/var/www/html/des20/Data/CIFSstatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log'
+glog='/TopStordata/TopStor.log';
 runningpools='/pacedata/pools/runningpools'
 txtres='/TopStordata/'`basename $0`'.txt'
 rm -rf $txtres 2>/dev/null
@@ -24,6 +25,7 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Creating_Volume:'$DG/$name'already_there';
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata code NFS1004@@@$hostnam/$DG/$name`;
 echo NFS1004@$datenow@$timenow@$hostnam/$DG/$name > ${logging}2
+echo $datenow $timenow warning NFS1004@$datenow@$timenow@$hostnam/$DG/$name >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
 echo CIFS1002:$hostnam/$DG/$name > $web;
 else
@@ -31,6 +33,7 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Creating_Volume:'$hostnam/$DG/$name;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code NFS1004@@@$DG/$name`;
 echo NFS1004@$datenow@$timenow@$hostnam/$DG/$name > ${logging}2
+echo $datenow $timenow info NFS1004@$datenow@$timenow@$hostnam/$DG/$name >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
 g=`ssh $sshost cat /TopStor/smb.confcurrent | grep ${name}_only | wc -c`; 
 if [[ g -ge 4 ]];
@@ -39,6 +42,7 @@ then
  logdata='Creating_Volume_already_there:'$hostnam/$DG/$name ;
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata code NFS1005@@@$hostnam/$DG/$name`;
 echo NFS1005@$datenow@$timenow@$hostnam/$DG/$name > ${logging}2
+echo $datenow $timenow warning NFS1005@$datenow@$timenow@$hostnam/$DG/$name >> $glog
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
 else
 ssh $sshost " cd /TopStor &&
@@ -63,11 +67,13 @@ if [[ $err -ge  4  ]]; then
 	logdata='Failed_Creating__Volume:'$hostnam/$DG/$name;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code NFS1005@@@i$hostnam/$DG/$name`;
 echo NFS1005@$datenow@$timenow@$hostnam/$DG/$name > ${logging}2
+echo $datenow $timenow error NFS1005@$datenow@$timenow@$hostnam/$DG/$name >> $glog
 else 
  echo CIFS1004:$hostnam/$DG/$name > $web; 
 	logdata='success_Creating__Volume:'$hostnam/$DG/$name;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code NFS1006@@@$hostnam/$DG/$name`;
 echo NFS1006@$datenow@$timenow@$hostnam/$DG/$name > ${logging}2
+echo $datenow $timenow info NFS1006@$datenow@$timenow@$hostnam/$DG/$name >> $glog
 fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
 ./GetPoolVollist &>/dev/null

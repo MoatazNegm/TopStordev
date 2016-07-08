@@ -76,7 +76,7 @@ if [[ $err -ge  4  ]]; then
 	echo $logthis >> $cronout
 else 
 echo $newsnap
-	echo Snap1029@$@ > $web; 
+	echo Snap1029@$hostnam/$newsnap > $web; 
 	logdata='Success_Creating_Snapshot:'$hostnam/$newsnap;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1030@@@$hostnam/$newsnap`;
 	echo $logthis >> $cronout

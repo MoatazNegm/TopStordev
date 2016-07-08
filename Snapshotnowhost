@@ -1,6 +1,7 @@
 #!/usr/local/bin/zsh
 cd /TopStor
 web='/var/www/html/des20/Data/currentinfo2.log2';
+glog='/TopStordata/TopStor.log';
 logging='/var/www/html/des20/Data/currentinfo2.log'
 runningpools='/pacedata/pools/runningpools'
 pDG=`echo $@ | awk '{print $1}'`;
@@ -18,7 +19,8 @@ else
  echo failed
 stamp=`date +%s`;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-	echo Snap1045:$newsnap > $web;
+	echo Snap1045@$newsnap > ${logging}2;
+	echo $datenow $timenow error Snap1045@$newsnap >> $glog
 	logdata='Failed to find running host for:'$newsnap;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Snap1045@@@$newsnap`;
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;

@@ -3,7 +3,7 @@ cd /TopStor/
 web='/var/www/html/des20/Data/Snapsstatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log'
 runningpools='/pacedata/pools/runningpools'
-
+glog='/TopStordata/TopStor.log';
 echo Snap1012: > $web;
 name=`echo $@ | awk '{print $1}'`;
 pDG=`echo $@ | awk '{print $2}'`;
@@ -23,21 +23,23 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Creating_Snapshot:'$hostnam/$DG/$FileS@$name;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1026@@@$hostnam/$DG/$FileS@name`;
 echo Snap1026@$datenow@$timenow@$hostnam/$DG/$FileS@$name > ${logging}2
+echo $datenow $timenow info Snap1026@$datenow@$timenow@$hostnam/$DG/$FileS@$name >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-/TopStor/SnapshotnowOnce $sshost $hostnam $DG/$FileS $name. 2> $txtres
-err=`wc -c  $txtres | awk '{print $1}'`;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-if [[ $err -ge  4  ]]; then
+/TopStor/SnapshotnowOnce $sshost $hostnam $DG/$FileS $name. > $txtres
+if [ $? -ne 0  ]]; then
 	echo Snap1014:$hostnam/$DG/$FileS > $web;
 	cat $txtres > $web;
 	logdata='Failed_Creating_Snapshot:'$hostnam/$DG/$FileS@$name;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata Snap1028@@@$hostnam/$DG/$FileS@$name`;
 echo Snap1028@$datenow@$timenow@$hostnam/$DG/$FileS@$name > ${logging}2
+echo $datenow $timenow error Snap1028@$datenow@$timenow@$hostnam/$DG/$FileS@$name >> $glog
 else 
  	echo Snap1015:$hostnam/$DG/$FileS$name.$now1 > $web; 
 	logdata='Success_Creating_Snapshot:'$hostnam/$DG/$FileS@$name;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1030@@@$hostnam/$DG/$FileS@$name`;
 echo Snap1030@$datenow@$timenow@$hostnam/$DG/$FileS@$name > ${logging}2
+echo $datenow $timenow info Snap1030@$datenow@$timenow@$hostnam/$DG/$FileS@$name >> $glog
 fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 fi

@@ -25,36 +25,20 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Domain_change:'$domain;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq code Domain1012@@@$domain`;
 echo Domain1012@$datenow@$timenow@$domain > ${logging}2 
+echo $datenow $timenow info Domain1012@$datenow@$timenow@$domain >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-echo $pass > txt/pass;
 hostn=`hostname | awk -F. '{print $1}'`;
 hostnc=`echo $hostn | tr '[:lower:]' '[:upper:]'`;
-#sed "1s/.*/hostname=\"$hostn\.$doms\"/" /etc/rc.conf > txt/rc.conf;
 hostname $hostn.$doms;
-#cp txt/rc.conf /etc/rc.conf;
-#/usr/bin/sed -e "s/DOMSMALL/${doms}/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" dhclient.conf > txt/dhclient.conf 2>txt/err.txt
-#cp txt/dhclient.conf /etc/dhclient.conf
-#echo search_domains=\"$doms\" > txt/resolvconf.conf
-#echo "domain $doms" >> txt/resolvconf.conf
-#echo name_servers=\"$domcontip\" >> txt/resolvconf.conf
-#cat /etc/resolv.conf >> txt/resolv.conf;
-#cp txt/resolvconf.conf /etc/resolvconf.conf;
-#resolvconf -u;
-sed -e "s/CONT/$domcont/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMC/$domc/g" -e "s/DOMSH/$domshort/g" -e "s/MYNAME/$hostnc/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" smb4.confWorkgrp > txt/smb4.conf 2>txt/err.txt ; 
-cat CIFSshares.txt >> txt/smb4.conf;
-cp txt/smb4.conf /etc/samba/smb.conf;
-#hostip=`ifconfig em1 | grep "inet " | awk '{print $2}'`
-#hosts=`cat /etc/hosts | grep -v "$hostn"`;
-#echo $hosts > /etc/hosts
-#echo $hostip   $hostn >> /etc/hosts
-#echo $hostip   $hostn.$doms >> /etc/hosts
-#sed -e "s/DOMC/$domc/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMSH/$domshort/g" -e "s/CONT/$domcont/g" krb5.conf > txt/krb5.conf;
-#cp txt/krb5.conf /etc/ ;
+sed -e "s/CONT/$domcont/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMC/$domc/g" -e "s/DOMSH/$domshort/g" -e "s/MYNAME/$hostnc/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" smb4.confWorkgrp > /TopStordata/smb.conf
+cat CIFSshares.txt >> /TopStordata/smb.conf;
+cp /TopStordata/smb.conf /etc/samba/smb.conf;
 systemctl restart smb
 echo Domain1011:$domain  > $web;
 logdata='success_changing_Wrokgroup:'$domain;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq code Domain1013@@@$domain`;
 echo Domain1013@$datenow@$timenow@$domain > ${logging}2 
+echo $datenow $timenow info Domain1013@$datenow@$timenow@$domain >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 fi

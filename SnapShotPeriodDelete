@@ -2,6 +2,7 @@
 cd /TopStor
 web='/var/www/html/des20/Data/Snapsstatus.log'
 logging='/var/www/html/des20/Data/currentinfo2.log'
+glog='/TopStordata/TopStor.log';
 periodel=` echo $@ | awk '{print $1}'`;
 userreq=` echo $@ | awk '{print $2}'`;
 txtres='/TopStordata/'`basename $0`$userreq'.txt'
@@ -14,6 +15,7 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Deleting_Period:'$periodel;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1043@@@$periodel`;
 echo Snap1043@$datenow@$timenow@$periodel > ${logging}2
+echo $datenow $timenow info Snap1043@$datenow@$timenow@$periodel >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 echo Snap1003:$periodel > $web
 /usr/bin/crontab -l | grep -v "$periodel" | /usr/bin/crontab -  2> $txtres
@@ -23,13 +25,15 @@ if [[ $err -ge  4  ]]; then
         echo Snap1004:$periodel > $web;
         cat $txtres > ${web}internal;
         logdata='Failed_Deleting_Period:'$periodel;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1044@@@$periodel`;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Snap1044@@@$periodel`;
 echo Snap1044@$datenow@$timenow@$periodel > ${logging}2
+echo $datenow $timenow error Snap1044@$datenow@$timenow@$periodel >> $glog
 else
 	 echo Snap1005:$periodel > $web;
         logdata='success_Deleting_Period:'$periodel;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata Snap1045@@@$periodel`;
 echo Snap1045@$datenow@$timenow@$periodel > ${logging}2
+echo $datenow $timenow info Snap1045@$datenow@$timenow@$periodel >> $glog
 fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 ./GetPoolperiodlist

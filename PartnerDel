@@ -4,6 +4,7 @@ webpartner='/var/www/html/des20/Data/Partnerslist.txt';
 resweb='/var/www/html/des20/Data/Partnerslist.txtupdated'
 web='/var/www/html/des20/Data/Partnersstatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log'
+glog='/TopStordata/TopStor.log';
 partners='/TopStordata/partners.txt'
 echo $@ >> tmppartner
 Partnername=`echo $@ | awk '{print $1}'`;
@@ -18,6 +19,7 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Deleting_partner:'$Partnername;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Partner1005@@@$Partnername`;
 echo Partner1005@$datenow@$timenow@$Partnername > ${logging}2
+echo $datenow $timenow info Partner1005@$datenow@$timenow@$Partnername >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 partnerlist=`cat $partners `;
 echo $partnerlist | grep "$Partnername" > /TopStordata/PartnerDel
@@ -40,5 +42,6 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='success_Deleting_partner:'$Partnername;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Partner1006@@@$Partnername`;
 echo Partner1006@$datenow@$timenow@$Partnername > ${logging}2
+echo $datenow $timenow info Partner1006@$datenow@$timenow@$Partnername >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 fi

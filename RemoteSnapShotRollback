@@ -2,6 +2,7 @@
 cd /TopStor
 web='/var/www/html/des20/Data/Replicatestatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log'
+glog='/TopStordata/TopStor.log';
 pDG=` echo $@ | awk '{print $1}'`;
 snaprol=` echo $@ | awk '{print $2}'`;
 userreq=` echo $@ | awk '{print $3}'`;
@@ -9,6 +10,7 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Rollingback_Snapshot:'$snaprol;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1042@@@$snaprol`;
 echo Replica1042@$datenow@$timenow@$snaprol > ${logging}2
+echo $datenow $timenow info Replica1042@$datenow@$timenow@$snaprol >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 echo Replica1006:$snaprol > $web;
 ./SnapShotRollback $pDG $snaprol $userreq
@@ -23,11 +25,13 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 	logdata='Failed_Rollingback_Snapshot:'$snaprol;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Replica1043@@@$snaprol`;
 echo Replica1043@$datenow@$timenow@$snaprol > ${logging}2
+echo $datenow $timenow error Replica1043@$datenow@$timenow@$snaprol >> $glog
 else 
 	echo Replica1008:$snaprol > $web; 
 	logdata='Success_Rollingback_Snapshot:'$snaprol;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1044@@@$snaprol`;
 echo Replica1044@$datenow@$timenow@$snaprol > ${logging}2
+echo $datenow $timenow info Replica1044@$datenow@$timenow@$snaprol >> $glog
 fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 ./GetSnaplist

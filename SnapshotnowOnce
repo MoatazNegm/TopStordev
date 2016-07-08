@@ -16,12 +16,14 @@ ssh root@$sshost /sbin/zfs snapshot $newsnap 2>> $txtres
 err=`wc -c  $txtres | awk '{print $1}'`;
 if [[ $err >  4  ]]; then
 	cat $txtres >> $web;
-	cat txt/err.txt
+        echo failed
+        exit 1;
 else 
 timenow=`/usr/bin/date`
 echo $timenow: DONE...Snapshot $newsnap is created >> $web; 
 echo $timenow: DONE...Snapshot $newsnap is created  $web; 
 ./GetSnaplist
 echo OK;
+exit 0
 fi;
 #sleep 2;

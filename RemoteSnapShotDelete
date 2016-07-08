@@ -2,6 +2,7 @@
 cd /TopStor
 web='/var/www/html/des20/Data/Replicatestatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log'
+glog='/TopStordata/TopStor.log';
 pDG=` echo $@ | awk '{print $1}'`;
 snapdel=` echo $@ | awk '{print $2}'`;
 userreq=` echo $@ | awk '{print $3}'`;
@@ -9,6 +10,7 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Deleting_Snapshot:'$snapdel;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1048@@@$snapdel`;
 echo Replica1048@$datenow@$timenow@$snapdel > ${logging}2
+echo $datenow $timenow info Replica1048@$datenow@$timenow@$snapdel >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 echo Replica1000:$snapdel > $web;
 
@@ -23,6 +25,7 @@ then
  logdata='Success_Deleting_Snapshot:'$snapdel;
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1050@@@$snapdel`;
  echo Replica1050@$datenow@$timenow@$snapdel > ${logging}2
+echo $datenow $timenow info Replica1050@$datenow@$timenow@$snapdel >> $glog
  privilege="SnapShots";
  contrun=`./privthis.sh $privilege $userreq`;
  echo success
@@ -32,6 +35,7 @@ else
 	logdata='Failed_Deleting_Snapshot:'$snapdel;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Replica1049@@@$snapdel`;
  echo Replica1049@$datenow@$timenow@$snapdel > ${logging}2
+echo $datenow $timenow error Replica1049@$datenow@$timenow@$snapdel >> $glog
  echo failed
 fi
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
