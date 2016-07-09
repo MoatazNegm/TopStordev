@@ -18,7 +18,7 @@ logdata='changing_Privileges_of_user:'$user;
 echo Priv1000:$user  > $web
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Priv1002@@@$user`;
 echo Priv1002@$datenow@$timenow@$user > ${logging}2;
-echo $datenow $timenow info Priv1002@$datenow@$timenow@$user >> $glog
+echo $datenow $timenow info Priv1002@@@$user >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 touch $currentpriv
 cat $currentpriv | grep -v "$user" > $currentpriv.tmp  2>/dev/null
@@ -35,7 +35,7 @@ logdata='Success_changing_UserPrivileges:'$user;
 echo Priv1001:$user > $web
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Priv1003@@@$user`;
 echo Priv1003@$datenow@$timenow@$user > ${logging}2;
-echo $datenow $timenow info Priv1003@$datenow@$timenow@$user >> $glog
+echo $datenow $timenow info Priv1003@@@$user >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 resdate=`date +%s`;
 res=`./jsonthis3.sh updated $resdate`;

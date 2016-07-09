@@ -28,7 +28,7 @@ if [ $? -eq 0 ]; then
   if [ $? -eq 0 ]; then
    hostnam=`ssh root@$sshost cat /TopStordata/hostname`
    scp $sshost:/pacedata/iscsitargets /TopStordata/partner_${sshost}_targets
-   partnsers=(`cat /TopStordata/partner_${sshost}_targets | awk '{print $1}'`);
+   partnsers=(`cat /TopStordata/partner_${sshost}_targets | awk '{print $2}'`);
    echo ${partners[@]} | while read -r verhost; do
      /TopStor/Partnerprep $verhost &>/dev/null
    done

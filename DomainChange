@@ -1,4 +1,5 @@
 #!/usr/local/bin/zsh
+cd /TopStor/
 web='/var/www/html/des20/Data/'`basename $0`'status.log';
 logging='/var/www/html/des20/Data/currentinfo2.log';
 txtres='/TopStordata/'`basename $0`'.txt'
@@ -27,7 +28,7 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Domain_change:'$domain;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq code Domain1003@@@$domain`;
 echo Domain1003@$datenow@$timenow@$domain > ${logging}2 
-echo $datenow $timenow info Domain1003@$datenow@$timenow@$domain >> $glog
+echo $datenow $timenow info Domain1003@@@$domain >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 hostn=`hostname | awk -F. '{print $1}'`;
 hostname $hostn.$doms;
@@ -47,13 +48,13 @@ if [ $? -ne 0  ]; then
 	logdata='failed_changing_domain:'$domain;
         code='Domain1004@@@'$domain
 echo Domain1004@$datenow@$timenow@$domain > ${logging}2 
-echo $datenow $timenow error Domain1004@$datenow@$timenow@$domain >> $glog
+echo $datenow $timenow error Domain1004@@@$domain >> $glog
 else 
  echo Domain1002:$domain > $web; 
  logdata='success_changing_domain:'$domain;
  code='Domain1005@@@'$domain
 echo Domain1005@$datenow@$timenow@$domain > ${logging}2 
-echo $datenow $timenow info Domain1005@$datenow@$timenow@$domain >> $glog
+echo $datenow $timenow info Domain1005@@@$domain >> $glog
 fi;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq code $code`;

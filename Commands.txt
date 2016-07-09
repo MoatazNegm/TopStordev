@@ -1,5 +1,0 @@
-RemoteVolSearch
-replidf.sh
-replivol.sh
-destroysnaps.sh
-RemoteGetSnaplist

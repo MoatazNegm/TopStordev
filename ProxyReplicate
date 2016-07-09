@@ -36,15 +36,17 @@ echo RemoteSendxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx >> ${txt}
  echo Ask=$@  >> ${txt}
  echo zfs send  -pv $opt $snap $intersnap \| ssh -C root\@$sshost zfs receive \-dvF $target >> ${txt}
  /usr/sbin/zfs send -p $opt $snap $intersnap | ssh -C root@$sshost "/usr/sbin/zfs receive -dvF $target" &> ${txt}.progress
+  stampp=`date +%s`
+  cp ${txt}.progress  ${txt}$stampp
  if [ $? -eq 0 ]; then
   RR=received
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-  echo $datenow $timenow info Replica1153@$datenow@$timenow@$HOSTNAM@$REMOTETUN@$POL/$VOL/$SNP >> $glog
+  echo $datenow $timenow info Replica1153@@@$HOSTNAM@$REMOTETUN@$POL/$VOL/$SNP $stampp>> $glog
   echo afterAsk:success=$RR  >> ${txt}
  else
   RR=failed
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-  echo $datenow $timenow info Replica1152@$datenow@$timenow@$HOSTNAM@$REMOTETUN@$POL/$VOL/$SNP >> $glog
+  echo $datenow $timenow error Replica1152@@@$HOSTNAM@$REMOTETUN@$POL/$VOL/$SNP $stampp >> $glog
   echo afterAsk:failed=$RR  >> ${txt}
  fi
  rm -rf ${txt}.pid >/dev/null
@@ -70,7 +72,7 @@ HOSTNAM=`cat /TopStordata/hostname`
 LOCALREP=` echo $@ | awk '{print $9}'`;
 echo "starting" > ${txt}
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-echo $datenow $timenow info Replica1151@$datenow@$timenow@$HOSTNAM@$REMOTETUN@$POL/$VOL/$SNP >> $glog
+echo $datenow $timenow info Replica1151@@@$HOSTNAM@$REMOTETUN@$POL/$VOL/$SNP >> $glog
 echo starting
 echo Roperands=$@ >> ${txt};
 POR=$pp;

@@ -1,6 +1,8 @@
 #!/usr/local/bin/zsh
+cd /TopStor/
 web='/var/www/html/des20/Data/DomainChangestatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log';
+glog='/TopStordata/TopStor.log';
 domain=`echo $@ | awk '{ print $1 }' `;
 domc=`echo $domain | tr '[:lower:]' '[:upper:]'`;
 doms=`echo $domain | tr '[:upper:]' '[:lower:]'`;
@@ -25,7 +27,7 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Domain_change:'$domain;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq code Domain1012@@@$domain`;
 echo Domain1012@$datenow@$timenow@$domain > ${logging}2 
-echo $datenow $timenow info Domain1012@$datenow@$timenow@$domain >> $glog
+echo $datenow $timenow info Domain1012@@@$domain >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 hostn=`hostname | awk -F. '{print $1}'`;
 hostnc=`echo $hostn | tr '[:lower:]' '[:upper:]'`;
@@ -39,6 +41,6 @@ logdata='success_changing_Wrokgroup:'$domain;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq code Domain1013@@@$domain`;
 echo Domain1013@$datenow@$timenow@$domain > ${logging}2 
-echo $datenow $timenow info Domain1013@$datenow@$timenow@$domain >> $glog
+echo $datenow $timenow info Domain1013@@@$domain >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 fi
