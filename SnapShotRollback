@@ -19,7 +19,7 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Rollingback_Snapshot:'$hostnam/$snaprol;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1040@@@$hostnam/$snaprol`;
 echo Snap1040@$datenow@$timenow@$hostnam/$snaprol > ${logging}2
-echo $datenow $timenow info Snap1040@@@$hostnam/$snaprol >> $glog
+echo $datenow $timenow info $userreq Snap1040@@@$hostnam/$snaprol >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 echo Snap1006:$hostnam/$snaprol > $web;
 ssh root@$sshost "/sbin/zfs rollback -r  $snaprol"  2> $txtres;
@@ -31,13 +31,13 @@ if [[ $err -ge  4  ]]; then
 	logdata='Failed_Rollingback_Snapshot:'$hostnam/$snaprol;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Snap1041@@@$hostnam/$snaprol`;
 echo Snap1041@$datenow@$timenow@$hostnam/$snaprol > ${logging}2
-echo $datenow $timenow error Snap1041@@@$hostnam/$snaprol >> $glog
+echo $datenow $timenow error $userreq Snap1041@@@$hostnam/$snaprol >> $glog
 else 
 	echo Snap1008:$hostnam/$snaprol > $web; 
 	logdata='Success_Rollingback_Snapshot:'$hostnam/$snaprol;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1042@@@$hostnam/$snaprol`;
 echo Snap1042@$datenow@$timenow@$hostnam/$snaprol > ${logging}2
-echo $datenow $timenow info Snap1042@@@$hostnam/$snaprol >> $glog
+echo $datenow $timenow info $userreq Snap1042@@@$hostnam/$snaprol >> $glog
 ./GetSnaplist
 fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;

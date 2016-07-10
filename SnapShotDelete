@@ -20,7 +20,7 @@ then
  logdata='Deleting_Snapshot:'$hostnam/$snapdel;
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1022@@@$hostnam/$snapdel`;
  echo Snap1022@$datenow@$timenow@$hostnam/$snapdel > ${logging}2
- echo $datenow $timenow info Snap1022@@@$hostnam/$snapdel >> $glog
+ echo $datenow $timenow info $userreq Snap1022@@@$hostnam/$snapdel >> $glog
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
  echo Snap1000:$hostnam/$snapdel > $web;
  ssh root@$sshost "/sbin/zfs destroy $snapdel"  2> $txtres
@@ -32,14 +32,14 @@ then
  	logdata='Failed_Deleting_Snapshot:'$snapdel;
  	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Snap1023@@@$hostnam/$snapdel`;
   echo Snap1023@$datenow@$timenow@$hostnam/$snapdel > ${logging}2
- echo $datenow $timenow error Snap1023@@@$hostnam/$snapdel >> $glog
+ echo $datenow $timenow error $userreq Snap1023@@@$hostnam/$snapdel >> $glog
   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
  else 
 	 echo Snap1002:$hostnam/$snapdel > $web; 
 	logdata='Success_Deleting_Snapshot:'$hostnam/$snapdel;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1025@@@$hostnam/$snapdel`;
   echo Snap1025@$datenow@$timenow@$hostnam/$snapdel > ${logging}2
- echo $datenow $timenow info Snap1025@@@$hostnam/$snapdel >> $glog
+ echo $datenow $timenow info $userreq Snap1025@@@$hostnam/$snapdel >> $glog
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
   ./GetSnaplist
   exit 0 ;

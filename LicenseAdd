@@ -16,7 +16,7 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='adding_Proxy_License:'$licensename;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1053@@@$licensename`;
 echo Replica1053@$datenow@$timenow@$licensename > ${logging}2
-echo $datenow $timenow info Replica1053@@@$licensename >> $glog
+echo $datenow $timenow info $userreq Replica1053@@@$licensename >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 isthere=`cat $proxy `
 istheren=` echo $isthere | wc -c `
@@ -39,7 +39,7 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='success_adding_Proxy_license:'$licensename;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1054@@@$licensename@$proxyname`;
 echo Replica1054@$datenow@$timenow@$licensename@$proxyname > ${logging}2
-echo $datenow $timenow info Replica1054@@@$licensename@$proxyname >> $glog
+echo $datenow $timenow info $userreq Replica1054@@@$licensename@$proxyname >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 fi
 fi

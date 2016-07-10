@@ -23,7 +23,7 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Creating_MinutelyPeriod:'$hostnam/$DG/$FileS
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1034@@@Minutely.$every.$keep/$hostnam/$DG/$FileS`;
 echo Snap1034@${datenow}@${timenow}@Minutely.$every.$keep for $hostnam/$DG/$FileS > ${logging}2
-echo $datenow $timenow info Snap1034@@@Minutely.$every.$keep/$hostnam/$DG/$FileS >> $glog
+echo $datenow $timenow info $userreq Snap1034@@@Minutely.$every.$keep/$hostnam/$DG/$FileS >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 stamp=`date +%s`;
 crontab -l > $cronthis
@@ -37,13 +37,13 @@ if [[ $err -ge  4  ]]; then
 	logdata='Failed_Creating_MinutelyPeriod:'$hostnam/$DG/$FileS;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Snap1035@@@Minutely.$every.$keep/$hostnam/$DG/$FileS`;
 echo Snap1035@${datenow}@${timenow}@Minutely.$every.$keep for $DG/$FileS > ${logging}2
-echo $datenow $timenow error Snap1035@@@Minutely.$every.$keep for $DG/$FileS >> $glog
+echo $datenow $timenow error $userreq Snap1035@@@Minutely.$every.$keep for $DG/$FileS >> $glog
 else 
  echo Snap1018:Minutely.$every.$keep : $hostnam/$DG/$FileS > $web; 
 	logdata='Success_Creating_MinutelyPeriod:'$hostnam/$DG/$FileS;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1036@@@Minutely.$every.$keep/$hostnam/$DG/$FileS`;
 echo Snap1036@${datenow}@${timenow}@Minutely.$every.$keep for $hostnam/$DG/$FileS > ${logging}2
-echo $datenow $timenow info Snap1036@@@Minutely.$every.$keep/$hostnam/$DG/$FileS >> $glog
+echo $datenow $timenow info $userreq Snap1036@@@Minutely.$every.$keep/$hostnam/$DG/$FileS >> $glog
 fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 ./GetPoolperiodlist

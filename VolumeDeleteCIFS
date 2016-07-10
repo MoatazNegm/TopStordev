@@ -23,7 +23,7 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Deleting:'$hostnam/$DG/$volname;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code NFS1000@@@$hostnam/$DG/$volname`;
 echo NFS1000@$datenow@$timenow@$hostnam/$DG/$volname > ${logging}2
-echo $datenow $timenow info NFS1000@@@$hostnam/$DG/$volname >> $glog
+echo $datenow $timenow info $userreq NFS1000@@@$hostnam/$DG/$volname >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 ssh $sshost " cd /TopStor &&
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
@@ -34,7 +34,7 @@ if [ $? -ne 0  ]; then
 	logdata='failed_deleting_volume:'$hostnam/$DG/$volname;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code NFS1001@@@$hostnam/$DG/$volname`;
 echo NFS1001@$datenow@$timenow@$hostnam/$DG/$volname > ${logging}2
-echo $datenow $timenow error NFS1001@@@$hostnam/$DG/$volname  >> $glog
+echo $datenow $timenow error $userreq NFS1001@@@$hostnam/$DG/$volname  >> $glog
 else 
 cp /etc/samba/smb.conf /TopStordata/smb.confcurrent;
  rm /TopStordata/$volname.txt;
@@ -46,7 +46,7 @@ cp /etc/samba/smb.conf /TopStordata/smb.confcurrent;
  logdata='success_deleting_volume'$hostnam/$DG/$volname;
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code NFS1002@@@$hostnam/$DG/$volname`;
 echo NFS1002@$datenow@$timenow@$hostnam/$DG/$volname > ${logging}2
-echo $datenow $timenow info NFS1002@@@$hostnam/$DG/$volname   >> $glog
+echo $datenow $timenow info $userreq NFS1002@@@$hostnam/$DG/$volname   >> $glog
 fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 ./GetPoolVollist

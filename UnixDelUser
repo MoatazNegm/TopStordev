@@ -15,7 +15,7 @@ datenow=`date +%m/%d/%Y`;timenow=`date +%T`;
 logdata='Deleting_user:'$username;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq code Unlin1004@@@$username`;
 echo Unlin1004@$datenow@$timenow@$username > ${logging}2
-echo $datenow $timenow info Unlin1004@@@$username >> $glog
+echo $datenow $timenow info $userreq Unlin1004@@@$username >> $glog
 oldlog=`cat $logging | sed 's/]//g' `; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 /bin/smbpasswd -d $username;
 userdel -r  $username 2>txt/${0:2}$userreq.txt;
@@ -28,13 +28,13 @@ if [[ $err -ge 3 ]]; then
  	logdata='failed_deleting_user:'$username	;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq code Unlin11001@@@$username`;
 echo Unlin11001@$datenow@$timenow@$username > ${logging}2
-echo $datenow $timenow error Unlin11001@@@$username  >> $glog
+echo $datenow $timenow error $userreq Unlin11001@@@$username  >> $glog
 else
 	echo Unlin1000:$username > $web;
 	logdata='success_deleting_user:'$username;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq Unlin1010@@@$username`;
 echo Unlin1010@$datenow@$timenow@$username > ${logging}2
-echo $datenow $timenow info Unlin1010@@@$username  >> $glog
+echo $datenow $timenow info $userreq Unlin1010@@@$username  >> $glog
 fi;
 oldlog=`cat $logging | sed 's/]//g' `; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 ./UnisListUsers;
