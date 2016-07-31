@@ -11,7 +11,7 @@ cat $partners | while read -r line ; do
   subres=`./jsonthis3.sh name $n type $t proxy $p passphrase $pass`;
   result=$result$subres,
 done;
-result=`echo $result | rev | cut -c 2- | rev`];
+result=`echo $result | rev | cut -c 2- | rev`']';
 echo $result >$webpartner;
 resdate=`date +%s`;
 res=` ./jsonthis3.sh updated $resdate`;
