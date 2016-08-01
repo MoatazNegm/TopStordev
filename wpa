@@ -1,0 +1,6 @@
+#!/bin/sh
+ip link set wlp0s20u2 up
+wpa_supplicant -B -iwlp0s20u2 -c /etc/wpa_wifi2
+#dhclient wlp0s20u2
+ip address add 192.168.0.102/24 dev wlp0s20u2
+route add default gw 192.168.0.1 wlp0s20u2

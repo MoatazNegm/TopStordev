@@ -15,6 +15,7 @@ ClearExit() {
 	exit 0;
 }
 trap ClearExit HUP
+/TopStor/wpa
 while true; do 
 {
 read line < /tmp2/msgfile
