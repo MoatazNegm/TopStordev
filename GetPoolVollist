@@ -50,5 +50,5 @@ result=`echo $result | rev | cut -c 2- | rev`]
 echo $result > $websnaps 2>txt/err.txt
 tstamp=`date +%s`;
 res=` ./jsonthis3.sh updated $tstamp `;
-echo $res > $resweb;
+echo $res > ${resweb}tmp;
 echo ready;
