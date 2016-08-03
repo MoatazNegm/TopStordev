@@ -5,6 +5,10 @@ resweb='/var/www/html/des20/Data/Vollist.txtupdated';
 runningpools='/pacedata/pools/runningpools'
 iscsimapping='/pacedata/iscsimapping'
 allprops='/TopStordata/allprops'
+pid='/TopStordata/GetPools.pid'
+if [[ -a $pid ]]; then exit; 
+else
+echo hi > $pid; 
 rm -rf $allprops &>/dev/null
 hostns=(`cat $iscsimapping | grep -v notconn | awk '{print $1}'`)
 for hostn in "${hostns[@]}"; do
@@ -47,8 +51,15 @@ for poolnow in "${gpool[@]}"; do
  done;
 done
 result=`echo $result | rev | cut -c 2- | rev`]
-echo $result > $websnaps 2>txt/err.txt
-tstamp=`date +%s`;
-res=` ./jsonthis3.sh updated $tstamp `;
-echo $res > ${resweb}tmp;
+echo $result > ${websnaps}tmp 2>txt/err.txt
+diff ${websnaps} ${websnaps}tmp &>/dev/null
+if [ $? -ne 0 ]; then
+ rm -rf $websnaps;
+ mv ${websnaps}tmp $websnaps;
+ tstamp=`date +%s`;
+ res=` ./jsonthis3.sh updated $tstamp `;
+ echo $res > $resweb;
+fi
+rm -rf $pid 
+fi
 echo ready;
