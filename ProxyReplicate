@@ -96,42 +96,51 @@ then
  RemoteAsk set$prot $vol $SO $RR
  echo zfs RR=$RR >> ${txt}
 else
- echo foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn >> ${txt}
- RemoteAsk RemoteGetSnaplist $vol;
- if [[ $RR == "nothing" ]];  then oldsnaps=""; else oldsnaps=$RR; fi;
- localsnaps=`./GetSnaplistlocal $vol`;
- ll=$oldsnaps;
- ll=${ll}' spot';
- echo ll=$ll >> ${txt}
- lineupsnaps=`echo $ll | tr ' ' '\n' `
- initialsnap="";
- echo $lineupsnaps | while read -r line  
- do
-  if [[ ${localsnaps/$line} == $localsnaps ]];
-  then ; else initialsnap=$line;  break; fi;
- done;
- targetsnap=$pool/$vol@$snap
- echo targetsnap=$targetsnap >> ${txt}
- echo initialsnap=$initialsnap >> ${txt}
- if [[ $initialsnap == $targetsnap ]]; 
- then echo up-to-date >> ${txt}; fi
- if [[ $initialsnap == "" ]];
- then 
-  echo yyyyyyyyyyyyyintital is null >> ${txt} 
-  echo RemoteAsk destroysnaps $vol >> ${txt};
-  RemoteAsk destroysnaps.sh $vol ;
-  RemoteAsk replipool.sh $vol none 
-  Sendzfs  -DR $pool/$vol@$snap $RR ;
-#  RemoteAsk set$prot $vol $SO $RR
-#  echo RemoteAsk replivol $PORzfs $REMOTETUN $SO $pool $vol nothing >> ${txt};
-#  RemoteAsk replivol $PORzfs $REMOTETUN $SO $pool $vol nothing;
-#echo exit  >> ${txt}
-#exit
+ if [[ $volfound == "yes" ]];
+ then
+  echo foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn >> ${txt}
+  RemoteAsk RemoteGetSnaplist $vol;
+  if [[ $RR == "nothing" ]];  then oldsnaps=""; else oldsnaps=$RR; fi;
+  localsnaps=`./GetSnaplistlocal $vol`;
+  ll=$oldsnaps;
+  ll=${ll}' spot';
+  echo ll=$ll >> ${txt}
+  lineupsnaps=`echo $ll | tr ' ' '\n' `
+  initialsnap="";
+  echo $lineupsnaps | while read -r line  
+  do
+   if [[ ${localsnaps/$line} == $localsnaps ]];
+   then ; else initialsnap=$line;  break; fi;
+  done;
+  targetsnap=$pool/$vol@$snap
+  echo targetsnap=$targetsnap >> ${txt}
+  echo initialsnap=$initialsnap >> ${txt}
+  if [[ $initialsnap == $targetsnap ]]; 
+  then echo up-to-date >> ${txt}; fi
+  if [[ $initialsnap == "" ]];
+  then 
+   echo yyyyyyyyyyyyyintital is null >> ${txt} 
+   echo RemoteAsk destroysnaps $vol >> ${txt};
+   RemoteAsk destroysnaps.sh $vol ;
+   RemoteAsk replipool.sh $vol none 
+   Sendzfs  -DR $pool/$vol@$snap $RR ;
+#   RemoteAsk set$prot $vol $SO $RR
+#   echo RemoteAsk replivol $PORzfs $REMOTETUN $SO $pool $vol nothing >> ${txt};
+#   RemoteAsk replivol $PORzfs $REMOTETUN $SO $pool $vol nothing;
+# echo exit  >> ${txt}
+# exit
+  else
+   echo RemoteAsk replivol.sh $PORzfs $REMOTETUN $SO  $pool $vol $initialsnap >> ${txt}
+   RemoteAsk replipool.sh $vol none 
+   echo zfs send -DR -I $initialsnap  $targetsnap to ${txt}c$ppzfs >> ${txt};
+   Sendzfs  -DRI  $initialsnap $RR $targetsnap;
+  fi
  else
-  echo RemoteAsk replivol.sh $PORzfs $REMOTETUN $SO  $pool $vol $initialsnap >> ${txt}
-  RemoteAsk replipool.sh $vol none 
-  echo zfs send -DR -I $initialsnap  $targetsnap to ${txt}c$ppzfs >> ${txt};
-  Sendzfs  -DRI  $initialsnap $RR $targetsnap;
+   echo target system $targetsnap is not responding  >> ${txt};
+  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+  echo $datenow $timenow error $USERREQ Replica1152@@@$HOSTNAM@$REMOTETUN@$POL/$VOL/$SNP >> $glog
+   exit 1;
+  
  fi
 fi
  RemoteAsk RemoteGetSnaplist $vol;

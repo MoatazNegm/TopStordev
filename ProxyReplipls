@@ -31,4 +31,6 @@ echo ProxyReplicate $oper3 ${txtres} $newsnap2 $pool $vol $remotetun $pp $so loc
  ./ProxyReplicate $oper3 ${txtres}  $newsnap2 $pool $vol $remotetun $pp $so local
  if [ $? -eq 0 ]; then
   echo success;
+ else
+   echo failed;
  fi

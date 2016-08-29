@@ -10,7 +10,7 @@ echo oper=$oper > $cronout
 oper1=`echo $oper | awk '{print $1}'`;
 oper2=`echo $oper | awk '{print $2}'`;
 oper3=`echo $oper | awk '{print $3}'`;
-userreq='System';
+userreq='system';
 filelog='txt/'${0:2}${userreq}'.txt'${stamp}
 touch $filelog 
 isallowed=`cat partners.txt | grep $oper3 | awk '{print $2}'`;
