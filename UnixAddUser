@@ -19,7 +19,7 @@ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data 
 echo $datenow $timenow info $userreq Unlin1018@@@$username >> $glog
 echo Unlin1018@$datenow@$timenow@$username > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
-useradd -c"TopStor" -m -p $userpass -s /usr/sbin/nologin $username 2> $txtres
+useradd -c"TopStor" -b /p1 -m -p $userpass -s /usr/sbin/nologin $username 2> $txtres
 ( echo $userpass; echo $userpass) | /bin/smbpasswd -s -a $username 2>> $txtres
 #mkdir -p /Data/Common/$username;
 #chown $username /Data/Common/$username;
