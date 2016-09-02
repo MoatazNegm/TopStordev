@@ -31,7 +31,7 @@ echo countsnapplus=$countsnap >> $cronout
 keep=$(($keep+0));
 echo keeppluszero=$keep >> $cronout
 timenow=`date`;
-userreq='System';
+userreq='system';
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 if (( $countsnap >  $keep )); then 
         	logdata='Deleting_Snapshot:'$hostnam/$oldsnap;
