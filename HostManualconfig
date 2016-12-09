@@ -4,6 +4,7 @@ web='/var/www/html/des20/Data/HostManualconfigstatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log';
 glog='/TopStordata/TopStor.log';
 txtres='/TopStordata/'`basename $0`'.txt'
+hostname=`hostname -s`
 rm -rf $txtres &>/dev/null
 hostn=`echo $@ | awk '{ print $1 }' `;
 hostip=`echo $@ | awk '{ print $2 }'`;
@@ -21,11 +22,14 @@ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data 
 echo HostManual1002@$datenow@$timenow@. > ${logging}2
 echo $datenow $timenow info $userreq HostManual1002@@@. >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
+chattr -i /etc/resolv.conf
 sed -i "/nameserver/c\nameserver $hostdns" /etc/resolv.conf
+chattr +i /etc/resolv.conf
 grep GATEWAY /etc/sysconfig/network-scripts/ifcf* | awk -F: '{print $1}' | sort -u | xargs sed -i "/GATEWAYc\GATEWAY\=$hostrout"  2>/dev/null
 #sed -e "s/HOSTNAME/$hostn/g" -e "s/IPADD/$hostip/g" -e "s/ROUTE/$hostrout/g" rc.conf > txt/rc.conf
 sed -ri  "s/(https:\/\/)[^=]*$/\1$hostip\//g" /etc/httpd/conf.d/sshhttp.conf 
-CC=`pcs resource | grep IPaddr | grep $(hostname) | awk '{print $1}'`
+CC=`pcs resource | grep IPaddr | grep "$hostname" | awk '{print $1}'`
+echo CCis $CC
 pcs resource update $CC ip=$hostip
 pcs resource debug-stop $CC
 pcs resource debug-start $CC
