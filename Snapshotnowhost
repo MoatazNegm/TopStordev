@@ -6,7 +6,7 @@ logging='/var/www/html/des20/Data/currentinfo2.log'
 runningpools='/pacedata/pools/runningpools'
 pDG=`echo $@ | awk '{print $1}'`;
 DG=`echo $@ | awk -F/ '{print $1}'`;
-myhost=`hostname`
+myhost=`hostname -s`
 sshost=`cat $runningpools | sort -u | grep $DG `
 if [ $? -eq 0 ]; then
  sshost=`echo $sshost | awk '{print $1}'`

@@ -2,6 +2,7 @@
 cd /TopStor/
 web='/var/www/html/des20/Data/HostManualconfigstatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log';
+runningpools='/pacedata/pools/runningpools';
 glog='/TopStordata/TopStor.log';
 txtres='/TopStordata/'`basename $0`'.txt'
 hostname=`hostname -s`
@@ -33,7 +34,9 @@ echo CCis $CC
 pcs resource update $CC ip=$hostip
 pcs resource debug-stop $CC
 pcs resource debug-start $CC
+oldhostn=`cat /TopStordata/hostname`
 echo $hostn > /TopStordata/hostname
+sed -i "s/$oldhostn/$hostn/g" $runningpools
 echo HostManual1001: > $web
 logdata='success_changing_box_to:'$hostn'_'$hostip'_'$hostrout'_'$hostdns;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
