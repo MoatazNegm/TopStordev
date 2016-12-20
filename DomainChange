@@ -18,7 +18,7 @@ contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == "true" ]];
 then
 echo contrun $contrun
-domcontip=` host $domcont.$doms | awk '{print $NF}'`
+domcontip=` host $domcont.$doms | head -1 |  awk '{print $NF}'`
 ip1=` echo $domcontip | awk -F. '{print $1}'`;
 ip2=` echo $domcontip | awk -F. '{print $2}'`;
 ip3=` echo $domcontip | awk -F. '{print $3}'`;
@@ -30,7 +30,7 @@ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user 
 echo Domain1003@$datenow@$timenow@$domain > ${logging}2 
 echo $datenow $timenow info $userreq Domain1003@@@$domain >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-hostn=`hostname | awk -F. '{print $1}'`;
+hostn=`hostname -s`;
 hostname $hostn.$doms;
 /usr/bin/sed -e "s/DOMSMALL/${doms}/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" dhclient.conf > /TopStordata/dhclient.conf 
 cp /TopStordata/dhclient.conf /etc/dhclient.conf
@@ -41,20 +41,37 @@ sed -e "s/DOMC/$domc/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMSH/$domshort/g" -e "s/C
 cp /TopStordata/krb5.conf /etc/ ;
 sed -e "s/CONT/$domcont\.$doms/g" -e "s/DOMSMALL/$doms/g" ntp.conf > /TopStordata/ntp.conf ;
 systemctl restart smb;
-realm join --user=$admin@$domc $domc  2> $txtres ;
+realm discover | grep $domc  &>/dev/null
 if [ $? -ne 0  ]; then
+	echo Domain1101:$domain > $web;
+	cat $txtres  > ${web}internal;
+	logdata='failed_changing_domain:'$domain;
+        code='Domain1104@@@'$domain
+echo Domain1104@$datenow@$timenow@$domain > ${logging}2 
+echo $datenow $timenow error $userreq Domain1104@@@$domain >> $glog
+else
+# realm join --user=$admin@$domc $domc  2> $txtres ;
+ securessh=$(expect -c "
+ set timeout 10
+ spawn realm join --user=$admin@$domc $domc  ;
+expect \"*assword*\"
+send \"$pass\r\"
+expect eof
+")
+ if [ $? -ne 0  ]; then
 	echo Domain1001:$domain > $web;
 	cat $txtres  > ${web}internal;
 	logdata='failed_changing_domain:'$domain;
         code='Domain1004@@@'$domain
-echo Domain1004@$datenow@$timenow@$domain > ${logging}2 
-echo $datenow $timenow error $userreq Domain1004@@@$domain >> $glog
-else 
- echo Domain1002:$domain > $web; 
- logdata='success_changing_domain:'$domain;
- code='Domain1005@@@'$domain
-echo Domain1005@$datenow@$timenow@$domain > ${logging}2 
-echo $datenow $timenow info $userreq Domain1005@@@$domain >> $glog
+ echo Domain1004@$datenow@$timenow@$domain > ${logging}2 
+ echo $datenow $timenow error $userreq Domain1004@@@$domain >> $glog
+ else 
+  echo Domain1002:$domain > $web; 
+  logdata='success_changing_domain:'$domain;
+  code='Domain1005@@@'$domain
+  echo Domain1005@$datenow@$timenow@$domain > ${logging}2 
+  echo $datenow $timenow info $userreq Domain1005@@@$domain >> $glog
+ fi;
 fi;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq code $code`;
