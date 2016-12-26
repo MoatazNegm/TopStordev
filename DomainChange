@@ -37,35 +37,40 @@ cp /TopStordata/dhclient.conf /etc/dhclient.conf
 sed -e "s/CONT/$domcont/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMC/$domc/g" -e "s/DOMSH/$domshort/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" smb4.conf > /TopStordata/smb.conf 
 cat CIFSshares.txt >> /TopStordata/smb.conf;
 cp /TopStordata/smb.conf /etc/samba/smb.conf;
-sed -e "s/DOMC/$domc/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMSH/$domshort/g" -e "s/CONT/$domcont/g" krb5.conf > /TopStordata/krb5.conf;
-cp /TopStordata/krb5.conf /etc/ ;
+#sed -e "s/DOMC/$domc/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMSH/$domshort/g" -e "s/CONT/$domcont/g" krb5.conf > /TopStordata/krb5.conf;
+sed -i "/default\_realm/c\default\_realm \= $domc" /etc/krb5.conf
+#cp /TopStordata/krb5.conf /etc/ ;
 sed -e "s/CONT/$domcont\.$doms/g" -e "s/DOMSMALL/$doms/g" ntp.conf > /TopStordata/ntp.conf ;
 systemctl restart smb;
-realm discover | grep $domc  &>/dev/null
-if [ $? -ne 0  ]; then
-	echo Domain1101:$domain > $web;
-	cat $txtres  > ${web}internal;
-	logdata='failed_changing_domain:'$domain;
-        code='Domain1104@@@'$domain
-echo Domain1104@$datenow@$timenow@$domain > ${logging}2 
-echo $datenow $timenow error $userreq Domain1104@@@$domain >> $glog
-else
-# realm join --user=$admin@$domc $domc  2> $txtres ;
- securessh=$(expect -c "
+securessh=$(expect -c "
  set timeout 10
- spawn realm join --user=$admin@$domc $domc  ;
+ spawn kinit $admin  ;
 expect \"*assword*\"
 send \"$pass\r\"
 expect eof
 ")
+realm leave $doms;
+sleep 2;
+realm leave $doms;
+realm discover | grep $doms  &>/dev/null
+if [ $? -ne 0  ]; then
+	echo Domain1101:$domain > $web;
+	cat $txtres  > ${web}internal;
+	logdata='Domain:'$domain'is_not_found';
+        code='Domain1104@@@'$domain
+echo Domain1104@$datenow@$timenow@$domain > ${logging}2 
+echo $datenow $timenow error $userreq Domain1104@@@$domain >> $glog
+else
+ realm join $doms  2> $txtres ;
  if [ $? -ne 0  ]; then
 	echo Domain1001:$domain > $web;
 	cat $txtres  > ${web}internal;
-	logdata='failed_changing_domain:'$domain;
+	logdata='failed_joining_domain:'$domain;
         code='Domain1004@@@'$domain
  echo Domain1004@$datenow@$timenow@$domain > ${logging}2 
  echo $datenow $timenow error $userreq Domain1004@@@$domain >> $glog
  else 
+  realm permit --all
   echo Domain1002:$domain > $web; 
   logdata='success_changing_domain:'$domain;
   code='Domain1005@@@'$domain
