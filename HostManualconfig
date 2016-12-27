@@ -36,7 +36,9 @@ pcs resource debug-stop $CC
 pcs resource debug-start $CC
 oldhostn=`cat /TopStordata/hostname`
 echo $hostn > /TopStordata/hostname
-sed -i "s/$oldhostn/$hostn/g" $runningpools
+#sed -i "s/$oldhostn/$hostn/g" $runningpools
+sed -i "/$hostname/s/\w*\$//" $runningpools
+sed -i "/$hostname/s/\$/$hostn/" $runningpools
 echo HostManual1001: > $web
 logdata='success_changing_box_to:'$hostn'_'$hostip'_'$hostrout'_'$hostdns;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
