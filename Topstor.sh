@@ -16,6 +16,11 @@ ClearExit() {
 }
 trap ClearExit HUP
 /TopStor/wpa
+hostname=`hostname -s`
+ping -c 1 $hostname &>/dev/null
+if [ $? -ne 0 ]; then
+ ./nsupdate.sh &>/dev/null
+fi
 while true; do 
 {
 read line < /tmp2/msgfile
