@@ -31,10 +31,16 @@ echo Domain1003@$datenow@$timenow@$domain > ${logging}2
 echo $datenow $timenow info $userreq Domain1003@@@$domain >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 hostn=`hostname -s`;
+cat $runningpools | grep $hostn
+if [ $? -ne 0 ]; then
+ echo pls configure storage first.;
+ exit;
+fi
+poolis=`echo $runningpools | grep $hostn | awk '{print $2}'`
 hostname $hostn.$doms;
 /usr/bin/sed -e "s/DOMSMALL/${doms}/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" dhclient.conf > /TopStordata/dhclient.conf 
 cp /TopStordata/dhclient.conf /etc/dhclient.conf
-sed -e "s/CONT/$domcont/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMC/$domc/g" -e "s/DOMSH/$domshort/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" smb4.confDomain > /TopStordata/smb.conf 
+sed -e "s/HOME/$poolis/g" -e "s/CONT/$domcont/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMC/$domc/g" -e "s/DOMSH/$domshort/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" smb4.confDomain > /TopStordata/smb.conf 
 cat CIFSshares.txt >> /TopStordata/smb.conf;
 cp /TopStordata/smb.conf /etc/samba/smb.conf;
 #sed -e "s/DOMC/$domc/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMSH/$domshort/g" -e "s/CONT/$domcont/g" krb5.conf > /TopStordata/krb5.conf;

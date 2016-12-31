@@ -1,4 +1,7 @@
 #!/bin/sh
-usermod $1 -m
-chmod -R 700 /p1/$1
-echo $@  > /root/sambaconnect
+hostnam=`cat /TopoStordata/hostname`
+poolis=`cat $runningpools | grep "$hostnam" | awk '{print $2}'`
+mkdir -p /$poolis/$1
+usermod $1 -m &>/dev/null
+chmod -R 700 /$poolis/$1
+chown $1 /$poolis/$1
