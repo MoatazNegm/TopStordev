@@ -2,6 +2,7 @@
 cd /TopStor/
 web='/var/www/html/des20/Data/'`basename $0`'status.log';
 logging='/var/www/html/des20/Data/currentinfo2.log';
+runningpools='/pacedata/pools/runningpools'
 txtres='/TopStordata/'`basename $0`'.txt'
 rm -rf $txtres &>/dev/null
 glog='/TopStordata/TopStor.log';
