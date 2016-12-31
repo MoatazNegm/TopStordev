@@ -47,7 +47,7 @@ if [ $? -ne 0 ]; then
  
  exit;
 fi
-poolis=`echo $runningpools | grep $hostn | awk '{print $2}'`
+poolis=`cat $runningpools | grep $hostn | awk '{print $2}'`
 hostname $hostn.$doms;
 /usr/bin/sed -e "s/DOMSMALL/${doms}/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" dhclient.conf > /TopStordata/dhclient.conf 
 cp /TopStordata/dhclient.conf /etc/dhclient.conf
