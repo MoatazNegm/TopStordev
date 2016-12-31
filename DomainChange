@@ -34,7 +34,7 @@ hostn=`hostname -s`;
 hostname $hostn.$doms;
 /usr/bin/sed -e "s/DOMSMALL/${doms}/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" dhclient.conf > /TopStordata/dhclient.conf 
 cp /TopStordata/dhclient.conf /etc/dhclient.conf
-sed -e "s/CONT/$domcont/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMC/$domc/g" -e "s/DOMSH/$domshort/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" smb4.conf > /TopStordata/smb.conf 
+sed -e "s/CONT/$domcont/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMC/$domc/g" -e "s/DOMSH/$domshort/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" smb4.confDomain > /TopStordata/smb.conf 
 cat CIFSshares.txt >> /TopStordata/smb.conf;
 cp /TopStordata/smb.conf /etc/samba/smb.conf;
 #sed -e "s/DOMC/$domc/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMSH/$domshort/g" -e "s/CONT/$domcont/g" krb5.conf > /TopStordata/krb5.conf;
@@ -71,6 +71,10 @@ else
  echo $datenow $timenow error $userreq Domain1004@@@$domain >> $glog
  else 
   realm permit --all
+  rm -rf /etc/samba/smb.conf &>/dev/null
+  cp /TopStordata/smb.conf /etc/samba/smb.conf;
+  systemctl enable smb
+  systemctl restart smb
   echo Domain1002:$domain > $web; 
   logdata='success_changing_domain:'$domain;
   code='Domain1005@@@'$domain
