@@ -92,6 +92,10 @@ else
   cp /TopStordata/smb.conf /etc/samba/smb.conf;
   systemctl enable smb
   systemctl restart smb
+  sed -i "/fallback/c\fallback_homedir = \/$poolis\/\%u\@\%d" /etc/sssd/sssd.conf
+  systemctl restart sssd
+  mkdir /$poolis/common
+  chmod 777 /$poolis/common
   echo Domain1002:$domain > $web; 
   logdata='success_changing_domain:'$domain;
   code='Domain1005@@@'$domain
