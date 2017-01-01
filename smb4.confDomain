@@ -27,6 +27,7 @@ inherit acls = Yes
 
 [homes]
 root preexec = /TopStor/sambaconnect %S
+path = /HOME/%S
 writeable = Yes
 nt acl support = yes
 admin users = %S
