@@ -1,0 +1,8 @@
+#!/bin/sh
+
+afold=`echo $@ | awk '{print $1}'`;
+fold=`echo $afold | awk -F'/' '{print $NF}'`
+runningpool=`zpool list -H | awk '{print $1}'`
+cd /$runningpool
+find $afold -type f -print0 | xargs -0 sha512sum > ${fold}.sha
+tar -czvf ${fold}.tar.gz $afold
