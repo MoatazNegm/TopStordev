@@ -18,6 +18,7 @@ echo Unlin1004@$datenow@$timenow@$username > ${logging}2
 echo $datenow $timenow info $userreq Unlin1004@@@$username >> $glog
 oldlog=`cat $logging | sed 's/]//g' `; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 /bin/smbpasswd -d $username;
+rm -rf /home/$username &>/dev/null
 userdel -r  $username 2>txt/${0:2}$userreq.txt;
 rm key/$username;
 err=`wc -c txt/${0:2}$userreq.txt | awk '{print $1}'`;
