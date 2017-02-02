@@ -1,0 +1,2 @@
+#!/bin/sh
+chgrp apache /var/www/html/des20/Data/`hostname -s`*
