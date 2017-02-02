@@ -46,7 +46,7 @@ echo $datenow $timenow warning $userreq NFS1005@@@$hostnam/$DG/$name >> $glog
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
 else
 ssh $sshost " cd /TopStor &&
- /sbin/zfs create -o quota=$quota -o dedup=on -o compression=lz4  $DG/$name 2> $txtres  &&
+ /sbin/zfs create -o xattr=sa -o redundant_metadata=most -o atime=off -o quota=$quota -o dedup=on -o compression=lz4  $DG/$name 2> $txtres  &&
  /sbin/zfs set prot:kind=CIFS $DG/$name &&
  cp /etc/samba/smb.conf /TopStordata/smb.confcurrent &&
  cp sharecifs.txt /TopStordata/$name.txt
