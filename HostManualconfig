@@ -38,10 +38,12 @@ pcs resource debug-stop $CC
 pcs resource debug-start $CC
 /sbin/ip addr del ${oldip}/24 dev $dev
 oldhostn=`cat /TopStordata/hostname`
+/pace/keysend.sh
 echo $hostn > /TopStordata/hostname
 #sed -i "s/$oldhostn/$hostn/g" $runningpools
 sed -i "/$hostname/s/\w*\$//" $runningpools
 sed -i "/$hostname/s/\$/$hostn/" $runningpools
+/pace/keysend.sh
 echo HostManual1001: > $web
 logdata='success_changing_box_to:'$hostn'_'$hostip'_'$hostrout'_'$hostdns;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
