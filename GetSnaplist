@@ -3,10 +3,12 @@ cd /TopStor/;
 websnaps='/var/www/html/des20/Data/listsnaps.txt';
 resweb='/var/www/html/des20/Data/listsnaps.txtupdated';
 iscsimapping='/pacedata/iscsimapping';
+runningpools='/pacedata/pools/runningpools';
 result='[';
 runhosts=(`cat $iscsimapping | grep -v notconnected | awk '{print $1}'`)
-echo "$runhosts" | while read -r sshost
+echo "$runhosts" | while read -r sshosy
 do
+ sshost=`cat $runningpools | grep $sshosy | awk '{print $NF}'`
  namearray=`ssh $sshost /sbin/zfs list -t snapshot -H -o name,creation,repli:sender,repli:receiver`; 
  echo "$namearray" | while read -r line 
  do

@@ -7,7 +7,8 @@ volsize=`echo $@ | awk '{print $2}'`;
 pool=`zfs list | grep  -w $vol`
 if [ $? -eq 0 ]; then
  pool=`echo $pool | awk -F'/' '{print $1}'`;
- sshost=`cat $runningpools | grep -v runningpools | awk '{print $1}' `
+# sshost=`cat $runningpools | grep -v runningpools | awk '{print $1}' `
+ sshost=`cat /TopStordata/hostname`
  targetip=` cat /etc/hosts | grep "$sshost" | awk '{print $1}'`
  echo $targetip  $pool 
  exit 0;

@@ -1,5 +1,6 @@
 #!/usr/local/bin/zsh
 cd /TopStor/
+echo $@ > /root/tmp
 web='/var/www/html/des20/Data/CIFSstatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log'
 glog='/TopStordata/TopStor.log';
@@ -12,7 +13,9 @@ quota=`echo $@ | awk '{print $3}'`;
 userreq=` echo $@ | awk '{print $4}'`;
 DG=`echo $pDG | awk -F_ '{print $2}'`;
 hostnam=`echo $pDG | awk -F_ '{print $1}'`;
-sshost=`cat $runningpools | grep $hostnam | awk '{print $1}'`;
+#sshost=`cat $runningpools | grep $hostnam | awk '{print $1}'`;
+sshost=`echo $pDG | awk -F_ '{print $1}'`;
+
 echo CIFS1001:$hostnam/$DG/$name > $web;
 privilege="CIFS";
 contrun=`./privthis.sh $privilege $userreq`;

@@ -11,7 +11,8 @@ pro=`echo $@ | awk '{print $3}'`;
 userreq=` echo $@ | awk '{print $4}'`;
 DG=`echo $pDG | awk -F_ '{print $2}'`;
 hostnam=`echo $pDG | awk -F_ '{print $1}'`;
-sshost=`cat $runningpools | grep $hostnam | awk '{print $1}'`;
+sshost=`echo $pDG | awk -F_ '{print $1}'`;
+#sshost=`cat $runningpools | grep $hostnam | awk '{print $1}'`;
 txtres='/TopStordata/'`basename $0`$userreq
 rm -rf $txtres &>/dev/null
 echo CIFS1005:$hostnam/$DG/$volname > $web;

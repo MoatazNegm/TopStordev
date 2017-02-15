@@ -50,3 +50,4 @@ echo HostManual1003@$datenow@$timenow@. > ${logging}2
 echo $datenow $timenow info $userreq HostManual1003@@@. >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
 fi
+/pace/keysend.sh

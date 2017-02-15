@@ -15,7 +15,8 @@ txtres='/TopStordata/'`basename $0`$userreq'.txt'
 rm $txtres 2>/dev/null
 DG=`echo $pDG | awk -F_ '{print $2}'`;
 hostnam=`echo $pDG | awk -F_ '{print $1}'`;
-sshost=`cat $runningpools | grep $hostnam | awk '{print $1}'`;
+sshost=`echo $pDG | awk -F_ '{print $1}'`;
+#sshost=`cat $runningpools | grep $hostnam | awk '{print $1}'`;
 privilege="Replication";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]

@@ -13,7 +13,8 @@ txtres='/TopStordata'`basename $0`$userreq
 rm -rf $txtres 2>/dev/null
 DG=`echo $pDG | awk -F_ '{print $2}'`;
 hostnam=`echo $pDG | awk -F_ '{print $1}'`;
-sshost=`cat $runningpools | grep $hostnam | awk '{print $1}'`;
+sshost=`echo $pDG | awk -F_ '{print $1}'`;
+#sshost=`cat $runningpools | grep $hostnam | awk '{print $1}'`;
 echo CIFS1005:$hostnam/$DG/$volname > $web;
 privilege=$pro;
 contrun=`./privthis.sh $privilege $userreq`;

@@ -12,7 +12,8 @@ DG=`echo $pDG | awk -F_ '{print $2}'`;
 hostnam=`echo $pDG | awk -F_ '{print $1}'`;
 txtres='/TopStordata'`basename $0`'.txt'
 rm -rf $txtres 2>/dev.null
-sshost=`cat $runningpools | grep $hostnam | awk '{print $1}'`;
+sshost=`echo $pDG | awk -F_ '{print $1}'`;
+#sshost=`cat $runningpools | grep $hostnam | awk '{print $1}'`;
 echo CIFS1001:$hostnam/$DG/$name > $web;
 privilege="CIFS";
 contrun=`./privthis.sh $privilege $userreq`;

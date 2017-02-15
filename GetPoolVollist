@@ -25,8 +25,9 @@ else
  result="[";
  for poolnow in "${gpool[@]}"; do
   echo poolnow $poolnow
-  sshost=`echo $poolnow | awk -F: '{print $1}'`
+#  sshost=`echo $poolnow | awk -F: '{print $1}'`
   hostnam=`echo $poolnow | awk -F: '{print $2}'`
+  sshost=`echo $poolnow | awk -F: '{print $2}'`
   pool=`echo $poolnow | awk -F: '{print $3}'`
   ssh root@$sshost /TopStor/GetPoolprop | (cat > $allprops)
   quota=`cat $allprops | grep  quota | grep ${pool}/  | awk -v CONVFMT=%2.5f '{gsub($3,$3/1048576); print $1" "$3}'`;

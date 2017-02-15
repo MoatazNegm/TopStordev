@@ -7,9 +7,11 @@ runningpools='/pacedata/pools/runningpools'
 pDG=`echo $@ | awk '{print $1}'`;
 DG=`echo $@ | awk -F/ '{print $1}'`;
 myhost=`hostname -s`
-sshost=`cat $runningpools | sort -u | grep $DG `
+myhost=`cat /TopStordata/hostname`
+sshosline=`cat $runningpools | sort -u | grep $DG `
 if [ $? -eq 0 ]; then
- sshost=`echo $sshost | awk '{print $1}'`
+# sshost=`echo $sshosline | awk '{print $1}'`
+ sshost=`echo $sshosline | awk '{print $NF}'`
  echo $sshost | grep $myhost &>/dev/null
  if [ $? -eq 0 ]; then
  res=`./Snapshotnow $@`
