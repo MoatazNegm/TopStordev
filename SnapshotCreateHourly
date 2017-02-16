@@ -28,7 +28,7 @@ echo $datenow $timenow info $userreq Snap1037@@@. >> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 stamp=`date +%s`;
 crontab -l > $cronthis
-echo $min  "*"/$every "*" "*" "*"  /TopStor/pump.sh Snapshotnowhost $hostnam/$DG/$FileS hourly.$keep.$min.$every.na $stamp 2> txt/err.txt >> $cronthis
+echo $min  "*"/$every "*" "*" "*"  /TopStor/Snapshotnowhost $hostnam/$DG/$FileS hourly.$keep.$min.$every.na $stamp 2> txt/err.txt >> $cronthis
 crontab $cronthis 2>> $txtres
 err=`wc -c  $txtres | awk '{print $1}'`;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
