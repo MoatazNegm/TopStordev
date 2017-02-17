@@ -318,33 +318,3 @@
 ;	writable = yes
 ;	printable = no
 ;	write list = +staff
-;;;;;;;;         starttry1_only
-[try1]
-path = /p1/try1
-read only = no
-browsable = yes
-write list = @everyone
-admin users = administrator
-writeable = Yes
-;;;;;;;;;;;;;;;;;;;;   stoptry1_only
-
-;;;;;;;;         startcifs2_only
-[cifs2]
-path = /p1/cifs2
-read only = no
-browsable = yes
-write list = @everyone
-admin users = administrator
-writeable = Yes
-;;;;;;;;;;;;;;;;;;;;   stopcifs2_only
-
-;;;;;;;;         startnano226_only
-[nano226]
-path = /POOL/nano226
-read only = no
-browsable = yes
-write list = @everyone
-admin users = administrator
-writeable = Yes
-;;;;;;;;;;;;;;;;;;;;   stopnano226_only
-

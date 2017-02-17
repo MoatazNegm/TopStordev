@@ -15,15 +15,6 @@ domain master = no
 local master = no
 preferred master = no
 disable netbios = no
-[common]
-path = /HOME/common
-#read only = no
-browsable = yes
-write list = @everyone
-admin users = administrator
-writeable = Yes
-nt acl support = yes
-inherit acls = Yes
 
 [homes]
 root preexec = /TopStor/sambaconnect %S
