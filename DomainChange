@@ -1,5 +1,6 @@
 #!/usr/local/bin/zsh
 cd /TopStor/
+echo $@ > ~/tmp
 web='/var/www/html/des20/Data/'`basename $0`'status.log';
 logging='/var/www/html/des20/Data/currentinfo2.log';
 runningpools='/pacedata/pools/runningpools'
@@ -69,7 +70,8 @@ expect eof
 realm leave $doms;
 sleep 2;
 realm leave $doms;
-realm discover | grep $doms  &>/dev/null
+echo here
+realm discover $doms   &>/dev/null
 if [ $? -ne 0  ]; then
 	echo Domain1101:$domain > $web;
 	cat $txtres  > ${web}internal;

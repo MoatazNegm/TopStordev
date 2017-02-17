@@ -1,6 +1,5 @@
 #!/usr/local/bin/zsh
 cd /TopStor/
-echo $@ > /root/tmp
 web='/var/www/html/des20/Data/CIFSstatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log'
 glog='/TopStordata/TopStor.log';
