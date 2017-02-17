@@ -48,7 +48,7 @@ echo $datenow $timenow warning $userreq NFS1003@@@$hostnam/$DG/$name >> $glog
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
 else
 ssh $sshost " cd /TopStor &&
- /sbin/zfs create -o acltype=posixacl -o aclinherit=passthrough -o xattr=sa -o atime=off -o redundant_metadata=most -o quota=$quota -o dedup=on -o compression=lz4  $DG/$name 2> $txtres &&
+ /sbin/zfs create -o overlay=on -o acltype=posixacl -o aclinherit=passthrough -o xattr=sa -o atime=off -o redundant_metadata=most -o quota=$quota -o dedup=on -o compression=lz4  $DG/$name 2> $txtres &&
  /sbin/zfs set prot:kind=NFS $DG/$name &&
  chmod 777 /$DG/$name &&
  echo \# start${name}_only >> /etc/exports &&
