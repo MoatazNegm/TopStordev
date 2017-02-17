@@ -4,7 +4,7 @@ web='/var/www/html/des20/Data/Hostprop.txt';
 if [ ! -f /TopStordata/hostname ]; then echo NONE >> /TopStordata/hostname; fi
 hostn=`cat /TopStordata/hostname`
 allips=""
-ips=(`pcs resource | grep IPaddr | awk '{print $1}'`)
+ips=(`pcs resource | grep IPaddr2 | awk '{print $1}'`)
 for CC in "${ips[@]}"; do
  hostip=`pcs resource show $CC | grep Attributes | awk '{print $2}' | awk -F= '{print $2}'`
  allips=$allips"_"$hostip
