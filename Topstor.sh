@@ -21,6 +21,8 @@ ping -c 1 $hostname &>/dev/null
 if [ $? -ne 0 ]; then
  ./nsupdate.sh &>/dev/null
 fi
+systemctl disable NetworkManager &>/dev/null
+systemctl stop NetworkManager &>/dev/null
 while true; do 
 {
 read line < /tmp2/msgfile
