@@ -1,5 +1,6 @@
 #!/usr/local/bin/zsh
 cd /TopStor
+echo $@ > ~/tmp
 web='/var/www/html/des20/Data/Usersstatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log';
 txtres='/TopStordata/'`basename $0`'.txt'
@@ -42,7 +43,7 @@ else
  logdata='1004:success_adding_user:'$username;
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data "$logdata" code Unlin1022@@@$username`;
 echo $datenow $timenow info $userreq Unlin1021@@@$username >> $glog
-echo Unlin1021@$datenow@$timenow@$username > ${logging}2
+echo Unlin1022@$datenow@$timenow@$username > ${logging}2
 fi 
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 ./UnixListUsers;
