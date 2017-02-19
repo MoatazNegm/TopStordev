@@ -1,6 +1,6 @@
 #!/usr/local/bin/zsh
 web="/var/www/html/des20/Data/Usersstatus.log";
-logging="/var/www/html/des20/data/des19/Data/currentinfo2.log";
+logging="/var/www/html/des20/Data/currentinfo2.log";
 txtres='/TopStordata/'`basename $0`'.txt'
 rm -rf $txtres &>/dev/null
 glog='/TopStordata/TopStor.log'
