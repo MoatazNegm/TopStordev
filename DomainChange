@@ -1,6 +1,5 @@
 #!/usr/local/bin/zsh
 cd /TopStor/
-echo $@ > ~/tmp
 web='/var/www/html/des20/Data/'`basename $0`'status.log';
 logging='/var/www/html/des20/Data/currentinfo2.log';
 runningpools='/pacedata/pools/runningpools'

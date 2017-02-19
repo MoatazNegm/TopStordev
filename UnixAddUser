@@ -1,6 +1,5 @@
 #!/usr/local/bin/zsh
 cd /TopStor
-echo $@ > ~/tmp
 web='/var/www/html/des20/Data/Usersstatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log';
 txtres='/TopStordata/'`basename $0`'.txt'
