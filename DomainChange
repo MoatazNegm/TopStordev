@@ -12,14 +12,15 @@ doms=`echo $domain | tr '[:upper:]' '[:lower:]'`;
 domshort=` echo $domc | awk -F. '{ print $1 }'`;
 admin=`echo $@ | awk '{ print $2 }'`;
 pass=`echo $@ | awk '{ print $3 }'`;
-domcont=` echo $@ | awk '{ print $4 }'`
+domcont=` host -t SRV _ldap._tcp.$doms | awk '{print $NF}' | head -1 | rev | cut -c 2- | rev `;
+#domcont=` echo $@ | awk '{ print $4 }'`
 userreq=` echo $@ | awk '{ print $5 }'`;
 privilege="Active_Directory";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == "true" ]];
 then
 echo contrun $contrun
-domcontip=` host $domcont.$doms | head -1 |  awk '{print $NF}'`
+domcontip=` host $domcont | head -1 |  awk '{print $NF}'`
 ip1=` echo $domcontip | awk -F. '{print $1}'`;
 ip2=` echo $domcontip | awk -F. '{print $2}'`;
 ip3=` echo $domcontip | awk -F. '{print $3}'`;
@@ -52,12 +53,12 @@ hostname $hostn.$doms;
 /usr/bin/sed -e "s/DOMSMALL/${doms}/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" dhclient.conf > /TopStordata/dhclient.conf 
 cp /TopStordata/dhclient.conf /etc/dhclient.conf
 sed -e "s/HOME/$poolis/g" -e "s/CONT/$domcont/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMC/$domc/g" -e "s/DOMSH/$domshort/g" -e "s/DOMIPCONT/$ip1\.$ip2\.$ip3\.$ip4/g" smb4.confDomain > /TopStordata/smb.conf 
-cat CIFSshares.txt >> /TopStordata/smb.conf;
+cat /TopStordata/CIFSshares.txt >> /TopStordata/smb.conf;
 cp /TopStordata/smb.conf /etc/samba/smb.conf;
 #sed -e "s/DOMC/$domc/g" -e "s/DOMSMALL/$doms/g" -e "s/DOMSH/$domshort/g" -e "s/CONT/$domcont/g" krb5.conf > /TopStordata/krb5.conf;
 sed -i "/default\_realm/c\default\_realm \= $domc" /etc/krb5.conf
 #cp /TopStordata/krb5.conf /etc/ ;
-sed -e "s/CONT/$domcont\.$doms/g" -e "s/DOMSMALL/$doms/g" ntp.conf > /TopStordata/ntp.conf ;
+sed -e "s/CONT/$domcont/g" -e "s/DOMSMALL/$doms/g" ntp.conf > /TopStordata/ntp.conf ;
 systemctl restart smb;
 securessh=$(expect -c "
  set timeout 10
@@ -95,8 +96,8 @@ else
   systemctl restart smb
   sed -i "/fallback/c\fallback_homedir = \/$poolis\/\%u\@\%d" /etc/sssd/sssd.conf
   systemctl restart sssd
-  mkdir /$poolis/common
-  chmod 777 /$poolis/common
+#  mkdir /$poolis/common
+#  chmod 777 /$poolis/common
   echo Domain1002:$domain > $web; 
   logdata='success_changing_domain:'$domain;
   code='Domain1005@@@'$domain
