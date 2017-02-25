@@ -44,7 +44,7 @@ else
  logdata='1004:success_adding_user:'$username;
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data "$logdata" code Unlin1022@@@$username`;
 dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
-echo $datenow $timenow info $userreq Unlin1021@@@$username $dtn>> $glog
+echo $datenow $timenow info $userreq Unlin1022@@@$username $dtn>> $glog
 echo Unlin1022@$datenow@$timenow@$username > ${logging}2
 fi 
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
