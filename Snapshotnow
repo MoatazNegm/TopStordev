@@ -42,15 +42,17 @@ if (( $countsnap >  $keep )); then
 	datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
         	echo Snap1001@$hostnam/$oldsnap > $web;
 	
-echo $datenow $timenow info $userreq Snap1001@$hostnam/$oldsnap $stamp>> $glog
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Snap1001@$hostnam/$oldsnap $dtn $stamp>> $glog
 
         	cat ${txtres}$stamp > ${web}internal;
         	logdata='Difficulty_Deleting_Snapshot:'$oldsnap;
-        	logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata Snap1023@@@$hostnam/$oldsnap`;
+        	logthis=`./nthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata Snap1023@@@$hostnam/$oldsnap`;
         echo $logthis >> $cronout
 	else
         echo Snap1024@$@ > $web;
-echo $datenow $timenow info $userreq Snap1024@$hostnam/$oldsnap  >> $glog
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Snap1024@$hostnam/$oldsnap $dtn>> $glog
         	logdata='Success_Deleting_Snapshot:'$hostnam/$oldsnap;
         	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1025@@@$hostnam/$oldsnap`;
         	echo $logthis >> $cronout
@@ -71,16 +73,18 @@ cat ${txtres}$stamp >> $cronout
 echo filenameis=${txtres}$stamp >> $cronout
 err=`wc -c  ${txtres}$stamp | awk '{print $1}'`;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-if [[ $err -ge  4  ]]; then
-	echo Snap1027@ $hostnam/$newsnap > $web;
-	echo $datenow $timenow error $userreq Snap1028@@@$hostnam/$newsnap $stamp  >> $glog
+if [[ $err -ge  4  ]]; then 
+	echo Snap1027@ $hostnam/$newsnap > $web;   
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+	echo $datenow $timenow error $userreq Snap1028@@@$hostnam/$newsnap $dtn $stamp  >> $glog
 	logdata='Failed_Creating_Snapshot:'$hostnam/$newsnap;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Snap1028@@@$hostnam/$newsnap`;
 	echo $logthis >> $cronout
 else 
 echo $newsnap
 	echo Snap1029@ $hostnam/$newsnap > $web; 
-	echo $datenow $timenow info $userreq Snap1030@@@$hostnam/$newsnap >> $glog
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+	echo $datenow $timenow info $userreq Snap1030@@@$hostnam/$newsnap $dtn>> $glog
 	logdata='Success_Creating_Snapshot:'$hostnam/$newsnap;
 	logthis=`./jsonthis3.sh stmap $stmap Date $datenow time $timenow msg info user $userreq data $logdata code Snap1030@@@$hostnam/$newsnap`;
 	echo $logthis >> $cronout

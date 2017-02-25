@@ -15,7 +15,8 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Deleting_Period:'$periodel;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1043@@@$periodel`;
 echo Snap1043@$datenow@$timenow@$periodel > ${logging}2
-echo $datenow $timenow info $userreq Snap1043@@@$periodel >> $glog
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Snap1043@@@$periodel $dtn>> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 echo Snap1003:$periodel > $web
 /usr/bin/crontab -l | grep -v "$periodel" | /usr/bin/crontab -  2> $txtres
@@ -27,13 +28,15 @@ if [[ $err -ge  4  ]]; then
         logdata='Failed_Deleting_Period:'$periodel;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Snap1044@@@$periodel`;
 echo Snap1044@$datenow@$timenow@$periodel > ${logging}2
-echo $datenow $timenow error $userreq Snap1044@@@$periodel >> $glog
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow error $userreq Snap1044@@@$periodel $dtn>> $glog
 else
 	 echo Snap1005:$periodel > $web;
         logdata='success_Deleting_Period:'$periodel;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata Snap1045@@@$periodel`;
 echo Snap1045@$datenow@$timenow@$periodel > ${logging}2
-echo $datenow $timenow info $userreq Snap1045@@@$periodel >> $glog
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Snap1045@@@$periodel $dtn>> $glog
 fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 ./GetPoolperiodlist

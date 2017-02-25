@@ -25,7 +25,8 @@ then
  logdata='Replicating_manually:'$hostnam/$DG/$FileS' to'$partner;
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1033@@@$hostnam/$DG/$FileS@$partner`;
 echo Replica1033@$datenow@$timenow@$hostnam/$DG/$FileS@$partner > ${logging}2
-echo $datenow $timenow info $userreq Replica1033@@@$hostnam/$DG/$FileS@$partner >> $glog
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Replica1033@@@$hostnam/$DG/$FileS@$partner $dtn>> $glog
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
  echo ./RemoteSnapshotnowOnce $sshost $hostnam $DG/$FileS $name. $partner  $txtres 
  ./RemoteSnapshotnowOnce $sshost $hostnam $DG/$FileS $name. $partner  $txtres; 
@@ -36,13 +37,15 @@ echo $datenow $timenow info $userreq Replica1033@@@$hostnam/$DG/$FileS@$partner 
 	logdata='Failed_Replicating_manually:'$hostnam/$DG/$FileS' to'${partner}": "$txtres;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata cdoe Replica1034@@@$hostnam/$DG/$FileS@$partner@$$txtres`;
 echo Replica1034@$datenow@$timenow@$hostnam/$DG/$FileS@$partner@$txtres > ${logging}2
-echo $datenow $timenow error $userreq Replica1034@@@$hostnam/$DG/$FileS@$partner@$txtres >> $glog
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow error $userreq Replica1034@@@$hostnam/$DG/$FileS@$partner@$txtres $dtn>> $glog
  else 
  	echo Replica1015:$hostnam/$DG/$FileS:$partner > $web; 
 	logdata='Success_Replicating_manually:'$hostnam/$DG/$FileS' to'$partner;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1035@@@$hostnam/$DG/$FileS@$partner`;
 echo Replica1035@$datenow@$timenow@$hostnam/$DG/$FileS@$partner > ${logging}2
-echo $datenow $timenow info $userreq Replica1035@@@$hostnam/$DG/$FileS@$partner >> $glog
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Replica1035@@@$hostnam/$DG/$FileS@$partner $dtn>> $glog
  fi;
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 fi

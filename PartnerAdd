@@ -20,7 +20,8 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='adding_'$type'_partner:'$Partnername;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Partner1007@@@$Partnername`;
 echo Partner1007@$datenow@$timenow@$Partnername > ${logging}2
-echo $datenow $timenow info $userreq Partner1007@@@$Partnername >> $glog
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Partner1007@@@$Partnername $dtn>> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 isthere=`cat $partners | grep "$Partnername $type" | wc -c `
 isthere=$((isthere+0));
@@ -30,7 +31,8 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='adding_'$type'_partner_already_there:'$Partnername;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata code Partner1008@@@$Partnername`;
 echo Partner1008@$datenow@$timenow@$Partnername > ${logging}2
-echo $datenow $timenow warning $userreq Partner1008@@@$Partnername >> $glog
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow warning $userreq Partner1008@@@$Partnername $dtn>> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 else
 partnerlist=`cat $partners `;
@@ -65,7 +67,8 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='success_adding_'$type'_partner:'$Partnername;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Partner1009@@@$Partnername@$newtype`;
 echo Partner1009@$datenow@$timenow@$Partnername@$newtype > ${logging}2
-echo $datenow $timenow info $userreq Partner1009@@@$Partnername@$newtype >> $glog
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Partner1009@@@$Partnername@$newtype $dtn>> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 fi
 fi

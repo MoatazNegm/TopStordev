@@ -10,7 +10,8 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Rollingback_Snapshot:'$snaprol;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1042@@@$snaprol`;
 echo Replica1042@$datenow@$timenow@$snaprol > ${logging}2
-echo $datenow $timenow info $userreq Replica1042@@@$snaprol >> $glog
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Replica1042@@@$snaprol $dtn>> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 echo Replica1006:$snaprol > $web;
 ./SnapShotRollback $pDG $snaprol $userreq
@@ -25,13 +26,15 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 	logdata='Failed_Rollingback_Snapshot:'$snaprol;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Replica1043@@@$snaprol`;
 echo Replica1043@$datenow@$timenow@$snaprol > ${logging}2
-echo $datenow $timenow error $userreq Replica1043@@@$snaprol >> $glog
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow error $userreq Replica1043@@@$snaprol $dtn>> $glog
 else 
 	echo Replica1008:$snaprol > $web; 
 	logdata='Success_Rollingback_Snapshot:'$snaprol;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1044@@@$snaprol`;
 echo Replica1044@$datenow@$timenow@$snaprol > ${logging}2
-echo $datenow $timenow info $userreq Replica1044@@@$snaprol >> $glog
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Replica1044@@@$snaprol $dtn>> $glog
 fi;
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 ./GetSnaplist

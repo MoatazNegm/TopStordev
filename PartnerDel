@@ -19,7 +19,8 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='Deleting_partner:'$Partnername;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Partner1005@@@$Partnername`;
 echo Partner1005@$datenow@$timenow@$Partnername > ${logging}2
-echo $datenow $timenow info $userreq Partner1005@@@$Partnername >> $glog
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Partner1005@@@$Partnername $dtn>> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 partnerlist=`cat $partners `;
 echo $partnerlist | grep "$Partnername" > /TopStordata/PartnerDel
@@ -42,6 +43,7 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='success_Deleting_partner:'$Partnername;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Partner1006@@@$Partnername`;
 echo Partner1006@$datenow@$timenow@$Partnername > ${logging}2
-echo $datenow $timenow info $userreq Partner1006@@@$Partnername >> $glog
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Partner1006@@@$Partnername $dtn>> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 fi

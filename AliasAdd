@@ -16,7 +16,8 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='adding_Alias:'$aliasname;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1055@@@$aliasname`;
 echo Replica1055@$datenow@$timenow@$aliasname > ${logging}2
-echo $datenow $timenow info $userreq Replica1055@@@$aliasname >> $glog
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Replica1055@@@$aliasname $dtn>> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 isthere=`cat $proxy `
 istheren=` echo $isthere | wc -c `
@@ -39,7 +40,8 @@ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 logdata='success_adding_Proxy:'$proxyname;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1056@@@$aliasname`;
 echo Replica1056@$datenow@$timenow@$aliasname > ${logging}2
-echo $datenow $timenow info $userreq Replica1056@@@$aliasname >> $glog
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Replica1056@@@$aliasname $dtn>> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
 fi
 fi
