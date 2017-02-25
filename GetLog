@@ -3,7 +3,7 @@ cd /TopStor
 liner=`echo $@ | awk '{print $2}'`;
 web='/var/www/html/des20/Data/CIFSstatus.log';
 logging='/var/www/html/des20/Data/Logs.log'$liner
-logupdate='/var/www/html/des20/Data/Logs.logupdated'$liner
+logupdate='/var/www/html/des20/Data/Logs.logupdated'
 web='/var/www/html/des20/Data/'$page2
 glog='/TopStordata/TopStor.log';
 dater=`echo $@ | awk '{print $1}'`;
@@ -59,7 +59,6 @@ then
    fi
   fi
  fi
- headlines=$((page*liner))
  if [ $res -ne 1 ];
  then  
   dater=`echo $dater | sed -e 's/\//\\\\\//g'`
@@ -79,6 +78,5 @@ then
  done;
  result=`echo $result | rev | cut -c 2- | rev`]
  echo $result;
- echo $result > $logging
- touch ${logupdate}
+ echo $result > $logging && touch ${logupdate}
 fi
