@@ -1,10 +1,8 @@
 #!/usr/local/bin/zsh
 cd /TopStor
 liner=`echo $@ | awk '{print $2}'`;
-web='/var/www/html/des20/Data/CIFSstatus.log';
 logging='/var/www/html/des20/Data/Logs.log'$liner
 logupdate='/var/www/html/des20/Data/Logs.logupdated'
-web='/var/www/html/des20/Data/'$page2
 glog='/TopStordata/TopStor.log';
 dater=`echo $@ | awk '{print $1}'`;
 liner=`echo $@ | awk '{print $2}'`;
@@ -13,58 +11,11 @@ privilege='Logs';
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
 then
- start=`tac $glog | head -n 1 | awk '{print $1}' ` 
- ifsmall=`cat $glog | head -n 1 | awk '{print $1}' ` 
- iflarge=$start
- res=0
- if [ $dater = "0" ]; then
-   dater=$start
- else
-  dater=$((dater/1000))
-  start=`echo $start | awk -F'/' '{print $3}'``echo $start | awk -F'/' '{print $1}'``echo $start | awk -F'/' '{print $2}'`
-  echo $start
-  start=` date +%s -d $start`
-  echo $start, $dater
-  if [ $((dater)) -gt $((start)) ]; then
-   dater=$iflarge;
- echo it is iflarge $dater
-  else 
-   start=$ifsmall
-   start=`echo $start | awk -F'/' '{print $3}'``echo $start | awk -F'/' '{print $1}'``echo $start | awk -F'/' '{print $2}'`
-   start=` date +%s -d $start`
-   if [ $((dater)) -lt $((start)) ]; then
-    dater=$ifsmall 
- echo it is ifsmall $dater
-   else
-    datern=$dater
-  echo normal $dater
-    while [ $res -ne 1 ];
-    do
-     dater=`date -d '@'$datern +%m/%d/%Y`
-     dater=`echo $dater | sed -e 's/\//\\\\\//g'`
-     echo another $dater 
-     startline=`tac $glog | awk "/$dater/{ print NR; exit }"`
-     tac $glog | grep "$dater" &>/dev/null
-     if [ $? -ne 0 ]; then 
-      datern=$((datern-86400));
-      echo another datern $datern
-      if [ $datern -lt 14923200 ]; 
-      then 
-       res=1; 
-      fi
-     else res=1; 
-     echo found $startline 
-     fi
-    done
-   fi
-  fi
- fi
- if [ $res -ne 1 ];
- then  
-  dater=`echo $dater | sed -e 's/\//\\\\\//g'`
- fi
- startline=`tac $glog | awk "/$dater/{ print NR; exit }"`
- tojson=$(tac $glog | tail -n +$startline | head -n $liner)
+  dater=`date +%s -d $dater`
+ echo $dater
+# tojson=$(tac $glog | tail -n +$startline | head -n $liner)
+ tojson=$(awk -v d=$dater '$6 < d' $glog | tac | head -n $liner )
+ echo $tojson
  result="[";
  echo ${tojson[@]} | while read -r line;  do
   datenow=`echo $line | awk '{print $1}'`
@@ -80,3 +31,4 @@ then
  echo $result;
  echo $result > $logging && touch ${logupdate}
 fi
+echo $dater
