@@ -10,6 +10,7 @@ traffic="";
 s=1
 hostns=(`cat $iscsimapping | grep -v notconn | awk '{print $1}'`)
 disks=(`cat $iscsimapping | grep -v notconn | awk '{print $3}'`)
+diskcount=1;
 result='[';
 for disk in "${disks[@]}"; do
  cat $runningpools | grep $disk 
@@ -20,11 +21,13 @@ for disk in "${disks[@]}"; do
   diskhost=`cat $runningpools | grep $disk | awk '{print $NF}'`;
   diskpool=`cat $runningpools | grep $disk | awk '{print $2}'`;
   poolrole=`cat $runningpools | grep $disk | awk '{print $5}'`;
+  grouptype='raid_single_parity';
   poolrole='spare';
  fi 
  disksize=`cat $iscsimapping | grep -w $disk | awk '{print $4}'`
- subres=`./jsonthis3.sh disk $disk host $diskhost pool $diskpool size $disksize poolrole $poolrole`
+ subres=`./jsonthis3.sh id $diskcount name $disk host $diskhost pool $diskpool size $disksize poolrole $poolrole grouptype $grouptype`
  result=$result$subres,
+ diskcount=$((diskcount+1));
 done
 result=` echo $result | rev | cut -c 2- | rev`']';
 echo $result > $traf
