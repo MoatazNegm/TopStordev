@@ -13,19 +13,27 @@ disks=(`cat $iscsimapping | grep -v notconn | awk '{print $3}'`)
 diskcount=1;
 result='[';
 for disk in "${disks[@]}"; do
- cat $runningpools | grep $disk 
+ cat $runningpools | grep $disk  &>/dev/null
  if [ $? -ne 0 ]; then
-  diskhost='free';
+  diskgroup='free'
   diskpool='free'; 
  else
-  diskhost=`cat $runningpools | grep $disk | awk '{print $NF}'`;
   diskpool=`cat $runningpools | grep $disk | awk '{print $2}'`;
   poolrole=`cat $runningpools | grep $disk | awk '{print $5}'`;
-  grouptype='raid_single_parity';
-  poolrole='spare';
+  groupline=`cat $runningpools | grep "$diskpool" | sed "s/.*$diskpool\(.*\)$disk.*/\1/"`
+  mirrorc=`echo $groupline | grep mirror | awk -F'mirror' '{print $NF}' | wc -c `
+  raidc=`echo $groupline | grep raid | awk -F'raid' '{print $NF}' | wc -c `
+  spare=`echo $groupline | grep spare | awk -F'spare' '{print $NF}' | wc -c `
+  grouptype='stripe';
+  allc=${raidc}'_raid '${mirrorc}'_mirror '$spare'_spare'
+  winning=` echo $allc |tr " " "\n"| grep -v 0 | sort | head -1`
+  if [ ! -z $winning ]; then
+    grouptype=`echo $winning | awk -F'_' '{print $2}'`
+  fi
  fi 
+ diskhost=`cat $runningpools | grep $disk | awk '{print $NF}'`;
  disksize=`cat $iscsimapping | grep -w $disk | awk '{print $4}'`
- subres=`./jsonthis3.sh id $diskcount name $disk host $diskhost pool $diskpool size $disksize poolrole $poolrole grouptype $grouptype`
+ subres=`./jsonthis3.sh id $diskcount name $disk host $diskhost pool $diskpool size $disksize grouptype $grouptype`
  result=$result$subres,
  diskcount=$((diskcount+1));
 done
