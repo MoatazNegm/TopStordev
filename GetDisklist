@@ -19,21 +19,61 @@ for disk in "${disks[@]}"; do
   diskpool='free'; 
  else
   diskpool=`cat $runningpools | grep $disk | awk '{print $2}'`;
-  poolrole=`cat $runningpools | grep $disk | awk '{print $5}'`;
+  psize=`cat $runningpools | grep $disk | awk '{print $3}'`;
+  psizet=`echo $psize | grep T | awk -F'T' '{print $1}'`
+  if [ -z $psizeT ]; then 
+   psizeg=`echo $psize | grep G | awk -F'G' '{print $1}'`
+   poolsize=`bc -l <<< "1*$psizeg"`
+  else 
+   poolsize=`bc -l <<< "1000*$psizet"`
+  fi
   groupline=`cat $runningpools | grep "$diskpool" | sed "s/.*$diskpool\(.*\)$disk.*/\1/"`
   mirrorc=`echo $groupline | grep mirror | awk -F'mirror' '{print $NF}' | wc -c `
+  if [ $mirrorc -eq 0 ]; then mirrorc="removethis"; fi;
   raidc=`echo $groupline | grep raid | awk -F'raid' '{print $NF}' | wc -c `
-  spare=`echo $groupline | grep spare | awk -F'spare' '{print $NF}' | wc -c `
+  if [ $raidc -eq 0 ]; then raidc="removethis"; fi;
+  sparec=`echo $groupline | grep spare | awk -F'spare' '{print $NF}' | wc -c `
+  if [ $sparec -eq 0 ]; then sparec="removethis"; fi;
+  IngroupDisk1c=`echo $groupline | grep scsi | awk -F'scsi' '{print $NF}' | wc -c `
+  IngroupDisk1="notavailable"
+  if [ $IngroupDisk1c -eq 0 ]; then 
+   IngroupDisk1c="removethis";
+  else 
+   IngroupDisk1='scsi'`echo $groupline | grep scsi | awk -F'scsi' '{print $NF}' | awk '{print $1}'`
+  fi
   grouptype='stripe';
-  allc=${raidc}'_raid '${mirrorc}'_mirror '$spare'_spare'
-  winning=` echo $allc |tr " " "\n"| grep -v 0 | sort | head -1`
+  allc=${raidc}'_raid '${mirrorc}'_mirror '$sparec'_spare'
+  winning=` echo $allc |tr " " "\n"| grep -v removethis | sort -n | head -1`
   if [ ! -z $winning ]; then
     grouptype=`echo $winning | awk -F'_' '{print $2}'`
+    groupc=`echo $winning | wc -c`
+    allc2=${IngroupDisk1c}'_'scsi' '$winning
+    echo $allc2
+    winning2=` echo $allc2 |tr " " "\n"| grep -v removethis | sort -n | head -1`
+    echo $winning2 | grep scsi &>/dev/null
+    if [ $? -ne 0 ]; then IngroupDisk1='notavailable'; fi; 
+  fi
+  IngroupDisk2="notavailable";
+  cat $runningpools | grep "$disk" | sed "s/.*$disk\(.*\).*/\1/" | grep scsi &>/dev/null
+  if [ $? -eq 0 ]; then
+   groupline2=`cat $runningpools | grep "$disk" | sed "s/.*$disk\(.*\)scsi.*/\1/" `
+   IngroupDisk2c=`echo $groupline2 | wc -c`
+   mirrorc2=`echo $groupline2 | grep mirror | awk -F'mirror' '{print $1}' | wc -c `
+   if [ $mirrorc2 -eq 0 ]; then mirrorc2="removethis"; fi;
+   raidc2=`echo $groupline2 | grep raid | awk -F'raid' '{print $1}' | wc -c `
+   if [ $raidc2 -eq 0 ]; then raidc2="removethis"; fi;
+   allc2=${IngroupDisk2c}'_scsi '${raidc2}'_raid '${mirrorc2}'_mirror';
+    echo $allc2
+   winning2=` echo $allc2 |tr " " "\n"| grep -v removethis | sort -n| head -1`;
+   echo $winning2 | grep scsi &>/dev/null   
+   if [ $? -eq 0 ]; then 
+    IngroupDisk2='scsi'`cat $runningpools | grep scsi | awk -F"$disk" '{print $2}' | awk -F'scsi' '{print $2}' | awk '{print $1}'`
+   fi
   fi
  fi 
  diskhost=`cat $runningpools | grep $disk | awk '{print $NF}'`;
  disksize=`cat $iscsimapping | grep -w $disk | awk '{print $4}'`
- subres=`./jsonthis3.sh id $diskcount name $disk host $diskhost pool $diskpool size $disksize grouptype $grouptype`
+ subres=`./jsonthis3.sh id $diskcount name $disk host $diskhost pool $diskpool size $disksize grouptype $grouptype poolsize $poolsize InGroupDisk1 $IngroupDisk1 InGroupDisk2 $IngroupDisk2`
  result=$result$subres,
  diskcount=$((diskcount+1));
 done
