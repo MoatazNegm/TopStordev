@@ -1,21 +1,14 @@
 #!/usr/local/bin/zsh
 cd /TopStor/;
+COMMAND=$0
+RUNNING=`ps --no-headers -C${COMMAND} | wc -l`
+if [ $RUNNING -gt 1 ]; then exit 0; fi
 websnaps='/var/www/html/des20/Data/Vollist.txt';
 resweb='/var/www/html/des20/Data/Vollist.txtupdated';
 runningpools='/pacedata/pools/runningpools'
 iscsimapping='/pacedata/iscsimapping'
 allprops='/TopStordata/allprops'
-pid='/TopStordata/GetPools.pid'
 stamp=`date +%s`
-if [[ -a $pid ]]; 
-then 
- stamp2=`cat $pid`;
- stampdiff=$((stamp-stamp2));
- if [[ $stampdiff -ge 20 ]]; then rm -rf $pid;
- fi
- exit; 
-else
- echo $stamp > $pid;
  rm -rf $allprops &>/dev/null
  hostns=(`cat $iscsimapping | grep -v notconn | awk '{print $1}'`)
  for hostn in "${hostns[@]}"; do
@@ -73,7 +66,5 @@ if [[ $? -ne 0 ]]; then
  tstamp=`date +%s`;
  res=` ./jsonthis3.sh updated $tstamp `;
  echo $res > $resweb;
-fi
-rm -rf $pid 
 fi
 echo ready;

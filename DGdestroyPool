@@ -2,6 +2,7 @@
 web="/usr/local/www/apache24/data/des19/Data/DGstatus.log";
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 userreq=` echo $@ | awk '{print $1}'`;
+echo $@ > ~/tmp
 privilege="DISK_Groups";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]

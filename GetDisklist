@@ -1,7 +1,10 @@
 #!/usr/local/bin/zsh
 cd /TopStor/
+COMMAND=$0
+RUNNING=`ps --no-headers -C${COMMAND} | wc -l`
+if [ $RUNNING -gt 1 ]; then exit 0; fi
 iscsitargets='/pacedata/iscsitargets'
-runningpools='/pacedata/pools/runningpools'
+runningpools='/pacedata/pools/runningpoolstemp'
 iscsimapping='/pacedata/iscsimappingtemp'
 traf='/var/www/html/des20/Data/disklist.txt';
 trafupdate='/var/www/html/des20/Data/disklist.txtupdated';
