@@ -1,6 +1,6 @@
 #!/usr/local/bin/zsh
-web="/usr/local/www/apache24/data/des19/Data/DGstatus.log";
-logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
+web="/var/www/html/des20/Data/DGstatus.log";
+logging='/var/www/html/des20/Data/currentinfo2.log'
 userreq=` echo $@ | awk '{print $1}'`;
 echo $@ > ~/tmp
 privilege="DISK_Groups";
