@@ -1,13 +1,19 @@
 #!/usr/local/bin/zsh
-web="/usr/local/www/apache24/data/des19/Data/DGstatus.log";
-logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
-raid=` echo $@ | awk '{print $2}'`;
-result=` echo $@ | awk '{print $1}'`;
-userreq=` echo $@ | awk '{print $3}'`;
+echo $@ > ~/tmp  
+web="/var/www/html/des20/Data/DGstatus.log";
+logging='/var/www/html/des20/Data/currentinfo2.log'
+raid=` echo $@ | awk '{print $1}'`;
+userreq=` echo $@ | awk '{print $2}'`;
+host=` echo $@ | awk '{print $3}'`;
+disk1=` echo $@ | awk '{print $4}'`;
+nextpool="1";
 privilege="DISK_Groups"
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
 then
+if [[ $raid == "readcache" ]]; then msgraid="readcache"; fi;
+if [[ $raid == "readwritecache" ]]; then msgraid="readwritecache"; fi;
+if [[ $raid == "single" ]]; then msgraid="Single"; fi;
 if [[ $raid == "mirror" ]]; then msgraid="Mirror"; fi;
 if [[ $raid == "raidz1" ]]; then msgraid="RAID5"; fi;
 if [[ $raid == "raidz2" ]]; then msgraid="Enhanced RAID6"; fi;
@@ -20,6 +26,10 @@ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $
 disks=(`/sbin/sysctl kern.disks | sed -e 's/cd0 //g' -e 's/ada0//g' -e 's/da0//g' -e 's/kern.disks: //g'`)
 noofdisks=`echo $disks | wc -w | awk '{print $1}'`;
 disksarr=(${=disks});
+if [[ $raid == "Single" ]]; then
+ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${disk1};
+ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} ${disk1} 2>txt/${0:2}$userreq.txt
+fi 
 if [[ $raid == "mirror" ]]; then
  poolcr="mirror "
  for ((i = 1; i < $noofdisks; i++));
@@ -30,8 +40,6 @@ if [[ $raid == "mirror" ]]; then
  R10=`echo $poolcr | awk '{$NF="";print}'`; 
  R10ar=(${=R10});
  zpool create -f Data $R10ar 2>txt/${0:2}$userreq.txt 	
-else
-	zpool create -f Data $raid $disksarr  2>txt/${0:2}$userreq.txt
 fi
 err=`wc -c txt/${0:2}$userreq.txt | awk '{print $1}'`;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;

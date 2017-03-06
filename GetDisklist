@@ -2,10 +2,10 @@
 cd /TopStor/
 COMMAND=$0
 RUNNING=`ps --no-headers -C${COMMAND} | wc -l`
-if [ $RUNNING -gt 1 ]; then exit 0; fi
+if [ $RUNNING -gt 1 ]; then echo running; exit 0; fi
 iscsitargets='/pacedata/iscsitargets'
-runningpools='/pacedata/pools/runningpoolstemp'
-iscsimapping='/pacedata/iscsimappingtemp'
+runningpools='/pacedata/pools/runningpools'
+iscsimapping='/pacedata/iscsimapping'
 traf='/var/www/html/des20/Data/disklist.txt';
 trafupdate='/var/www/html/des20/Data/disklist.txtupdated';
 gpool=("")
@@ -13,6 +13,7 @@ traffic="";
 s=1
 hostns=(`cat $iscsimapping | grep -v notconn | awk '{print $1}'`)
 disks=(`cat $iscsimapping | grep -v notconn | awk '{print $3}'`)
+echo disks=$disks
 diskcount=1;
 result='[';
 for disk in "${disks[@]}"; do
