@@ -1,4 +1,5 @@
-#!/usr/local/bin/zsh
+#!/usr/bin/sh
+cd /TopStor/
 web="/var/www/html/des20/Data/DGstatus.log";
 logging='/var/www/html/des20/Data/currentinfo2.log'
 pool=` echo $@ | awk '{print $1}'`;
@@ -34,3 +35,4 @@ fi
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 rm txt/${0:2}$userreq.txt
 fi
+sh GetDisklist a

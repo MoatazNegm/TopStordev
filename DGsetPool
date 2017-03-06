@@ -1,4 +1,5 @@
-#!/usr/local/bin/zsh
+#!/usr/bin/sh
+cd /TopStor/
 echo $@ > ~/tmp  
 web="/var/www/html/des20/Data/DGstatus.log";
 logging='/var/www/html/des20/Data/currentinfo2.log'
@@ -23,9 +24,9 @@ logdata='Creating_Pool:Data_with_RAID_'$raid;
 logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DG1006@@@$msgraid`;
 echo DG1006@$datenow@$timenow@$msgraid > ${logging}2
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-disks=(`/sbin/sysctl kern.disks | sed -e 's/cd0 //g' -e 's/ada0//g' -e 's/da0//g' -e 's/kern.disks: //g'`)
+disks=('obsoletecode')
 noofdisks=`echo $disks | wc -w | awk '{print $1}'`;
-disksarr=(${=disks});
+disksarr=(${disks});
 if [[ $raid == "Single" ]]; then
 ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${disk1};
 ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} ${disk1} 2>txt/${0:2}$userreq.txt
@@ -38,7 +39,7 @@ if [[ $raid == "mirror" ]]; then
   i=$((i+1));
  done
  R10=`echo $poolcr | awk '{$NF="";print}'`; 
- R10ar=(${=R10});
+ R10ar=(${R10});
  zpool create -f Data $R10ar 2>txt/${0:2}$userreq.txt 	
 fi
 err=`wc -c txt/${0:2}$userreq.txt | awk '{print $1}'`;
@@ -59,3 +60,4 @@ fi
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 rm txt/${0:2}$userreq.txt
 fi
+./GetDisklist a
