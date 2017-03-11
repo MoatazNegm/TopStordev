@@ -13,7 +13,7 @@ traffic="";
 s=1
 hostns=(`cat $iscsimapping | grep -v notconn | awk '{print $1}'`)
 disks=(`cat $iscsimapping | grep -v notconn | awk '{print $3}'`)
-echo disks=$disks
+#echo disks=$disks
 diskcount=1;
 result='[';
 for disk in "${disks[@]}"; do
@@ -36,10 +36,15 @@ for disk in "${disks[@]}"; do
    poolsize=`bc -l <<< "1000*$psizet"`
   fi
   groupline=`cat $runningpools | grep "$diskpool" | sed "s/.*$diskpool\(.*\)$disk.*/\1/"`
+#  echo $groupline
   mirrorc=`echo $groupline | grep mirror | awk -F'mirror' '{print $NF}' | wc -c `
   if [ $mirrorc -eq 0 ]; then mirrorc="removethis"; fi;
-  raidc=`echo $groupline | grep raid | awk -F'raid' '{print $NF}' | wc -c `
-  if [ $raidc -eq 0 ]; then raidc="removethis"; fi;
+  raidc1=`echo $groupline | grep raidz1 | awk -F'raidz1' '{print $NF}' | wc -c ` 
+  if [ $raidc1 -eq 0 ]; then raidc1="removethis"; fi;
+  raidc2=`echo $groupline | grep raidz2 | awk -F'raidz2' '{print $NF}' | wc -c ` 
+  if [ $raidc2 -eq 0 ]; then raidc2="removethis"; fi;
+  raidc3=`echo $groupline | grep raidz3 | awk -F'raidz3' '{print $NF}' | wc -c ` 
+  if [ $raidc3 -eq 0 ]; then raidc3="removethis"; fi;
   sparec=`echo $groupline | grep spare | awk -F'spare' '{print $NF}' | wc -c `
   if [ $sparec -eq 0 ]; then sparec="removethis"; fi;
   IngroupDisk1c=`echo $groupline | grep scsi | awk -F'scsi' '{print $NF}' | wc -c `
@@ -49,8 +54,9 @@ for disk in "${disks[@]}"; do
   else 
    IngroupDisk1='scsi'`echo $groupline | grep scsi | awk -F'scsi' '{print $NF}' | awk '{print $1}'`
   fi
-  allc=${raidc}'_raid '${mirrorc}'_mirror '$sparec'_spare'
-  winning=` echo $allc |tr " " "\n"| grep -v removethis | sort -n | head -1`
+  allc=${raidc1}'_raid1 '${raidc2}'_raid2 '${raidc3}'_raid3 '${mirrorc}'_mirror '$sparec'_spare'
+  winning=`echo $allc |tr " " "\n"| grep -v removethis | sort -n | head -1`
+#  echo $winning
   if [ ! -z $winning ]; then
     grouptype=`echo $winning | awk -F'_' '{print $2}'`
     groupc=`echo $winning | wc -c`
@@ -64,11 +70,17 @@ for disk in "${disks[@]}"; do
   if [ $? -eq 0 ]; then
    groupline2=`cat $runningpools | grep "$disk" | sed "s/.*$disk\(.*\)scsi.*/\1/" | awk -F'scsi' '{print $1}'`
    IngroupDisk2c=`echo $groupline2 | wc -c`
+  sparec2=`echo $groupline | grep spare | awk -F'spare' '{print $NF}' | wc -c `
+  if [ $sparec2 -eq 0 ]; then sparec2="removethis"; fi;
    mirrorc2=`echo $groupline2 | grep mirror | awk -F'mirror' '{print $1}' | wc -c `
    if [ $mirrorc2 -eq 0 ]; then mirrorc2="removethis"; fi;
-   raidc2=`echo $groupline2 | grep raid | awk -F'raid' '{print $1}' | wc -c `
-   if [ $raidc2 -eq 0 ]; then raidc2="removethis"; fi;
-   allc2=${IngroupDisk2c}'_scsi '${raidc2}'_raid '${mirrorc2}'_mirror';
+   raidc21=`echo $groupline2 | grep raidz1 | awk -F'raidz1' '{print $1}' | wc -c `
+   if [ $raidc21 -eq 0 ]; then raidc21="removethis"; fi;
+   raidc22=`echo $groupline2 | grep raidz2 | awk -F'raidz2' '{print $1}' | wc -c `
+   if [ $raidc22 -eq 0 ]; then raidc22="removethis"; fi;
+   raidc23=`echo $groupline2 | grep raidz3 | awk -F'raidz3' '{print $1}' | wc -c `
+   if [ $raidc23 -eq 0 ]; then raidc23="removethis"; fi;
+   allc2=${IngroupDisk2c}'_scsi '${raidc21}'_raid1 '${raidc22}'_raid2 '${raidc23}'_raid3 '${mirrorc2}'_mirror '${sparec2}'_spare';
    winning2=` echo $allc2 |tr " " "\n"| grep -v removethis | sort -n| head -1`;
    echo $winning2 | grep scsi &>/dev/null   
    if [ $? -eq 0 ]; then 
