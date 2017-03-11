@@ -4,6 +4,7 @@ echo $@ > ~/tmp
 echo $#
 web="/var/www/html/des20/Data/DGstatus.log";
 logging='/var/www/html/des20/Data/currentinfo2.log'
+runningpools='/pacedata/pools/runningpools'
 raid=` echo $@ | awk '{print $1}'`;
 userreq=` echo $@ | awk '{print $2}'`;
 host=` echo $@ | awk '{print $3}'`;
@@ -33,9 +34,53 @@ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $
 disks=('obsoletecode')
 noofdisks=`echo $disks | wc -w | awk '{print $1}'`;
 disksarr=(${disks});
+if [[ $raid == "addmirror" ]]; then
+disk2=` echo $@ | awk '{print $5}'`;
+ ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${disk2};
+ ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${disk1};
+ ssh $host  /sbin/zpool add -f p${nextpool} mirror ${disk1} ${disk2} 2>txt/${0:2}$userreq.txt
+ echo ssh $host  /sbin/zpool add -f p${nextpool} mirror ${disk1} ${disk2} 
+fi 
+if [[ $raid == "attachmirror" ]]; then
+disk2=` echo $@ | awk '{print $5}'`;
+ ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${disk2};
+ ssh $host  /sbin/zpool attach -f p${nextpool} ${disk1} ${disk2} 2>txt/${0:2}$userreq.txt
+ echo ssh $host  /sbin/zpool attach -f p${nextpool} ${disk1} ${disk2} 
+fi 
+if [[ $raid == "delspecial" ]]; then
+ ssh $host  /sbin/zpool remove  p${nextpool} ${disk1} 2>txt/${0:2}$userreq.txt
+ #ssh $host  /sbin/zpool remove -f p${nextpool} ${disk1}
+fi 
+if [[ $raid == "addcache" ]]; then
+ ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${disk1};
+ ssh $host  /sbin/zpool add -f p${nextpool} cache ${disk1} 2>txt/${0:2}$userreq.txt
+fi 
+if [[ $raid == "addlog" ]]; then
+ ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${disk1};
+ ssh $host  /sbin/zpool add -f p${nextpool} log ${disk1} 2>txt/${0:2}$userreq.txt
+fi 
+if [[ $raid == "addspare" ]]; then
+ ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${disk1};
+ ssh $host  /sbin/zpool add -f p${nextpool} spare ${disk1} 2>txt/${0:2}$userreq.txt
+fi 
 if [[ $raid == "Single" ]]; then
  ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${disk1};
  ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} ${disk1} 2>txt/${0:2}$userreq.txt
+fi 
+if [[ $raid == "addparity3" ]]; then
+ diskargs=${#params[@]};
+ diskargs=$((diskargs-1));
+ echo $diskargs >> ~/tmp
+ i=2
+ disk1=" "
+ while [ $i -lt $diskargs ]; do
+   i=$((i+1));
+   ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
+   disk1=${disk1}${params[$i]}" "
+   echo i=$i, $disk1 >> ~/tmp 
+ done;
+ ssh $host  /sbin/zpool add -f  p${nextpool} raidz3 ${disk1} 2>txt/${0:2}$userreq.txt
+echo ssh $host  /sbin/zpool add  p${nextpool} raidz3 ${disk1}  >> ~/tmp
 fi 
 if [[ $raid == "parity3" ]]; then
  diskargs=${#params[@]};
@@ -52,6 +97,21 @@ if [[ $raid == "parity3" ]]; then
  ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} raidz3 ${disk1} 2>txt/${0:2}$userreq.txt
 echo ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} raidz3 ${disk1}  >> ~/tmp
 fi 
+if [[ $raid == "addparity2" ]]; then
+ diskargs=${#params[@]};
+ diskargs=$((diskargs-1));
+ echo $diskargs >> ~/tmp
+ i=2
+ disk1=" "
+ while [ $i -lt $diskargs ]; do
+   i=$((i+1));
+   ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
+   disk1=${disk1}${params[$i]}" "
+   echo i=$i, $disk1 >> ~/tmp 
+ done;
+ ssh $host  /sbin/zpool add -f p${nextpool} raidz2 ${disk1} 2>txt/${0:2}$userreq.txt
+echo ssh $host  /sbin/zpool add p${nextpool} raidz2 ${disk1}  >> ~/tmp
+fi 
 if [[ $raid == "parity2" ]]; then
  diskargs=${#params[@]};
  diskargs=$((diskargs-1));
@@ -66,6 +126,19 @@ if [[ $raid == "parity2" ]]; then
  done;
  ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} raidz2 ${disk1} 2>txt/${0:2}$userreq.txt
 echo ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} raidz2 ${disk1}  >> ~/tmp
+fi 
+if [[ $raid == "addparity" ]]; then
+ diskargs=${#params[@]};
+ diskargs=$((diskargs-1));
+ i=2
+ disk1=" "
+ while [ $i -lt $diskargs ]; do
+   i=$((i+1));
+   ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
+   disk1=${disk1}${params[$i]}" "
+ done;
+ #ssh $host  /sbin/zpool add p${nextpool} raidz1 ${disk1} 2>txt/${0:2}$userreq.txt
+ ssh $host  /sbin/zpool add -f p${nextpool} raidz1 ${disk1} 
 fi 
 if [[ $raid == "parity" ]]; then
  diskargs=${#params[@]};
@@ -82,20 +155,21 @@ if [[ $raid == "parity" ]]; then
  ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} raidz1 ${disk1} 2>txt/${0:2}$userreq.txt
 echo ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} raidz1 ${disk1}  >> ~/tmp
 fi 
-if [[ $raid == "stripeset" ]]; then
+if [[ $raid == "add" ]]; then
  diskargs=${#params[@]};
  diskargs=$((diskargs-1));
- echo $diskargs >> ~/tmp
+# echo $diskargs >> ~/tmp
  i=2
  disk1=" "
  while [ $i -lt $diskargs ]; do
    i=$((i+1));
    ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
    disk1=${disk1}${params[$i]}" "
-   echo i=$i, $disk1 >> ~/tmp 
+#   echo i=$i, $disk1 >> ~/tmp 
  done;
- ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} ${disk1} 2>txt/${0:2}$userreq.txt
-echo ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} ${disk1}  >> ~/tmp
+ ssh $host  /sbin/zpool add  -f p${nextpool} ${disk1} 2>txt/${0:2}$userreq.txt
+ #ssh $host  /sbin/zpool add  -f p${nextpool} ${disk1} 
+#echo ssh $host  /sbin/zpool add -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} ${disk1}  >> ~/tmp
 fi 
 if [[ $raid == "mirror" ]]; then
  diskargs=${#params[@]};
@@ -141,4 +215,7 @@ fi
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 rm txt/${0:2}$userreq.txt
 fi
+sed -i "/p${nextpool}/c\\" $runningpools
+sleep 3
 ./GetDisklist a
+sleep 2

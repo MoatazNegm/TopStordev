@@ -39,6 +39,10 @@ for disk in "${disks[@]}"; do
   fi
   groupline=`cat $runningpools | grep "$diskpool" | sed "s/.*$diskpool\(.*\)$disk.*/\1/"`
 #  echo $groupline
+  logc=`echo $groupline | grep log | awk -F'log' '{print $NF}' | wc -c `
+  if [ $logc -eq 0 ]; then logc="removethis"; fi;
+  cachec=`echo $groupline | grep cache | awk -F'cache' '{print $NF}' | wc -c `
+  if [ $cachec -eq 0 ]; then cachec="removethis"; fi;
   mirrorc=`echo $groupline | grep mirror | awk -F'mirror' '{print $NF}' | wc -c `
   if [ $mirrorc -eq 0 ]; then mirrorc="removethis"; fi;
   raidc1=`echo $groupline | grep raidz1 | awk -F'raidz1' '{print $NF}' | wc -c ` 
@@ -56,7 +60,7 @@ for disk in "${disks[@]}"; do
   else 
    IngroupDisk1='scsi'`echo $groupline | grep scsi | awk -F'scsi' '{print $NF}' | awk '{print $1}'`
   fi
-  allc=${raidc1}'_raid1 '${raidc2}'_raid2 '${raidc3}'_raid3 '${mirrorc}'_mirror '$sparec'_spare'
+  allc=${cachec}'_cache '${logc}'_log '${raidc1}'_raid1 '${raidc2}'_raid2 '${raidc3}'_raid3 '${mirrorc}'_mirror '$sparec'_spare'
   winning=`echo $allc |tr " " "\n"| grep -v removethis | sort -n | head -1`
 #  echo $winning
   if [ ! -z $winning ]; then
@@ -72,6 +76,10 @@ for disk in "${disks[@]}"; do
   if [ $? -eq 0 ]; then
    groupline2=`cat $runningpools | grep "$disk" | sed "s/.*$disk\(.*\)scsi.*/\1/" | awk -F'scsi' '{print $1}'`
    IngroupDisk2c=`echo $groupline2 | wc -c`
+  cachec2=`echo $groupline | grep cache | awk -F'cache' '{print $NF}' | wc -c `
+  if [ $cachec2 -eq 0 ]; then cachec2="removethis"; fi;
+   logc2=`echo $groupline2 | grep log | awk -F'log' '{print $1}' | wc -c `
+   if [ $logc2 -eq 0 ]; then logc2="removethis"; fi;
   sparec2=`echo $groupline | grep spare | awk -F'spare' '{print $NF}' | wc -c `
   if [ $sparec2 -eq 0 ]; then sparec2="removethis"; fi;
    mirrorc2=`echo $groupline2 | grep mirror | awk -F'mirror' '{print $1}' | wc -c `
@@ -82,7 +90,7 @@ for disk in "${disks[@]}"; do
    if [ $raidc22 -eq 0 ]; then raidc22="removethis"; fi;
    raidc23=`echo $groupline2 | grep raidz3 | awk -F'raidz3' '{print $1}' | wc -c `
    if [ $raidc23 -eq 0 ]; then raidc23="removethis"; fi;
-   allc2=${IngroupDisk2c}'_scsi '${raidc21}'_raid1 '${raidc22}'_raid2 '${raidc23}'_raid3 '${mirrorc2}'_mirror '${sparec2}'_spare';
+   allc2=${IngroupDisk2c}'_scsi '${cachec2}'_cache '${logc2}'_log '${raidc21}'_raid1 '${raidc22}'_raid2 '${raidc23}'_raid3 '${mirrorc2}'_mirror '${sparec2}'_spare';
    winning2=` echo $allc2 |tr " " "\n"| grep -v removethis | sort -n| head -1`;
    echo $winning2 | grep scsi &>/dev/null   
    if [ $? -eq 0 ]; then 
