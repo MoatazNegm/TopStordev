@@ -37,6 +37,36 @@ if [[ $raid == "Single" ]]; then
  ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${disk1};
  ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} ${disk1} 2>txt/${0:2}$userreq.txt
 fi 
+if [[ $raid == "parity3" ]]; then
+ diskargs=${#params[@]};
+ diskargs=$((diskargs-1));
+ echo $diskargs >> ~/tmp
+ i=2
+ disk1=" "
+ while [ $i -lt $diskargs ]; do
+   i=$((i+1));
+   ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
+   disk1=${disk1}${params[$i]}" "
+   echo i=$i, $disk1 >> ~/tmp 
+ done;
+ ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} raidz3 ${disk1} 2>txt/${0:2}$userreq.txt
+echo ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} raidz3 ${disk1}  >> ~/tmp
+fi 
+if [[ $raid == "parity2" ]]; then
+ diskargs=${#params[@]};
+ diskargs=$((diskargs-1));
+ echo $diskargs >> ~/tmp
+ i=2
+ disk1=" "
+ while [ $i -lt $diskargs ]; do
+   i=$((i+1));
+   ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
+   disk1=${disk1}${params[$i]}" "
+   echo i=$i, $disk1 >> ~/tmp 
+ done;
+ ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} raidz2 ${disk1} 2>txt/${0:2}$userreq.txt
+echo ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} raidz2 ${disk1}  >> ~/tmp
+fi 
 if [[ $raid == "parity" ]]; then
  diskargs=${#params[@]};
  diskargs=$((diskargs-1));

@@ -27,7 +27,9 @@ for disk in "${disks[@]}"; do
   poolsize='0';
  else
   diskpool=`cat $runningpools | grep $disk | awk '{print $2}'`;
-  psize=`cat $runningpools | grep $disk | awk '{print $3}'`;
+  sshost=`cat $runningpools | grep $disk | awk '{print $NF}'`;
+  psize=`ssh $sshost zfs list -H  p1| awk '{print $3}' `
+#  psize=`cat $runningpools | grep $disk | awk '{print $3}'`;
   psizet=`echo $psize | grep T | awk -F'T' '{print $1}'`
   if [ -z $psizeT ]; then 
    psizeg=`echo $psize | grep G | awk -F'G' '{print $1}'`
