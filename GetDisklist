@@ -26,9 +26,11 @@ for disk in "${disks[@]}"; do
   IngroupDisk2='notavailable';
   poolsize='0';
  else
+echo hihere
   diskpool=`cat $runningpools | grep $disk | awk '{print $2}'`;
   sshost=`cat $runningpools | grep $disk | awk '{print $NF}'`;
   psize=`ssh $sshost zfs list -H  p1| awk '{print $3}' `
+echo hello
 #  psize=`cat $runningpools | grep $disk | awk '{print $3}'`;
   psizet=`echo $psize | grep T | awk -F'T' '{print $1}'`
   if [ -z $psizeT ]; then 
@@ -38,7 +40,7 @@ for disk in "${disks[@]}"; do
    poolsize=`bc -l <<< "1000*$psizet"`
   fi
   groupline=`cat $runningpools | grep "$diskpool" | sed "s/.*$diskpool\(.*\)$disk.*/\1/"`
-#  echo $groupline
+  echo $groupline
   logc=`echo $groupline | grep log | awk -F'log' '{print $NF}' | wc -c `
   if [ $logc -eq 0 ]; then logc="removethis"; fi;
   cachec=`echo $groupline | grep cache | awk -F'cache' '{print $NF}' | wc -c `
@@ -76,11 +78,11 @@ for disk in "${disks[@]}"; do
   if [ $? -eq 0 ]; then
    groupline2=`cat $runningpools | grep "$disk" | sed "s/.*$disk\(.*\)scsi.*/\1/" | awk -F'scsi' '{print $1}'`
    IngroupDisk2c=`echo $groupline2 | wc -c`
-  cachec2=`echo $groupline | grep cache | awk -F'cache' '{print $NF}' | wc -c `
+  cachec2=`echo $groupline2 | grep cache | awk -F'cache' '{print $NF}' | wc -c `
   if [ $cachec2 -eq 0 ]; then cachec2="removethis"; fi;
    logc2=`echo $groupline2 | grep log | awk -F'log' '{print $1}' | wc -c `
    if [ $logc2 -eq 0 ]; then logc2="removethis"; fi;
-  sparec2=`echo $groupline | grep spare | awk -F'spare' '{print $NF}' | wc -c `
+  sparec2=`echo $groupline2 | grep spare | awk -F'spare' '{print $NF}' | wc -c `
   if [ $sparec2 -eq 0 ]; then sparec2="removethis"; fi;
    mirrorc2=`echo $groupline2 | grep mirror | awk -F'mirror' '{print $1}' | wc -c `
    if [ $mirrorc2 -eq 0 ]; then mirrorc2="removethis"; fi;
