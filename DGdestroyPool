@@ -43,4 +43,4 @@ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $
 rm txt/${0:2}$userreq.txt
 fi
 sed -i "/p${nextpool}/c\\" $runningpools
-sh GetDisklist a
+./GetDisklist a
