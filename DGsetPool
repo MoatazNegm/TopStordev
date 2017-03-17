@@ -1,6 +1,5 @@
 #!/usr/bin/sh
 cd /TopStor/
-echo $@ > ~/tmp  
 echo $#
 web="/var/www/html/des20/Data/DGstatus.log";
 logging='/var/www/html/des20/Data/currentinfo2.log';
@@ -278,7 +277,6 @@ then
  if [[ $raid == "parity3" ]]; then
   diskargs=${#params[@]};
   diskargs=$((diskargs-1));
-  echo $diskargs >> ~/tmp
   i=2
   disk1=" "
   diskn=""
@@ -317,7 +315,6 @@ then
  if [[ $raid == "addparity2" ]]; then
   diskargs=${#params[@]};
   diskargs=$((diskargs-1));
-  echo $diskargs >> ~/tmp
   i=2
   disk1=" "
   diskn=""
@@ -356,7 +353,6 @@ then
  if [[ $raid == "parity2" ]]; then
   diskargs=${#params[@]};
   diskargs=$((diskargs-1));
-  echo $diskargs >> ~/tmp
   i=2
   disk1=" "
   diskn="";
@@ -365,7 +361,6 @@ then
    ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
    disk1=${disk1}${params[$i]}" "
    diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
-   echo i=$i, $disk1 >> ~/tmp 
   done;
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata="Creating pool "p${nextpool}" with dual parity array using disks:"$diskn
@@ -435,7 +430,6 @@ then
  if [[ $raid == "parity" ]]; then
   diskargs=${#params[@]};
   diskargs=$((diskargs-1));
-  echo $diskargs >> ~/tmp
   i=2
   disk1=" "
   diskn=""
@@ -444,7 +438,6 @@ then
    ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
    disk1=${disk1}${params[$i]}" "
    diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
-   echo i=$i, $disk1 >> ~/tmp 
   done;
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata="Creating pool "p${nextpool}" with single parity array using disks:"$diskn
@@ -483,7 +476,6 @@ then
    ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
    disk1=${disk1}${params[$i]}" "
    diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
-#   echo i=$i, $disk1 >> ~/tmp 
   done;
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata="Adding disks to non-redundant pool "p${nextpool}" using disks:"$diskn
@@ -514,7 +506,6 @@ then
  if [[ $raid == "stripeset" ]]; then
   diskargs=${#params[@]};
   diskargs=$((diskargs-1));
-  echo $diskargs >> ~/tmp
   i=2
   disk1=" "
   diskn=""
@@ -523,7 +514,6 @@ then
    ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
    disk1=${disk1}${params[$i]}" "
    diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
-   echo i=$i, $disk1 >> ~/tmp 
   done;
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata="Creating non-redundant pool "p${nextpool}" using disks:"$diskn
@@ -554,7 +544,6 @@ then
  if [[ $raid == "mirror" ]]; then
   diskargs=${#params[@]};
   diskargs=$((diskargs-1));
-  echo $diskargs >> ~/tmp
   i=2
    disk1=" "
   diskn=""
@@ -563,7 +552,6 @@ then
    ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
    disk1=${disk1}${params[$i]}" "
    diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
-   echo i=$i, $disk1 >> ~/tmp 
   done;
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata="Creating pool "p${nextpool}" with mirrored disks:"$diskn
