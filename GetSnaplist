@@ -5,7 +5,7 @@ resweb='/var/www/html/des20/Data/listsnaps.txtupdated';
 iscsimapping='/pacedata/iscsimapping';
 runningpools='/pacedata/pools/runningpools';
 result='[';
-runhosts=(`cat $iscsimapping | grep -v notconnected | awk '{print $1}'`)
+runhosts=(`cat $iscsimapping | grep -v notconnected | awk '{print $1}' | uniq`)
 echo "$runhosts" | while read -r sshosy
 do
  sshost=`cat $runningpools | grep $sshosy | awk '{print $NF}'`

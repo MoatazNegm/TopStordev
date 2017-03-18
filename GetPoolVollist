@@ -10,7 +10,7 @@ iscsimapping='/pacedata/iscsimapping'
 allprops='/TopStordata/allprops'
 stamp=`date +%s`
  rm -rf $allprops &>/dev/null
- hostns=(`cat $iscsimapping | grep -v notconn | awk '{print $1}'`)
+ hostns=(`cat $iscsimapping | grep -v notconn | awk '{print $1}' | uniq`)
  for hostn in "${hostns[@]}"; do
   poollist=(`cat $runningpools | grep $hostn | awk '{print $1":"$NF":"$2}'`);
   gpool=( ${gpool[@]} ${poollist[@]} );
@@ -19,7 +19,7 @@ stamp=`date +%s`
  for poolnow in "${gpool[@]}"; do
   echo poolnow $poolnow
 #  sshost=`echo $poolnow | awk -F: '{print $1}'`
-  hostnam=`echo $poolnow | awk -F: '{print $2}'`
+  hostnam=`echo $poolnow | awk -F: '{print $2}' | uniq`
   sshost=`echo $poolnow | awk -F: '{print $2}'`
   pool=`echo $poolnow | awk -F: '{print $3}'`
   ssh root@$sshost /TopStor/GetPoolprop | (cat > $allprops)
