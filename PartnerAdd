@@ -1,5 +1,4 @@
 #!/usr/local/bin/zsh
-echo $@ > ~/tmp
 webpartner='/var/www/html/des20/Data/Partnerslist.txt';
 resweb='/var/www/html/des20/Data/Partnerslist.txtupdated'
 web='/var/www/html/des20/Data/Partnersstatus.log';

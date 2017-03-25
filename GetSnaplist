@@ -23,7 +23,7 @@ do
   time2=` echo $creall | awk -F_ '{print $2}'`;
   sender=`echo $line | awk '{print $7}'`;
   receiver=`echo $line | awk '{print $8}'`;
-  subres=`/usr/local/bin/zsh jsonthis3.sh stamp $stamp name $name pool ${pool} onlyname $onlyname father $father2 creation $creatform time $time2 sender $sender receiver $receiver `;
+  subres=`/usr/local/bin/zsh jsonthis3.sh stamp $stamp host $sshost class ${sshost}'_'${pool} name $name pool ${pool} onlyname $onlyname father $father2 creation $creatform time $time2 sender $sender receiver $receiver `;
   result=$result$subres,;
  done
 done
