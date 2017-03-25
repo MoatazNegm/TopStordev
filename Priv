@@ -1,5 +1,6 @@
 #!/usr/local/bin/zsh
 cd /TopStor
+echo $@ > ~/tmp
 privilege="User_Priv";
 user=`echo $@ | awk '{print $2}'`
 contrun="false";

@@ -1,5 +1,4 @@
 #!/usr/local/bin/zsh
-echo $@ > ~/tmp
 web='/var/www/html/des20/Data/Replicatestatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log';
 glog='/TopStordata/TopStor.log';
