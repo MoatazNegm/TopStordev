@@ -36,6 +36,7 @@ if [[ $err -ge  4  ]]; then
 echo Unlin1020@$datenow@$timenow@$username > ${logging}2
 dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
 echo $datenow $timenow error $userreq Unlin1020@@@$username $dtn>> $glog
+ echo $txtres > ~/tmp
 else 
  openssl rsautl -encrypt -inkey key/public_key.pem -pubin -in <( echo $userpass) -out key/$username;  
  chmod 400 key/$username;

@@ -48,10 +48,10 @@ sed -i "/$hostname/s/\$/$hostn/" $runningpools
 echo HostManual1001: > $web
 logdata='success_changing_box_to:'$hostn'_'$hostip'_'$hostrout'_'$hostdns;
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code HostManual1003@@@.`;
-echo HostManual1003@$datenow@$timenow@. > ${logging}2
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code HostManual1003@@@${hostn}@${hostip}@${hostrout}@${hostdns}`;
+echo HostManual1003@$datenow@$timenow@$hostn@$hostip@$hostrout@$hostdns > ${logging}2
 dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
-echo $datenow $timenow info $userreq HostManual1003@@@. $dtn>> $glog
+echo $datenow $timenow info $userreq HostManual1003@@@$hostn@$hostip@$hostrout@$hostdns $dtn>> $glog
 oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
 fi
 /pace/keysend.sh

@@ -1,5 +1,15 @@
 #!/usr/local/bin/zsh
 cd /TopStor
+COMMAND0=$0
+echo $COMMAND0 | grep \/ 
+if [ $? -eq 0 ]; then
+ COMMAND=`echo $COMMAND0 | awk -F'/' '{print $2}'`;
+else 
+ COMMAND=$COMMAND0; 
+fi
+RUNNING=`ps --no-headers -C${COMMAND} | wc -l`
+if [[ $RUNNING -gt 1 ]]; then echo hi;  exit 0; fi
+echo $0 $RUNNING
 liner=`echo $@ | awk '{print $2}'`;
 logging='/var/www/html/des20/Data/Logs.log'$liner
 logupdate='/var/www/html/des20/Data/Logs.logupdated'

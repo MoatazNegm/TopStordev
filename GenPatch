@@ -1,10 +1,25 @@
 #!/usr/local/bin/zsh
 #cd /root/scripts
-webfile='/usr/local/www/apache24/data/des19/Data';
-#gitloc=`echo $@ | awk '{print $1}'`;
+cd /TopStor/
+logging='/var/www/html/des20/Data/currentinfo2.log';
+glog='/TopStordata/TopStor.log';
+currentfw=`git branch | grep \* | awk '{print $2}'`
+webfile='/usr/local/www/apache24/data/des20/Data';
+newfw=`echo $@ | awk '{print $1}'`;
+userreq=`echo $@ | awk '{print $2}'`;
+privilege="Uploadch";
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
+ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+ logdata='Start upgrading from version '$currentfw' to version '$newfw;
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Upsa1010@@@$currentfw@$newfw`;
+ echo Upsa1010@$datenow@$timenow@$currentfw@$newfw > ${logging}2;
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq  Upsa1010@@@$currentfw@$newfw $dtn>> $glog
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+
 gitloc='/TopStor';
-filen=`echo $@ | awk '{print $1}'`;
-filever=`echo $filen | awk -F_ '{print $2}'`;
 cd $gitloc  
 git add --all;
 currentver=`cat ver`;
@@ -23,4 +38,5 @@ git add --all
 msg="committing ver"$filever;
 git commit -am "$msg";
 fi 
+fi
 #rm $webfile/$filen
