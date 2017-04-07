@@ -31,6 +31,7 @@ else
 crontab -l | grep reboot  > /TopStordata/cronfile
 crontab -r 
 crontab /TopStordata/cronfile
+
 echo > /etc/exports
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 	echo Datasu5:$pool > $web;
