@@ -32,8 +32,8 @@ stamp=`date +%s`
   creation=`cat $allprops | grep  creation | grep ${pool}/  | awk  '{$3=$5"-"$4"-"$7; print $1" "$3}'`;
   compressratio=`cat $allprops | grep compressratio | grep ${pool}/ | awk  '{print $1" "$3}'`;
   dedup=`cat $allprops | grep dedup | grep ${pool}/ | awk '{print $1" "$3}'`;
-  CIFSshare=`cat $allprops | grep  prot | grep kind  | grep ${pool}/ | grep CIFS  | awk '{print $1" "$3}'`;
-  NFSshare=`cat $allprops | grep  prot | grep kind | grep ${pool}/ | grep NFS | awk '{print $1" "$3}'`;
+  CIFSshare=`cat $allprops | grep  prot | grep kind  | grep ${pool}/ | grep " CIFS"  | awk '{print $1" "$3}'`;
+  NFSshare=`cat $allprops | grep  prot | grep kind | grep ${pool}/ | grep " NFS" | awk '{print $1" "$3}'`;
   nameof=`cat $allprops | grep  name | grep ${pool}/ | awk -F/ '{print $2}' | awk '{print $1}'`;
   if [[ -z $nameof ]]; 
   then 
