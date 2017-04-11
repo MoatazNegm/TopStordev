@@ -1,9 +1,27 @@
 #!/bin/sh
+TopStor='/TopStor'
+pace='/pace'
+web='/var/www/html/des20/'
 
 afold='/pace /TopStor /var/www/html/des20/ --exclude /var/www/html/des20/Data';
-fold=`echo $@ | awk '{print $1}'`
+#fold=`echo $@ | awk '{print $1}'`
+cd $TopStor ; 
+fold=`git branch | grep \* | awk '{print $2}'`
+git format-patch master --stdout > /TopStordata/TopStor.p
+echo before pace
+cd $pace ; 
+git format-patch master --stdout > /TopStordata/pace.p
+echo before web
+cd $web ; 
+git format-patch master --stdout > /TopStordata/web.p
+
+echo fold=$fold
 cd /TopStordata
-#find $afold -type f -print0 | xargs -0 sha512sum > ${fold}.sha
-git format-patch master --stdout
-tar -czvf ${fold}.tar.gz $afold
- openssl  rsautl -encrypt -inkey /TopStor/key/public_key.pem -pubin -in ${fold}.tar.gz -out ${fold}
+rm -rf /TopStor/key/crt_key.crt 2>/dev/null
+openssl req -key /TopStor/key/private_key.pem -new -x509 -days 10000 -out /TopStor/key/crt_key.crt -subj "/C=TR/ST=IST/L=IST/O=Quickstor/OU=Storage/CN=Quickstor.net"
+
+tar -czvf ${fold}.tar.gz /TopStordata/TopStor.p /TopStordata/pace.p /TopStordata/web.p
+openssl  smime -encrypt -aes-256-cbc -binary -in /TopStordata/${fold}.tar.gz -outform DER -out /TopStordata/${fold} /TopStor/key/crt_key.crt 
+
+#openssl  smime -decrypt -aes-256-cbc -binary -in /TopStordata/config1 -inform DER -out config.tar.gz -inkey /TopStor/key/private_key.pem
+
