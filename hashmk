@@ -7,12 +7,17 @@ afold='/pace /TopStor /var/www/html/des20/ --exclude /var/www/html/des20/Data';
 #fold=`echo $@ | awk '{print $1}'`
 cd $TopStor ; 
 fold=`git branch | grep \* | awk '{print $2}'`
+echo $fold > ver
 #git format-patch master --stdout > /TopStordata/TopStor.p
 echo before pace
 cd $pace ; 
+git checkout -b $fold
+git commit -am "ver $fold"
 #git format-patch master --stdout > /TopStordata/pace.p
 echo before web
 cd $web ; 
+git checkout -b $fold
+git commit -am "ver $fold"
 #git format-patch master --stdout > /TopStordata/web.p
 
 echo fold=$fold
