@@ -56,25 +56,11 @@ then
   rsync -rt ${newd}/$TopStor/ /$TopStor/
   rsync -rt ${newd}/$pace/ /$pace/
   rsync -rt ${newd}/$web/ /$web/
-  #git commit -am "done applying fw ${newfw}"
-  #cd $pace
-  #git commit -am "prep to apply fw ${newfw}"
-  #git checkout master
-  #git checkout -b ${newfw}
-  #git apply ${newd}/TopStordata/pace.p 
-  #git commit -am "done applying fw ${newfw}"
-  #cd $web
-# echo going web
- # sleep 3
-# git commit -am "prep to apply fw ${newfw}"
- # git checkout master
-#git checkout -b ${newfw}
- # echo start apply
- # echo Data/* >> .git/info/exclude
- # git apply  ${newd}/TopStordata/web.p 
- # echo git apply --exclude=Data ${newd}/TopStordata/web.p
- # echo end apply
- # git commit -am "done applying fw ${newfw}" 
+  git checkout $newfw
+  cd /$pace
+  git checkout $newfw
+  cd /$web
+  git checkout $newfw
   cd /$TopStor
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata='Success upgrading from version '$currentfw' to version '$newfw;
