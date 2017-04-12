@@ -1,7 +1,7 @@
 #!/usr/local/bin/zsh
 #cd /root/scripts
 echo $@ > ~/tmp
-TopStor='TopStortmp'
+TopStor='TopStor'
 tmpdir='/p1'
 pace='pace'
 web='var/www/html/des20/'
@@ -50,8 +50,10 @@ then
   #git checkout master
   #git checkout -b ${newfw}
   #git apply ${newd}/TopStordata/TopStor.p 
-   rm -rf .git
-  rsync -rt ${newd}/$TopStor/ /TopStortmp/
+  rm -rf /$TopStor/.git
+  rm -rf /$pace/.git
+  rm -rf /$web/.git
+  rsync -rt ${newd}/$TopStor/ /TopStor/
   rsync -rt ${newd}/$pace/ /pace/
   rsync -rt ${newd}/$web/ /web/
   #git commit -am "done applying fw ${newfw}"
@@ -73,7 +75,7 @@ then
  # echo git apply --exclude=Data ${newd}/TopStordata/web.p
  # echo end apply
  # git commit -am "done applying fw ${newfw}" 
-  cd $TopStor
+  cd /$TopStor
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata='Success upgrading from version '$currentfw' to version '$newfw;
   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Upsu1010@@@$currentfw@$newfw`;
