@@ -53,9 +53,9 @@ then
   rm -rf /$TopStor/.git
   rm -rf /$pace/.git
   rm -rf /$web/.git
-  rsync -rt ${newd}/$TopStor/ /TopStor/
-  rsync -rt ${newd}/$pace/ /pace/
-  rsync -rt ${newd}/$web/ /web/
+  rsync -rt ${newd}/$TopStor/ /$TopStor/
+  rsync -rt ${newd}/$pace/ /$pace/
+  rsync -rt ${newd}/$web/ /$web/
   #git commit -am "done applying fw ${newfw}"
   #cd $pace
   #git commit -am "prep to apply fw ${newfw}"
