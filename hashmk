@@ -2,26 +2,27 @@
 TopStor='/TopStor'
 pace='/pace'
 web='/var/www/html/des20'
-
+tmpdir='/p1'
 afold='/pace /TopStor /var/www/html/des20/ --exclude /var/www/html/des20/Data';
 #fold=`echo $@ | awk '{print $1}'`
 cd $TopStor ; 
 fold=`git branch | grep \* | awk '{print $2}'`
-git format-patch master --stdout > /TopStordata/TopStor.p
+#git format-patch master --stdout > /TopStordata/TopStor.p
 echo before pace
 cd $pace ; 
-git format-patch master --stdout > /TopStordata/pace.p
+#git format-patch master --stdout > /TopStordata/pace.p
 echo before web
 cd $web ; 
-git format-patch master --stdout > /TopStordata/web.p
+#git format-patch master --stdout > /TopStordata/web.p
 
 echo fold=$fold
-cd /TopStordata
+cd $tmpdir
 rm -rf /TopStor/key/crt_key.crt 2>/dev/null
 openssl req -key /TopStor/key/private_key.pem -new -x509 -days 10000 -out /TopStor/key/crt_key.crt -subj "/C=TR/ST=IST/L=IST/O=Quickstor/OU=Storage/CN=Quickstor.net"
 
-tar -czvf ${fold}.tar.gz /TopStordata/TopStor.p /TopStordata/pace.p /TopStordata/web.p
-openssl  smime -encrypt -aes-256-cbc -binary -in /TopStordata/${fold}.tar.gz -outform DER -out /TopStordata/${fold} /TopStor/key/crt_key.crt 
+tar -czvf ${fold}.tar.gz /TopStor  /pace /var/www/html/des20 --exclude='/var/www/html/des20/Data' --exclude='/TopStor/key'
+
+#tar -czvf ${fold}.tar.gz /TopStordata/TopStor.p /TopStordata/pace.p /TopStordata/web.p
+openssl  smime -encrypt -aes-256-cbc -binary -in $tmpdir/${fold}.tar.gz -outform DER -out $tmpdir/${fold} /TopStor/key/crt_key.crt 
 
 #openssl  smime -decrypt -aes-256-cbc -binary -in /TopStordata/config1 -inform DER -out config.tar.gz -inkey /TopStor/key/private_key.pem
-

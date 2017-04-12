@@ -1,26 +1,27 @@
 #!/usr/local/bin/zsh
 #cd /root/scripts
 echo $@ > ~/tmp
-TopStor='/TopStortmp'
-pace='/pace'
-web='/var/www/html/des20/'
+TopStor='TopStortmp'
+tmpdir='/p1'
+pace='pace'
+web='var/www/html/des20/'
 logging='/var/www/html/des20/Data/currentinfo2.log';
 glog='/TopStordata/TopStor.log';
 currentfw=`git branch | grep \* | awk '{print $2}'`
 webfile='/var/www/html/des20/Data';
-cd $TopStor
+cd /$TopStor
 newfw=`echo $@ | awk '{print $1}'`;
 userreq=`echo $@ | awk '{print $2}'`;
 privilege="Uploadch";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
 then
- newd='/TopStordata/'${newfw}.d
+ newd=$tmpdir/${newfw}.d
  mkdir $newd
  chmod 700 $newd
  openssl  smime -decrypt -aes-256-cbc -binary -in $webfile/$newfw -inform DER -out ${newd}/${newfw}.tar.gz -inkey /TopStor/key/private_key.pem
  if [ $? -ne 0 ]; then 
-  cd $TopStor
+  cd /$TopStor
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
  logdata='Upgrade file is not valid ';
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Upnv1010@@`;
@@ -28,10 +29,10 @@ then
  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
  echo $datenow $timenow info $userreq  Upnv1010@@ $dtn>> $glog
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
- rm -rf $newd
+# rm -rf $newd
  exit
  fi
-  cd $TopStor
+  cd /$TopStor
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
  logdata='Start upgrading from version '$currentfw' to version '$newfw;
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Upsa1010@@@$currentfw@$newfw`;
@@ -44,24 +45,34 @@ then
  tar -xvzf ${newfw}.tar.gz
  if [ $? -eq 0 ];
  then
-  cd $TopStor
-  git commit -am "prep to apply fw ${newfw}"
-  git checkout master
-  git checkout -b ${newfw}
-  git apply ${newd}/TopStordata/TopStor.p 
-  git commit -am "done applying fw ${newfw}"
-  cd $pace
-  git commit -am "prep to apply fw ${newfw}"
-  git checkout master
-  git checkout -b ${newfw}
-  git apply ${newd}/TopStordata/pace.p 
-  git commit -am "done applying fw ${newfw}"
-  cd $web
-  git commit -am "prep to apply fw ${newfw}"
-  git checkout master
-  git checkout -b ${newfw}
-  git apply ${newd}/TopStordata/web.p 
-  git commit -am "done applying fw ${newfw}" 
+  cd /$TopStor
+  #git commit -am "prep to apply fw ${newfw}"
+  #git checkout master
+  #git checkout -b ${newfw}
+  #git apply ${newd}/TopStordata/TopStor.p 
+   rm -rf .git
+  rsync -rt ${newd}/$TopStor/ /TopStortmp/
+  rsync -rt ${newd}/$pace/ /pace/
+  rsync -rt ${newd}/$web/ /web/
+  #git commit -am "done applying fw ${newfw}"
+  #cd $pace
+  #git commit -am "prep to apply fw ${newfw}"
+  #git checkout master
+  #git checkout -b ${newfw}
+  #git apply ${newd}/TopStordata/pace.p 
+  #git commit -am "done applying fw ${newfw}"
+  #cd $web
+# echo going web
+ # sleep 3
+# git commit -am "prep to apply fw ${newfw}"
+ # git checkout master
+#git checkout -b ${newfw}
+ # echo start apply
+ # echo Data/* >> .git/info/exclude
+ # git apply  ${newd}/TopStordata/web.p 
+ # echo git apply --exclude=Data ${newd}/TopStordata/web.p
+ # echo end apply
+ # git commit -am "done applying fw ${newfw}" 
   cd $TopStor
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata='Success upgrading from version '$currentfw' to version '$newfw;
@@ -79,5 +90,5 @@ then
   echo $datenow $timenow info $userreq  Upfa1010@@@$currentfw@$newfw $dtn>> $glog
   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
  fi
-  rm -rf $newd
+ # rm -rf $newd
 fi
