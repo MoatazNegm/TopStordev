@@ -22,12 +22,12 @@ git commit -am "ver $fold"
 
 echo fold=$fold
 cd $tmpdir
-rm -rf /TopStor/key/crt_key.crt 2>/dev/null
-openssl req -key /TopStor/key/private_key.pem -new -x509 -days 10000 -out /TopStor/key/crt_key.crt -subj "/C=TR/ST=IST/L=IST/O=Quickstor/OU=Storage/CN=Quickstor.net"
+#rm -rf /TopStor/key/crt_key.pem 2>/dev/null
+#openssl req -keyout /TopStor/key/private_key.pem -new -x509 -days 10000 -out /TopStor/key/crt_key.pem -subj "/C=TR/ST=IST/L=IST/O=Quickstor/OU=Storage/CN=Quickstor.net" -passout pass:YN
 
 tar -czvf ${fold}.tar.gz /TopStor  /pace /var/www/html/des20 --exclude='/var/www/html/des20/Data' --exclude='/TopStor/key'
 
 #tar -czvf ${fold}.tar.gz /TopStordata/TopStor.p /TopStordata/pace.p /TopStordata/web.p
-openssl  smime -encrypt -aes-256-cbc -binary -in $tmpdir/${fold}.tar.gz -outform DER -out $tmpdir/${fold} /TopStor/key/crt_key.crt 
+openssl  smime -encrypt -aes-256-cbc -binary -in $tmpdir/${fold}.tar.gz -outform DER -out $tmpdir/${fold} /TopStor/key/crt_key.pem 
 
 #openssl  smime -decrypt -aes-256-cbc -binary -in /TopStordata/config1 -inform DER -out config.tar.gz -inkey /TopStor/key/private_key.pem

@@ -19,11 +19,12 @@ then
  newd=$tmpdir/${newfw}.d
  mkdir $newd
  chmod 700 $newd
- openssl  smime -decrypt -aes-256-cbc -binary -in $webfile/$newfw -inform DER -out ${newd}/${newfw}.tar.gz -inkey /TopStor/key/private_key.pem
+ echo openssl  smime \-decrypt \-aes\-256-cbc \-binary \-in $webfile\/$newfw \-inform DER \-out ${newd}\/${newfw}\.tar\.gz \-inkey /TopStor/key/private_key\.pem
+ openssl  smime -decrypt -aes-256-cbc -binary -in $webfile/$newfw -inform DER -out ${newd}/${newfw}.tar.gz -inkey /TopStor/key/private_key.pem -passin pass:YousefNadody
  if [ $? -ne 0 ]; then 
   cd /$TopStor
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
- logdata='Upgrade file is not valid ';
+ logdata='Upgrade file is not really valid ';
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Upnv1010@@`;
  echo Upnv1010@$datenow@$timenow > ${logging}2;
  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
@@ -60,7 +61,7 @@ then
   cd /$pace
   git checkout $newfw
   cd /$web
-  git checkout $newfw
+  git commit -am "changing to new fw" && git checkout $newfw
   cd /$TopStor
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata='Success upgrading from version '$currentfw' to version '$newfw;
