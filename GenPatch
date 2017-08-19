@@ -11,7 +11,7 @@ currentfw=`git branch | grep \* | awk '{print $2}'`
 webfile='/var/www/html/des20/Data';
 cd /$TopStor
 newfw=`echo $@ | awk '{print $1}'`;
-realfw=`echo $newfw | awk -F'.' '{print $1.$2}'`;
+realfw=`echo $newfw | awk -F'.' '{print $1"."$2}'`;
 userreq=`echo $@ | awk '{print $2}'`;
 privilege="Uploadch";
 contrun=`./privthis.sh $privilege $userreq`;
