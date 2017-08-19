@@ -11,6 +11,7 @@ currentfw=`git branch | grep \* | awk '{print $2}'`
 webfile='/var/www/html/des20/Data';
 cd /$TopStor
 newfw=`echo $@ | awk '{print $1}'`;
+realfw=`echo $newfw | awk -F'.' '{print $1.$2}'`;
 userreq=`echo $@ | awk '{print $2}'`;
 privilege="Uploadch";
 contrun=`./privthis.sh $privilege $userreq`;
@@ -19,8 +20,7 @@ then
  newd=$tmpdir/${newfw}.d
  mkdir $newd
  chmod 700 $newd
- echo openssl  smime \-decrypt \-aes\-256-cbc \-binary \-in $webfile\/$newfw \-inform DER \-out ${newd}\/${newfw}\.tar\.gz \-inkey /TopStor/key/private_key\.pem
- openssl  smime -decrypt -aes-256-cbc -binary -in $webfile/$newfw -inform DER -out ${newd}/${newfw}.tar.gz -inkey /TopStor/key/private_key.pem -passin pass:YousefNadody
+ gpg --batch --passphrase YousefNadody -d  $webfile/$newfw > ${newd}/${newfw}.tar.gz
  if [ $? -ne 0 ]; then 
   cd /$TopStor
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
@@ -35,11 +35,11 @@ then
  fi
   cd /$TopStor
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
- logdata='Start upgrading from version '$currentfw' to version '$newfw;
- logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Upsa1010@@@$currentfw@$newfw`;
- echo Upsa1010@$datenow@$timenow@$currentfw@$newfw > ${logging}2;
+ logdata='Start upgrading from version '$currentfw' to version '$realfw;
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Upsa1010@@@$currentfw@$realfw`;
+ echo Upsa1010@$datenow@$timenow@$currentfw@$realfw > ${logging}2;
  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
- echo $datenow $timenow info $userreq  Upsa1010@@@$currentfw@$newfw $dtn>> $glog
+ echo $datenow $timenow info $userreq  Upsa1010@@@$currentfw@$realfw $dtn>> $glog
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
  echo newfw=$newfw
  cd $newd
@@ -64,19 +64,19 @@ then
   git commit -am "changing to new fw" && git checkout $newfw
   cd /$TopStor
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-  logdata='Success upgrading from version '$currentfw' to version '$newfw;
-  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Upsu1010@@@$currentfw@$newfw`;
-  echo Upsu1010@$datenow@$timenow@$currentfw@$newfw > ${logging}2;
+  logdata='Success upgrading from version '$currentfw' to version '$realfw;
+  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Upsu1010@@@$currentfw@$realfw`;
+  echo Upsu1010@$datenow@$timenow@$currentfw@$realfw > ${logging}2;
   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
-  echo $datenow $timenow info $userreq  Upsu1010@@@$currentfw@$newfw $dtn>> $glog
+  echo $datenow $timenow info $userreq  Upsu1010@@@$currentfw@$realfw $dtn>> $glog
   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
  else
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-  logdata='Failed upgrading from version '$currentfw' to version '$newfw;
-  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Upfa1010@@@$currentfw@$newfw`;
-  echo Upfa1010@$datenow@$timenow@$currentfw@$newfw > ${logging}2;
+  logdata='Failed upgrading from version '$currentfw' to version '$realfw;
+  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Upfa1010@@@$currentfw@$realfw`;
+  echo Upfa1010@$datenow@$timenow@$currentfw@$realfw > ${logging}2;
   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
-  echo $datenow $timenow info $userreq  Upfa1010@@@$currentfw@$newfw $dtn>> $glog
+  echo $datenow $timenow info $userreq  Upfa1010@@@$currentfw@$realfw $dtn>> $glog
   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
  fi
  # rm -rf $newd
