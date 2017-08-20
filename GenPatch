@@ -19,7 +19,7 @@ if [[ $contrun == 'true' ]]
 then
  gpg --list-keys | grep Fwkey
  if [[ $? -ne 0 ]]; then
-  cp /TopStor/key/*.gpg
+  cp /TopStor/key/*.gpg /root/.genugp/
   gpg --import-ownertrust /TopStor/key/gpgowner.txt
  fi
  newd=$tmpdir/${newfw}.d
