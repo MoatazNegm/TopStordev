@@ -2,7 +2,7 @@
 #cd /root/scripts
 echo $@ > ~/tmp
 TopStor='TopStor'
-tmpdir='/p1'
+tmpdir='/root'
 pace='pace'
 web='var/www/html/des20/'
 logging='/var/www/html/des20/Data/currentinfo2.log';
@@ -19,7 +19,7 @@ if [[ $contrun == 'true' ]]
 then
  gpg --list-keys | grep Fwkey
  if [[ $? -ne 0 ]]; then
-  cp /TopStor/key/*.gpg /root/.genugp/
+  cp /TopStor/key/*.gpg /root/.gnupg/
   gpg --import-ownertrust /TopStor/key/gpgowner.txt
  fi
  newd=$tmpdir/${newfw}.d
