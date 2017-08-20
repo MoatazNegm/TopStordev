@@ -1,0 +1,6 @@
+#!/bin/sh
+cp ~/.gnupg/pubring.gpg /TopStor/key/
+cp ~/.gnupg/secring.gpg /TopStor/key/
+cp ~/.gnupg/trustdb.gpg /TopStor/key/
+gpg --export-ownertrust > /TopStor/key/gpgowner.txt
+
