@@ -17,6 +17,11 @@ privilege="Uploadch";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
 then
+ gpg --list-keys | grep Fwkey
+ if [[ $? -ne 0 ]]; then
+  cp /TopStor/key/*.gpg
+  gpg --import-ownertrust /TopStor/key/gpgowner.txt
+ fi
  newd=$tmpdir/${newfw}.d
  mkdir $newd
  chmod 700 $newd
