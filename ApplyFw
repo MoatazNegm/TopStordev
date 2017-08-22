@@ -1,4 +1,5 @@
 #!/bin/sh
+echo $@  > /root/applyfw
 cd /TopStor
 TopStor='TopStor'
 tmpdir='/root'
