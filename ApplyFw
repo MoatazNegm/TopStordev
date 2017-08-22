@@ -1,10 +1,10 @@
 #!/bin/sh
 echo $@  > /root/applyfw
 cd /TopStor
-TopStor='TopStor'
+TopStor='/TopStor'
 tmpdir='/root'
-pace='pace'
-web='var/www/html/des20/'
+pace='/pace'
+web='/var/www/html/des20/'
 logging='/var/www/html/des20/Data/currentinfo2.log';
 glog='/TopStordata/TopStor.log';
 currentfw=`git branch | grep \* | awk '{print $2}'`
