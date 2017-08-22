@@ -1,0 +1,30 @@
+#!/bin/sh
+echo $@  > /root/applyurl
+cd /TopStor
+TopStor='/TopStor'
+tmpdir='/root'
+pace='/pace'
+web='/var/www/html/des20/'
+logging='/var/www/html/des20/Data/currentinfo2.log';
+glog='/TopStordata/TopStor.log';
+currentfw=`git branch | grep \* | awk '{print $2}'`
+realfw=`echo $@ | awk '{print $1}'`;
+userreq=`echo $@ | awk '{print $2}'`;
+privilege="Uploadch";
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
+ urlis=`cat $TopStor/fw.txt`
+ cd $web/Data
+ wget $urlis/current/QS* &> /root/tmp
+ thefile=`cat /root/tmp | grep ftp | grep QS | grep -v \* | head -1 | awk -F'\' '{print $NF}'`
+ cd $TopStor
+ ./GenPatch $thefile admin
+ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+ logdata='Featching new Firmware from QuickStor ftps';
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Upfe1010@@@`;
+ echo Upfe1010 > ${logging}2;
+ dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+ echo $datenow $timenow info $userreq  Upfe1010@@@ $dtn>> $glog
+ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+fi
