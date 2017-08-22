@@ -2,10 +2,10 @@
 echo $@ > /root/applyfw
 fw=`echo $@ | awk '{print $1}'`;
 cd /var/www/html/des20/
-git commit -am"changing to $fw" && git checkout $fw
+git commit -am"changing to $fw" ; git checkout $fw
 cd /pace/
-git commit -am"changing to $fw" && git checkout $fw
+git commit -am"changing to $fw" ; git checkout $fw
 cd /TopStor/
-git commit -am"changing to $fw" && git checkout $fw
+git commit -am"changing to $fw" ; git checkout $fw
 
 
