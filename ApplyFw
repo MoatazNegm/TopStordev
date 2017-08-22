@@ -8,14 +8,7 @@ web='var/www/html/des20/'
 logging='/var/www/html/des20/Data/currentinfo2.log';
 glog='/TopStordata/TopStor.log';
 currentfw=`git branch | grep \* | awk '{print $2}'`
-webfile='/var/www/html/des20/Data';
 realfw=`echo $@ | awk '{print $1}'`;
-cd $web
-git commit -am"changing to $fw" ; git checkout $fw
-cd $pace
-git commit -am"changing to $fw" ; git checkout $fw
-cd $TopStor 
-git commit -am"changing to $fw" ; git checkout $fw
 userreq=`echo $@ | awk '{print $2}'`;
 privilege="Uploadch";
 contrun=`./privthis.sh $privilege $userreq`;
