@@ -8,16 +8,20 @@ web='/var/www/html/des20/'
 logging='/var/www/html/des20/Data/currentinfo2.log';
 glog='/TopStordata/TopStor.log';
 currentfw=`git branch | grep \* | awk '{print $2}'`
-realfw=`echo $@ | awk '{print $1}'`;
-userreq=`echo $@ | awk '{print $2}'`;
+newsite=`echo $@ | awk '{print $2}'`;
+userreq=`echo $@ | awk '{print $1}'`;
 privilege="Uploadch";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
 then
+ if [[ $newsite == "" ]]; then
  urlis=`cat $TopStor/fw.txt`
  cd $web/Data
- wget $urlis/current/QS* &> /root/tmp
+ echo wget $urlis\/current\/QS\* 
+ rm -rf QS*
+ wget $urlis/current/QS* 2> /root/tmp
  thefile=`cat /root/tmp | grep ftp | grep QS | grep -v \* | head -1 | awk -F'\' '{print $NF}'`
+ echo thefile=$thefile
  cd $TopStor
  ./GenPatch $thefile admin
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
@@ -27,4 +31,5 @@ then
  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
  echo $datenow $timenow info $userreq  Upfe1010@@@ $dtn>> $glog
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+fi
 fi
