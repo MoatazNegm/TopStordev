@@ -23,11 +23,11 @@ then
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 
  cd $web
- git commit -am"changing to $fw" ; git checkout $fw
+ git commit -am"changing to $realfw" ; git checkout $realfw
  cd $pace
- git commit -am"changing to $fw" ; git checkout $fw
+ git commit -am"changing to $realfw" ; git checkout $realfw
  cd $TopStor 
- git commit -am"changing to $fw" ; git checkout $fw
+ git commit -am"changing to $realfw" ; git checkout $realfw
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
  logdata='Success upgrading from version '$currentfw' to version '$realfw;
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Upsu1010@@@$currentfw@$realfw`;
