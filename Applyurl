@@ -20,7 +20,8 @@ then
  echo wget $urlis\/current\/QS\* 
  rm -rf QS*
  wget $urlis/current/QS* 2> /root/tmp
- thefile=`cat /root/tmp | grep ftp | grep QS | grep -v \* | head -1 | awk -F'\' '{print $NF}'`
+ echo tmp is 
+ thefile=`cat /root/tmp | grep ftp | grep QS | grep -v \* | head -1 | awk -F'/' '{print $NF}'`
  echo thefile=$thefile
  cd $TopStor
  ./GenPatch $thefile admin
