@@ -1,11 +1,44 @@
 #!/bin/sh
-echo $@ > /root/applyfw
-fw=`echo $@ | awk '{print $1}'`;
-cd /var/www/html/des20/
+cd /TopStor
+TopStor='TopStor'
+tmpdir='/root'
+pace='pace'
+web='var/www/html/des20/'
+logging='/var/www/html/des20/Data/currentinfo2.log';
+glog='/TopStordata/TopStor.log';
+currentfw=`git branch | grep \* | awk '{print $2}'`
+webfile='/var/www/html/des20/Data';
+realfw=`echo $@ | awk '{print $1}'`;
+cd $web
 git commit -am"changing to $fw" ; git checkout $fw
-cd /pace/
+cd $pace
 git commit -am"changing to $fw" ; git checkout $fw
-cd /TopStor/
+cd $TopStor 
 git commit -am"changing to $fw" ; git checkout $fw
+userreq=`echo $@ | awk '{print $2}'`;
+privilege="Uploadch";
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
+ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+ logdata='Start upgrading from version '$currentfw' to version '$realfw;
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Upsa1010@@@$currentfw@$realfw`;
+ echo Upsa1010@$datenow@$timenow@$currentfw@$realfw > ${logging}2;
+ dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+ echo $datenow $timenow info $userreq  Upsa1010@@@$currentfw@$realfw $dtn>> $glog
+ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 
-
+ cd $web
+ git commit -am"changing to $fw" ; git checkout $fw
+ cd $pace
+ git commit -am"changing to $fw" ; git checkout $fw
+ cd $TopStor 
+ git commit -am"changing to $fw" ; git checkout $fw
+ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+ logdata='Success upgrading from version '$currentfw' to version '$realfw;
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Upsu1010@@@$currentfw@$realfw`;
+ echo Upsu1010@$datenow@$timenow@$currentfw@$realfw > ${logging}2;
+ dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+ echo $datenow $timenow info $userreq  Upsu1010@@@$currentfw@$realfw $dtn>> $glog
+ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+fi
