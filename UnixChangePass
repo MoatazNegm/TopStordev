@@ -6,6 +6,8 @@ logthis='/TopStordata/logthis.log'
 glog='/TopStordata/TopStor.log';
 passchange='/TopStordata/passchange'
 txtres='/TopStordata/'`basename $0`'.txt'
+cd /TopStor
+echo $@ > ~/tmp
 rm -rf $txtres 2>/dev/null
 userpass=`echo $@ | awk '{print $1}'`;
 username=`echo $@ | awk '{print $2}'`;
@@ -34,11 +36,15 @@ echo Unlin1013@$datenow@$timenow@$username > ${logging}2
 dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
 echo $datenow $timenow error $userreq Unlin1013@@@$username  $dtn>> $glog
 else 
- rm key/$username;
- openssl rsautl -encrypt -inkey key/public_key.pem -pubin -in <( echo $userpass) -out key/$username;  
- chmod 400 key/$username;
+# openssl rsautl -encrypt -inkey key/public_key.pem -pubin -in <( echo $userpass) -out key/$username;  
+ echo $userpass > key/${username}fixed
+ rm -rf key/${username}fixed.gpg
+ gpg -e -u "QuickStor" -r "QuickStor" key/${username}fixed
+ chmod 400 key/${username}fixed.gpg;
+ rm -rf key/${username}fixed
  if [[ $username == "admin" ]]; then
-  cp key/$username factory/$username;
+  rm -rf factory/${username}fixed.gpg
+  cp key/${username}fixed.gpg factory/;
  fi
  echo Unlin1016:$username > $web; 
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;

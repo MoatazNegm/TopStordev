@@ -1,10 +1,5 @@
 #!/usr/local/bin/zsh
 web='/var/www/html/des20/Data/isuser.txt';
 cd /TopStor
-rm key/*chk
+rm key/*chk 2>/dev/null
 rm $web
-resulting="not found";
-username=`echo $@ | awk '{print $1}'`;
-userpass=`echo $@ | awk '{print $2}'`;
- openssl rsautl -encrypt -inkey key/public_key.pem -pubin -in <(echo $userpass) -out key/$username;
-chmod 400 key/$username;
