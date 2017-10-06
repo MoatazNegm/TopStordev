@@ -5,7 +5,7 @@ userreq=` echo $@ | awk '{print $2}'`;
 modpriv=` echo $@ | awk '{print $1}'`;
 superuser='admin';
 sysuser='system';
-if [[ $sysuer == $userreq || $superuser == $userreq ]];
+if [[ $sysuser == $userreq || $superuser == $userreq ]];
 then
   echo true;
 else

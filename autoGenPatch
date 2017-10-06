@@ -17,10 +17,10 @@ rm -rf * &>/dev/null
 wget ftp://10.11.11.124/pub/current/
 realfw=`cat index.html | grep qsfw | awk -F'current/' '{print $2}' | awk -F'.qsfw' '{print $1}'`
 newfw=`echo $realfw`'.qsfw'
+cd /TopStor
 echo $newfw | grep $currentfw
 if [ $? -eq 0 ]; 
 then
- cd /TopStor
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
  logdata='Software autocheck found system software is latest version';
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Upnu1010@@`;
@@ -29,7 +29,6 @@ then
  echo $datenow $timenow info $userreq  Upnu1010@@ $dtn>> $glog
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
 else
- cd $webfile
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
  logdata='Start downloading new software version: '$realfw;
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Updo1010@@@$realfw`;
@@ -37,7 +36,9 @@ else
  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
  echo $datenow $timenow info $userreq  Updo1010@@@$realfw $dtn>> $glog
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-wget ftp://10.11.11.124/pub/current/*
+ cd $webfile
+ wget ftp://10.11.11.124/pub/current/$newfw
+ cd /TopStor
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
  logdata='finish downloading new software version: '$realfw;
  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Upfd1010@@@$realfw`;
@@ -45,6 +46,5 @@ wget ftp://10.11.11.124/pub/current/*
  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
  echo $datenow $timenow info $userreq  Upfd1010@@@$realfw $dtn>> $glog
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
- cd /TopStor
  ./GenPatch $newfw system 
 fi
