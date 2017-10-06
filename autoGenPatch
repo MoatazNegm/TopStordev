@@ -1,0 +1,50 @@
+#!/usr/local/bin/zsh
+#cd /root/scripts
+cd /TopStor
+TopStor='TopStor'
+tmpdir='/root'
+pace='pace'
+web='var/www/html/des20/'
+logging='/var/www/html/des20/Data/currentinfo2.log';
+glog='/TopStordata/TopStor.log';
+currentfw=`git branch | grep \* | awk '{print $2}'`
+webfile='/var/www/html/des20/Data';
+userreq='system'
+cd /TopStordata
+mkdir fw &>/dev/null
+cd fw
+rm -rf * &>/dev/null
+wget ftp://10.11.11.124/pub/current/
+realfw=`cat index.html | grep qsfw | awk -F'current/' '{print $2}' | awk -F'.qsfw' '{print $1}'`
+newfw=`echo $realfw`'.qsfw'
+echo $newfw | grep $currentfw
+if [ $? -eq 0 ]; 
+then
+ cd /TopStor
+ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+ logdata='Software autocheck found system software is latest version';
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Upnu1010@@`;
+ echo Upnu1010@$datenow@$timenow > ${logging}2;
+ dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+ echo $datenow $timenow info $userreq  Upnu1010@@ $dtn>> $glog
+ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+else
+ cd $webfile
+ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+ logdata='Start downloading new software version: '$realfw;
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Updo1010@@@$realfw`;
+ echo Updo1010@$datenow@$timenow@$realfw > ${logging}2;
+ dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+ echo $datenow $timenow info $userreq  Updo1010@@@$realfw $dtn>> $glog
+ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+wget ftp://10.11.11.124/pub/current/*
+ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+ logdata='finish downloading new software version: '$realfw;
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Upfd1010@@@$realfw`;
+ echo Upfd1010@$datenow@$timenow@$realfw > ${logging}2;
+ dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+ echo $datenow $timenow info $userreq  Upfd1010@@@$realfw $dtn>> $glog
+ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+ cd /TopStor
+ ./GenPatch $newfw system 
+fi

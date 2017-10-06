@@ -4,7 +4,8 @@ userpriv='/var/www/html/des20/Data/userpriv.txt';
 userreq=` echo $@ | awk '{print $2}'`;
 modpriv=` echo $@ | awk '{print $1}'`;
 superuser='admin';
-if [[ $superuser == $userreq ]];
+sysuser='system';
+if [[ $sysuer == $userreq || $superuser == $userreq ]];
 then
   echo true;
 else
