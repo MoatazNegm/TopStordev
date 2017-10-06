@@ -15,7 +15,7 @@ mkdir fw &>/dev/null
 cd fw
 rm -rf * &>/dev/null
 #wget ftp://10.11.11.124/pub/current/
-wget ftp://ftp.quickstor.net/download/current/
+wget ftp://ftp.quickstor.net/download/current/ --user=anonymous@quickstor.net
 if [ ! -f index.html ];
  then 
  cd /TopStor
@@ -50,7 +50,8 @@ else
  echo $datenow $timenow info $userreq  Updo1010@@@$realfw $dtn>> $glog
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
  cd $webfile
- wget ftp://10.11.11.124/pub/current/$newfw
+# wget ftp://10.11.11.124/pub/current/$newfw
+ wget ftp://ftp.quickstor.net/download/current/$newfw --user=anonymous@quickstor.net
  cd /TopStor
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
  logdata='finish downloading new software version: '$realfw;
