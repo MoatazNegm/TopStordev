@@ -14,7 +14,8 @@ cd /TopStordata
 mkdir fw &>/dev/null
 cd fw
 rm -rf * &>/dev/null
-wget ftp://10.11.11.124/pub/current/
+#wget ftp://10.11.11.124/pub/current/
+wget ftp://ftp.quickstor.net/download/current/
 if [ ! -f index.html ];
  then 
  cd /TopStor
