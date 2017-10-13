@@ -51,8 +51,8 @@ else
  echo $datenow $timenow info $userreq  Updo1010@@@$realfw $dtn>> $glog
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
  cd $webfile
-# wget ftp://10.11.11.124/pub/current/$newfw
- wget ftp://ftp.quickstor.net/download/current/$newfw --user=anonymous@quickstor.net
+# wget ftp://10.11.11.124/pub/current/${newfw}.qsfw
+ wget ftp://ftp.quickstor.net/download/current/${newfw}.qsfw --user=anonymous@quickstor.net
  cd /TopStor
  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
  logdata='finish downloading new software version: '$realfw;
@@ -61,5 +61,5 @@ else
  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
  echo $datenow $timenow info $userreq  Upfd1010@@@$realfw $dtn>> $glog
  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
- ./GenPatch $newfw system 
+ ./GenPatch ${newfw}.qsfw system 
 fi
