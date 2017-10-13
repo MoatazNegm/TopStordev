@@ -23,7 +23,7 @@ if [ $? -ne 0 ]; then
 fi
 systemctl disable NetworkManager &>/dev/null
 systemctl stop NetworkManager &>/dev/null
-/TopStor/autoGenPatch
+#/TopStor/autoGenPatch
 while true; do 
 {
 read line < /tmp2/msgfile
