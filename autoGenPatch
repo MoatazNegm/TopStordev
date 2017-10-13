@@ -29,7 +29,8 @@ if [ ! -f index.html ];
  exit
 fi
 realfw=`cat index.html | grep qsfw | awk -F'current/' '{print $2}' | awk -F'.qsfw' '{print $1}'`
-newfw=`echo $realfw`'.qsfw'
+
+newfw=`echo -e ${realfw}'\n'$currentfw | sort -nr | head -1`
 cd /TopStor
 echo $newfw | grep $currentfw
 if [ $? -eq 0 ]; 
