@@ -1,0 +1,90 @@
+#!/usr/local/bin/zsh
+cd /TopStor
+web='/var/www/html/des20/Data/CIFSstatus.log';
+page=`echo $@ | awk '{print $2}'`;
+page2=$page
+logging='/var/www/html/des20/Data/Logs.log'$page2
+logupdate='/var/www/html/des20/Data/Logs.logupdated'$page2
+web='/var/www/html/des20/Data/'$page2
+glog='/TopStordata/TopStor.log';
+dater=`echo $@ | awk '{print $1}'`;
+page=$((page+1));
+liner=`echo $@ | awk '{print $3}'`;
+userreq=` echo $@ | awk '{print $4}'`;
+privilege='Logs';
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
+ start=`tac $glog | head -n 1 | awk '{print $1}' ` 
+ ifsmall=`cat $glog | head -n 1 | awk '{print $1}' ` 
+ iflarge=$start
+ res=0
+ if [ $dater = "0" ]; then
+   dater=$start
+ else
+  dater=$((dater/1000))
+  start=`echo $start | awk -F'/' '{print $3}'``echo $start | awk -F'/' '{print $1}'``echo $start | awk -F'/' '{print $2}'`
+  echo $start
+  start=` date +%s -d $start`
+  echo $start, $dater
+  if [ $((dater)) -gt $((start)) ]; then
+   dater=$iflarge;
+ echo it is iflarge $dater
+  else 
+   start=$ifsmall
+   start=`echo $start | awk -F'/' '{print $3}'``echo $start | awk -F'/' '{print $1}'``echo $start | awk -F'/' '{print $2}'`
+   start=` date +%s -d $start`
+   if [ $((dater)) -lt $((start)) ]; then
+    dater=$ifsmall 
+ echo it is ifsmall $dater
+   else
+    datern=$dater
+  echo normal $dater
+    while [ $res -ne 1 ];
+    do
+     dater=`date -d '@'$datern +%m/%d/%Y`
+     dater=`echo $dater | sed -e 's/\//\\\\\//g'`
+     echo another $dater 
+     startline=`tac $glog | awk "/$dater/{ print NR; exit }"`
+     tac $glog | grep "$dater" &>/dev/null
+     if [ $? -ne 0 ]; then 
+      datern=$((datern-86400));
+      echo another datern $datern
+      if [ $datern -lt 14923200 ]; 
+      then 
+       res=1; 
+      fi
+     else res=1; 
+     echo found $startline 
+     fi
+    done
+   fi
+  fi
+ fi
+ headlines=$((page*liner))
+ if [ $res -ne 1 ];
+ then  
+  dater=`echo $dater | sed -e 's/\//\\\\\//g'`
+ fi
+ startline=`tac $glog | awk "/$dater/{ print NR; exit }"`
+ if [ $page -eq 1 ]; then
+  tojson=$(tac $glog | tail -n +$startline | head -n $headlines)
+ else
+  tojson=$(tac $glog | tail -n +$startline | head -n $headlines | tail -n $liner)
+ fi
+ result="[";
+ echo ${tojson[@]} | while read -r line;  do
+  datenow=`echo $line | awk '{print $1}'`
+  timenow=`echo $line | awk '{print $2}'`
+  msg=`echo $line | awk '{print $3}'`
+  user=`echo $line | awk '{print $4}' `
+  code=`echo $line | awk '{print $5}' `
+  stamp=`echo $line | awk '{print $6}'`
+  subres=`./jsonthis3.sh Date $datenow time $timenow msg $msg user $user code $code stamp $stamp `;
+  result=$result$subres,
+ done;
+ result=`echo $result | rev | cut -c 2- | rev`]
+ echo $result;
+ echo $result > $logging
+ touch ${logupdate}
+fi

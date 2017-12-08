@@ -1,0 +1,30 @@
+#!/usr/local/bin/zsh
+web="/usr/local/www/apache24/data/des19/Data/DGstatus.log";
+logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
+userreq=` echo $@ | awk '{print $1}'`;
+privilege="DISK_Groups";
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logdata='Deleting_Pool:Data';
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata`;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+zpool destroy Data 2>txt/${0:2}$userreq.txt
+crontab -r 2>>txt/${0:2}$userreq.txt
+err=`wc -c txt/${0:2}$userreq.txt | awk '{print $1}'`;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+if [[ err -ge 4 ]]; then
+	cat txt/${0:2}$userreq.txt > $web;
+	logdata='failed_Deleting_Pool:Data';
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata`;
+else
+	echo pool Data is removed with all containing data > $web;
+	logdata='Success_Deleting_Pool:Data';
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata `;
+fi 
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+rm txt/${0:2}$userreq.txt
+fi
+bb=`cat $web`;
+echo $datenow $timenow :$bb > ${logging}2

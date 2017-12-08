@@ -1,0 +1,15 @@
+#!/bin/sh
+runningpool=`zpool list -H | awk '{print $1}'`
+tocheck=(`ls /$runningpool/ | grep .sha | grep -v err`)
+cd /$runningpool
+rm -rf *.err
+for toca in "${tocheck[@]}"; do
+ sha512sum -c $toca 2>/dev/null | grep -v OK > ${toca}.err
+ perr=`cat ${toca}.err`;
+ if [[ -z $perr ]]; then
+ echo nothing &>/dev/null
+ else
+  echo $toca:err:; 
+  cat ${toca}.err
+ fi
+done

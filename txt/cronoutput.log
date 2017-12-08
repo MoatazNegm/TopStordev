@@ -1,0 +1,23 @@
+oper= / Minutely.1.1.na.na
+oper1=/
+oper2=Minutely.1.1.na.na
+stamp=1467923462
+keep=1
+currentsnaps=
+oldsnap=
+countsnap=1
+countsnapplus=2
+keeppluszero=1
+{"Date":"07/07/2016","time":"22:31:02","msg":"warning","user":"System","data":"Difficulty_Deleting_Snapshot:"}
+newsnap2=Minutely.1.1.na.na.1467923462
+newsnap=/@Minutely.1.1.na.na.1467923462
+snapshotresult :
+cannot open '/': invalid dataset name
+usage:
+	snapshot|snap [-r] [-o property=value] ... <filesystem|volume>@<snap> ...
+
+For the property list, run: zfs set|get
+
+For the delegated permission list, run: zfs allow|unallow
+filenameis=/TopStordata/Snapshotnow.txt1467923462
+{"Date":"07/07/2016","time":"22:31:02","msg":"error","user":"System","data":"Failed_Creating_Snapshot:mezo2//@Minutely.1.1.na.na.1467923462","code":"Snap1028@@@mezo2//@Minutely.1.1.na.na.1467923462"}

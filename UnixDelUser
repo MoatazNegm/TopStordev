@@ -1,0 +1,46 @@
+#!/usr/local/bin/zsh
+web="/var/www/html/des20/Data/Usersstatus.log";
+logging="/var/www/html/des20/Data/currentinfo2.log";
+txtres='/TopStordata/'`basename $0`'.txt'
+rm -rf $txtres &>/dev/null
+glog='/TopStordata/TopStor.log'
+username=`echo $@ | awk '{print $1}'`;
+userreq=`echo $@ | awk '{print $2}'`;
+privilege="Box_Users";
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
+echo Unlin1001:$username...> $web;
+datenow=`date +%m/%d/%Y`;timenow=`date +%T`;
+logdata='Deleting_user:'$username;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq code Unlin1004@@@$username`;
+echo Unlin1004@$datenow@$timenow@$username > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Unlin1004@@@$username $dtn>> $glog
+oldlog=`cat $logging | sed 's/]//g' `; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+/bin/smbpasswd -d $username;
+rm -rf /home/$username &>/dev/null
+userdel -r  $username 2>txt/${0:2}$userreq.txt;
+rm key/$username;
+err=`wc -c txt/${0:2}$userreq.txt | awk '{print $1}'`;
+datenow=`date +%m/%d/%Y`;timenow=`date +%T`;
+if [[ $err -ge 3 ]]; then
+	echo Unlin11000:$username > $web;
+	cat txt/${0:2}$userreq.txt > ${web}internal;
+ 	logdata='failed_deleting_user:'$username	;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq code Unlin11001@@@$username`;
+echo Unlin11001@$datenow@$timenow@$username > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow error $userreq Unlin11001@@@$username $dtn >> $glog
+else
+	echo Unlin1000:$username > $web;
+	logdata='success_deleting_user:'$username;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info data $logdata user $userreq Unlin1010@@@$username`;
+echo Unlin1010@$datenow@$timenow@$username > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Unlin1010@@@$username $dtn >> $glog
+fi;
+oldlog=`cat $logging | sed 's/]//g' `; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+./UnisListUsers;
+fi
+rm txt/${0:2}$userreq.txt

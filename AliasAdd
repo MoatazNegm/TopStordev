@@ -1,0 +1,47 @@
+#!/usr/local/bin/zsh
+webproxy='/var/www/html/des20/Data/Proxylist.txt';
+resweb='/var/www/html/des20/Data/Proxylist.txtupdated'
+web='/var/www/html/des20/Data/Proxystatus.log';
+logging='/var/www/html/des20/Data/currentinfo2.log';
+glog='/TopStordata/TopStor.log';
+proxy='/TopStordata/proxy.txt'
+aliasname=`echo $@ | awk '{print $1}'`;
+userreq=`echo $@  | awk '{print $2}'`;
+privilege="Proxy";
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
+echo Replica1022:$aliasname > $web;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logdata='adding_Alias:'$aliasname;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1055@@@$aliasname`;
+echo Replica1055@$datenow@$timenow@$aliasname > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Replica1055@@@$aliasname $dtn>> $glog
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
+isthere=`cat $proxy `
+istheren=` echo $isthere | wc -c `
+istheren=$((istheren+0));
+if [[ $istheren -le 2 ]]; then
+ isthere='n/a n/a n/a';
+fi
+proxyname=`echo $isthere | awk '{print $1}'`
+licensename=`echo $isthere | awk '{print $2}'`
+newproxy=${proxyname}' '${licensename}' '${aliasname};
+echo $newproxy > $proxy
+subres=`./jsonthis3.sh Proxyurl $proxyname License $licensename Alias $aliasname`
+result='['${subres}']' ;
+echo $result >$webproxy
+resdate=`date +%s`;
+res=` ./jsonthis3.sh updated $resdate`;
+echo $res > $resweb;
+echo Replica1023:$aliasname > $web;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logdata='success_adding_Proxy:'$proxyname;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1056@@@$aliasname`;
+echo Replica1056@$datenow@$timenow@$aliasname > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Replica1056@@@$aliasname $dtn>> $glog
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging
+fi
+fi

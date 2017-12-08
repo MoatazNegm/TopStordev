@@ -1,0 +1,5 @@
+#!/usr/local/bin/zsh
+web='/var/www/html/des20/Data/isuser.txt';
+cd /TopStor
+rm key/*chk 2>/dev/null
+rm $web

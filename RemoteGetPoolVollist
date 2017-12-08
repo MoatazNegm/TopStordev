@@ -1,0 +1,8 @@
+#!/usr/local/bin/zsh
+cd /TopStor/;
+vol=$@
+websnaps='/usr/local/www/apache24/data/des19/Data/Vollist.txt';
+resweb='/usr/local/www/apache24/data/des19/Data/Vollist.txtupdated';
+quota=`/sbin/zfs get -t filesystem -Hp quota | grep  Data/"$vol" | awk -v CONVFMT=%.5g '{gsub($3,$3/1048576); print $1" "$3}' | awk '{print $2}'` 
+prot=`/sbin/zfs get -t filesystem  prot:kind  | grep  Data/"$vol" | awk '{print $3}'`;
+echo $prot $quota

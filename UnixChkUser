@@ -1,0 +1,20 @@
+#!/usr/local/bin/zsh
+cd /TopStor/key;
+web='/var/www/html/des20/Data/isuser.txt';
+resulting="not found";
+username=`echo $@ | awk '{print $1}'`;
+userchk=`echo $@ | awk '{print $2}'`;
+userpass=`echo $@ | awk '{print $3}'`;
+rm -rf ${username}fixed
+gpg --batch --passphrase YousefNadody ${username}fixed.gpg
+pass1=`cat ${username}fixed`
+echo $pass1,$userpass,$username,$userchk > ~/tmp2
+echo $@ >> ~/tmp2
+echo $pass1 | grep -w $userpass
+if [[ $? -eq 0 ]]; then
+ resulting="ok";
+fi;
+cd /TopStor/
+resform=`/usr/local/bin/zsh jsonthis3.sh name $username status $resulting`;
+echo $resform >$web 2>txt/err.txt
+

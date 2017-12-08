@@ -1,0 +1,23 @@
+
+
+;;;;;;;;         startmezotmp_only
+[mezotmp]
+path = /Data/mezotmp
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable - Yes
+nt acl support - yes
+inherit acls = Yes
+;;;;;;;;;;;;;;;;;;;;   stopmezotmp_only
+;;;;;;;;         starttmpvol2_only
+[tmpvol2]
+path = /POOL/tmpvol2
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable = Yes
+;;;;;;;;;;;;;;;;;;;;   stoptmpvol2_only
+

@@ -1,0 +1,50 @@
+#!/usr/local/bin/zsh
+web="/usr/local/www/apache24/data/des19/Data/DGstatus.log";
+logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
+raid=` echo $@ | awk '{print $2}'`;
+result=` echo $@ | awk '{print $1}'`;
+userreq=` echo $@ | awk '{print $3}'`;
+privilege="DISK_Groups"
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
+echo DG1003:$1 > $web
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logdata='Creating_Pool:Data_with_RAID_'$raid;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DG1006@@@$1`;
+echo DG1006@$datenow@$timenow@$1 > ${logging}2
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+disks=(`/sbin/sysctl kern.disks | sed -e 's/cd0 //g' -e 's/ada0//g' -e 's/da0//g' -e 's/kern.disks: //g'`)
+noofdisks=`echo $disks | wc -w | awk '{print $1}'`;
+disksarr=(${=disks});
+if [[ $raid == "mirror" ]]; then
+ poolcr="mirror "
+ for ((i = 1; i < $noofdisks; i++));
+ do 
+  poolcr=${poolcr}" "${disksarr[$i]}" "${disksarr[$((i+1))]}" mirror ";
+  i=$((i+1));
+ done
+ R10=`echo $poolcr | awk '{$NF="";print}'`; 
+ R10ar=(${=R10});
+ zpool create -f Data $R10ar 2>txt/${0:2}$userreq.txt 	
+else
+	zpool create -f Data $raid $disksarr  2>txt/${0:2}$userreq.txt
+fi
+err=`wc -c txt/${0:2}$userreq.txt | awk '{print $1}'`;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+if [[ err -ge 3 ]]; then
+	echo DG1004:$1 > $web;
+	cat txt/${0:2}$userreq.txt > ${web}internal;
+	logdata='Failed_Creating_Pool:Data_with_RAID_'$raid;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code DG1007@@@$1`;
+echo DG1007@$datenow@$timenow@$raid > ${logging}2
+	
+else
+	echo DG1005:$raid:. > $web;
+	logdata='Success_Creating_Pool:Data_with_RAID_'$raid;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DG1008@@@$1@$raid`;
+echo DG1008@$datenow@$timenow@$raid@. > ${logging}2
+fi 
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+rm txt/${0:2}$userreq.txt
+fi

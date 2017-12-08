@@ -1,0 +1,53 @@
+#!/usr/local/bin/zsh
+cd /TopStor
+web='/var/www/html/des20/Data/CIFSstatus.log';
+logging='/var/www/html/des20/Data/currentinfo2.log'
+glog='/TopStordata/TopStor.log';
+runningpools='/pacedata/pools/runningpools'
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+volname=`echo $@ | awk '{print $2}'`;
+pDG=`echo $@ | awk '{print $1}'`;
+pro=`echo $@ | awk '{print $3}'`;
+userreq=` echo $@ | awk '{print $4}'`;
+txtres='/TopStordata'`basename $0`$userreq
+rm -rf $txtres 2>/dev/null
+DG=`echo $pDG | awk -F_ '{print $2}'`;
+hostnam=`echo $pDG | awk -F_ '{print $1}'`;
+sshost=`echo $pDG | awk -F_ '{print $1}'`;
+#sshost=`cat $runningpools | grep $hostnam | awk '{print $1}'`;
+echo CIFS1005:$hostnam/$DG/$volname > $web;
+privilege=$pro;
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logdata='Deleting:'$hostnam/$DG/$volname;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code NFS1000@@@$hostnam/$DG/$volname `;
+echo NFS1000@$datenow@$timenow@$hostnam/$DG/$volname > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq NFS1000@@@$hostnam/$DG/$volname $dtn>> $glog
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+ssh $sshost " cd /TopStor &&
+/sbin/zfs destroy -r $DG/$volname" &> $txtres;
+if [ $? -ne 0  ]; then
+	echo CIFS1006:$hostnam/$DG/$volname > $web;
+	cat $txtres > ${web}internal;
+	logdata='failed_deleting_volume:'$hostnam/$DG/$volname;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code NFS1001@@@$hostnam/$DG/$volname`;
+echo NFS1001@$datenow@$timenow@$hostnam/$DG/$volname > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`
+echo $datenow $timenow error $userreq NFS1001@@@$hostnam/$DG/$volname $dtn >> $glog
+else 
+ ./delblock.sh start${volname}_only stop${volname}_only /etc/exports  ;
+ systemctl restart nfs-server
+ echo CIFS1007:$hostnam/$DG/$volname > $web; 
+ logdata='success_deleting_volume'$hostnam/$DG/$volname;
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdat code NFS1002@@@$hostnam/$DG/$volname`;
+echo NFS1002@$datenow@$timenow@$hostnam/$DG/$volname > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`
+echo $datenow $timenow info $userreq NFS1002@@@$hostnam/$DG/$volname $dtn>> $glog
+fi;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+./GetPoolVollist
+fi

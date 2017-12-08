@@ -1,0 +1,40 @@
+#!/usr/local/bin/zsh
+logging='/var/www/html/des20/Data/currentinfo2.log'
+logf='/TopStordata/zfsrec'
+localrep=`echo $@ | awk '{print $2}'`;
+if [[ $localrep == 'proxy' ]];
+then
+ pp=`cat workingpp | awk '{print $1}'`;
+else
+ pp=`cat workingpplocal | awk '{print $1}'`;
+fi
+#pp=`echo $@ | awk '{print $2}'`;
+pp=$((pp+2));
+tun=`echo $@ | awk '{print $4 }'`;
+partner=`echo $@ | awk '{print $5 }'`;
+pool=`echo $@ | awk '{print $6 }'`;
+vol=`echo $@ | awk '{print $7 }'`;
+initsnap=`echo $@ | awk '{print $8 }'`;
+echo oper=$@ >> tmp2repli
+zfs rollback -Rf $initsnap 2>/dev/null;
+if [[ $localrep == 'proxy' ]];
+then
+ /usr/bin/nc --ssl-cert /TopStor/key/TopStor.crt --ssl-key /TopStor/key/TopStor.key -l $tun $pp |  zfs receive -dvF  $pool >$logf 2>>tmprepli
+else
+ nc --ssl-cert /TopStor/key/TopStor.crt --ssl-key /TopStor/key/TopStor.key -l $tun $pp |zfs receive -dvF  $pool >$logf 2>>tmprepli 
+fi
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+cat $logf | grep -w received;
+if [[ $? -ne 0 ]];
+then
+ logdata='Failed_Receiving_new_snapshot_for:'$vol'_from:'$partner;
+ code='Repli1001@@@'$vol'@'$partner;
+ coddate='Repli1001@'$datenow'@'$timenow'@'$vol'@'$partner;
+else
+ logdata='Success_Receiving_new_snapshot_for:'$vol'_from:'$partner;
+ code='Repli1002@@@'$vol'@'$partner;
+ coddate='Repli1002@'$datenow'@'$timenow'@'$vol'@'$partner;
+fi
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $partner data $logdata code $code`;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+echo $coddate > ${logging}2

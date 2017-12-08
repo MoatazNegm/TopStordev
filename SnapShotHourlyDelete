@@ -1,0 +1,30 @@
+#!/usr/local/bin/zsh
+cd /TopStor
+web='/usr/local/www/apache24/data/des19/Data/status.log';
+logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
+echo Snap1003:  > $web;
+rm txt/cronthis.txt;
+oper1=` echo $@ | awk '{print $1}'`;
+userreq=` echo $@ | awk '{print $2}'`;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logdata='Creating_HourlyPeriod:'$oper1;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1043@@@$oper1`;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+crontab -l > txt/cronthis.txt;
+snapsched=`echo $oper1 | awk -F@ '{print $2}'`;
+cat txt/cronthis.txt | grep -v $snapsched > txt/cronthis.txt
+crontab txt/cronthis.txt 2>txt/${0:2}$userreq.txt;
+err=`wc -c  txt/${0:2}$userreq.txt | awk '{print $1}'`;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+if [[ $err -ge  4  ]]; then
+	Snap1004:$oper1 > $web;
+	cat txt/${0:2}$userreq.txt > $web;
+	logdata='Failed_Creating_HourlyPeriod:'$oper1;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata Snap1044@@@$oper1`;
+else 
+ 	echo Snap1045:$snapsched > $web; 
+	logdata='Success_Creating_HourlyPeriod:'$oper1;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1045@@@$snapsched`;
+fi;
+rm txt/${0:2}$userreq.txt
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;

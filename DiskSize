@@ -1,0 +1,26 @@
+#!/usr/local/bin/zsh
+web="/usr/local/www/apache24/data/des19";
+loc=`echo $@ | awk '{print $1}'`;
+disks=(`/sbin/sysctl kern.disks | sed -e 's/cd0 //g' -e 's/ada0//g' -e 's/da0//g' -e 's/kern.disks: //g'`);
+noofdisks=` echo $disks | wc -w | awk '{print $1}'`;
+onedisk=`echo $disks | awk '{print $1}'`;
+xonedisk=`diskinfo -v $onedisk | sed -n -e 3p | awk '{print $1}'`;
+sizeonedisk=$(($xonedisk/1024/1024/1024));
+size=0;
+for disk in  $disks
+do
+x=`diskinfo -v $disk | sed -n -e 3p | awk '{print $1}'`;
+y=$(($x/1024/1024/1024));
+size=$(($size+$y));
+done
+size=$(($sizeonedisk*$noofdisks));
+R10=$(($sizeonedisk*$noofdisks/2));
+ R10=$((R10*96/100))
+R5=$(($sizeonedisk*($noofdisks-1))); 
+ R5=$((R5*96/100))
+R6=$(($sizeonedisk*($noofdisks-2)));
+ R6=$((R6*96/100))
+R7=$(($sizeonedisk*($noofdisks-3)));
+ R7=$((R7*96/100))
+jsonsize=`/usr/local/bin/zsh jsonthis3.sh size $size count $noofdisks onedisk $sizeonedisk R10 $R10 R5 $R5 R6 $R6 R7 $R7`;
+echo $jsonsize > $web/$loc;

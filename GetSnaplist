@@ -1,0 +1,35 @@
+#!/usr/local/bin/zsh
+cd /TopStor/;
+websnaps='/var/www/html/des20/Data/listsnaps.txt';
+resweb='/var/www/html/des20/Data/listsnaps.txtupdated';
+iscsimapping='/pacedata/iscsimapping';
+runningpools='/pacedata/pools/runningpools';
+result='[';
+runhosts=(`cat $iscsimapping | grep -v notconnected | awk '{print $1}' | uniq`)
+echo "$runhosts" | while read -r sshosy
+do
+ sshost=`cat $runningpools | grep $sshosy | awk '{print $NF}'`
+ namearray=`ssh $sshost /sbin/zfs list -t snapshot -H -o name,creation,repli:sender,repli:receiver`; 
+ echo "$namearray" | while read -r line 
+ do
+  name=` echo $line | awk '{print $1}'`;
+  stamp=`echo $name | awk -F'.'  '{print $NF}'`
+  onlyname=` echo $name | awk -F@ '{print $2}'`;
+  father2=` echo $name | awk -F@ '{print $1}' | awk -F/ '{print $2}'`;
+  pool=` echo $name |  awk -F/ '{print $1}'`;
+  creat=` echo $line | awk '{print $2" "$3" "$4"  "$5" "$6}' `; 
+  creall=`/bin/date --date=$creat  +%m/%d/%y_%R`;
+  creatform=` echo $creall | awk -F_ '{print $1}'`;
+  time2=` echo $creall | awk -F_ '{print $2}'`;
+  sender=`echo $line | awk '{print $7}'`;
+  receiver=`echo $line | awk '{print $8}'`;
+  subres=`/usr/local/bin/zsh jsonthis3.sh stamp $stamp host $sshost class ${sshost}'_'${pool} name $name pool ${pool} onlyname $onlyname father $father2 creation $creatform time $time2 sender $sender receiver $receiver `;
+  result=$result$subres,;
+ done
+done
+result=`echo $result | rev | cut -c 2- | rev`];
+echo $result >$websnaps;
+resdate=`date +%s`;
+res=` ./jsonthis3.sh updated $resdate`;
+echo $res > $resweb;
+#echo ready;

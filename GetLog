@@ -1,0 +1,44 @@
+#!/usr/local/bin/zsh
+cd /TopStor
+COMMAND0=$0
+echo $COMMAND0 | grep \/ 
+if [ $? -eq 0 ]; then
+ COMMAND=`echo $COMMAND0 | awk -F'/' '{print $2}'`;
+else 
+ COMMAND=$COMMAND0; 
+fi
+RUNNING=`ps --no-headers -C${COMMAND} | wc -l`
+if [[ $RUNNING -gt 1 ]]; then echo hi;  exit 0; fi
+echo $0 $RUNNING
+liner=`echo $@ | awk '{print $2}'`;
+logging='/var/www/html/des20/Data/Logs.log'$liner
+logupdate='/var/www/html/des20/Data/Logs.logupdated'
+glog='/TopStordata/TopStor.log';
+dater=`echo $@ | awk '{print $1}'`;
+liner=`echo $@ | awk '{print $2}'`;
+userreq=` echo $@ | awk '{print $3}'`;
+privilege='Logs';
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
+  dater=`date +%s -d $dater`
+ echo $dater
+# tojson=$(tac $glog | tail -n +$startline | head -n $liner)
+ tojson=$(awk -v d=$dater '$6 < d' $glog | tac | head -n $liner )
+ echo $tojson
+ result="[";
+ echo ${tojson[@]} | while read -r line;  do
+  datenow=`echo $line | awk '{print $1}'`
+  timenow=`echo $line | awk '{print $2}'`
+  msg=`echo $line | awk '{print $3}'`
+  user=`echo $line | awk '{print $4}' `
+  code=`echo $line | awk '{print $5}' `
+  stamp=`echo $line | awk '{print $6}'`
+  subres=`./jsonthis3.sh Date $datenow time $timenow msg $msg user $user code $code stamp $stamp `;
+  result=$result$subres,
+ done;
+ result=`echo $result | rev | cut -c 2- | rev`]
+ echo $result;
+ echo $result > $logging && touch ${logupdate}
+fi
+echo $dater

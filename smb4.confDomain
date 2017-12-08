@@ -1,0 +1,28 @@
+[global]
+security = ads
+workgroup = DOMSH
+realm = DOMC
+server string = FreeBSD Client %v
+load printers = no
+client signing = yes
+;encrypt password = yes
+passdb backend = tdbsam
+log file = /var/log/samba/DOMC.log
+kerberos method = secrets and keytab
+client use spnego = yes 
+template homedir = /HOME/%U
+domain master = no
+local master = no
+preferred master = no
+disable netbios = no
+
+[homes]
+root preexec = /TopStor/sambaconnect %S
+path = /HOME/%S
+writeable = Yes
+nt acl support = yes
+admin users = %S
+browsable = no
+map archive = yes
+inherit acls = Yes
+##########################

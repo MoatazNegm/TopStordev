@@ -1,0 +1,35 @@
+#!/usr/local/bin/zsh
+web='/var/www/html/des20/Data/CIFSstatus.log';
+logging='/var/www/html/des20/Data/currentinfo2.log'
+cd /TopStor
+vol=`echo $@ | awk '{print $1}'`;
+partner=`echo $@ | awk '{print $2 }'`;
+logf=`echo $@ | awk '{print $3 }'`;
+
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+echo $logf | grep -w received;
+if [[ $? -ne 0 ]]; 
+then
+ logdata='Failed_Receiving_new_snapshot_for:'$vol'_from:'$partner;
+ code='Repli1001@@@'$vol'@'$partner
+ codedate='Repli1001@'$datenow'@'$timenow'@'$vol'@'$partner
+else
+ logdata='Success_Receiving_new_snapshot_for:'$vol'_from:'$partner;
+ code='Repli1002@@@'$vol'@'$partner
+ codedate='Repli1002@'$datenow'@'$timenow'@'$vol'@'$partner
+ g=`cat smb.confcurrent | grep ${vol}_only `; 
+ if [ $? -ne 0  ];
+ then
+  cp /etc/samba/smb.conf smb.confcurrent;
+  sleep 1;
+  sed -e "s/NAMECIFS/$vol/g" sharecifs.txt > $vol.txt;
+  cat $vol.txt >> smb.confcurrent;
+  cat $vol.txt >> CIFSshares.txt;
+  cat $vol.txt >> /etc/samba/smb4.conf ;
+  systemctl restart smb ;
+ fi
+ ./GetPoolVollist
+fi
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $partner data $logdata code $code`;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+echo $codedate > ${logging}2

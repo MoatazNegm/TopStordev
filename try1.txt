@@ -1,0 +1,10 @@
+;;;;;;;;         starttry1_only
+[try1]
+path = /p1/try1
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable = Yes
+;;;;;;;;;;;;;;;;;;;;   stoptry1_only
+

@@ -1,0 +1,53 @@
+#!/usr/local/bin/zsh
+cd /TopStor
+web='/var/www/html/des20/Data/Snapsstatus.log';
+logging='/var/www/html/des20/Data/currentinfo2.log'
+glog='/TopStordata/TopStor.log';
+cronthis='/TopStordata/cronthis.txt'
+rm -rf $cronthis
+every=0; ev=`echo $@ | awk '{print $1}'`; every=$(($every+$ev)) ; if (($every < 1)); then every=1; fi
+keep=0; k=`echo $@ | awk '{print $2}'`; keep=$(($keep+$k)); if (($keep < 1)); then keep=1 ; fi
+pDG=` echo $@ | awk '{print $3}'`; 
+FileS=` echo $@ | awk '{print $4}'`;
+userreq=` echo $@ | awk '{print $5}'`;
+txtres='/TopStordata/'`basename $0`$userreq'.txt'
+rm $txtres 2>/dev/null
+DG=` echo $pDG | awk -F_ '{print $2}'`;
+hostnam=` echo $pDG | awk -F_ '{print $1}'`;
+privilege="SnapShots";
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
+echo Snap1016:Minutely.$every.$keep for $hostnam/$DG/$FileS > $web;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logdata='Creating_MinutelyPeriod:'$hostnam/$DG/$FileS
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1034@@@Minutely.$every.$keep/$hostnam/$DG/$FileS`;
+echo Snap1034@${datenow}@${timenow}@Minutely.$every.$keep for $hostnam/$DG/$FileS > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Snap1034@@@Minutely.$every.$keep/$hostnam/$DG/$FileS $dtn>> $glog
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+stamp=`date +%s`;
+crontab -l > $cronthis
+echo "*"/$every "*" "*" "*" "*"  /TopStor/Snapshotnowhost $hostnam/$DG/$FileS Minutely.$keep.$every.na.na $stamp 2> txt/err.txt >> $cronthis
+crontab $cronthis 2>> $txtres
+err=`wc -c  $txtres | awk '{print $1}'`;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+if [[ $err -ge  4  ]]; then
+	echo Snap1017:Minutely.$every.$keep for $hostnam/$DG/$FileS > $web;
+	cat $txtres > ${web}internal;
+	logdata='Failed_Creating_MinutelyPeriod:'$hostnam/$DG/$FileS;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Snap1035@@@Minutely.$every.$keep/$hostnam/$DG/$FileS`;
+echo Snap1035@${datenow}@${timenow}@Minutely.$every.$keep for $DG/$FileS > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow error $userreq Snap1035@@@Minutely.$every.$keep for $DG/$FileS $dtn>> $glog
+else 
+ echo Snap1018:Minutely.$every.$keep : $hostnam/$DG/$FileS > $web; 
+	logdata='Success_Creating_MinutelyPeriod:'$hostnam/$DG/$FileS;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1036@@@Minutely.$every.$keep/$hostnam/$DG/$FileS`;
+echo Snap1036@${datenow}@${timenow}@Minutely.$every.$keep for $hostnam/$DG/$FileS > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Snap1036@@@Minutely.$every.$keep/$hostnam/$DG/$FileS $dtn>> $glog
+fi;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+./GetPoolperiodlist
+fi

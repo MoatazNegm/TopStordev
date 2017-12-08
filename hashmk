@@ -1,0 +1,34 @@
+#!/bin/sh
+TopStor='/TopStor'
+pace='/pace'
+web='/var/www/html/des20'
+tmpdir='/root'
+afold='/pace /TopStor /var/www/html/des20/ --exclude /var/www/html/des20/Data';
+#fold=`echo $@ | awk '{print $1}'`
+cd $TopStor ; 
+fold=`git branch | grep \* | awk '{print $2}'`
+echo $fold > ver
+#git format-patch master --stdout > /TopStordata/TopStor.p
+echo before pace
+cd $pace ; 
+git checkout -b $fold
+git commit -am "ver $fold"
+#git format-patch master --stdout > /TopStordata/pace.p
+echo before web
+cd $web ; 
+git checkout -b $fold
+git commit -am "ver $fold"
+#git format-patch master --stdout > /TopStordata/web.p
+
+echo fold=$fold
+cd $tmpdir
+
+tar -czvf ${fold}.tar.gz /TopStor  /pace /var/www/html/des20 --exclude='/var/www/html/des20/Data' --exclude='/TopStor/key'
+gpg --list-keys | grep Fwkey
+if [[ $? -ne 0 ]]; then
+ cp /TopStor/key/*.gpg /root/.gnupg/
+ gpg --import-ownertrust /TopStor/key/gpgowner.txt
+fi
+gpg -e -u "QuickStor" -r "QuickStor"  $tmpdir/${fold}.tar.gz
+mv  $tmpdir/${fold}.tar.gz.gpg $tmpdir/${fold}.qsfw 
+

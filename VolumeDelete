@@ -1,0 +1,35 @@
+#!/usr/local/bin/zsh
+cd /TopStor
+web='/usr/local/www/apache24/data/des19/Data/status.log';
+logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
+echo Deleteing  $@.... > $web;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+rm txt/err2.txt;
+volname=`echo $@ | awk '{print $2}'`;
+DG=`echo $@ | awk '{print $1}'`;
+pro=`echo $@ | awk '{print $3}'`;
+userreq=` echo $@ | awk '{print $4}'`;
+privilege=$pro;
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logdata='Deleting:'$DG/$volname;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code NFS1002@@@$DG/$volname`;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+/sbin/zfs destroy $DG/$volname &>txt/err2.txt;
+err=`wc -c  txt/err2.txt | awk '{print $1}'`;
+err=$((err+1));
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+if [[ $err -ge  4  ]]; then
+	cat txt/err2.txt > $web;
+	logdata='failed_deleting_volume:'$DG/$volname;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code NFS1001@@@$DG/$volname`;
+else 
+ echo DONE...volume $volname is deleted > $web; 
+ logdata='success_deleting_volume'$DG/$volname;
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code NFS@@@$DG/$volname`;
+fi;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+./GetPoolVollist
+fi

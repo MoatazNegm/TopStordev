@@ -1,0 +1,6 @@
+#!/usr/local/bin/zsh
+#res=`echo $@ | awk '{print $1}'`;
+vol=`echo $@ | awk '{print $1}'`;
+count=`/sbin/zfs list | grep -w "$vol" | wc -l`;
+count=$((count+0));
+if [[ $count == 1 ]]; then echo found ; else echo no; fi;

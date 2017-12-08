@@ -1,0 +1,53 @@
+#!/usr/local/bin/zsh
+web='/var/www/html/des20/Data/NFSstatus.log';
+logging='/var/www/html/des20/Data/currentinfo2.log'
+logf='/TopStordata/zfsrec'
+cd /TopStor
+localrep=`echo $@ | awk '{print $2}'`;
+prot=`echo $@ | awk '{print $6}'`;
+vol=`echo $@ | awk '{print $7}'`;
+partner=`echo $@ | awk '{print $5 }'`;
+tun=`echo $@ | awk '{print $4 }'`;
+partner=`echo $@ | awk '{print $5 }'`;
+pool='Data';
+
+if [[ $localrep == "proxy" ]];
+then
+ pp=`cat workingpp | awk '{print $1}'`;
+else
+ pp=`cat workingpplocal | awk '{print $1}'`;
+fi
+pp=$((pp+2));
+if [[ $localrep == "proxy" ]];
+then
+# echo /usr/bin/nc -l $tun $pp \|  zfs receive -dvF  $pool > tmprepli;
+# /usr/bin/nc --ssl-cert /TopStor/key/TopStor.crt --ssl-key /TopStor/key/TopStor.key -l $tun $pp |  zfs receive -dvF  $pool >$logf 2>>tmprepli ;
+else
+# echo nc -l $tun $pp \|zfs receive -dvF  $pool >tmprepli;
+#  nc --ssl-cert /TopStor/key/TopStor.crt --ssl-key /TopStor/key/TopStor.key -l $tun $pp |zfs receive -dvF  $pool >$logf 2>>tmprepli;
+fi
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+cat $logf | grep -w received;
+if [[ $? -ne 0 ]];  
+then
+ logdata='Failed_Receiving_new_snapshot_for:'$vol'_from:'$partner;
+ code='Repli1001@@@'$vol'@'$partner
+ codedate='Repli1001@'$datenow'@'$timenow'@'$vol'@'$partner
+else
+ logdata='Success_Receiving_new_snapshot_for:'$vol'_from:'$partner;
+ code='Repli1002@@@'$vol'@'$partner
+ codedate='Repli1002@'$datenow'@'$timenow'@'$vol'@'$partner
+ g=`cat /etc/exports | grep ${vol}_only | wc -c`; 
+ if [[ $g -le 4 ]];
+ then
+  chmod 777 /$pool/$vol
+  echo \# start${vol}_only >> /etc/exports
+  echo /$pool/$vol \*\(rw,sync,insecure,no_root_squash,no_all_squash\) >> /etc/exports
+  echo  \# stop${vol}_only >> /etc/exports
+  systemctl restart nfs-server > /dev/null 2> /dev/null; 
+ fi
+ ./GetPoolVollist
+fi
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $partner data $logdata code $code`;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+echo $codedate > ${logging}2

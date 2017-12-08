@@ -1,0 +1,10 @@
+;;;;;;;;         startmezocifs_only
+[mezocifs]
+path = /p1/mezocifs
+read only = no
+browsable = yes
+write list = @everyone
+admin users = administrator
+writeable = Yes
+;;;;;;;;;;;;;;;;;;;;   stopmezocifs_only
+

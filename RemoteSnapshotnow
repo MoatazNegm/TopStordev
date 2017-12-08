@@ -1,0 +1,138 @@
+#! /usr/local/bin/zsh
+cd /TopStor
+web2='/usr/local/www/apache24/data/des19/Data/currentinfo2.log2';
+logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
+stamp=`date +%s`;
+cronout='/TopStordata/replicronoutput.log';
+#echo System is creating Snapshot $@.... > $web;
+oper=$@; 
+echo oper=$oper > $cronout
+oper1=`echo $oper | awk '{print $1}'`;
+oper2=`echo $oper | awk '{print $2}'`;
+oper3=`echo $oper | awk '{print $3}'`;
+userreq='system';
+filelog='txt/'${0:2}${userreq}'.txt'${stamp}
+touch $filelog 
+isallowed=`cat partners.txt | grep $oper3 | awk '{print $2}'`;
+if [[ $isallowed == "DualWay" ||  $isallowed == "receiver" ]];
+then
+ hostn=`hostname -s `;
+ hostip=`ifconfig em1 | grep "inet " | awk '{print $2}'`;
+ hostp=`echo $oper2 `;
+ echo oper1=$oper1 >> $cronout;
+ echo oper2=$oper2 >> $cronout;
+ echo stamp=$stamp >> $cronout
+ keep=`echo $oper2 | awk -F. '{print $2}'`;
+ echo keep=$keep >> $cronout
+ currentsnaps=`/sbin/zfs list -t snapshot | grep "$oper1" | grep "$oper2" | awk '{print $1}'`;
+ echo currentsnaps=$currentsnaps >> $cronout
+ oldsnap=`echo $currentsnaps | sort | head -n 1` ;
+ echo oldsnap=$oldsnap >> $cronout
+ count=0
+ countsnap=`echo  "$currentsnaps" | wc -l `;
+ echo countsnap=$countsnap >> $cronout 
+ countsnap=$(($countsnap+1));
+ echo countsnapplus=$countsnap >> $cronout
+ keep=$(($keep+0));
+ echo keeppluszero=$keep >> $cronout
+ timenow=`date`;
+ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+ counter=$((keep+1));
+ snapsc=$((countsnap+0));
+ while [[ $counter -le $snapsc ]];  do
+ currentsnaps=`/sbin/zfs list -t snapshot | grep "$oper1" | grep "$oper2" | awk '{print $1}'`;
+  oldsnap=`echo $currentsnaps | sort | head -n 1` 
+  counter=$((counter+1));
+#	echo $timenow: have to delete $oldsnap > $web;
+  logdata='Deleting_Snapshot:'$oldsnap;
+  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1022@@@$oldsnap`;
+  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  /sbin/zfs destroy $oldsnap 2>$filelog
+  err=`cat $filelog | wc -c `;
+  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+  if [[ $err -ge  4  ]]; then
+   echo Snap1028@$datenow@$timenow@$oldsnap  > $web2;
+   logdata='Difficulty_Deleting_Snapshot:'$oldsnap;
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata code Snap1028@@@$oldsnap`;
+  echo $logthis >> $cronout
+  counter=$((snapsc+3));
+  else
+   echo Snap1025@$datenow@$timenow@$oldsnap > $web2;
+   logdata='Success_Deleting_Snapshot:'$oldsnap;
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1025@@@$oldsnap`;
+   echo $logthis >> $cronout
+  fi;
+  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+ done 
+ newsnap2='Repli.'$hostp'.'$stamp;
+ pool=`echo $oper1 | awk -F/ '{print $1}'`;
+ vol=`echo $oper1 | awk -F/ '{print $2}'`;
+ echo newsnap2=$newsnap2 >> $cronout
+ newsnap=`echo $oper1@$newsnap2`;
+ echo newsnap=$newsnap >> $cronout
+ logdata='Creating_Snapshot:'$newsnap;
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata Snap1026@@@$newsnap`;
+ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+ /sbin/zfs snapshot $newsnap > $filelog 2>&1;
+ /sbin/zfs set repli:sender=$hostip $newsnap;
+ /sbin/zfs set repli:receiver=$oper3 $newsnap;
+ #echo $hostip $oper3 $newsnap2 $pool $vol 
+ echo Repli1003@$datenow@$timenow@$newsnap@$oper3 > $web2
+ isproxy=`cat partners.txt | grep $oper3 | awk '{print $3}'`;
+ if [[ $isproxy == "true" ]];
+ then
+##########with proxy##################################################
+### ./Asksend 1032_8($8) 10.176.214.6($6) 15737($7) RemoteVolSearch sdk
+ # ./ProxysndSVC.sh
+  so=`cat proxy.txt | awk '{print $3}'`
+  remotetun=`cat txt/peer | grep "$oper3" | awk '{print $3}'`
+  pp=`cat workingpp | awk '{print $1}'` 
+  /sbin/zfs set repli:sender=$so $newsnap; 
+ ps -axuw | grep ProxyReplicate >/dev/null 2>&1
+ if [[ $? -ne 0 ]];
+ then
+  echo ./ProxyReplicate $oper3 $filelog $newsnap2 $pool $vol $remotetun $pp $so proxy >> $cronout
+  ./ProxyReplicate $oper3 $filelog $newsnap2 $pool $vol $remotetun $pp $so proxy
+ else
+  echo Cancelled as there is another replication is running >> $filelog 
+ fi
+ 
+##########noproxy####################################################
+ else
+  so=$hostip
+  remotetun=$oper3
+  pp=`cat workingpplocal | awk '{print $1}'` 
+  /sbin/zfs set repli:sender=$so $newsnap; 
+  ps -axuw | grep  ProxyReplicate >/dev/null 2>&1
+  if [[ $? -ne 0 ]];
+  then 
+   echo ./ProxyReplicate $oper3 $filelog $newsnap2 $pool $vol $remotetun $pp $so local>> $cronout
+   ./ProxyReplicate $oper3 $filelog $newsnap2 $pool $vol $remotetun $pp $so local
+  else
+   echo Cancelled as there is another replication is running >> $filelog
+  fi
+ fi;
+ #echo donereplicating
+ echo snapshotresult : >> $cronout
+ cat $filelog >> $cronout 
+ echo filenameis=$filelog >> $cronout
+ err=`cat $filelog | wc -c  `;
+ err2=`cat txt/repliresult 2>/dev/null`;
+ rm txt/repliresult 2>/dev/null;
+ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+ if [[ $err -ge  4  || $err2 != "success" ]]; then
+	failed=`cat $filelog`
+	echo Repli1005@$datenow@$timenow@${newsnap}@$oper3 > $web2 ;
+	echo 'Failed_Replicating'${newsnap}':'$failed > ${web2}internal ;
+	logdata='Failed_Replicating'${newsnap};
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Repli1005@@@$newsnap@$oper3`;
+	echo $logthis >> $cronout
+ else 
+	echo Repli1006@$datenow@$timenow@$newsnap$oper3 > $web2; 
+	logdata='Success_Replicating_Snapshot:'$newsnap;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Repli1006@@@$newsnap@$oper3`;
+	echo $logthis >> $cronout
+ fi;
+ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+fi
+rm $filelog 2>/dev/null

@@ -1,0 +1,90 @@
+#!/usr/local/bin/zsh
+cd /TopStor/
+web='/var/www/html/des20/Data/CIFSstatus.log';
+logging='/var/www/html/des20/Data/currentinfo2.log'
+glog='/TopStordata/TopStor.log';
+runningpools='/pacedata/pools/runningpools'
+txtres='/TopStordata/'`basename $0`'.txt'
+rm -rf $txtres 2>/dev/null
+name=`echo $@ | awk '{print $2}'`;
+pDG=`echo $@ | awk '{print $1}'`;
+quota=`echo $@ | awk '{print $3}'`;
+userreq=` echo $@ | awk '{print $4}'`;
+DG=`echo $pDG | awk -F_ '{print $2}'`;
+hostnam=`echo $pDG | awk -F_ '{print $1}'`;
+#sshost=`cat $runningpools | grep $hostnam | awk '{print $1}'`;
+sshost=`echo $pDG | awk -F_ '{print $1}'`;
+
+echo CIFS1001:$hostnam/$DG/$name > $web;
+privilege="CIFS";
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
+oldname=` ssh $sshost /sbin/zfs list | grep -w "$name" | wc -c `;
+if [[ $oldname -ge 4 ]];
+then 
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logdata='Creating_Volume:'$DG/$name'already_there';
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code NFS1004@@@$hostnam/$DG/$name`;
+echo NFS1004@$datenow@$timenow@$hostnam/$DG/$name > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq NFS1004@@@$hostnam/$DG/$name $dtn>> $glog
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
+echo CIFS1002:$hostnam/$DG/$name > $web;
+else
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logdata='Creating_Volume:'$hostnam/$DG/$name;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code NFS1004@@@$DG/$name`;
+echo NFS1004@$datenow@$timenow@$hostnam/$DG/$name > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq NFS1004@@@$hostnam/$DG/$name $dtn>> $glog
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
+g=`ssh $sshost cat /TopStor/smb.confcurrent | grep ${name}_only | wc -c`; 
+if [[ g -ge 4 ]];
+then
+ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+ logdata='Creating_Volume_already_there:'$hostnam/$DG/$name ;
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata code NFS1005@@@$hostnam/$DG/$name`;
+echo NFS1005@$datenow@$timenow@$hostnam/$DG/$name > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow warning $userreq NFS1005@@@$hostnam/$DG/$name $dtn>> $glog
+ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
+else
+ssh $sshost " cd /TopStor &&
+ /sbin/zfs create -o overlay=on -o acltype=posixacl -o aclinherit=passthrough -o xattr=sa -o redundant_metadata=most -o atime=off -o quota=$quota -o dedup=on -o compression=lz4  $DG/$name 2> $txtres  &&
+ /sbin/zfs set prot:kind=CIFS $DG/$name &&
+ cp /etc/samba/smb.conf /TopStordata/smb.confcurrent &&
+ cp sharecifs.txt /TopStordata/$name.txt
+ sed -i "s/NAMECIFS/$name/g"  /TopStordata/$name.txt &&
+ sed -i "s/POOL/$DG/g" /TopStordata/$name.txt &&
+ cat /TopStordata/$name.txt >> /TopStordata/smb.confcurrent &&
+ cat /TopStordata/$name.txt >> /TopStordata/CIFSshares.txt &&
+ cat /TopStordata/$name.txt >> /etc/samba/smb.conf &&
+ chmod 777 /$DG/$name
+ systemctl stop smb &&
+ systemctl start smb " 
+scp $sshost:$txtres $txtres
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+err=`wc -c  $txtres  | awk '{print $1}'`;
+if [[ $err -ge  4  ]]; then
+	echo CIFS1003:$hostnam/$DG/$name > $web;
+	cat $txtres > ${web}internal;
+	logdata='Failed_Creating__Volume:'$hostnam/$DG/$name;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code NFS1005@@@i$hostnam/$DG/$name`;
+echo NFS1005@$datenow@$timenow@$hostnam/$DG/$name > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow error $userreq NFS1005@@@$hostnam/$DG/$name $dtn>> $glog
+else 
+ echo CIFS1004:$hostnam/$DG/$name > $web; 
+	logdata='success_Creating__Volume:'$hostnam/$DG/$name;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code NFS1006@@@$hostnam/$DG/$name`;
+echo NFS1006@$datenow@$timenow@$hostnam/$DG/$name > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq NFS1006@@@$hostnam/$DG/$name $dtn>> $glog
+fi;
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
+./GetPoolVollist &>/dev/null
+fi
+fi
+fi
+echo ready ;

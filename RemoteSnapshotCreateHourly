@@ -1,0 +1,58 @@
+#!/usr/local/bin/zsh
+web='/var/www/html/des20/Data/Replicatestatus.log';
+logging='/var/www/html/des20/Data/currentinfo2.log';
+glog='/TopStordata/TopStor.log';
+runningpools='/pacedata/pools/runningpools'
+cronthis='/TopStordata/cronthis.txt'
+min=`echo $@ | awk '{print $1}'` ;
+every=0; ev=`echo $@ | awk '{print $2}'`; every=$(($every+$ev)); if (($every < 1)); then every=1; fi
+keep=0; k=`echo $@ | awk '{print $3}'`; keep=$(($keep+$k)); if (($keep < 1)); then keep=1 ; fi
+pDG=` echo $@ | awk '{print $4}'`; 
+FileS=` echo $@ | awk '{print $5}'`;
+partner=` echo $@ | awk '{print $6}'`;
+userreq=` echo $@ | awk '{print $7}'`;
+txtres='/TopStordata/'`basename $0`$userreq'.txt'
+rm $txtres 2>/dev/null
+DG=`echo $pDG | awk -F_ '{print $2}'`;
+hostnam=`echo $pDG | awk -F_ '{print $1}'`;
+sshost=`echo $pDG | awk -F_ '{print $1}'`;
+#sshost=`cat $runningpools | grep $hostnam | awk '{print $1}'`;
+privilege="Replication";
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
+echo Replica1009: > $web;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logdata='Creating_Hourly_Replication_Period:'$hostnam/$DG/$FileS@'_to_'$partner;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata Replica1039@@@.`;
+echo Replica1039@$datenow@$timenow@. > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Replica1039@@@. $dtn>> $glog
+
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+crontab -l > $cronthis
+stamp=`date +%s`
+echo $min  "*"/$every "*" "*" "*"  /TopStor/pump.sh RemoteSnapshotnowOnce $sshost $hostnam $DG/$FileS hourly.$keep.$min.$every.na. $partner ${txtres}.$stamp >> $cronthis 
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+crontab $cronthis 2>> $txtres
+if [ $? -ne 0  ]; then
+	echo Replica1010: > $web;
+	cat $txtres > ${web}internal;
+	logdata='Failed_Creating_Hourly_replication_Period:'$hostnam/$DG/$FileS'_for_'$partner;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Replica1040@@@.`;
+echo Replica1040@$datenow@$timenow@. > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow error $userreq Replica1040@@@. $dtn>> $glog
+else 
+ 	echo Replica1011:Hourly.$min.$every.$keep:$partner:$hsotnam/$DG/$FileS > $web; 
+	logdata='Success_Creating_Hourly_replication_Period:'$hostnam/$DG/$FileS'_for_'$partner;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1041@@@Hourly.$min.$every.$keep@$partner@$hostham/$DG/$FileS`;
+stamp=`date +%s`
+echo Replica1041@$datenow@$timenow@Hourly.$min.$every.$keep@$partne@$hostnam/$DG/$FileS > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Replica1041@@@Hourly.$min.$every.$keep@$partne@$hostnam/$DG/$FileS $dtn>> $glog
+fi
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+./RemoteGetPoolperiodlist &
+fi
+rm -rf ${txtres}.$stamp &>/dev/null

@@ -1,0 +1,14 @@
+#!/usr/local/bin/zsh
+ctr="$1"
+./checkjson $ctr
+if [[ $? -ne 0 ]];
+then 
+ cp ${ctr}back $ctr 2>/dev/null
+ if [[ $? -ne 0 ]]; 
+ then 
+  echo > $ctr;
+ fi
+else
+ cp $ctr ${ctr}back;
+fi
+

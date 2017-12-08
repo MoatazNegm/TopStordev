@@ -1,0 +1,66 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 6 (0x6)
+    Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C=EG, ST=Cairo, L=Cairo, O=QuickStor, OU=QStor, CN=QuickStor CA/name=EasyRSA/emailAddress=sales@quickstor.net
+        Validity
+            Not Before: Aug  3 21:39:56 2015 GMT
+            Not After : Jul 31 21:39:56 2025 GMT
+        Subject: C=EG, ST=Cairo, L=Cairo, O=QuickStor, OU=QStor, CN=Repliserv4/name=EasyRSA/emailAddress=sales@quickstor.net
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus:
+                    00:a9:b5:7f:d8:ae:86:e3:5f:42:d0:b8:c1:98:b2:
+                    5a:3b:52:a1:ea:5e:e9:80:62:88:7a:e6:ab:69:eb:
+                    25:6a:a5:12:09:6b:39:59:bd:24:8c:6f:7c:14:23:
+                    3d:4a:d5:0a:07:d2:ea:81:55:30:25:7c:6b:87:f8:
+                    bb:14:1e:95:4c:19:6e:09:a0:1a:35:e3:bb:cc:0d:
+                    b9:63:52:af:23:b5:4a:6a:c3:47:3a:f4:4b:b7:c2:
+                    28:22:6f:8f:41:d7:95:03:2f:54:a8:34:09:3f:d8:
+                    ca:3e:4f:9d:f7:ef:7a:02:76:81:3c:b3:70:29:ec:
+                    f8:eb:db:66:12:a6:24:63:02:a2:b1:0f:a0:2d:a7:
+                    0a:98:4d:3d:65:83:19:f1:30:8a:45:7a:95:7e:d9:
+                    8c:52:d3:8c:09:6d:0e:aa:0f:91:10:9c:c0:cc:99:
+                    9e:07:df:1b:26:30:fc:af:be:74:a7:9b:e4:df:bd:
+                    b2:9f:47:92:0f:f3:33:cf:72:03:6b:7c:6f:98:1a:
+                    85:e9:8d:02:2b:7d:b2:94:55:62:2f:42:fb:d4:10:
+                    ee:a8:9d:03:e1:37:75:d6:05:17:f4:ed:15:ca:a1:
+                    38:ce:dc:5d:05:11:70:e2:53:bb:91:1b:d8:e5:f9:
+                    70:4b
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints:
+                CA:FALSE
+            Netscape Comment:
+                Easy-RSA Generated Certificate
+            X509v3 Subject Key Identifier:
+                7F:D9:08:7B:D0:5E:74:CF:A5:86:98:A5:7B:B1:D2:45:7B:EE:9A:86
+            X509v3 Authority Key Identifier:
+                keyid:35:96:1D:B6:6F:08:6D:14:95:66:AB:18:C7:63:6B:B0:C0:0B:65:EC
+                DirName:/C=EG/ST=Cairo/L=Cairo/O=QuickStor/OU=QStor/CN=QuickStor CA/name=EasyRSA/emailAddress=sales@quickstor.net
+                serial:D8:22:35:2F:82:DA:44:DD
+
+            X509v3 Extended Key Usage:
+                TLS Web Client Authentication
+            X509v3 Key Usage:
+                Digital Signature
+    Signature Algorithm: sha256WithRSAEncryption
+         12:49:f9:93:3d:ed:86:5f:0f:c6:cf:68:84:f0:7e:05:2f:03:
+         bb:79:6f:a5:22:ab:d2:0d:5b:ba:22:74:7b:2c:1d:d8:bb:1b:
+         da:6b:2f:30:1b:86:6d:ef:72:61:44:c5:2f:5c:25:fc:8a:14:
+         8e:b8:8b:3c:90:1b:73:2a:33:20:e2:bf:1e:40:ee:80:90:cb:
+         25:45:c7:29:6a:37:58:c4:ae:ce:50:f4:91:34:3c:04:d0:a3:
+         8d:d4:75:c0:ad:90:c2:ea:e2:c8:cc:05:57:bd:98:58:ce:1e:
+         b1:24:77:74:66:08:65:79:5d:29:51:fd:99:dc:69:d8:74:13:
+         ab:69:40:9f:9e:f8:09:c6:9b:ad:ed:8f:1f:7b:24:f6:f5:9c:
+         73:da:85:fa:36:2a:75:cf:20:f2:85:47:b1:cc:ef:21:9d:d3:
+         e9:ed:9f:37:be:fc:ee:1e:80:69:5d:e1:68:75:c3:ec:20:63:
+         a4:69:9a:06:cf:3f:e7:36:a5:61:80:ef:ea:a8:69:b7:53:1c:
+         cd:43:b4:1e:9e:9e:9e:26:f9:6b:45:86:40:2b:4f:8d:56:77:
+         36:35:9c:c0:15:bc:bf:c6:ca:42:c4:dc:63:54:1d:94:1e:85:
+         44:fb:c5:84:df:dd:cc:2c:1d:10:7c:58:df:a8:44:0a:a6:2a:
+         1d:61:49:6e
+-----BEGIN CERTIFICATE-----
+

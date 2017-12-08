@@ -1,0 +1,37 @@
+#!/bin/sh
+
+. /etc/rc.subr
+
+name="TopStor"
+start_cmd="${name}_start"
+stop_cmd="${name}_stop"
+rcvar=TopStor_enable
+command="/TopStor/Topstor.sh"
+command_interpreter="/usr/local/bin/zsh"
+load_rc_config $name
+: ${TopStor_enable:=no}
+: ${TopStor_msg="TopStor started successfuly."}
+TopStor_start()
+{
+	echo "$TopStor_msg"
+	/TopStor/Topstor.sh &
+}
+TopStor_stop()
+{
+    kill -KILL `ps -axw | grep ProxySVC | awk '{print $1}'` 2>/dev/null;
+  killall openvpn 2>/dev/null;
+  kill -KILL `ps -axw | grep ProxyncSVC | grep peer | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep Askrcv | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep nc | grep 3336 | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep nc | grep 3337 | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep nc | grep 2236 | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep nc | grep 2237 | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep zfs | grep send | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep zfs | grep receive | awk '{print $1}'` 2>/dev/null;
+  kill -KILL `ps -axw | grep nc | grep 2238 | awk '{print $1}'` 2>/dev/null;
+	echo " it is stopped thanking God"
+	pkill -HUP -f Topstor
+	touch /TopStor/txt/flag
+}
+
+run_rc_command "$1"

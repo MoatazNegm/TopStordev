@@ -1,0 +1,586 @@
+#!/usr/bin/sh
+cd /TopStor/
+echo $#
+web="/var/www/html/des20/Data/DGstatus.log";
+logging='/var/www/html/des20/Data/currentinfo2.log';
+glog='/TopStordata/TopStor.log';
+runningpools='/pacedata/pools/runningpools'
+iscsimapping='/pacedata/iscsimapping'
+raid=` echo $@ | awk '{print $1}'`;
+userreq=` echo $@ | awk '{print $2}'`;
+host=` echo $@ | awk '{print $3}'`;
+hostnam=` echo $@ | awk '{print $3}'`;
+disk1=` echo $@ | awk '{print $4}'`;
+nextpool="1";
+msgraid="nothing";
+privilege="DISK_Groups"
+contrun=`./privthis.sh $privilege $userreq`;
+declare -a params=(`echo $@`);
+declare -a hostparam=();
+declare -a diskparam=();
+if [[ $contrun == 'true' ]];
+then
+ msgraid=$raid
+ if [[ $raid == "readcache" ]]; then msgraid="readcache"; fi;
+ if [[ $raid == "readwritecache" ]]; then msgraid="readwritecache"; fi;
+ if [[ $raid == "mirror" ]]; then msgraid="Mirror"; fi;
+ if [[ $raid == "raidz1" ]]; then msgraid="RAID5"; fi;
+ if [[ $raid == "raidz2" ]]; then msgraid="Enhanced RAID6"; fi;
+ disks=('obsoletecode')
+ noofdisks=`echo $disks | wc -w | awk '{print $1}'`;
+ disksarr=(${disks});
+ if [[ $raid == "addmirror" ]]; then
+  disk2=` echo $@ | awk '{print $5}'`;
+  diskn1=`grep -nr $disk1 $iscsimapping | awk -F':' '{print $1}'`","
+  diskn2=`grep -nr $disk2 $iscsimapping | awk -F':' '{print $1}'`","
+  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+  logdata="Adding a mirror array to  pool: "p${nextpool}" using disks:"$diskn1","$diskn2
+  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst20@@@p${nextpool}@$diskn1@$diskn2`;
+  echo DGst20@$datenow@$timenow@p${nextpool}@$diskn1@$diskn2 > ${logging}2
+  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+  echo $datenow $timenow info $userreq DGst20@@@p${nextpool}@$diskn1@diskn2 $dtn>> $glog
+  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${disk2};
+  ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${disk1};
+  ssh $host  /sbin/zpool add -f p${nextpool} mirror ${disk1} ${disk2} 2>txt/${0:2}$userreq.txt
+  if [ $? -eq 0 ]; then
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata=" Success addding a mirror array to  pool: "p${nextpool}" using disks:"$diskn1","$diskn2
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGsu20@@@p${nextpool}@$diskn1@$diskn2`;
+   echo DGsu20@$datenow@$timenow@p${nextpool}@$diskn1@$diskn2 > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow info $userreq DGsu20@@@p${nextpool}@$diskn1@$diskn2 $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  else
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata=" Failed addding a mirror parity array to  pool: "p${nextpool}" using disks:"$diskn1","$diskn2
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code DGfa20@@@p${nextpool}@$diskn1@$diskn2`;
+   echo DGfa20@$datenow@$timenow@p${nextpool}@$diskn1@$diskn2 > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow error $userreq DGfa20@@@p${nextpool}@$diskn1@$diskn2 $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  fi
+ fi 
+ if [[ $raid == "attachmirror" ]]; then
+  disk2=` echo $@ | awk '{print $5}'`;
+  diskn=`grep -nr $disk2 $iscsimapping | awk -F':' '{print $1}'`
+  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+  logdata="Attaching Disk"$diskn" to Pool "p${nextpool}" as a mirror pair"
+  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst7@@@$diskn@p${nextpool}`;
+  echo DGst7@$datenow@$timenow@$diskn@p${nextpool} > ${logging}2
+  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+  echo $datenow $timenow info $userreq DGst7@@@$diskn@p${nextpool} $dtn>> $glog
+  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${disk2};
+  ssh $host  /sbin/zpool attach -f p${nextpool} ${disk1} ${disk2} 2>txt/${0:2}$userreq.txt
+  if [ $? -ne 0 ]; then
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Failed attaching Disk"$diskn" to Pool "p${nextpool}" as a mirror pair"
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code DGfa7@@@$diskn@p${nextpool}`;
+   echo DGfa7@$datenow@$timenow@$diskn@p${nextpool} > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow error $userreq DGfa7@@@$diskn@p${nextpool} $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  else
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Success atttaching Disk"$diskn" to Pool "p${nextpool}" as a mirror pair"
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGsu7@@@$diskn@p${nextpool}`;
+   echo DGsu7@$datenow@$timenow@$diskn@p${nextpool} > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow info $userreq DGsu7@@@$diskn@p${nextpool} $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  fi 
+ fi
+ if [[ $raid == "delspecial" ]]; then
+  diskn=`grep -nr $disk1 $iscsimapping | awk -F':' '{print $1}'`
+  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+  logdata="Deleting special Disk"$diskn
+  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst9@@@$diskn`;
+  echo DGst9@$datenow@$timenow@$diskn > ${logging}2
+  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+  echo $datenow $timenow info $userreq DGst9@@@$diskn $dtn>> $glog
+  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  ssh $host  /sbin/zpool remove  p${nextpool} ${disk1} 2>txt/${0:2}$userreq.txt
+  #ssh $host  /sbin/zpool remove -f p${nextpool} ${disk1}
+  if [ $? -eq 0 ]; then
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Success deleting special Disk"$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGsu9@@@$diskn`;
+   echo DGsu9@$datenow@$timenow@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow info $userreq DGsu10@@@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  else 
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Failed adding Disk"$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code DGfa9@@@$diskn`;
+   echo DGfa9@$datenow@$timenow@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow error $userreq DGfa9@@@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  fi
+ fi 
+ if [[ $raid == "addcache" ]]; then
+  diskn=`grep -nr $disk1 $iscsimapping | awk -F':' '{print $1}'`
+  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+  logdata="Adding Disk"$diskn" as a read cache"
+  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst10@@@$diskn`;
+  echo DGst10@$datenow@$timenow@$diskn > ${logging}2
+  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+  echo $datenow $timenow info $userreq DGst10@@@$diskn $dtn>> $glog
+  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${disk1};
+  ssh $host  /sbin/zpool add -f p${nextpool} cache ${disk1} 2>txt/${0:2}$userreq.txt
+  if [ $? -eq 0 ]; then
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Success adding Disk"$diskn" as a read cache" 
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGsut10@@@$diskn`;
+   echo DGsu10@$datenow@$timenow@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow info $userreq DGsu10@@@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  else 
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Failed adding Disk"$diskn" as a read cache"
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code DGfa10@@@$diskn`;
+   echo DGfa10@$datenow@$timenow@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow error $userreq DGfa10@@@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  fi
+ fi 
+ if [[ $raid == "addlog" ]]; then
+  diskn=`grep -nr $disk1 $iscsimapping | awk -F':' '{print $1}'`
+  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+  logdata="Adding Disk"$diskn" as a read/write cache"
+  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst11@@@$diskn`;
+  echo DGst11@$datenow@$timenow@$diskn > ${logging}2
+  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+  echo $datenow $timenow info $userreq DGst11@@@$diskn $dtn>> $glog
+  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${disk1};
+  ssh $host  /sbin/zpool add -f p${nextpool} log ${disk1} 2>txt/${0:2}$userreq.txt
+  if [ $? -eq 0 ]; then
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Success adding Disk"$diskn" as a read/write cache"
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGsut11@@@$diskn`;
+   echo DGsu11@$datenow@$timenow@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow info $userreq DGsu11@@@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  else 
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Failed adding Disk"$diskn" as a read/write cache"
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code DGfa11@@@$diskn`;
+   echo DGfa11@$datenow@$timenow@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow error $userreq DGfa11@@@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  fi
+ fi 
+ if [[ $raid == "addspare" ]]; then
+  diskn=`grep -nr $disk1 $iscsimapping | awk -F':' '{print $1}'`
+  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+  logdata="Adding Disk"$diskn" as a spare"
+  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst8@@@$diskn`;
+  echo DGst8@$datenow@$timenow@$diskn > ${logging}2
+  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+  echo $datenow $timenow info $userreq DGst8@@@$diskn $dtn>> $glog
+  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${disk1};
+  ssh $host  /sbin/zpool add -f p${nextpool} spare ${disk1} 2>txt/${0:2}$userreq.txt
+  if [ $? -eq 0 ]; then
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Success adding Disk"$diskn" as a spare"
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGsu8@@@$diskn`;
+   echo DGsu8@$datenow@$timenow@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow info $userreq DGsu8@@@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  else 
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Failed adding Disk"$diskn" as a spare"
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code DGfa8@@@$diskn`;
+   echo DGfa8@$datenow@$timenow@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow error $userreq DGfa8@@@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  fi
+ fi 
+ if [[ $raid == "Single" ]]; then
+  diskn=`grep -nr $disk1 $iscsimapping | awk -F':' '{print $1}'`
+  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+  logdata="Creating pool: "p${nextpool}" with single disk: disk"$diskn
+  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DG1st6@@@p${nextpool}@$diskn`;
+  echo DG1st6@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+  echo $datenow $timenow info $userreq DG1st6@@@p${nextpool}@$diskn $dtn>> $glog
+  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${disk1};
+  ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} ${disk1} 2>txt/${0:2}$userreq.txt
+  if [ $? -ne 0 ]; then
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Failed creating pool: "p${nextpool}" with single disk: disk"$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code DG1fa6@@@p${nextpool}@$diskn`;
+   echo DG1fa6@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow error $userreq DG1fa6@@@p${nextpool}@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  else 
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Success in creating pool: "p${nextpool}" with single disk: disk"$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DG1su6@@@p${nextpool}@$diskn`;
+   echo DG1su6@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow info $userreq DG1su6@@@p${nextpool}@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  fi
+ fi 
+ if [[ $raid == "addparity3" ]]; then
+  diskargs=${#params[@]};
+  diskargs=$((diskargs-1));
+  i=2
+  disk1=" ";
+  diskn="";
+  while [ $i -lt $diskargs ]; do
+   i=$((i+1));
+   ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
+   disk1=${disk1}${params[$i]}" "
+   diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+  done;
+  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+  logdata="Adding a triple parity array to  pool: "p${nextpool}" using disks:"$diskn
+  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst12@@@p${nextpool}@$diskn`;
+  echo DGst12@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+  echo $datenow $timenow info $userreq DGst12@@@p${nextpool}@$diskn $dtn>> $glog
+  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  ssh $host  /sbin/zpool add -f  p${nextpool} raidz3 ${disk1} 2>txt/${0:2}$userreq.txt
+  if [ $? -eq 0 ]; then
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata=" Success addding a triple parity array to  pool: "p${nextpool}" using disks:"$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGsu12@@@p${nextpool}@$diskn`;
+   echo DGsu12@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow info $userreq DGsu12@@@p${nextpool}@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  else
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata=" Failed addding a triple parity array to  pool: "p${nextpool}" using disks:"$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code DGfa12@@@p${nextpool}@$diskn`;
+   echo DGfa12@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow error $userreq DGfa12@@@p${nextpool}@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  fi
+ fi 
+ if [[ $raid == "parity3" ]]; then
+  diskargs=${#params[@]};
+  diskargs=$((diskargs-1));
+  i=2
+  disk1=" "
+  diskn=""
+  while [ $i -lt $diskargs ]; do
+   i=$((i+1));
+   ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
+   disk1=${disk1}${params[$i]}" "
+   diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+  done;
+  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+  logdata="Creating pool "p${nextpool}" with triple parity array using disks:"$diskn
+  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst13@@@p${nextpool}@$diskn`;
+  echo DGst13@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+  echo $datenow $timenow info $userreq DGst13@@@p${nextpool}@$diskn $dtn>> $glog
+  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} raidz3 ${disk1} 2>txt/${0:2}$userreq.txt
+  if [ $? -eq 0 ]; then
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Success creating pool "p${nextpool}" with triple parity array using disks:"$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGsu13@@@p${nextpool}@$diskn`;
+   echo DGsu13@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow info $userreq DGsu13@@@p${nextpool}@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  else
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Failed creating pool "p${nextpool}" with triple parity array using disks:"$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code DGfa13@@@p${nextpool}@$diskn`;
+   echo DGfa13@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow error $userreq DGfa13@@@p${nextpool}@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  fi
+ fi  
+ if [[ $raid == "addparity2" ]]; then
+  diskargs=${#params[@]};
+  diskargs=$((diskargs-1));
+  i=2
+  disk1=" "
+  diskn=""
+  while [ $i -lt $diskargs ]; do
+   i=$((i+1));
+   ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
+   disk1=${disk1}${params[$i]}" "
+   diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+  done;
+  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+  logdata="Adding a dual parity array to  pool: "p${nextpool}" using disks:"$diskn
+  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst14@@@p${nextpool}@$diskn`;
+  echo DGst14@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+  echo $datenow $timenow info $userreq DGst14@@@p${nextpool}@$diskn $dtn>> $glog
+  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  ssh $host  /sbin/zpool add -f p${nextpool} raidz2 ${disk1} 2>txt/${0:2}$userreq.txt
+  if [ $? -eq 0 ]; then
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata=" Success addding a dual parity array to  pool: "p${nextpool}" using disks:"$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGsu14@@@p${nextpool}@$diskn`;
+   echo DGsu14@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow info $userreq DGsu14@@@p${nextpool}@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  else
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata=" Failed addding a dual parity array to  pool: "p${nextpool}" using disks:"$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code DGfa14@@@p${nextpool}@$diskn`;
+   echo DGfa12@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow error $userreq DGfa14@@@p${nextpool}@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  fi
+ fi  
+ if [[ $raid == "parity2" ]]; then
+  diskargs=${#params[@]};
+  diskargs=$((diskargs-1));
+  i=2
+  disk1=" "
+  diskn="";
+  while [ $i -lt $diskargs ]; do
+   i=$((i+1));
+   ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
+   disk1=${disk1}${params[$i]}" "
+   diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+  done;
+  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+  logdata="Creating pool "p${nextpool}" with dual parity array using disks:"$diskn
+  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst15@@@p${nextpool}@$diskn`;
+  echo DGst15@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+  echo $datenow $timenow info $userreq DGst15@@@p${nextpool}@$diskn $dtn>> $glog
+  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} raidz2 ${disk1} 2>txt/${0:2}$userreq.txt
+  if [ $? -eq 0 ]; then
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Success creating pool "p${nextpool}" with dual parity array using disks:"$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGsu15@@@p${nextpool}@$diskn`;
+   echo DGsu15@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow info $userreq DGsu15@@@p${nextpool}@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  else
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Failed creating pool "p${nextpool}" with dual parity array using disks:"$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code DGfa15@@@p${nextpool}@$diskn`;
+   echo DGfa15@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow error $userreq DGfa15@@@p${nextpool}@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  fi
+ fi 
+ if [[ $raid == "addparity" ]]; then
+  diskargs=${#params[@]};
+  diskargs=$((diskargs-1));
+  i=2
+  disk1=" "
+  diskn=""
+  while [ $i -lt $diskargs ]; do
+   i=$((i+1));
+   ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
+   disk1=${disk1}${params[$i]}" "
+   diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+  done;
+  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+  logdata="Adding a single parity array to  pool: "p${nextpool}" using disks:"$diskn
+  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst16@@@p${nextpool}@$diskn`;
+  echo DGst16@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+  echo $datenow $timenow info $userreq DGst16@@@p${nextpool}@$diskn $dtn>> $glog
+  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  #ssh $host  /sbin/zpool add p${nextpool} raidz1 ${disk1} 2>txt/${0:2}$userreq.txt
+  ssh $host  /sbin/zpool add -f p${nextpool} raidz1 ${disk1} 
+  if [ $? -eq 0 ]; then
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata=" Success addding a single parity array to  pool: "p${nextpool}" using disks:"$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGsu16@@@p${nextpool}@$diskn`;
+   echo DGsu16@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow info $userreq DGsu16@@@p${nextpool}@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  else
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata=" Failed addding a single parity array to  pool: "p${nextpool}" using disks:"$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code DGfa16@@@p${nextpool}@$diskn`;
+   echo DGfa16@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow error $userreq DGfa16@@@p${nextpool}@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  fi
+ fi 
+ if [[ $raid == "parity" ]]; then
+  diskargs=${#params[@]};
+  diskargs=$((diskargs-1));
+  i=2
+  disk1=" "
+  diskn=""
+  while [ $i -lt $diskargs ]; do
+   i=$((i+1));
+   ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
+   disk1=${disk1}${params[$i]}" "
+   diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+  done;
+  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+  logdata="Creating pool "p${nextpool}" with single parity array using disks:"$diskn
+  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst17@@@p${nextpool}@$diskn`;
+  echo DGst17@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+  echo $datenow $timenow info $userreq DGst17@@@p${nextpool}@$diskn $dtn>> $glog
+  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} raidz1 ${disk1} 2>txt/${0:2}$userreq.txt
+  if [ $? -eq 0 ]; then
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Success creating pool "p${nextpool}" with single parity array using disks:"$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGsu17@@@p${nextpool}@$diskn`;
+   echo DGsu17@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow info $userreq DGsu17@@@p${nextpool}@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  else
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Failed creating pool "p${nextpool}" with single parity array using disks:"$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code DGfa17@@@p${nextpool}@$diskn`;
+   echo DGfa17@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow error $userreq DGfa17@@@p${nextpool}@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  fi
+ fi 
+ if [[ $raid == "add" ]]; then
+  diskargs=${#params[@]};
+  diskargs=$((diskargs-1));
+  i=2
+  disk1=" "
+  diskn=""
+  while [ $i -lt $diskargs ]; do
+   i=$((i+1));
+   ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
+   disk1=${disk1}${params[$i]}" "
+   diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+  done;
+  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+  logdata="Adding disks to non-redundant pool "p${nextpool}" using disks:"$diskn
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst18@@@p${nextpool}@$diskn`;
+  echo DGst18@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+  echo $datenow $timenow info $userreq DGst18@@@p${nextpool}@$diskn $dtn>> $glog
+  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  ssh $host  /sbin/zpool add  -f p${nextpool} ${disk1} 2>txt/${0:2}$userreq.txt
+  if [ $? -eq 0 ]; then
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata=" Success addding disks to non-redundant pool "p${nextpool}" using disks: "$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGsu18@@@p${nextpool}@$diskn`;
+   echo DGsu18@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow info $userreq DGsu18@@@p${nextpool}@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  else
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata=" Failed addding disks to non-redundant pool "p${nextpool}" using disks: "$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code DGfa18@@@p${nextpool}@$diskn`;
+   echo DGfa18@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow error $userreq DGfa18@@@p${nextpool}@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  fi
+ fi 
+ if [[ $raid == "stripeset" ]]; then
+  diskargs=${#params[@]};
+  diskargs=$((diskargs-1));
+  i=2
+  disk1=" "
+  diskn=""
+  while [ $i -lt $diskargs ]; do
+   i=$((i+1));
+   ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
+   disk1=${disk1}${params[$i]}" "
+   diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+  done;
+  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+  logdata="Creating non-redundant pool "p${nextpool}" using disks:"$diskn
+  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst21@@@p${nextpool}@$diskn`;
+  echo DGst21@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+  echo $datenow $timenow info $userreq DGst21@@@p${nextpool}@$diskn $dtn>> $glog
+  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} ${disk1} 2>txt/${0:2}$userreq.txt
+  if [ $? -eq 0 ]; then
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Success creating non-redundant pool "p${nextpool}" using disks:"$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGsu21@@@p${nextpool}@$diskn`;
+   echo DGsu21@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow info $userreq DGsu21@@@p${nextpool}@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  else
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Failed creating non-redundant pool "p${nextpool}" using disks:"$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code DGfa21@@@p${nextpool}@$diskn`;
+   echo DGfa21@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow error $userreq DGfa21@@@p${nextpool}@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  fi
+ fi 
+ if [[ $raid == "mirror" ]]; then
+  diskargs=${#params[@]};
+  diskargs=$((diskargs-1));
+  i=2
+   disk1=" "
+  diskn=""
+  while [ $i -lt $diskargs ]; do
+   i=$((i+1));
+   ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
+   disk1=${disk1}${params[$i]}" "
+   diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+  done;
+  datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+  logdata="Creating pool "p${nextpool}" with mirrored disks:"$diskn
+  logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst19@@@p${nextpool}@$diskn`;
+  echo DGst19@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+  dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+  echo $datenow $timenow info $userreq DGst19@@@p${nextpool}@$diskn $dtn>> $glog
+  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  ssh $host  /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} mirror ${disk1} 2>txt/${0:2}$userreq.txt
+  if [ $? -eq 0 ]; then
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Success creating pool "p${nextpool}" with mirrored disks:"$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGsu19@@@p${nextpool}@$diskn`;
+   echo DGsu19@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow info $userreq DGsu19@@@p${nextpool}@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  else
+   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+   logdata="Failed creating pool "p${nextpool}" with mirrored disks:"$diskn
+   logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code DGfa19@@@p${nextpool}@$diskn`;
+   echo DGfa19@$datenow@$timenow@p${nextpool}@$diskn > ${logging}2
+   dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+   echo $datenow $timenow error $userreq DGfa19@@@p${nextpool}@$diskn $dtn>> $glog
+   oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  fi
+ fi 
+fi
+rm txt/${0:2}$userreq.txt
+sed -i "/p${nextpool}/c\\" $runningpools
+sleep 3
+./pump.sh GetDisklist a

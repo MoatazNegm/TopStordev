@@ -1,0 +1,20 @@
+#!/usr/local/bin/zsh
+cd /TopStor
+web='/var/www/html/des20/Data/Hostprop.txt';
+if [ ! -f /TopStordata/hostname ]; then echo NONE >> /TopStordata/hostname; fi
+hostn=`cat /TopStordata/hostname`
+allips=""
+allsubnets=""
+ips=(`pcs resource | grep IPaddr2 | awk '{print $1}'`)
+for CC in "${ips[@]}"; do
+ hostip=`pcs resource show $CC | grep Attributes | awk '{print $2}' | awk -F= '{print $2}'`
+ hostsubnet=`pcs resource show $CC | grep Attributes | awk '{print $4}' | awk -F= '{print $2}'`
+ allips=$allips"_"$hostip
+ allsubnets=$allsubnets"_"$hostsubnet
+done
+allips=`echo $allips | awk -F_ '{$1="";print}'`
+allsubnets=`echo $allsubnets | awk -F_ '{$1="";print}'`
+hostrout=`netstat -rn | awk '{print $2}' | grep -v "Gateway" | grep -v "IP" | grep -v "0.0.0.0"`;
+hostdns=` cat /etc/resolv.conf | grep nameserver | awk '{print $2}'`;
+jsonips=`/usr/local/bin/zsh jsonthis3.sh name $hostn addr $allips subnet $allsubnets rout $hostrout dns $hostdns`;
+echo $jsonips > $web; 

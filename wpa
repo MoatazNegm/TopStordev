@@ -1,0 +1,7 @@
+#!/bin/sh
+ip address add 10.1.1.10/24 dev p8p1:0
+ip link set wlp2s0 up
+wpa_supplicant -B -iwlp2s0 -c /etc/wpa.wifi
+dhclient wlp2s0
+#ip address add WIFIIP/24 dev wlp2s0
+#route add default gw WIFIGW wlp2s0

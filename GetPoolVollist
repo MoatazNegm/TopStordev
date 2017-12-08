@@ -1,0 +1,70 @@
+#!/usr/local/bin/zsh
+cd /TopStor/;
+COMMAND=$0
+RUNNING=`ps --no-headers -C${COMMAND} | wc -l`
+if [ $RUNNING -gt 1 ]; then exit 0; fi
+websnaps='/var/www/html/des20/Data/Vollist.txt';
+resweb='/var/www/html/des20/Data/Vollist.txtupdated';
+runningpools='/pacedata/pools/runningpools'
+iscsimapping='/pacedata/iscsimapping'
+allprops='/TopStordata/allprops'
+stamp=`date +%s`
+ rm -rf $allprops &>/dev/null
+ hostns=(`cat $iscsimapping | grep -v notconn | awk '{print $1}' | uniq`)
+ for hostn in "${hostns[@]}"; do
+  poollist=(`cat $runningpools | grep $hostn | awk '{print $1":"$NF":"$2}'`);
+  gpool=( ${gpool[@]} ${poollist[@]} );
+ done
+ result="[";
+ for poolnow in "${gpool[@]}"; do
+  echo poolnow $poolnow
+#  sshost=`echo $poolnow | awk -F: '{print $1}'`
+  hostnam=`echo $poolnow | awk -F: '{print $2}' | uniq`
+  sshost=`echo $poolnow | awk -F: '{print $2}'`
+  pool=`echo $poolnow | awk -F: '{print $3}'`
+  ssh root@$sshost /TopStor/GetPoolprop | (cat > $allprops)
+  quota=`cat $allprops | grep  quota | grep ${pool}/  | awk -v CONVFMT=%2.5f '{gsub($3,$3/1048576); print $1" "$3}'`;
+  logicalused=`cat $allprops | grep  logicalused | grep ${pool}/ | awk -v CONVFMT=%.5g '{gsub($3,$3/1048576); print $1" "$3}'`
+  avail=`cat $allprops | grep  avail | grep ${pool}/ | awk -v CONVFMT=%.5g '{gsub($3,$3/1048576); print $1" "$3}'`;
+  useddata=`cat $allprops | grep  usedbydataset | grep ${pool}/ | awk -v CONVFMT=%.5g '{gsub($3,$3/1048576); print $1" "$3}'` 
+  usedsnaps=`cat $allprops | grep  usedbysnapshots | grep ${pool}/ | awk -v CONVFMT=%.5g '{gsub($3,$3/1048576); print $1" "$3}'` 
+  quota=`cat $allprops | grep  quota | grep ${pool}/ | awk -v CONVFMT=%.5g '{gsub($3,$3/1048576); print $1" "$3}'` 
+  creation=`cat $allprops | grep  creation | grep ${pool}/  | awk  '{$3=$5"-"$4"-"$7; print $1" "$3}'`;
+  compressratio=`cat $allprops | grep compressratio | grep ${pool}/ | awk  '{print $1" "$3}'`;
+  dedup=`cat $allprops | grep dedup | grep ${pool}/ | awk '{print $1" "$3}'`;
+  CIFSshare=`cat $allprops | grep  prot | grep kind  | grep ${pool}/ | grep " CIFS"  | awk '{print $1" "$3}'`;
+  NFSshare=`cat $allprops | grep  prot | grep kind | grep ${pool}/ | grep " NFS" | awk '{print $1" "$3}'`;
+  nameof=`cat $allprops | grep  name | grep ${pool}/ | awk -F/ '{print $2}' | awk '{print $1}'`;
+  if [[ -z $nameof ]]; 
+  then 
+	subres=`./jsonthis3.sh host $sshost uPool $pool class ${hostnam}'_'$pool Pool ${hostnam}':'$pool` ;
+ 	result=$result$subres,
+  else  
+   echo $nameof | while read -r line; do
+ 	q=` echo $quota | grep -w "$line" | awk '{print $2}'|uniq`;
+	lo=`echo $logicalused | grep -w "$line" | awk '{print $2}'|uniq`;
+	av=`echo $avail | grep -w "$line" | awk '{print $2}'|uniq`;
+	usd=`echo $useddata | grep -w  "$line" | awk '{print $2}'|uniq`;
+	uss=`echo $usedsnaps | grep -w  "$line" | awk '{print $2}'|uniq`;
+	cr=`echo $creation | grep -w "$line" | awk '{print $2}'|uniq`;
+	co=`echo $compressratio | grep -w "$line" | awk '{print $2}'|uniq`;
+	de=`echo $dedup | grep -w  "$line" | awk '{print $2}'|uniq`;
+	nf=`echo $NFSshare | grep -w "$line" | awk '{print $2}'|uniq`;
+	ci=`echo $CIFSshare | grep -w "$line" | awk '{print $2}'|uniq`;
+	qu=`echo $quota | grep -w "$line" | awk '{print $2}'|uniq`;
+	subres=`./jsonthis3.sh host $sshost uPool $pool class ${hostnam}'_'$pool Pool ${hostnam}':'$pool name $line volsize $q volact $lo available $av useddata $usd usedsnaps $uss crdate $cr compress $co dedup $de quota $qu protocol $ci$nf` ;
+ 	result=$result$subres,
+ done;
+fi
+done
+result=`echo $result | rev | cut -c 2- | rev`]
+echo $result > ${websnaps}tmp 2>txt/err.txt
+diff ${websnaps} ${websnaps}tmp &>/dev/null
+if [[ $? -ne 0 ]]; then
+ rm -rf $websnaps;
+ mv ${websnaps}tmp $websnaps;
+ tstamp=`date +%s`;
+ res=` ./jsonthis3.sh updated $tstamp `;
+ echo $res > $resweb;
+fi
+echo ready;

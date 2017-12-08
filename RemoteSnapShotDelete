@@ -1,0 +1,44 @@
+#!/usr/local/bin/zsh
+cd /TopStor
+web='/var/www/html/des20/Data/Replicatestatus.log';
+logging='/var/www/html/des20/Data/currentinfo2.log'
+glog='/TopStordata/TopStor.log';
+pDG=` echo $@ | awk '{print $1}'`;
+snapdel=` echo $@ | awk '{print $2}'`;
+userreq=` echo $@ | awk '{print $3}'`;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logdata='Deleting_Snapshot:'$snapdel;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1048@@@$snapdel`;
+echo Replica1048@$datenow@$timenow@$snapdel > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Replica1048@@@$snapdel $dtn>> $glog
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+echo Replica1000:$snapdel > $web;
+
+./SnapShotDelete $pDG $snapdel $userreq 
+./GetSnaplist
+ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+privilege="SnapShots";
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
+ echo Replica1002:$snapdel > $web; 
+ logdata='Success_Deleting_Snapshot:'$snapdel;
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Replica1050@@@$snapdel`;
+ echo Replica1050@$datenow@$timenow@$snapdel > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq Replica1050@@@$snapdel $dtn>> $glog
+ privilege="SnapShots";
+ contrun=`./privthis.sh $privilege $userreq`;
+ echo success
+else
+	echo Replica1001:$snapdel > $web;
+	echo 'Failed Deleteing Snapshot remote' > ${web}internal;
+	logdata='Failed_Deleting_Snapshot:'$snapdel;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Replica1049@@@$snapdel`;
+ echo Replica1049@$datenow@$timenow@$snapdel > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow error $userreq Replica1049@@@$snapdel $dtn>> $glog
+ echo failed
+fi
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;

@@ -1,0 +1,94 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 1 (0x1)
+    Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C=EG, ST=PA, L=CAIRO, O=QuickStor, OU=Sales, CN=QuickStor CA/name=EasyRSA/emailAddress=sales@quickstor.net
+        Validity
+            Not Before: Jan 22 16:48:02 2016 GMT
+            Not After : Jan 19 16:48:02 2026 GMT
+        Subject: C=EG, ST=PA, L=CAIRO, O=QuickStor, OU=Sales, CN=topstor/name=EasyRSA/emailAddress=sales@quickstor.net
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus:
+                    00:bf:47:af:af:dc:a9:e9:e5:79:54:ae:20:11:71:
+                    1c:dc:45:fe:39:c7:24:e6:2d:4c:30:17:76:30:4a:
+                    96:79:74:0d:f0:9d:f9:e7:0d:62:fa:c7:48:41:f7:
+                    18:ff:0c:29:a2:01:f1:fd:c8:89:6d:8d:d3:3e:5e:
+                    8d:45:8d:a8:80:aa:e1:d6:3e:12:41:91:e9:3d:bf:
+                    79:dc:4d:59:7d:8a:ca:71:b2:ad:91:e4:64:a8:c7:
+                    53:cf:a0:d9:1d:c4:b4:03:ed:3e:37:f1:0e:15:dd:
+                    4f:cc:6f:59:89:7e:1c:a9:ec:07:9f:f5:f2:02:7b:
+                    14:15:36:96:6a:10:cf:06:36:8c:54:6c:95:3f:ac:
+                    53:a8:be:0e:f3:fb:e3:82:37:92:c1:1d:d0:ce:00:
+                    a5:66:f9:8b:98:ac:a6:31:36:4c:99:a7:2c:5c:ad:
+                    8a:c4:3a:01:56:4c:d0:c8:84:ea:4d:0d:1a:9b:54:
+                    76:25:47:06:aa:91:9e:75:39:17:ed:9b:68:e1:fc:
+                    07:57:e5:b6:5d:80:7d:79:1e:e2:15:1a:0a:6c:23:
+                    65:54:ba:c7:1f:dd:59:9d:72:4f:e3:42:92:12:f3:
+                    f4:61:74:5c:30:14:cd:8c:98:c7:24:be:39:6c:24:
+                    67:93:aa:f8:a0:a9:4a:75:d0:7f:61:02:8c:45:27:
+                    45:73
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Comment: 
+                Easy-RSA Generated Certificate
+            X509v3 Subject Key Identifier: 
+                32:34:84:DB:2B:DE:95:D7:B3:A1:85:89:38:B0:40:9E:F8:9D:BA:84
+            X509v3 Authority Key Identifier: 
+                keyid:AA:2E:A5:1C:C8:09:4E:02:BE:4C:73:CD:92:49:B1:62:8E:A2:A5:36
+                DirName:/C=EG/ST=PA/L=CAIRO/O=QuickStor/OU=Sales/CN=QuickStor CA/name=EasyRSA/emailAddress=sales@quickstor.net
+                serial:C4:36:B1:E9:5C:5F:F7:E0
+
+            X509v3 Extended Key Usage: 
+                TLS Web Client Authentication
+            X509v3 Key Usage: 
+                Digital Signature
+    Signature Algorithm: sha256WithRSAEncryption
+         75:34:da:1b:11:ba:b2:7d:1c:7b:3c:9f:0c:db:cd:cb:20:d0:
+         c5:ff:6e:77:2a:63:14:3e:81:1a:8a:ab:a9:71:47:b8:cd:35:
+         f5:c0:eb:b4:7b:8e:10:0a:28:14:4c:4f:aa:c0:e7:77:92:7e:
+         94:33:a1:d0:f3:e1:f9:5f:47:13:cb:43:a4:4e:ea:44:f3:43:
+         ee:6f:56:5d:ed:a5:7d:a0:2c:c7:d2:a8:48:af:92:3d:c8:92:
+         e0:93:f4:e3:23:93:63:21:3e:f8:cb:be:bf:67:19:0c:40:57:
+         34:65:18:f9:ac:06:85:7a:4e:1e:47:a5:04:60:10:2f:c8:01:
+         eb:e2:08:45:95:6e:f3:7c:a9:dd:40:77:17:fa:ef:a0:d2:d0:
+         2d:86:fb:d6:f5:71:a7:7a:c8:2f:66:42:b2:4e:ba:a4:a0:d3:
+         35:29:a9:52:98:99:a1:7f:ba:fd:53:38:ab:95:b2:b1:45:c3:
+         05:23:68:70:70:bb:d3:54:f3:ed:75:94:84:a8:55:c3:2b:93:
+         f7:9a:e5:31:43:bb:1a:65:dd:8c:4d:b6:fc:51:36:63:d8:84:
+         be:31:25:79:f2:7b:4a:44:50:aa:77:d5:2b:fe:6b:76:31:31:
+         d9:bd:9b:c1:1b:5d:c4:91:a2:99:32:2c:b3:65:3d:d5:c8:2c:
+         59:b7:c4:84
+-----BEGIN CERTIFICATE-----
+MIIFAjCCA+qgAwIBAgIBATANBgkqhkiG9w0BAQsFADCBmzELMAkGA1UEBhMCRUcx
+CzAJBgNVBAgTAlBBMQ4wDAYDVQQHEwVDQUlSTzESMBAGA1UEChMJUXVpY2tTdG9y
+MQ4wDAYDVQQLEwVTYWxlczEVMBMGA1UEAxMMUXVpY2tTdG9yIENBMRAwDgYDVQQp
+EwdFYXN5UlNBMSIwIAYJKoZIhvcNAQkBFhNzYWxlc0BxdWlja3N0b3IubmV0MB4X
+DTE2MDEyMjE2NDgwMloXDTI2MDExOTE2NDgwMlowgZYxCzAJBgNVBAYTAkVHMQsw
+CQYDVQQIEwJQQTEOMAwGA1UEBxMFQ0FJUk8xEjAQBgNVBAoTCVF1aWNrU3RvcjEO
+MAwGA1UECxMFU2FsZXMxEDAOBgNVBAMTB3RvcHN0b3IxEDAOBgNVBCkTB0Vhc3lS
+U0ExIjAgBgkqhkiG9w0BCQEWE3NhbGVzQHF1aWNrc3Rvci5uZXQwggEiMA0GCSqG
+SIb3DQEBAQUAA4IBDwAwggEKAoIBAQC/R6+v3Knp5XlUriARcRzcRf45xyTmLUww
+F3YwSpZ5dA3wnfnnDWL6x0hB9xj/DCmiAfH9yIltjdM+Xo1FjaiAquHWPhJBkek9
+v3ncTVl9ispxsq2R5GSox1PPoNkdxLQD7T438Q4V3U/Mb1mJfhyp7Aef9fICexQV
+NpZqEM8GNoxUbJU/rFOovg7z++OCN5LBHdDOAKVm+YuYrKYxNkyZpyxcrYrEOgFW
+TNDIhOpNDRqbVHYlRwaqkZ51ORftm2jh/AdX5bZdgH15HuIVGgpsI2VUuscf3Vmd
+ck/jQpIS8/RhdFwwFM2MmMckvjlsJGeTqvigqUp10H9hAoxFJ0VzAgMBAAGjggFS
+MIIBTjAJBgNVHRMEAjAAMC0GCWCGSAGG+EIBDQQgFh5FYXN5LVJTQSBHZW5lcmF0
+ZWQgQ2VydGlmaWNhdGUwHQYDVR0OBBYEFDI0hNsr3pXXs6GFiTiwQJ74nbqEMIHQ
+BgNVHSMEgcgwgcWAFKoupRzICU4CvkxzzZJJsWKOoqU2oYGhpIGeMIGbMQswCQYD
+VQQGEwJFRzELMAkGA1UECBMCUEExDjAMBgNVBAcTBUNBSVJPMRIwEAYDVQQKEwlR
+dWlja1N0b3IxDjAMBgNVBAsTBVNhbGVzMRUwEwYDVQQDEwxRdWlja1N0b3IgQ0Ex
+EDAOBgNVBCkTB0Vhc3lSU0ExIjAgBgkqhkiG9w0BCQEWE3NhbGVzQHF1aWNrc3Rv
+ci5uZXSCCQDENrHpXF/34DATBgNVHSUEDDAKBggrBgEFBQcDAjALBgNVHQ8EBAMC
+B4AwDQYJKoZIhvcNAQELBQADggEBAHU02hsRurJ9HHs8nwzbzcsg0MX/bncqYxQ+
+gRqKq6lxR7jNNfXA67R7jhAKKBRMT6rA53eSfpQzodDz4flfRxPLQ6RO6kTzQ+5v
+Vl3tpX2gLMfSqEivkj3IkuCT9OMjk2MhPvjLvr9nGQxAVzRlGPmsBoV6Th5HpQRg
+EC/IAeviCEWVbvN8qd1Adxf676DS0C2G+9b1cad6yC9mQrJOuqSg0zUpqVKYmaF/
+uv1TOKuVsrFFwwUjaHBwu9NU8+11lISoVcMrk/ea5TFDuxpl3YxNtvxRNmPYhL4x
+JXnye0pEUKp31Sv+a3YxMdm9m8EbXcSRopkyLLNlPdXILFm3xIQ=
+-----END CERTIFICATE-----

@@ -1,0 +1,4 @@
+#!/usr/local/bin/zsh
+count=`/sbin/zfs list -t snapshot | grep  "$@" | wc -l`;
+count=$((count+0));
+if [[ $count == 1 ]]; then echo found; else echo no; fi;

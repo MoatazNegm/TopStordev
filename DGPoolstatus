@@ -1,0 +1,19 @@
+#!/usr/local/bin/zsh
+web="/usr/local/www/apache24/data/des19/Data/poolstatus.txt";
+pstatus=` /sbin/zpool list | grep Data `;
+isok=` echo $pstatus | wc -c | awk '{print $1}'`;
+if [[ $isok -ge 20 ]]; then
+ raid='raidz2';
+ ismirr=`zpool status Data | grep mirror | wc -c`;
+ if [[ $ismirr -ge 5 ]]; then
+	raid='mirror';
+ fi
+ israidz=`zpool status Data |grep raidz1 | wc -c`;
+ if [[ $israidz -ge 5 ]]; then
+ 	raid='raidz';
+ fi
+ jsonok=`/usr/local/bin/zsh jsonthis3.sh status ok raid $raid`;
+else
+ jsonok=`/usr/local/bin/zsh jsonthis3.sh status no`;
+fi
+echo $jsonok > $web

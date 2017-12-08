@@ -1,0 +1,61 @@
+#!/usr/local/bin/zsh
+cd /TopStor/
+echo $@ > ~/tmp
+web='/var/www/html/des20/Data/HostManualconfigstatus.log';
+logging='/var/www/html/des20/Data/currentinfo2.log';
+runningpools='/pacedata/pools/runningpools';
+glog='/TopStordata/TopStor.log';
+txtres='/TopStordata/'`basename $0`'.txt'
+hostname=`hostname -s`
+rm -rf $txtres &>/dev/null
+hostn=`echo $@ | awk '{ print $1 }' `;
+hostip=`echo $@ | awk '{ print $2 }'`;
+hostrout=`echo $@ | awk '{ print $3 }'`;
+hostdns=` echo $@ | awk '{ print $4 }'`
+subnet=` echo $@ | awk '{ print $5 }'`;
+userreq=` echo $@ | awk '{ print $6 }'`;
+privilege="Error";
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]];
+then
+echo HostManual1000: > $web;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logdata='changing_box_to:'$hostn'_'$hostip'/'$subnet'_'$hostrout'_'$hostdns;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code HostManual1002@@@.`;
+echo HostManual1002@$datenow@$timenow@. > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq HostManual1002@@@i. $dtn>> $glog
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
+chattr -i /etc/resolv.conf
+sed -i "/nameserver/c\nameserver $hostdns" /etc/resolv.conf
+chattr +i /etc/resolv.conf
+grep GATEWAY /etc/sysconfig/network-scripts/ifcf* | awk -F: '{print $1}' | sort -u | xargs sed -i "/GATEWAYc\GATEWAY\=$hostrout"  2>/dev/null
+#sed -e "s/HOSTNAME/$hostn/g" -e "s/IPADD/$hostip/g" -e "s/ROUTE/$hostrout/g" rc.conf > txt/rc.conf
+sed -ri  "s/(https:\/\/)[^=]*$/\1$hostip\//g" /etc/httpd/conf.d/sshhttp.conf 
+CC=`pcs resource | grep IPaddr2 | awk '{print $1}'`
+echo CCis $CC
+oldip=`pcs resource show $CC | grep Attrib | awk '{print $2}' | awk -F'=' '{print $2}'`
+oldsubnet=`pcs resource show $CC | grep Attrib | awk '{print $4}' | awk -F'=' '{print $2}'`
+dev=`pcs resource show $CC | grep Attrib | awk '{print $3}' | awk -F'=' '{print $2}'`
+pcs resource update $CC ip=$hostip
+pcs resource update $CC cidr_netmask=$subnet
+pcs resource debug-stop $CC
+pcs resource debug-start $CC
+/sbin/ip addr del ${oldip}/$oldsubnet dev $dev
+oldhostn=`cat /TopStordata/hostname`
+/pace/keysend.sh
+echo $hostn > /TopStordata/hostname
+#sed -i "s/$oldhostn/$hostn/g" $runningpools
+sed -i "/$hostname/s/\w*\$//" $runningpools
+sed -i "/$hostname/s/\$/$hostn/" $runningpools
+/pace/keysend.sh
+echo HostManual1001: > $web
+logdata='success_changing_box_to:'$hostn'_'$hostip'_'$hostrout'_'$hostdns;
+datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code HostManual1003@@@${hostn}@${hostip}'/'${subnet}@${hostrout}@${hostdns}`;
+echo HostManual1003@$datenow@$timenow@$hostn@${hostip}'/'${subnet}@$hostrout@$hostdns > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+echo $datenow $timenow info $userreq HostManual1003@@@$hostn@${hostip}'/'${subnet}@$hostrout@$hostdns $dtn>> $glog
+oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging; 
+fi
+/pace/keysend.sh

@@ -1,0 +1,36 @@
+#!/usr/local/bin/zsh
+oper3=`echo $@ | awk '{print $1}'`
+txtres=`echo $@ | awk '{print $2}'`
+newsnap2=`echo $@ | awk '{print $3}'`
+pool=`echo $@ | awk '{print $4}'`
+vol=`echo $@ | awk '{print $5}'`
+remotetun=`echo $@ | awk '{print $6}'`
+pp=`echo $@ | awk '{print $7}'`
+so=`echo $@ | awk '{print $8}'`
+newsnap=`echo $@ | awk '{print $9}'`
+cronout=`echo $@ | awk '{print $10}'`
+replipidf='/TopStordata/ProxyReplicate.pid'
+cd /TopStor 
+/sbin/zfs set repli:sender=$so $newsnap;
+replipid=`cat $replipidf`
+if [ $? -eq 0 ];
+then
+ replipidn=`echo $replipid | wc -l`
+ if [ $replipidn -eq 1 ]; then
+  echo waiting >> $replipidf; 
+  echo skipping and will wait for running ProxyReplicate $oper3 ${txtres} $newsnap2 $pool $vol $remotetun $pp $so local>> $cronout
+  exit 0
+ else
+  tokill=` echo $replipid | grep pid | awk '{print $2}'`
+  kill -9 $tokill;
+  echo killed a running ProxyReplicate >> $cronout
+ fi
+fi
+echo ProxyReplicate $oper3 ${txtres} $newsnap2 $pool $vol $remotetun $pp $so local>> $cronout
+ echo ProxyReplicate $oper3 ${txtres} $newsnap2 $pool $vol $remotetun $pp $so local
+ ./ProxyReplicate $oper3 ${txtres}  $newsnap2 $pool $vol $remotetun $pp $so local
+ if [ $? -eq 0 ]; then
+  echo success;
+ else
+   echo failed;
+ fi

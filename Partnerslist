@@ -1,0 +1,18 @@
+#!/usr/local/bin/zsh
+webpartner='/var/www/html/des20/Data/Partnerslist.txt';
+resweb='/var/www/html/des20/Data/Partnerslist.txtupdated'
+partners='/TopStordata/partners.txt'
+result="[";
+cat $partners | while read -r line ; do
+  n=` echo $line | awk '{print $1}'`; 
+  t=`echo $line | awk '{print $2}'`;
+  p=`echo $line | awk '{print $3}'`;
+  pass=`echo $line | awk '{print $4}'`;
+  subres=`./jsonthis3.sh name $n type $t proxy $p passphrase $pass`;
+  result=$result$subres,
+done;
+result=`echo $result | rev | cut -c 2- | rev`']';
+echo $result >$webpartner;
+resdate=`date +%s`;
+res=` ./jsonthis3.sh updated $resdate`;
+echo $res > $resweb;

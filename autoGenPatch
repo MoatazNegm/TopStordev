@@ -1,0 +1,65 @@
+#!/usr/local/bin/zsh
+#cd /root/scripts
+cd /TopStor
+TopStor='TopStor'
+tmpdir='/root'
+pace='pace'
+web='var/www/html/des20/'
+logging='/var/www/html/des20/Data/currentinfo2.log';
+glog='/TopStordata/TopStor.log';
+currentfw=`git branch | grep \* | awk '{print $2}'`
+webfile='/var/www/html/des20/Data';
+userreq='system'
+cd /TopStordata
+mkdir fw &>/dev/null
+cd fw
+rm -rf * &>/dev/null
+#wget ftp://10.11.11.124/pub/current/
+wget ftp://ftp.quickstor.net/download/current/ --user=anonymous@quickstor.net
+if [ ! -f index.html ];
+ then 
+ cd /TopStor
+ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+ logdata='Software autocheck cannot reach online repository';
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg warning user $userreq data $logdata code Upcr1010@@`;
+ echo Upcr1010@$datenow@$timenow > ${logging}2;
+ dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+ echo $datenow $timenow warning $userreq  Upcr1010@@ $dtn>> $glog
+ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+ exit
+fi
+realfw=`cat index.html | grep qsfw | awk -F'current/' '{print $2}' | awk -F'.qsfw' '{print $1}'`
+
+newfw=`echo -e ${realfw}'\n'$currentfw | sort -nr | head -1`
+cd /TopStor
+echo $newfw | grep $currentfw
+if [ $? -eq 0 ]; 
+then
+ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+ logdata='Software autocheck found system software is latest version';
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Upnu1010@@`;
+ echo Upnu1010@$datenow@$timenow > ${logging}2;
+ dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+ echo $datenow $timenow info $userreq  Upnu1010@@ $dtn>> $glog
+ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+else
+ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+ logdata='Start downloading new software version: '$realfw;
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Updo1010@@@$realfw`;
+ echo Updo1010@$datenow@$timenow@$realfw > ${logging}2;
+ dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+ echo $datenow $timenow info $userreq  Updo1010@@@$realfw $dtn>> $glog
+ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+ cd $webfile
+# wget ftp://10.11.11.124/pub/current/${newfw}.qsfw
+ wget ftp://ftp.quickstor.net/download/current/${newfw}.qsfw --user=anonymous@quickstor.net
+ cd /TopStor
+ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+ logdata='finish downloading new software version: '$realfw;
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Upfd1010@@@$realfw`;
+ echo Upfd1010@$datenow@$timenow@$realfw > ${logging}2;
+ dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+ echo $datenow $timenow info $userreq  Upfd1010@@@$realfw $dtn>> $glog
+ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+ ./GenPatch ${newfw}.qsfw system 
+fi

@@ -1,0 +1,169 @@
+#!/usr/local/bin/zsh
+cd /TopStor
+export POR;
+export RR; 
+export STAMP;
+export OPERS;
+#############################################################################33
+function RemoteAsk() {
+ RR="";
+ stamp=`date +%s`
+ stamp=$(( ( $(od -An -N2 -i /dev/random) )%(1000)));
+ oldstamp=$(( ( $(od -An -N2 -i /dev/random) )%(1000)));
+ msg=$@;
+ flagcount=0;
+ pp=$POR;
+ ppplus=$((pp+1));
+ ppzfs=$((pp+2));
+ pipefile="txt/cout"$POR
+ while [ ! -p txt/cin$POR ] ; do  echo hi > /dev/null; done
+ issocat=`ps -auxw | grep Proxyreading | wc -c `;
+ if [[ $issocat -le 2 ]];
+ then
+   ./Proxyreading.sh $pipefile &;
+ fi
+ echo RemoteAskxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx >> txt/tmpproxyrequest
+ lineflagn=0;
+ echo Remotestamp=$stamp $msg txt/cin$POR >> txt/tmpproxyrequest;
+ echo $stamp $msg > txt/cin$POR ;
+ while [[ $lineflagn -le 2 && $flagcount -le 50 ]]; do
+ {
+# sleep 1
+ echo sending $stamp $msg >> txt/tmpproxyrequest
+ echo $stamp $msg > txt/cin$POR ;
+ echo sent $stamp $msg >> txt/tmpproxyrequest
+ if [[ $flagcount -ge 5 ]]; 
+ then
+  issocat=`ps -auxw | grep -w socat | grep -w "$pp" | wc -c `;
+  if [[ $issocat -le 3 ]];
+  then
+   issocat=`ps -auxw | grep -w socat | grep -w "$pp" | wc -c `;
+  fi
+#  echo $stamp $msg > txt/cin$POR ;
+ fi
+ echo read -r lineflag1  ${pipefile}f >> txt/tmpproxyrequest;
+ lineflag1=`tail -n 1  ${pipefile}f `;
+ echo flag1=$lineflag1 >> txt/tmpproxyrequest; 
+ lineflag=` echo $lineflag1 | grep -w "$stamp" | tail -n 1 `;
+ lineflagn=`echo $lineflag | wc -c `;
+ flagcount=$((flagcount+1));
+ echo lineflag=$lineflag  linen=$lineflagn count=$flagcount >> txt/tmpproxyrequest
+ }
+ done;
+# read -t 1 lineflag1<txt/cout$POR &
+ lineflag=`echo $lineflag | awk '{$1=""; print substr($0,2)}'`
+ if [[ $lineflag == "waiting" ]]; then RR="FAILED"; else RR=$lineflag; fi;
+ echo afterAsk=$RR >> txt/tmpproxyrequest
+ #echo $lineflag;
+}
+###############################################################################
+function Sendzfs () {
+ proxyser=`cat proxy.txt | awk '{print $1}'`;
+ msg=$@;
+ msgf=\'${msg}\'
+ pp=$POR;
+ ppzfs=$((pp+2));
+ echo sending /usr/local/bin/socat TCP4:$proxyser:$ppzfs exec:"$msgf" >> txt/tmpproxyrequest
+ /usr/local/bin/socat TCP4:10.1.1.1:323,connect-timeout=.002,interval=0.2,retry=2 PIPE:txt/tmptmp 2> /dev/null 
+ /usr/local/bin/socat TCP4:$proxyser:$ppzfs exec:${msgf};
+ echo finish sending /usr/local/bin/socat TCP4:$proxyser:$ppzfs exec:"$msgf" >> txt/tmpproxyrequest
+}
+#########################################################################
+###############################################################################
+so=`cat proxy.txt | awk '{print $3}'`;
+dst=`echo $@ | awk '{print $2}'`;
+filelog=`echo $@ | awk '{print $3}'`;
+snap=`echo $@ | awk '{print $4}'`
+pool=`echo $@ | awk '{print $5}'`;
+vol=`echo $@ | awk '{print $6}'`;
+STAMP=0
+partner=`cat partners.txt | grep $dst`;
+passphrase=` echo $partner | awk '{print $4}'`;
+pp=` echo $partner | awk '{print $5}'`;
+#pp=$(( 3000+( $(od -An -N2 -i /dev/random) )%(4000-1024+1) ))
+POR=$pp;
+echo Replicate=$RR >> txt/tmpproxyrequest
+echo Roperands=$@ >> txt/tmpproxyrequest;
+OPERS=`echo $so $dst ProxysendReInit.sh $dst $pp`;
+echo OPERS $OPERS >> txt/tmpproxyrequest
+issocat=`ps -axuw | grep ProxyReplicateSVC | grep -w "$dst" `
+issocatn=`echo $issocat | wc -c `;
+./Proxyalert.sh $so $dst $passphrase $pp;
+if [[ $issocatn -le 3 ]]; then 
+./ProxyReplicateSVC.sh $so $dst $passphrase $pp &
+fi
+RemoteAsk  ready; 
+echo RR=$RR  >> txt/tmpproxyrequest
+echo donennnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn >> txt/tmpproxyrequest
+if [[ $RR != "ready" ]]; then echo cannot make session;
+else 
+ POR=$pp;
+ echo RemoteAsk RemoteVolSearch $vol >> txt/tmpproxyrequest
+ RemoteAsk RemoteVolSearch $vol;
+ volfound=$RR;
+ echo volfound=$volfound >> txt/tmpproxyrequest
+ if [[ $volfound == 'FAILED' ]]; then echo Problem: $volfound >> $filelog; exit 1 ; fi
+ if [[ $volfound == "no" ]];
+ then
+  echo no >> txt/tmpproxyrequest
+  volpar=`./RemoteGetPoolVollist $vol`;
+  prot=`echo $volpar | awk '{print $1}'`;
+  size=`echo $volpar | awk '{print $2}'`;
+  echo RemoteAsk VolumeCreate$prot $pool $vol ${size}M admin >> txt/tmpproxyrequest 
+  RemoteAsk VolumeCreate$prot $pool $vol ${size}M admin; 
+  echo RemoteAsk repli.sh $pp $pool $so $vol >> txt/tmpproxyrequest;
+  RemoteAsk repli.sh $pp $pool $so $vol ;
+#  tobeready=`RemoteAsk repli.sh $pt $pool $so $vol` ;
+#  echo RemoteAsk GetPoolVollist hi  >> txt/tmpproxyrequest; 
+#  RemoteAsk GetPoolVollist hi  
+  echo zfs send -D $pool/$vol@$snap  to txt/c$ppzfs >> txt/tmpproxyrequest;
+  Sendzfs zfs send -D $pool/$vol@$snap ;
+ else 
+  if [[ $volfound == "found" ]];
+  then
+   echo foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn >> txt/tmpproxyrequest
+   RemoteAsk RemoteGetSnaplist $vol;
+   if [[ $RR == "nothing" ]];  then oldsnaps=""; else oldsnaps=$RR; fi;
+   localsnaps=`./RemoteGetSnaplist $vol`;
+   ll=$oldsnaps;
+   ll=${ll}' spot';
+   echo ll=$ll >> txt/tmpproxyrequest
+   echo oldsnaps result $RR >> txt/tmpproxyrequest;
+   lineupsnaps=`echo $ll | tr ' ' '\n' `
+   initialsnap="";
+   echo $lineupsnaps | while read -r line  
+   do
+    if [[ ${localsnaps/$line} == $localsnaps ]];
+    then ; else initialsnap=$line;  break; fi;
+   done;
+   targetsnap=$pool/$vol@$snap
+   echo targetsnap=$targetsnap >> txt/tmpproxyrequest
+   echo initialsnap=$initialsnap >> txt/tmpproxyrequest
+   if [[ $initialsnap == $targetsnap ]]; 
+   then echo up-to-date >> txt/tmpproxyrequest; fi
+   if [[ $initialsnap == "" ]];
+   then 
+    echo yyyyyyyyyyyyyintital is null >> txt/tmpproxyrequest 
+    echo RemoteAsk destroysnaps.sh $vol >> txt/tmpproxyrequest;
+    RemoteAsk destroysnaps.sh $vol ;
+    echo RemoteAsk repli.sh $pp $pool $so $vol >> txt/tmpproxyrequest;
+    RemoteAsk repli.sh $pp $pool $so $vol;
+#echo exit  >> txt/tmpproxyrequest
+#exit
+    echo zfs send -R   $targetsnap  to  txt/c$ppzfs >> txt/tmpproxyrequest;
+    Sendzfs zfs send -R   $targetsnap ;
+    exit;
+   else
+    echo RemoteAsk repli.sh $pp $pool $so $vol >> txt/tmpproxyrequest;
+    RemoteAsk repli.sh $pp $pool $so $vol;
+    echo zfs send -R -I $initialsnap  $targetsnap to txt/c$ppzfs >> txt/tmpproxyrequest;
+    Sendzfs zfs send -R -I $initialsnap  $targetsnap ;
+   fi
+  fi
+ fi
+ ./GetSnaplist & 
+ echo RemoteAsk GetSnaplist hi  >> txt/tmpproxyrequest 
+ RemoteAsk GetSnaplist hi & 
+fi
+ echo POR=$POR Compelete  >> txt/tmpproxyrequest ; 
+# RemoteAsk done  & ; 

@@ -1,0 +1,7 @@
+#!/usr/local/bin/zsh
+cd /TopStor/;
+webusers='/var/www/html/des20/Data/listusers.txt';
+namearray=( `cat /etc/passwd | grep TopStor | /usr/bin/cut -d: -f1,3 | /usr/bin/cut -d: -f1 | grep -v moataz ` ); 
+nameforjson=`echo $namearray | /usr/bin/sed 's/ /:/g'` ;
+jsonname=`./jsonthis.sh $nameforjson`;
+echo $jsonname >$webusers ;

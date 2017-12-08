@@ -1,0 +1,12 @@
+#!/usr/local/bin/zsh
+cd /TopStor
+#pp=`echo  $@ | awk '{print $1}'`;
+pp=`cat workingpp | awk '{print $1}'`;
+tun=`echo  $@ | awk '{print $2}'`;
+peer=`echo  $@ | awk '{print $3}'`;
+while true;
+do
+  rm txt/tmp$peer 2>/dev/null
+  nc -ld $tun $pp > txt/tmp$peer ;
+  cp txt/tmp$peer txt/$peer;
+done

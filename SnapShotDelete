@@ -1,0 +1,51 @@
+#!/usr/local/bin/zsh
+cd /TopStor
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin
+web='/var/www/html/des20/Data/Snapsstatus.log';
+logging='/var/www/html/des20/Data/currentinfo2.log'
+glog='/TopStordata/TopStor.log';
+runningpools='/pacedata/pools/runningpools'
+pDG=` echo $@ | awk '{print $1}'`;
+snapdel=` echo $@ | awk '{print $2}'`;
+userreq=` echo $@ | awk '{print $3}'`;
+txtres='/TopStordata/'`basename $0`$userreq'.txt'
+rm $txtres 2>/dev/null
+hostnam=` echo $@ | awk -F_ '{print $1}'`;
+sshost=`echo $pDG | awk -F_ '{print $1}'`;
+#sshost=`cat $runningpools | grep $hostnam | awk '{print $1}'`;
+privilege="SnapShots";
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
+then
+ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+ logdata='Deleting_Snapshot:'$hostnam/$snapdel;
+ logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1022@@@$hostnam/$snapdel`;
+ echo Snap1022@$datenow@$timenow@$hostnam/$snapdel > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+ echo $datenow $timenow info $userreq Snap1022@@@$hostnam/$snapdel $dtn>> $glog
+ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+ echo Snap1000:$hostnam/$snapdel > $web;
+ ssh root@$sshost "/sbin/zfs destroy $snapdel"  2> $txtres
+ err=`wc -c  $txtres | awk '{print $1}'`;
+ datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
+ if [[ $err -ge  4  ]]; then
+ 	echo Snap1001:$hostnam/$snapdel > $web;
+ 	cat $txtres > ${web}internal;
+ 	logdata='Failed_Deleting_Snapshot:'$snapdel;
+ 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code Snap1023@@@$hostnam/$snapdel`;
+  echo Snap1023@$datenow@$timenow@$hostnam/$snapdel > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+ echo $datenow $timenow error $userreq Snap1023@@@$hostnam/$snapdel $dtn>> $glog
+  oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+ else 
+	 echo Snap1002:$hostnam/$snapdel > $web; 
+	logdata='Success_Deleting_Snapshot:'$hostnam/$snapdel;
+	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code Snap1025@@@$hostnam/$snapdel`;
+  echo Snap1025@$datenow@$timenow@$hostnam/$snapdel > ${logging}2
+dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
+ echo $datenow $timenow info $userreq Snap1025@@@$hostnam/$snapdel $dtn>> $glog
+ oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
+  ./GetSnaplist
+  exit 0 ;
+ fi;
+fi

@@ -1,0 +1,62 @@
+#!/usr/local/bin/zsh
+cd /TopStor
+#replierpp=`echo  $@ | awk '{print $1}'`;
+tun=`echo  $@ | awk '{print $2}'`;
+replier=`echo  $@ | awk '{print $3}'`;
+stampid=`echo  $@ | awk '{print $4}'`;
+localrep=`echo  $@ | awk '{print $5}'`;
+if [[ $localrep == "proxy" ]];
+then
+ replierpp=`cat workingpp | awk '{print $1}'`;
+else
+ replierpp=`cat workingpplocal | awk '{print $1}'`;
+fi
+pp=$((replierpp+1));
+oldstamp=0;
+# packet : sender stamp command
+while true;
+do
+# echo starting >> tmpask
+ ps -awx | grep "nc -ld" | grep "$tun" | grep "$pp" >/dev/null 2>&1
+ if [[ $? -ne 0 ]]; 
+ then
+  if [[ $localrep == "local" ]];
+  then
+   readthis=`nc -ld $tun $pp | gunzip | openssl enc -d -aes-256-cbc -a -A -k SuperSecretPWD`;
+  else
+   readthis=`nc -ld $tun $pp 2>/dev/null`
+  fi;
+#  echo readthis $readthis >>tmpask
+  echo $readthis > tmpreadthis
+  newsender=`echo $readthis | awk '{print $1}'`;
+  stamp=`echo $readthis | awk '{print $2}'`;
+  isreply=`echo $readthis | awk '{print $3}'`;
+  newcom=`echo $readthis | awk '{$1=$2=$3="";print substr($0,4)}'`
+  if [[ $isreply == "finish" ]]; then break; fi
+  if [[ $isreply == "reply" ]]; 
+  then echo $readthis >> txt/remotereply$newsender ;
+  else
+   if [[ $stamp != $oldstamp ]];
+   then 
+    oldstamp=$stamp;
+    echo $oldstamp >> tmpreadthis
+    if [[ $localrep == "local" ]];
+    then 
+     issender=`cat partners.txt | grep "$newsender" | grep sender`; 
+     sendertun=`echo $issender | awk '{print $1}'`
+    else
+     issender=`cat txt/peer | grep "$newsender"`; 
+     sendertun=`echo $issender | awk '{print $3}'`
+    fi
+    echo $newsender >> tmprunthis 
+    if [[ $? -eq 0 ]]; 
+    then
+#     senderpp=`echo $issender | awk '{print $4}'`
+      senderpp=$pp
+     ./runthis $sendertun $newsender $replier $senderpp $pp $tun $stamp $localrep $newcom &;
+     echo ./runthis $sendertun $newsender $replier $senderpp $pp $tun $stamp $localrep $newcom >> tmprunthis2
+    fi
+   fi
+  fi 
+ fi 
+done

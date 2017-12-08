@@ -1,0 +1,92 @@
+#!/usr/local/bin/zsh
+cd /TopStor
+export RR;
+function Remoterequest() {
+so=`echo $@ | awk '{print $1}'`;
+dst=`echo $@ | awk '{print $2}'`;
+reply=`echo $@ | awk '{print $3}'`;
+msg=`echo $@ | awk '{$1=$2=$3=""; print substr($0,4)}'`
+lineflag="failed"
+stamp=`date +%s`
+read -t 2  line < /tmp/msgrack ;
+flagcount=0;
+echo xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx >> txt/tmprequest
+while [[ $lineflag == "failed" && flagcount -le 5 ]]; do
+{
+echo echo $so $stamp $reply $msg \| openssl enc -a -A -aes-256-cbc -k SuperSecretPWD \| gzip -cf \| nc -N  $dst  2234 >> txt/tmprequest
+echo $so $stamp $reply $msg | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $dst  2234
+read -t 20 line < /tmp/msgrack ;
+stampreply=`echo $line | awk '{print $1}'`;
+flagcount=$((flagcount+1));
+if [[ $stampreply == $stamp ]]; then echo line=$line >> txt/tmprequest; lineflag=`echo $line | awk '{$1=$2="";print substr($0,3)}'`;  fi 
+echo loopline=$lineflag >> txt/tmprequest
+}
+done;
+RR=$lineflag;
+echo afterrequest=$RR >> txt/tmprequest
+#echo $lineflag;
+}
+###############################################################################
+so=`echo $@ | awk '{print $1}'`;
+dst=`echo $@ | awk '{print $2}'`;
+filelog=`echo $@ | awk '{print $3}'`;
+snap=`echo $@ | awk '{print $4}'`
+pool=`echo $@ | awk '{print $5}'`;
+vol=`echo $@ | awk '{print $6}'`;
+pp=$(( 3000+( $(od -An -N2 -i /dev/random) )%(4000-1024+1) ))
+echo Replicate=$RR >> txt/tmprequest
+echo Roperands=$@ >> txt/tmprequest;
+Remoterequest $so $dst rep RemoteVolSearch $vol;
+volfound=$RR;
+echo volfound=$volfound >> txt/tmprequest
+if [[ $volfound != 'no' && $volfound != 'found' ]]; then echo not $volfound >> $filelog; exit 1 ; fi
+if [[ $volfound == "no" ]];
+then
+ echo no >> txt/tmprequest
+ volpar=`./RemoteGetPoolVollist $vol`;
+ prot=`echo $volpar | awk '{print $1}'`;
+ size=`echo $volpar | awk '{print $2}'`;
+ Remoterequest $so $dst nop VolumeCreate$prot $pool $vol ${size}M admin; 
+ echo /Remoterequest.sh $so $dst nop VolumeCreate$prot $pool $vol ${size}M admin >> txt/tmprequest
+ sleep 2
+ Remoterequest $so $dst nop repli.sh $pp $pool $so $vol ;
+ Remoterequest $so $dst nop GetPoolVollist hi & 
+ zfs send -D $pool/$vol@$snap  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $dst $pp ;
+else 
+ if [[ $volfound == "found" ]];
+ then
+  echo foundfoundfoundfoudnfoundofudnffoudnsdoufndfousdn >> txt/tmprequest
+  Remoterequest $so $dst rep RemoteGetSnaplist $vol;
+  oldsnaps=$RR
+  localsnaps=`./RemoteGetSnaplist $vol`;
+  ll=$oldsnaps;
+  ll=${ll}' spot';
+  echo ll=$ll >> txt/tmprequest
+  lineupsnaps=`echo $ll | tr ' ' '\n' `
+  initialsnap="";
+  echo $lineupsnaps | while read -r line  
+  do
+  if [[ ${localsnaps/$line} == $localsnaps ]];
+  then ; else initialsnap=$line;  break; fi;
+  done;
+  targetsnap=$pool/$vol@$snap
+  echo targetsnap=$targetsnap >> txt/tmprequest
+  echo initialsnap=$initialsnap >> txt/tmprequest
+  if [[ $initialsnap == $targetsnap ]]; 
+  then echo up-to-date >> txt/tmprequest; fi
+  echo Remoterequest.sh $so $dst nop repli.sh $pp $pool $so $vol >> txt/tmprequest
+  if [[ $initialsnap == "" ]];
+  then 
+   echo yyyyyyyyyyyyyintital is null >> txt/tmprequest 
+   Remoterequest $so $dst rep destroysnaps.sh $vol ;
+   Remoterequest $so $dst nop repli.sh $pp $pool $so $vol;
+   echo zfs send -R   $targetsnap  \| openssl enc -a -A -aes-256-cbc -k SuperSecretPWD \| gzip -cf \| nc -N  $dst $pp >> txt/tmprequest
+   zfs send -R   $targetsnap  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $dst $pp;
+  else
+   Remoterequest $so $dst nop repli.sh $pp $pool $so $vol;
+   zfs send -R -I $initialsnap  $targetsnap  | openssl enc -a -A -aes-256-cbc -k SuperSecretPWD | gzip -cf | nc -N  $dst $pp;
+  fi
+ fi
+fi
+./GetSnaplist &
+ Remoterequest $so $dst nop GetSnaplist hi & 

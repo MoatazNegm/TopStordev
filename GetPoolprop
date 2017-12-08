@@ -1,0 +1,17 @@
+#!/usr/local/bin/zsh
+cd /TopStor/;
+poolprop='/TopStordata/poolprop';
+resweb='/var/www/html/des20/Data/Vollist.txtupdated';
+runningpools='/pacedata/pools/runningpools'
+iscsimapping='/pacedata/iscsimapping'
+/sbin/zfs get -t filesystem -Hp quota   
+/sbin/zfs get -t filesystem -Hp logicalused  
+/sbin/zfs get -t filesystem -Hp avail 
+/sbin/zfs get -t filesystem -Hp usedbydataset   
+/sbin/zfs get -t filesystem -Hp usedbysnapshots  
+/sbin/zfs get -t filesystem -Hp quota 
+/sbin/zfs get -t filesystem -H creation 
+/sbin/zfs get -t filesystem -Hp compressratio 
+/sbin/zfs get -t filesystem -Hp dedup 
+/sbin/zfs get -t filesystem prot:kind 
+/sbin/zfs get -t filesystem -Hp name 

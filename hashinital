@@ -1,0 +1,12 @@
+#!/bin/sh
+runningpool=`zpool list -H | awk '{print $1}'`
+tocheck=(`printf "/etc\n/TopStor\n/pace\n/usr/lib/ocf\n/var/www/html/des20"`)
+cd /TopStor
+rm -rf *.err
+for toca in "${tocheck[@]}"; do
+ tocheck=`echo $toca | awk -F'/' '{print $NF}'`
+ ls /$runningpool/* | grep $tocheck  | grep .sha
+ if [[ $? -ne 0 ]]; then
+  ./hashmk $toca
+ fi
+done

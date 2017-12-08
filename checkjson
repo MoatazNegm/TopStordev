@@ -1,0 +1,25 @@
+#!/usr/local/bin/zsh
+ff="$1"
+novalid=`cat $1 | grep --regexp={"::",",,","\"\"",",:",":,","{{","{}","}{","}}","\[\[","\[\]","\]\[","\]\]",",\]",":\]","\[,","\[:","{,","{:",",}",":}"}`
+#echo novalid=$novalid 
+nuoflines=`cat $ff | wc -l`
+#echo nuoflines=$nuoflines
+noquotes=`sed 's/"[a-zA-Z0-9:_./]*"//g' $ff`
+#echo noquotes=$noquotes
+onlychars=`echo $noquotes | sed 's/[,:",{\[]*//g' | sed 's/[]]//g' | sed 's/}//g'`
+#echo onlychars=$onlychars
+br_r=`sed 's/[a-zA-Z0-9:_./",}{\]]*//g' $ff | wc -c`
+br_l=`sed 's/[a-zA-Z0-9:_./",}{\[]*//g' $ff | wc -c`
+race_r=`sed 's/[a-zA-Z0-9:_./",}\[\]]*//g' $ff | wc -c`
+race_l=`sed 's/[a-zA-Z0-9:_./",{[]*//g' $ff | sed 's/[]]//g' | wc -c`
+#echo $br_r
+#echo $br_l
+#echo $race_r
+#echo $race_l
+if [[ -z $onlychars && -z $novalid  && $nuoflines -le 1 && $br_r == $br_l && $race_r == $race_l ]];
+then
+ exit 0;
+else
+ exit 10;
+fi
+
