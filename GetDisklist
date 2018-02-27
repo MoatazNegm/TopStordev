@@ -3,7 +3,7 @@ cd /TopStor/
 COMMAND=$0
 RUNNING=`ps --no-headers -C${COMMAND} | wc -l`
 if [ $RUNNING -gt 1 ]; then echo running; exit 0; fi
-/pace/addtargetdisks.sh
+#/pace/addtargetdisks.sh
 /pace/listingtargets.sh
 iscsitargets='/pacedata/iscsitargets'
 runningpools='/pacedata/pools/runningpools'
@@ -15,7 +15,6 @@ traffic="";
 s=1
 hostns=(`cat $iscsimapping | grep -v notconn | awk '{print $1}' | uniq`)
 disks=(`cat $iscsimapping | grep -v notconn | awk '{print $3}'`)
-#echo disks=$disks
 diskcount=1;
 result='[';
 for disk in "${disks[@]}"; do
@@ -42,7 +41,7 @@ echo hello
    poolsize=`bc -l <<< "1000*$psizet"`
   fi
   groupline=`cat $runningpools | grep "$diskpool" | sed "s/.*$diskpool\(.*\)$disk.*/\1/"`
-  echo $groupline
+  echo groupline=$groupline
   logc=`echo $groupline | grep log | awk -F'log' '{print $NF}' | wc -c `
   if [ $logc -eq 0 ]; then logc="removethis"; fi;
   cachec=`echo $groupline | grep cache | awk -F'cache' '{print $NF}' | wc -c `
