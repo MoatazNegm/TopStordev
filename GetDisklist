@@ -3,6 +3,8 @@ cd /TopStor/
 COMMAND=$0
 RUNNING=`ps --no-headers -C${COMMAND} | wc -l`
 if [ $RUNNING -gt 1 ]; then echo running; exit 0; fi
+/pace/addtargetdisks.sh
+/pace/listingtargets.sh
 iscsitargets='/pacedata/iscsitargets'
 runningpools='/pacedata/pools/runningpools'
 iscsimapping='/pacedata/iscsimapping'
