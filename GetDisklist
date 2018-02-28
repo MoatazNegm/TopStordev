@@ -9,6 +9,7 @@ iscsitargets='/pacedata/iscsitargets'
 runningpools='/pacedata/pools/runningpools'
 iscsimapping='/pacedata/iscsimapping'
 traf='/var/www/html/des20/Data/disklist.txt';
+traflocal='/pacedata/disklist.txt';
 trafupdate='/var/www/html/des20/Data/disklist.txtupdated';
 gpool=("")
 traffic="";
@@ -112,3 +113,4 @@ echo $result > $traf
 resdate=`/bin/date +%s`;
 res=` ./jsonthis3.sh update $resdate`
 echo $res > $trafupdate;
+echo $result > $traflocal;
