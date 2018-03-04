@@ -31,6 +31,7 @@ for disk in "${disks[@]}"; do
 echo hihere
   diskpool=`cat $runningpools | grep $disk | awk '{print $2}'`;
   sshost=`cat $runningpools | grep $disk | awk '{print $NF}'`;
+  ssh $sshost zfs list
   psize=`ssh $sshost zfs list -H  p1| awk '{print $3}' `
 echo hello
 #  psize=`cat $runningpools | grep $disk | awk '{print $3}'`;
@@ -104,6 +105,7 @@ echo hello
  fi 
  diskhost=`cat $iscsimapping | grep $disk | awk '{print $1}'`;
  disksize=`cat $iscsimapping | grep -w $disk | awk '{print $4}'`
+ echo diskpool=$diskpool
  subres=`./jsonthis3.sh id $diskcount name $disk host $diskhost pool $diskpool size $disksize grouptype $grouptype poolsize $poolsize InGroupDisk1 $IngroupDisk1 InGroupDisk2 $IngroupDisk2`
  result=$result$subres,
  diskcount=$((diskcount+1));
