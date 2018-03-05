@@ -1,0 +1,131 @@
+#!/usr/local/bin/zsh
+cd /TopStor/
+COMMAND=$0
+RUNNING=`ps --no-headers -C${COMMAND} | wc -l`
+if [ $RUNNING -gt 1 ]; then echo running; exit 0; fi
+#/pace/addtargetdisks.sh
+/pace/listingtargets.sh
+iscsitargets='/pacedata/iscsitargets'
+runningpools='/pacedata/pools/runningpools'
+iscsimapping='/pacedata/iscsimapping'
+traf='/var/www/html/des20/Data/disklist.txt';
+traflocal='/pacedata/disklist.txt';
+trafupdate='/var/www/html/des20/Data/disklist.txtupdated';
+gpool=("")
+traffic="";
+s=1
+hostns=(`cat $iscsimapping | grep -v notconn | awk '{print $1}' | uniq`)
+disks=(`cat $iscsimapping | grep -v notconn | awk '{print $3}'`)
+diskcount=1;
+result='[';
+for disk in "${disks[@]}"; do
+ grouptype='stripe';
+ cat $runningpools | grep $disk  &>/dev/null
+ if [ $? -ne 0 ]; then
+  diskstatus='FREE'
+  grouptype='free'
+  diskpool='free'; 
+  IngroupDisk1='notavailable';
+  IngroupDisk2='notavailable';
+  poolsize='0';
+ else
+echo hihere
+  
+  diskpool=`cat $runningpools | grep $disk | awk '{print $2}'`;
+  sshost=`cat $runningpools | grep $disk | awk '{print $NF}'`;
+   
+  shost=`cat /etc/hosts | grep $sshost | awk '{print $1}'`
+  if [ ! -z $shost ]; then
+   sshost=$shost
+  fi
+  ssh $sshost zfs list
+  psize=`ssh $sshost zfs list -H  p1| awk '{print $3}' `
+  echo ssh=ssh $sshost zfs list -H  p1
+echo hello
+#  psize=`cat $runningpools | grep $disk | awk '{print $3}'`;
+  psizet=`echo $psize | grep T | awk -F'T' '{print $1}'`
+  if [ -z $psizeT ]; then 
+   psizeg=`echo $psize | grep G | awk -F'G' '{print $1}'`
+   poolsize=`bc -l <<< "1*$psizeg"`
+  else 
+   poolsize=`bc -l <<< "1000*$psizet"`
+  fi
+  groupline=`cat $runningpools | grep "$diskpool" | sed "s/.*$diskpool\(.*\)$disk.*/\1/"`
+  echo groupline=$groupline
+  logc=`echo $groupline | grep log | awk -F'log' '{print $NF}' | wc -c `
+  if [ $logc -eq 0 ]; then logc="removethis"; fi;
+  cachec=`echo $groupline | grep cache | awk -F'cache' '{print $NF}' | wc -c `
+  if [ $cachec -eq 0 ]; then cachec="removethis"; fi;
+  mirrorc=`echo $groupline | grep mirror | awk -F'mirror' '{print $NF}' | wc -c `
+  if [ $mirrorc -eq 0 ]; then mirrorc="removethis"; fi;
+  raidc1=`echo $groupline | grep raidz1 | awk -F'raidz1' '{print $NF}' | wc -c ` 
+  if [ $raidc1 -eq 0 ]; then raidc1="removethis"; fi;
+  raidc2=`echo $groupline | grep raidz2 | awk -F'raidz2' '{print $NF}' | wc -c ` 
+  if [ $raidc2 -eq 0 ]; then raidc2="removethis"; fi;
+  raidc3=`echo $groupline | grep raidz3 | awk -F'raidz3' '{print $NF}' | wc -c ` 
+  if [ $raidc3 -eq 0 ]; then raidc3="removethis"; fi;
+  sparec=`echo $groupline | grep spare | awk -F'spare' '{print $NF}' | wc -c `
+  if [ $sparec -eq 0 ]; then sparec="removethis"; fi;
+  IngroupDisk1c=`echo $groupline | grep scsi | awk -F'scsi' '{print $NF}' | wc -c `
+  IngroupDisk1="notavailable"
+  if [ $IngroupDisk1c -eq 0 ]; then 
+   IngroupDisk1c="removethis";
+  else 
+   IngroupDisk1='scsi'`echo $groupline | grep scsi | awk -F'scsi' '{print $NF}' | awk '{print $1}'`
+  fi
+  allc=${cachec}'_cache '${logc}'_log '${raidc1}'_raid1 '${raidc2}'_raid2 '${raidc3}'_raid3 '${mirrorc}'_mirror '$sparec'_spare'
+  winning=`echo $allc |tr " " "\n"| grep -v removethis | sort -n | head -1`
+#  echo $winning
+  if [ ! -z $winning ]; then
+    grouptype=`echo $winning | awk -F'_' '{print $2}'`
+    groupc=`echo $winning | wc -c`
+    allc2=${IngroupDisk1c}'_'scsi' '$winning
+    winning2=` echo $allc2 |tr " " "\n"| grep -v removethis | sort -n | head -1`
+    echo $winning2 | grep scsi &>/dev/null
+    if [ $? -ne 0 ]; then IngroupDisk1='notavailable'; fi; 
+  fi
+  IngroupDisk2="notavailable";
+  cat $runningpools | grep "$disk" | sed "s/.*$disk\(.*\).*/\1/" | grep scsi &>/dev/null
+  if [ $? -eq 0 ]; then
+   groupline2=`cat $runningpools | grep "$disk" | sed "s/.*$disk\(.*\)scsi.*/\1/" | awk -F'scsi' '{print $1}'`
+   IngroupDisk2c=`echo $groupline2 | wc -c`
+  cachec2=`echo $groupline2 | grep cache | awk -F'cache' '{print $NF}' | wc -c `
+  if [ $cachec2 -eq 0 ]; then cachec2="removethis"; fi;
+   logc2=`echo $groupline2 | grep log | awk -F'log' '{print $1}' | wc -c `
+   if [ $logc2 -eq 0 ]; then logc2="removethis"; fi;
+  sparec2=`echo $groupline2 | grep spare | awk -F'spare' '{print $NF}' | wc -c `
+  if [ $sparec2 -eq 0 ]; then sparec2="removethis"; fi;
+   mirrorc2=`echo $groupline2 | grep mirror | awk -F'mirror' '{print $1}' | wc -c `
+   if [ $mirrorc2 -eq 0 ]; then mirrorc2="removethis"; fi;
+   raidc21=`echo $groupline2 | grep raidz1 | awk -F'raidz1' '{print $1}' | wc -c `
+   if [ $raidc21 -eq 0 ]; then raidc21="removethis"; fi;
+   raidc22=`echo $groupline2 | grep raidz2 | awk -F'raidz2' '{print $1}' | wc -c `
+   if [ $raidc22 -eq 0 ]; then raidc22="removethis"; fi;
+   raidc23=`echo $groupline2 | grep raidz3 | awk -F'raidz3' '{print $1}' | wc -c `
+   if [ $raidc23 -eq 0 ]; then raidc23="removethis"; fi;
+   allc2=${IngroupDisk2c}'_scsi '${cachec2}'_cache '${logc2}'_log '${raidc21}'_raid1 '${raidc22}'_raid2 '${raidc23}'_raid3 '${mirrorc2}'_mirror '${sparec2}'_spare';
+   winning2=` echo $allc2 |tr " " "\n"| grep -v removethis | sort -n| head -1`;
+   echo $winning2 | grep scsi &>/dev/null   
+   if [ $? -eq 0 ]; then 
+    IngroupDisk2='scsi'`cat $runningpools | grep scsi | awk -F"$disk" '{print $2}' | awk -F'scsi' '{print $2}' | awk '{print $1}'`
+   fi
+  fi
+ fi 
+ diskhost=`cat $iscsimapping | grep $disk | awk '{print $1}'`;
+ diskstatus=`cat $iscsimapping | grep $disk | awk '{print $5}'`;
+ disksize=`cat $iscsimapping | grep -w $disk | awk '{print $4}'`
+ echo diskpool=$diskpool
+ subres=`./jsonthis3.sh id $diskcount name $disk host $diskhost pool $diskpool size $disksize grouptype $grouptype poolsize $poolsize InGroupDisk1 $IngroupDisk1 InGroupDisk2 $IngroupDisk2 diskstatus $diskstatus `
+ result=$result$subres,
+ diskcount=$((diskcount+1));
+done
+isjson=`python3.6 jsontest.py $result`
+if [ $isjson -eq 0 ];
+then
+ result=` echo $result | rev | cut -c 2- | rev`']';
+ echo $result > $traf
+ resdate=`/bin/date +%s`;
+ res=` ./jsonthis3.sh update $resdate`
+ echo $res > $trafupdate;
+ echo $result > $traflocal;
+fi
