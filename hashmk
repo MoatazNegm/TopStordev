@@ -31,4 +31,8 @@ if [[ $? -ne 0 ]]; then
 fi
 gpg -e -u "QuickStor" -r "QuickStor"  $tmpdir/${fold}.tar.gz
 mv  $tmpdir/${fold}.tar.gz.gpg $tmpdir/${fold}.qsfw 
-
+scp $tmpdir/${fold}.qsfw localrepo:
+if [ $? -ne 0 ];
+then
+ echo Please make sure LocalRepo is working
+fi
