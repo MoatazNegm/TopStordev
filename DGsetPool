@@ -31,8 +31,10 @@ then
  disksarr=(${disks});
  if [[ $raid == "addmirror" ]]; then
   disk2=` echo $@ | awk '{print $5}'`;
-  diskn1=`grep -nr $disk1 $iscsimapping | awk -F':' '{print $1}'`","
-  diskn2=`grep -nr $disk2 $iscsimapping | awk -F':' '{print $1}'`","
+  #diskn1=`grep -nr $disk1 $iscsimapping | awk -F':' '{print $1}'`","
+  diskn1=`python3.6 /pace/diskinfo.py /pacedata/disklist.txt $disk1`","
+  diskn2=`python3.6 /pace/diskinfo.py /pacedata/disklist.txt $disk2`","
+  #diskn2=`grep -nr $disk2 $iscsimapping | awk -F':' '{print $1}'`","
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata="Adding a mirror array to  pool: "p${nextpool}" using disks:"$diskn1","$diskn2
   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst20@@@p${nextpool}@$diskn1@$diskn2`;
@@ -63,7 +65,8 @@ then
  fi 
  if [[ $raid == "attachmirror" ]]; then
   disk2=` echo $@ | awk '{print $5}'`;
-  diskn=`grep -nr $disk2 $iscsimapping | awk -F':' '{print $1}'`
+  diskn=`python3.6 /pace/diskinfo.py /pacedata/disklist.txt $disk2`","
+  #diskn=`grep -nr $disk2 $iscsimapping | awk -F':' '{print $1}'`
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata="Attaching Disk"$diskn" to Pool "p${nextpool}" as a mirror pair"
   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst7@@@$diskn@p${nextpool}`;
@@ -92,7 +95,8 @@ then
   fi 
  fi
  if [[ $raid == "delspecial" ]]; then
-  diskn=`grep -nr $disk1 $iscsimapping | awk -F':' '{print $1}'`
+  diskn=`python3.6 /pace/diskinfo.py /pacedata/disklist.txt $disk1`","
+  #diskn=`grep -nr $disk1 $iscsimapping | awk -F':' '{print $1}'`
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata="Deleting special Disk"$diskn
   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst9@@@$diskn`;
@@ -121,7 +125,8 @@ then
   fi
  fi 
  if [[ $raid == "addcache" ]]; then
-  diskn=`grep -nr $disk1 $iscsimapping | awk -F':' '{print $1}'`
+  #diskn=`grep -nr $disk1 $iscsimapping | awk -F':' '{print $1}'`
+  diskn=`python3.6 /pace/diskinfo.py /pacedata/disklist.txt $disk1`","
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata="Adding Disk"$diskn" as a read cache"
   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst10@@@$diskn`;
@@ -150,7 +155,8 @@ then
   fi
  fi 
  if [[ $raid == "addlog" ]]; then
-  diskn=`grep -nr $disk1 $iscsimapping | awk -F':' '{print $1}'`
+  #diskn=`grep -nr $disk1 $iscsimapping | awk -F':' '{print $1}'`
+  diskn=`python3.6 /pace/diskinfo.py /pacedata/disklist.txt $disk1`","
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata="Adding Disk"$diskn" as a read/write cache"
   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst11@@@$diskn`;
@@ -179,7 +185,8 @@ then
   fi
  fi 
  if [[ $raid == "addspare" ]]; then
-  diskn=`grep -nr $disk1 $iscsimapping | awk -F':' '{print $1}'`
+  #diskn=`grep -nr $disk1 $iscsimapping | awk -F':' '{print $1}'`
+  diskn=`python3.6 /pace/diskinfo.py /pacedata/disklist.txt $disk1`","
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata="Adding Disk"$diskn" as a spare"
   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst8@@@$diskn`;
@@ -208,7 +215,8 @@ then
   fi
  fi 
  if [[ $raid == "Single" ]]; then
-  diskn=`grep -nr $disk1 $iscsimapping | awk -F':' '{print $1}'`
+  diskn=`python3.6 /pace/diskinfo.py /pacedata/disklist.txt $disk1`","
+  #diskn=`grep -nr $disk1 $iscsimapping | awk -F':' '{print $1}'`
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata="Creating pool: "p${nextpool}" with single disk: disk"$diskn
   logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DG1st6@@@p${nextpool}@$diskn`;
@@ -246,7 +254,8 @@ then
    i=$((i+1));
    ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
    disk1=${disk1}${params[$i]}" "
-   diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+   #diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+   diskn=`python3.6 /pace/diskinfo.py /pacedata/disklist.txt ${params[$i]}`","
   done;
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata="Adding a triple parity array to  pool: "p${nextpool}" using disks:"$diskn
@@ -284,7 +293,8 @@ then
    i=$((i+1));
    ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
    disk1=${disk1}${params[$i]}" "
-   diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+   #diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+   diskn=`python3.6 /pace/diskinfo.py /pacedata/disklist.txt ${params[$i]}`","
   done;
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata="Creating pool "p${nextpool}" with triple parity array using disks:"$diskn
@@ -322,7 +332,8 @@ then
    i=$((i+1));
    ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
    disk1=${disk1}${params[$i]}" "
-   diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+   #diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+   diskn=`python3.6 /pace/diskinfo.py /pacedata/disklist.txt ${params[$i]}`","
   done;
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata="Adding a dual parity array to  pool: "p${nextpool}" using disks:"$diskn
@@ -360,7 +371,8 @@ then
    i=$((i+1));
    ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
    disk1=${disk1}${params[$i]}" "
-   diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+   #diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+   diskn=`python3.6 /pace/diskinfo.py /pacedata/disklist.txt ${params[$i]}`","
   done;
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata="Creating pool "p${nextpool}" with dual parity array using disks:"$diskn
@@ -398,7 +410,8 @@ then
    i=$((i+1));
    ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
    disk1=${disk1}${params[$i]}" "
-   diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+   diskn=`python3.6 /pace/diskinfo.py /pacedata/disklist.txt ${params[$i]}`","
+   #diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
   done;
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata="Adding a single parity array to  pool: "p${nextpool}" using disks:"$diskn
@@ -437,7 +450,8 @@ then
    i=$((i+1));
    ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
    disk1=${disk1}${params[$i]}" "
-   diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+   #diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+   diskn=`python3.6 /pace/diskinfo.py /pacedata/disklist.txt ${params[$i]}`","
   done;
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata="Creating pool "p${nextpool}" with single parity array using disks:"$diskn
@@ -475,7 +489,8 @@ then
    i=$((i+1));
    ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
    disk1=${disk1}${params[$i]}" "
-   diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+   #diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+   diskn=`python3.6 /pace/diskinfo.py /pacedata/disklist.txt ${params[$i]}`","
   done;
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata="Adding disks to non-redundant pool "p${nextpool}" using disks:"$diskn
@@ -513,7 +528,8 @@ then
    i=$((i+1));
    ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
    disk1=${disk1}${params[$i]}" "
-   diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+   #diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+   diskn=`python3.6 /pace/diskinfo.py /pacedata/disklist.txt ${params[$i]}`","
   done;
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata="Creating non-redundant pool "p${nextpool}" using disks:"$diskn
@@ -551,7 +567,8 @@ then
    i=$((i+1));
    ssh $host  /sbin/zpool labelclear /dev/disk/by-id/${params[$i]};
    disk1=${disk1}${params[$i]}" "
-   diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+   #diskn=$diskn`grep -nr ${params[$i]} $iscsimapping | awk -F':' '{print $1}'`","
+   diskn=`python3.6 /pace/diskinfo.py /pacedata/disklist.txt ${params[$i]}`","
   done;
   datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
   logdata="Creating pool "p${nextpool}" with mirrored disks:"$diskn
