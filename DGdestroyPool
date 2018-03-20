@@ -21,7 +21,6 @@ zpool destroy $pool &>/dev/null
 if [ $? -ne 0 ]; then
 datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
 	echo DGfa5:$pool > $web;
-	cat txt/${0:2}$userreq.txt > ${web}internal;
 	logdata='failed_Deleting_Pool:'$pool;
 	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code DGfa5@@@$pool`;
 echo DGfa5@$datenow@$timenow@$pool > ${logging}2

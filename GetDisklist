@@ -60,7 +60,6 @@ for disk in linemap:
    x=[str(c).split('\'')[1].split() for c in linels if d in str(c) ]
    if(diskinfo[4]=='OFFLINE'):
     x[0][0]="old-"+str(x[0][0])
-    print(x[0])
   except:
 #  else:
    x[0]=['na',diskinfo[2][5:]]
@@ -72,22 +71,26 @@ for disk in linemap:
   if('log' in z[0]): z[0]='log'
   if('cache' in z[0]): z[0]='cache'
   if('spare' in z[0]): z[0]='spare'
-  yy=[ c.split() for c in linepool if d in str(c) ]
-  if(yy==[]):
-   y='free'
-   k='0'
-   h='0'
-  else:
+  try:
+   yy=[ c.split() for c in linepool if d in str(c) ]
    y=yy[0][1]
    k=yy[0][2]
    h=yy[0][4]
+  except:
+   y='free'
+   k='0'
+   h='0'
 #  print("x=",x[0][0]);
   if(y[0]=='p' and (int(y[1:]) in range(10)) and z[0]=='free'): 
    z[0]='stripe';
  except: 
   continue 
 # print("result=",x[0][0], x[0][1], z[0])
- disklist.append({'id':x[0][0],'name':'scsi-'+x[0][1],'host':diskinfo[0],'size':diskinfo[3],'diskstatus':diskinfo[4],'pool':y,'poolstatus':poolstate,'poolsize':k[:len(k)-1],'poolfree':h[:len(k)-1],'grouptype':z[0],'InGroupDisk1':Ingroup,'InGroupDisk2':Outgroup});
+ print(x)
+ try:
+  disklist.append({'id':x[0][0],'name':'scsi-'+x[0][1],'host':diskinfo[0],'size':diskinfo[3],'diskstatus':diskinfo[4],'pool':y,'poolstatus':poolstate,'poolsize':k[:len(k)-1],'poolfree':h[:len(k)-1],'grouptype':z[0],'InGroupDisk1':Ingroup,'InGroupDisk2':Outgroup});
+ except:
+  continue
 disklist=sorted(disklist,key=itemgetter("id"))
 jsondisk=str(disklist).replace("\'","\"")
 jsondisk=jsondisk.replace(': "',':"')
