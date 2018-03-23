@@ -1,7 +1,7 @@
 #!/usr/local/bin/zsh
 cd /TopStor
 web='/var/www/html/des20/Data/currentinfo2.log2';
-glog='/TopStordata/TopStor.log';
+glog='/var/www/html/des20/Data/TopStor.log';
 logging='/var/www/html/des20/Data/currentinfo2.log'
 runningpools='/pacedata/pools/runningpools'
 pDG=`echo $@ | awk '{print $1}'`;

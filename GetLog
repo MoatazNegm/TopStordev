@@ -14,7 +14,7 @@ echo $0 $RUNNING
 liner=`echo $@ | awk '{print $2}'`;
 logging='/var/www/html/des20/Data/Logs.log'$liner
 logupdate='/var/www/html/des20/Data/Logs.logupdated'
-glog='/TopStordata/TopStor.log';
+glog='/var/www/html/des20/Data/TopStor.log';
 dater=`echo $@ | awk '{print $1}'`;
 liner=`echo $@ | awk '{print $2}'`;
 userreq=` echo $@ | awk '{print $3}'`;

@@ -1,6 +1,6 @@
 #!/usr/local/bin/zsh
 cd /TopStor
-glog='/TopStordata/TopStor.log';
+glog='/var/www/html/des20/Data/TopStor.log';
 txt='/TopStordata/'`basename $0`
 export POR;
 export HOSTNAM;

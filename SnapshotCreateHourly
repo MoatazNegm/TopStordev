@@ -2,7 +2,7 @@
 web='/var/www/html/des20/Data/Snapsstatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log'
 cronthis='/TopStordata/cronthis.txt'
-glog='/TopStordata/TopStor.log';
+glog='/var/www/html/des20/Data/TopStor.log';
 rm -rf $cronthis 2>/dev/null
 min=`echo $@ | awk '{print $1}'` ;
 every=0; ev=`echo $@ | awk '{print $2}'`; every=$(($every+$ev)); if (($every < 1)); then every=1; fi

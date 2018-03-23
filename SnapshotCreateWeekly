@@ -1,7 +1,7 @@
 #!/usr/local/bin/zsh
 web='/var/www/html/des20/Data/Snapsstatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log'
-glog='/TopStordata/TopStor.log';
+glog='/var/www/html/des20/Data/TopStor.log';
 cronthis='/TopStordata/cronthis.txt'
 rm -rf $cronthis 2>/dev/null
 stime=`echo $@ | awk '{print $1}'`;

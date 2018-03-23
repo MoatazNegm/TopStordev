@@ -2,7 +2,7 @@
 cd /TopStor
 web='/var/www/html/des20/Data/Replicatestatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log'
-glog='/TopStordata/TopStor.log';
+glog='/var/www/html/des20/Data/TopStor.log';
 pDG=` echo $@ | awk '{print $1}'`;
 snapdel=` echo $@ | awk '{print $2}'`;
 userreq=` echo $@ | awk '{print $3}'`;

@@ -2,7 +2,7 @@
 cd /TopStor/
 web="/var/www/html/des20/Data/DGstatus.log";
 logging='/var/www/html/des20/Data/currentinfo2.log'
-glog='/TopStordata/TopStor.log'
+glog='/var/www/html/des20/Data/TopStor.log'
 pool=` echo $@ | awk '{print $1}'`;
 userreq=` echo $@ | awk '{print $2}'`;
 privilege="DISK_Groups";

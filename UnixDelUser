@@ -3,7 +3,7 @@ web="/var/www/html/des20/Data/Usersstatus.log";
 logging="/var/www/html/des20/Data/currentinfo2.log";
 txtres='/TopStordata/'`basename $0`'.txt'
 rm -rf $txtres &>/dev/null
-glog='/TopStordata/TopStor.log'
+glog='/var/www/html/des20/Data/TopStor.log'
 username=`echo $@ | awk '{print $1}'`;
 userreq=`echo $@ | awk '{print $2}'`;
 privilege="Box_Users";

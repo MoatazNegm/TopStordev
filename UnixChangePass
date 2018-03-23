@@ -3,7 +3,7 @@ web='/var/www/html/des20/Data/Usersstatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log';
 resweb='/var/www/html/des20/Data/userpass.txtupdated';
 logthis='/TopStordata/logthis.log'
-glog='/TopStordata/TopStor.log';
+glog='/var/www/html/des20/Data/TopStor.log';
 passchange='/TopStordata/passchange'
 txtres='/TopStordata/'`basename $0`'.txt'
 cd /TopStor

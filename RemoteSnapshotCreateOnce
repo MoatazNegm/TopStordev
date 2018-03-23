@@ -3,7 +3,7 @@ cd /TopStor
 web='/var/www/html/des20/Data/Replicatestatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log';
 runningpools='/pacedata/pools/runningpools'
-glog='/TopStordata/TopStor.log';
+glog='/var/www/html/des20/Data/TopStor.log';
 echo Replica1012: > $web;
 name=`echo $@ | awk '{print $1}'`;
 pDG=`echo $@ | awk '{print $2}'`;

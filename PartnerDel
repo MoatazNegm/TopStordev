@@ -4,7 +4,7 @@ webpartner='/var/www/html/des20/Data/Partnerslist.txt';
 resweb='/var/www/html/des20/Data/Partnerslist.txtupdated'
 web='/var/www/html/des20/Data/Partnersstatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log'
-glog='/TopStordata/TopStor.log';
+glog='/var/www/html/des20/Data/TopStor.log';
 partners='/TopStordata/partners.txt'
 echo $@ >> tmppartner
 Partnername=`echo $@ | awk '{print $1}'`;

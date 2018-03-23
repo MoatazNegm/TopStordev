@@ -1,6 +1,6 @@
 #!/usr/bin/sh
 logging='/var/www/html/des20/Data/currentinfo2.log'
-glog='/TopStordata/TopStor.log'
+glog='/var/www/html/des20/Data/TopStor.log'
 msg=` echo $@ | awk '{print $1}'`;
 msgtype=` echo $@ | awk '{print $2}'`;
 msguser=` echo $@ | awk '{print $3}'`;

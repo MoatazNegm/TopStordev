@@ -2,7 +2,7 @@
 cd /TopStor/
 web='/var/www/html/des20/Data/Snapsstatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log'
-glog='/TopStordata/TopStor.log';
+glog='/var/www/html/des20/Data/TopStor.log';
 runningpools='/pacedata/pools/runningpools'
 pDG=` echo $@ | awk '{print $1}'`;
 snaprol=` echo $@ | awk '{print $2}'`;

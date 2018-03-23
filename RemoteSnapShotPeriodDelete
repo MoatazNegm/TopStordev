@@ -2,7 +2,7 @@
 cd /TopStor
 web='/var/www/html/des20/Data/Replicatestatus.log'
 logging='/var/www/html/des20/Data/currentinfo2.log'
-glog='/TopStordata/TopStor.log';
+glog='/var/www/html/des20/Data/TopStor.log';
 txtres='/TopStordata/'`basename $0`$userreq'.txt'
 rm $txtres 2>/dev/null
 periodel=` echo $@ | awk '{print $1}'`;
