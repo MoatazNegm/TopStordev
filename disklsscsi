@@ -1,2 +1,2 @@
 #!/bin/sh
-lsscsi -i | grep org | awk -F':' '{print $4}' | awk -F']' '{print $1" "$2}' | awk '{print $1" "$7}'
+lsscsi -i | grep ORG | awk -F':' '{print $4}' | awk -F']' '{print $1" "$2}' | awk '{print $1" "$7}'
