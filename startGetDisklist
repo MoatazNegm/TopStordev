@@ -1,0 +1,106 @@
+#!/bin/python3.6
+import subprocess
+import sys, json
+from operator import itemgetter
+
+
+def linewords(theline,lword):
+ h=theline.split()
+ lwordx=[c+" 0 "+h[h.index(c)+1] for c in h if lword in c]
+ return lwordx[0]
+
+iscsimapping=open("/pacedata/iscsimapping")
+runningpools=open("/pacedata/pools/runningpools")
+linepool=runningpools.read().splitlines()
+linemap=iscsimapping.read().splitlines()
+result=subprocess.run(['/sbin/zpool','status'], stdout=subprocess.PIPE)
+lsscsi=subprocess.run(['/TopStor/disklsscsi'], stdout=subprocess.PIPE)
+linels=lsscsi.stdout.splitlines();
+linelist=result.stdout.splitlines();
+buf=[]
+poolstatus=[str(c).split() for c in linelist if "state:" in str(c)]
+try:
+  poolstate=poolstatus[0][2][:-1]
+except:
+  poolstate="na"
+buf=[ {"group":str(c).split("\\t")[1].split()[0],"pos":linelist.index(c)} for c in linelist if 'cache' in str(c) or 'mirror' in str(c) or 'spare' in str(c) or 'logs' in str(c) or 'raidz' in str(c) ]
+xgroup=0;
+while xgroup < len(buf):
+ if(xgroup < len(buf)-1):
+  buf[xgroup]['disks']=[str(c).split()[1] for c in linelist if linelist.index(c) > buf[xgroup]["pos"] and  linelist.index(c) < buf[xgroup+1]['pos'] and 'scsi' in str(c) ]
+ else:
+  buf[xgroup]['disks']=[str(c).split()[1] for c in linelist if linelist.index(c) > buf[xgroup]['pos'] and  linelist.index(c) < len(linelist)  and 'scsi' in str(c) ]
+ xgroup+=1
+disklist=[]
+for disk in linemap:
+ Ingroup='notavailble'
+ Outgroup='notavailable'
+ diskinfo=disk.split()
+ try:
+  d=diskinfo[2].split('-')[1]
+  z=[]
+  for c in buf:
+   for ll in c['disks']:
+    if( d in ll):
+     z.append(c['group']) 
+     try: 
+      Ingroup=c['disks'][c['disks'].index(ll)+1]
+     except:
+      Ingroup='notavailable'
+      pass
+     try: 
+      Outgroup=c['disks'][c['disks'].index(ll)-1]
+     except:
+      Outgroup='notavailable'
+      pass
+     if(c['disks'].index(ll)==0): 
+      Outgroup='notavailable'
+#  if(diskinfo[4]!='OFFLINE'):
+  try:
+   x=[str(c).split('\'')[1].split() for c in linels if d in str(c) ]
+   if(diskinfo[4]=='OFFLINE'):
+    x[0][0]="old-"+str(x[0][0])
+  except:
+   x[0]=['na',diskinfo[2][5:]]
+   print('x=',x)
+  if(z==[]):
+   z.append('free')
+  if(z[0]=='free'):
+   Ingroup='notavailable'
+   Outgroup='notavailable'
+  if('log' in z[0]): z[0]='log'
+  if('cache' in z[0]): z[0]='cache'
+  if('spare' in z[0]): z[0]='spare'
+  try:
+   yy=[ c.split() for c in linepool if d in str(c) ]
+   y=yy[0][1]
+   k=yy[0][2]
+   h=yy[0][4]
+  except:
+   y='free'
+   k='0'
+   h='0'
+#  print("x=",x[0][0]);
+  if(y[0]=='p' and (int(y[1:]) in range(10)) and z[0]=='free'): 
+   z[0]='stripe';
+ except: 
+  continue 
+# print("result=",x[0][0], x[0][1], z[0])
+ try:
+  disklist.append({'id':x[0][0],'name':'scsi-'+x[0][1],'host':diskinfo[0],'size':diskinfo[3],'diskstatus':diskinfo[4],'pool':y,'poolstatus':poolstate,'poolsize':k[:len(k)-1],'poolfree':h[:len(k)-1],'grouptype':z[0],'InGroupDisk1':Ingroup,'InGroupDisk2':Outgroup});
+ except:
+  continue
+disklist=sorted(disklist,key=itemgetter("id"))
+jsondisk=str(disklist).replace("\'","\"")
+jsondisk=jsondisk.replace(': "',':"')
+jsondisk=jsondisk.replace(', "',',"')
+jsondisk=jsondisk.replace(', {',',{')
+fdisklist=open("/pacedata/disklist.txt","w")
+fdisklist.write(jsondisk)
+fdisklist2=open("/var/www/html/des20/Data/disklist.txt","w")
+fdisklist2.write(jsondisk)
+fdisklist.close()
+fdisklist2.close()
+iscsimapping.close()
+runningpools.close()
+#print(sorted(disklist,key=itemgetter("id")))
