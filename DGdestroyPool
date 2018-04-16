@@ -1,5 +1,6 @@
 #!/usr/bin/sh
 cd /TopStor/
+echo $@ > /root/tmp
 web="/var/www/html/des20/Data/DGstatus.log";
 logging='/var/www/html/des20/Data/currentinfo2.log'
 glog='/var/www/html/des20/Data/TopStor.log'
@@ -9,39 +10,19 @@ privilege="DISK_Groups";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
 then
-	echo DGst5:$pool > $web;
-datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-logdata='Deleting_Pool:'$pool;
-logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGst5@@@$pool`;
-echo DGst5@$datenow@$timenow@$pool > ${logging}2
- dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
- echo $datenow $timenow info $userreq DGst5@@@$pool $dtn>> $glog
-oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-zpool destroy $pool &>/dev/null 
-if [ $? -ne 0 ]; then
-datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-	echo DGfa5:$pool > $web;
-	logdata='failed_Deleting_Pool:'$pool;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg error user $userreq data $logdata code DGfa5@@@$pool`;
-echo DGfa5@$datenow@$timenow@$pool > ${logging}2
- dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
- echo $datenow $timenow error $userreq DGfa5@@@$pool $dtn>> $glog
-else
-crontab -l | grep reboot  > /TopStordata/cronfile
-crontab -r 
-crontab /TopStordata/cronfile
+ /TopStor/logmsg.sh DGst5 info $userreq $pool
+ zpool destroy -f $pool &>/dev/null 
+ if [ $? -ne 0 ]; then
+  /TopStor/logmsg.sh DGfa5 error $userreq $pool
+ else
+  crontab -l | grep reboot  > /TopStordata/cronfile
+  crontab -r 
+  crontab /TopStordata/cronfile
 
-echo > /etc/exports
-datenow=`date +%m/%d/%Y`; timenow=`date +%T`;
-	echo Datasu5:$pool > $web;
-	logdata='Success_Deleting_Pool:'$pool;
-	logthis=`./jsonthis3.sh Date $datenow time $timenow msg info user $userreq data $logdata code DGsu5@@@Data `;
-echo DGsu5@$datenow@$timenow@$pool > ${logging}2
- dt=${datenow}'T'${timenow}; dtn=`date +%s -d $dt`;
- echo $datenow $timenow info $userreq DGsu5@@@$pool $dtn>> $glog
-fi 
-oldlog=`cat $logging | sed 's/]//g'`; newlog=$oldlog,$logthis]; echo $newlog > $logging;
-rm txt/${0:2}$userreq.txt
+  echo > /etc/exports
+  /TopStor/logmsg.sh DGsu5 info $userreq $pool
+ fi 
+ rm txt/${0:2}$userreq.txt
 fi
 sed -i "/p${nextpool}/c\\" $runningpools
-./GetDisklist a
+ETCDCTL_API=3 /pace/putzpool.py
