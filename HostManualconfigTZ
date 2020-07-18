@@ -2,7 +2,7 @@
 export ETCDCTL_API=3
 cd /TopStor/
 echo $@ > ~/tmp
-dev='enp0s8'
+dev='eno1'
 web='/var/www/html/des20/Data/HostManualconfigstatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log';
 runningpools='/pacedata/pools/runningpools';

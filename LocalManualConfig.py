@@ -8,7 +8,7 @@ import logmsg
 def config(*bargs):
  cmdline=['/TopStor/queuethis.sh','LocalManualconfig.py','running',bargs[-1]]
  result=subprocess.run(cmdline,stdout=subprocess.PIPE)
- enpdev='enp0s8'
+ enpdev='eno1'
  needreboot=False
  with open('/root/HostManualconfigtmp3','w') as f:
   f.write(str(bargs))

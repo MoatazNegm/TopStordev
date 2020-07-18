@@ -1,6 +1,6 @@
 #!/bin/sh
 export ETCDCTL_API=3
-enpdev='enp0s8'
+enpdev='eno1'
 pool=`echo $@ | awk '{print $1}'`
 vol=`echo $@ | awk '{print $2}'`
 ipaddr=`echo $@ | awk '{print $3}'`
