@@ -2,6 +2,7 @@
 import subprocess,sys, datetime,socket
 import json
 from etcddel import etcddel as deli
+from etcddellocal import etcddel as delilocal
 from etcdget import etcdget as get 
 from etcdputlocal import etcdput as putlocal 
 from ast import literal_eval as mtuple
