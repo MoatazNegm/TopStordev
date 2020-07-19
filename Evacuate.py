@@ -2,6 +2,7 @@
 import subprocess,sys, datetime
 import json
 from etcdget import etcdget as get
+from etcdput import etcdput as put 
 from etcddel import etcddel as deli 
 from ast import literal_eval as mtuple
 from socket import gethostname as hostname
@@ -19,9 +20,21 @@ def sendlog(*args):
  msg={'req': 'Evacuate', 'reply':z}
  hostip=get('ActivePartners/'+args[-2])
  losts=get('lost','--prefix')
- if args[-2] not in str(losts):
+ knowns=get('knwon','--prefix')
+ readys=get('ready','--prefix')
+ if args[-2] not in str(losts) or args[-2] in str(readys):
   sendhost(hostip[0], str(msg),'recvreply',myhost)
-  sleep(60)
+ isleader=1
+ leader=get('leader','--prefix')
+ if args[-2] in str(leader):
+  isleader=1
+  nextleader=get('nextlead')[0].split('/')[0]
+  while isleader:
+   print('still leader')
+   sleep(2)
+   leader=get('leader','--prefix')
+   if nextleader in str(leader):
+    isleader=0
  deli("",args[-2])
  put("tosync","yes")
 

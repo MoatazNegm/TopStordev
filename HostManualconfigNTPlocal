@@ -1,0 +1,22 @@
+#!/bin/sh
+export ETCDCTL_API=3
+cd /TopStor/
+echo $@ > ~/tmp
+dev='enp0s8'
+web='/var/www/html/des20/Data/HostManualconfigstatus.log';
+logging='/var/www/html/des20/Data/currentinfo2.log';
+runningpools='/pacedata/pools/runningpools';
+glog='/var/www/html/des20/Data/TopStor.log';
+txtres='/TopStordata/'`basename $0`'.txt'
+myip=`echo $@ | awk '{print $1}'`
+ntp=`ETCDCTL_API=3 ./etcdgetlocal.py $myip ntp`
+rm -rf /etc/chrony.conf
+cp /TopStor/chrony.conf /etc/
+echo $ntp | grep '\.'
+if [ $? -eq 0 ];
+then
+ sed -i "s/MASTERSERVER/$ntp/g" /etc/chrony.conf
+else
+ sed -i '/MASTERSERVER/,+1 d' /etc/chrony.conf
+fi
+systemctl restart chronyd

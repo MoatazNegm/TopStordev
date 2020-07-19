@@ -1,0 +1,14 @@
+#!/bin/sh
+export ETCDCTL_API=3
+cd /TopStor/
+echo $@ > ~/tmp
+dev='enp0s8'
+web='/var/www/html/des20/Data/HostManualconfigstatus.log';
+logging='/var/www/html/des20/Data/currentinfo2.log';
+runningpools='/pacedata/pools/runningpools';
+glog='/var/www/html/des20/Data/TopStor.log';
+txtres='/TopStordata/'`basename $0`'.txt'
+myip=`echo $@ | awk '{print $1}'`
+tz=`ETCDCTL_API=3 ./etcdgetlocal.py $myip tz | awk -F'%' '{print $1}' `
+tzone=`timedatectl list-timezones | grep $tz` 
+timedatectl set-timezone $tzone

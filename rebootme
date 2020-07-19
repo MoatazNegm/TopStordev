@@ -13,20 +13,25 @@ rm -rf $txtres &>/dev/null
 #subnet=` echo $@ | awk '{ print $3 }'`;
 #oldip=`pcs resource show CC | grep Attribute | awk -F'ip=' '{print $2}' | awk '{print $1 }'`
 #oldsubnet=` echo $@ | awk '{ print $4 }'`;
+echo wait
 sleep 10
 echo hi > /root/HostCC2
 echo shuttingdown 1 >> /root/HostCC2
+echo shuttingdown 1 
 mkdir /tmp/cpools 2>/dev/null
 rm -rf /tmp/cpools/*
 cp /TopStordata/pdhc* /tmp/cpools/
 /sbin/zpool export -a ;
 cp /tmp/cpools/* /TopStordata/
 echo shuttingdown 2 >> /root/HostCC2
+echo shuttingdown 2
 #/pace/keysend.sh $hostip
 /sbin/rabbitmqctl stop_app
 echo shuttingdown 3 >> /root/HostCC2
+echo shuttingdown 3
 /sbin/iscsiadm --mode node --logoutall=all
 echo shuttingdown 4 >> /root/HostCC2
+echo shuttingdown 4 
 echo shuttingdown 6 >> /root/HostCC2
 pkill httpd
 echo shuttingdown 8 >> /root/HostCC2
