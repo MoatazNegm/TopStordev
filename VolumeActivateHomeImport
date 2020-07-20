@@ -36,9 +36,9 @@ then
    regn=`echo $registry | wc -c`
    if [ $regn -gt 10 ];
    then
-    name=` $l | awk -F'/' '{print $2}'`
-    ipaddr=` $l | awk -F'/' '{print $8}'`
-    ipsubnet=` $l | awk -F'/' '{print $9}'`
+    name=` echo $registry | awk -F'/' '{print $2}'`
+    ipaddr=` echo $registry | awk -F'/' '{print $8}'`
+    ipsubnet=` echo $registry | awk -F'/' '{print $9}'`
     /pace/etcdput.py volumes/Home/$myhost/$pool/$name $registry
     /TopStor/cifs.sh $pool $name $ipaddr $ipsubnet Home 
    fi
