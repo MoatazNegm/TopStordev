@@ -69,12 +69,12 @@ then
  if [ $? -ne 0  ]; then
    /TopStor/logmsg.py NFS1001 error $userreq $volname
  else
+  rm -rf /$DG/smb.$volname
   /pace/etcddel.py volume $volname
   /TopStor/SnapShotPeriodDelete $volname $userreq
   /pace/delbroadcastlocal.py volume $volname
   /pace/putzpool.py 
   /TopStor/logmsg.py NFS1002 info  $userreq $volname
-  rm -rf /$DG/$volname
  fi
  rm -rf /$DG/smb.$volname
 fi

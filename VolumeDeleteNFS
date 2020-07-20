@@ -54,7 +54,7 @@ then
   /pace/delbroadcastlocal.py volumes $volname
   /TopStor/SnapShotPeriodDelete $volname $userreq
   /TopStor/logmsg.py NFS1002 info $userreq $volname
-  rm -rf /$DG/$volname
+  rm -rf /$DG/exports.$volname
  fi
  rm -rf /$DG/exports.$volname
 fi

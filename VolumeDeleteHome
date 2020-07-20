@@ -28,6 +28,7 @@ if [ $? -ne 0  ]; then
 fi
 cp /etc/samba/smb.conf /TopStordata/smb.confcurrent;
  rm /TopStordata/$volname;
+ rm /$DG/smb.$volname;
  /TopStor/delblock.py start${volname}_only stop${volname}_only /TopStordata/smb.confcurrent  ;
  /TopStor/delblock.py start${volname}_only stop${volname}_only /TopStordata/CIFSshares.txt  ;
  cp /TopStordata/smb.confcurrent.new /etc/samba/smb.conf;
