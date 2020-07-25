@@ -1,48 +1,58 @@
 #!/bin/python3.6
-import subprocess,sys, datetime,socket
-import json
-from etcddel import etcddel as deli
-from etcddellocal import etcddel as delilocal
-from etcdget import etcdget as get 
-from etcdputlocal import etcdput as putlocal 
+import subprocess,sys, datetime
 from etcdput import etcdput as put 
-from ast import literal_eval as mtuple
+from etcdputlocal import etcdput as putlocal
+from etcdget import etcdget as get 
+from etcddel import etcddel as deli 
 from socket import gethostname as hostname
-from sendhost import sendhost
 import logmsg
 def setall(*bargs):
- arg=bargs
- name=bargs[-2]
- cmdline=['/TopStor/queuethis.sh','Evacuate.py','running',bargs[-1]]
- result=subprocess.run(cmdline,stdout=subprocess.PIPE)
- logmsg.sendlog('Evacuaest01','info',arg[-1],name)
- with open('/root/evacuatelocal','w') as f:
-  f.write('bargs'+str(bargs)+'\n')
- myhost=socket.gethostname()
- myip=get('ready/'+myhost)
- leader=get('leader','--prefix')
- if myhost in str(leader):
-  with open('/root/evacuatelocal','a') as f:
-   f.write('iamleader '+myip[0]+' '+arg[-2]+'\n')
-  cmdline=['/TopStor/Converttolocal.sh',myip[0]]
-  result=subprocess.run(cmdline,stdout=subprocess.PIPE)
- delilocal(myip[0],'namespace','--prefix')
- delilocal(myip[0],'Active','--prefix')
- delilocal(myip[0],'alias','--prefix')
- delilocal(myip[0],'known','--prefix')
- putlocal(myip[0],'configured','no')
- with open('/root/evacuatelocal','a') as f:
-  f.write('iamknown '+myip[0]+' '+arg[-2]+'\n')
-  #logmsg.sendlog('Evacuaesu01','info',arg[-1],name)
- #cmdline=['/TopStor/queuethis.sh','Evacuate.py','finished',bargs[-1]]
- #result=subprocess.run(cmdline,stdout=subprocess.PIPE)
- #with open('/root/evacuatelocal','a') as f:
- # f.write('sending queue log finish '+myip[0]+' '+name+'\n')
- with open('/root/evacuatelocal','a') as f:
-  f.write('rebooting '+myip[0]+' '+name+'\n')
- cmdline=['/TopStor/rebootme','finished',bargs[-1]]
- result=subprocess.run(cmdline,stdout=subprocess.PIPE)
- return 1
+ thehosts=get('toremove','start')
+ if thehosts[0]==-1:
+  return
+ leader=get('leader','--prefix')[0][0].replace('leader/','')
+ myhost=hostname()
+ myip=get('ready',myhost)[0][1]
+ print(myip,myhost,leader,str(thehosts))
+ for host in thehosts:
+  hostn=host[0].replace('toremove/','')
+  hostip=get('ActivePartners/'+hostn)[0]
+  if myhost in hostn and myhost in leader:
+   cmdline=['/TopStor/Converttolocal.sh',myip]
+   result=subprocess.run(cmdline,stdout=subprocess.PIPE)
+  if myhost in hostn and myhost not in leader:
+   putlocal(myip,'toreset','yes')
+   put('toremovereset/'+hostn,'reset')
+   cmdline=['/pace/removetargetdisks.sh', hostn, hostip]
+   result=subprocess.run(cmdline,stdout=subprocess.PIPE)
+   cmdline=['/TopStor/rebootme','finished']
+   result=subprocess.run(cmdline,stdout=subprocess.PIPE)
+  hostreset=get('toremovereset/'+hostn,'reset')[0]
+  if hostn in str(hostreset): 
+   if myhost not in hostn : 
+    hosts=get('toremove/'+hostn,'done')
+    if myhost not in str(hosts):
+     put('toremove/'+hostn+'/'+myhost,'done')
+     cmdline=['/pace/removetargetdisks.sh', hostn, hostip]
+     result=subprocess.run(cmdline,stdout=subprocess.PIPE)
+   if myhost not in hostn and myhost in leader:
+    actives=get('Active','--prefix')
+    dones=get('toremove/'+hostn,'done')
+    doneall=1
+    for active in actives:
+     activen=active[0].replace('ActivePartners/','')
+     if activen not in str(dones) and activen not in str(thehosts): 
+      print(activen,str(dones),str(thehosts))
+      doneall=0
+      break
+    if doneall==1:
+     frstnode=get('frstnode')[0]
+     newnode=frstnode.replace('/'+hostn,'').replace(hostn+'/','')
+     put('frstnode',newnode)
+     deli("", hostn)
+     put('tosync','yes')
+     logmsg.sendlog('Evacuaesu01','info','system',hostn)
+ return
 
 if __name__=='__main__':
  setall(*sys.argv[1:])

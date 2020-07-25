@@ -9,7 +9,19 @@ leader=`./etcdget.py leader --prefix`
 echo $leader | grep $myip 
 if [ $? -eq 0 ];
 then
- ./etcdput.py configured $cf
+ actives=`./etcdget.py Active --prefix | wc -l`
+ if [ $actives -ge 2 ];
+ then
+  echo it is clustered with other nodes >> ~/cftmp
+ else
+  ./etcdput.py configured $cf
+ fi
 else
- ./etcdput.py $myip configured $cf
+ actives=`./etcdgetlocal.py $myip Active --prefix | wc -l`
+ if [ $actives -ge 2 ];
+ then
+  echo it is clustered with other nodes >> ~/cftmp
+ else
+  ./etcdputlocal.py $myip configured $cf
+ fi
 fi

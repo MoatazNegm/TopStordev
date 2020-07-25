@@ -206,6 +206,14 @@ def do(body):
    f.write('received ReleasePoolLock from parnter :'+str(r["reply"])+'\n')
   result=subprocess.run(r["reply"],stdout=subprocess.PIPE)
 ########## if GroupChange ##############
+ elif r["req"]=='RemoveTargets':  
+  with open('/root/recvtmp2','w') as f:
+   f.write('received RemoveTarget from parnter :'+str(r["reply"])+'\n')
+  torun=['/pace/removetargetdisks.sh',r["reply"][0]]
+  with open('/root/recvtmp2','a') as f:
+   f.write('received RemoveTarget from parnter :'+str(torun)+'\n')
+  result=subprocess.run(torun,stdout=subprocess.PIPE)
+########## if GroupChange ##############
  elif r["req"]=='GroupChange':  
   with open('/root/recv2','a') as f:
    f.write('received GroupChange from parnter :'+str(r["reply"])+'\n')

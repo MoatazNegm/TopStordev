@@ -35,4 +35,7 @@ echo shuttingdown 4
 echo shuttingdown 6 >> /root/HostCC2
 pkill httpd
 echo shuttingdown 8 >> /root/HostCC2
+sync
+sync
+sync
 /sbin/reboot

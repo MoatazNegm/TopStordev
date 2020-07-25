@@ -28,6 +28,11 @@ else
  then
   ./etcdput.py configured yes
   echo $hostname $hostip > /TopStordata/members 
+  ./etcdget.py frstnode | grep dhcp
+  if [ $? -ne 0 ];
+  then
+   ./etcdget.py frstnode $hostname
+  fi
  fi
 fi
 echo $configured | grep yes 
