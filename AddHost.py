@@ -10,9 +10,6 @@ def setall(*bargs):
  result=subprocess.run(cmdline,stdout=subprocess.PIPE)
  logmsg.sendlog('AddHostst01','info',arg[-1],name)
  put('allowedPartners',name)
- logmsg.sendlog('AddHostsu01','info',arg[-1],name)
- cmdline=['/TopStor/queuethis.sh','AddHost.py','finished',bargs[-1]]
- result=subprocess.run(cmdline,stdout=subprocess.PIPE)
 
 if __name__=='__main__':
  setall(*sys.argv[1:])
