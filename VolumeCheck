@@ -7,12 +7,17 @@ glog='/var/www/html/des20/Data/TopStor.log';
 runningpools='/pacedata/pools/runningpools'
 txtres='/TopStordata/'`basename $0`'.txt'
 rm -rf $txtres 2>/dev/null
-
+echo $@ > /root/VolumeCheck
 pool=`echo $@ | awk -F'pool=' '{print $2}' | awk '{print $1}'`;
 userreq=`echo $@ | awk -F'user=' '{print $2}' | awk '{print $1}'`;
 myhost=`hostname -s`
 ips='0'
-pools=`ls -1 / | grep pdhcp `
+pools=`mount | grep pdhcp | awk '{print $1}'`
+echo $pools | grep pdhcp
+if [ $? -ne 0 ];
+then
+ exit
+fi
 echo "${pools[@]}" | while read pool;
 do
  ips=`cat /$pool/smb.* | grep SUMMARY | awk '{print $NF}' | awk -F'/' '{print $8}'`
