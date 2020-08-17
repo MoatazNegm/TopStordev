@@ -89,7 +89,8 @@ then
   /TopStor/etcdput.py 'usersinfo/'$username $userid':'$usergd':'$userhome'/'$size'/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no'
   /TopStor/etcdput.py 'usershash/'$username $userhash
   /TopStor/broadcast.py UserAdd /TopStor/pump.sh UnixAddUser_sync -d$myhost $username $userhash $userid $usergd $userhome
-  /TopStor/UnixChangeUser $username $usergroups $userreq
+  /TopStor/pump.sh UnixChangeUser $username $usergroups $userreq
+  echo 1  putzpool UnixChangeUser update > /pacedata/putzpool & 
   /TopStor/logmsg.py Unlin1022 info $userreq $username
  fi 
 fi
