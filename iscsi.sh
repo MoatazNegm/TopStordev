@@ -11,30 +11,39 @@ targetiqn=`echo $@ | awk '{print $6}'`
 chapuser=`echo $@ | awk '{print $7}'`
 chappas=`echo $@ | awk '{print $8}'`
 vtype='iscsi'
+myhost=`hostname`
 echo $@ > /root/iscsiparam
-pcs resource | grep $ipaddr | grep -v iscsi
-if [ $? -eq 0 ];
-then
-  /TopStor/logmsg.py ISCSIwa01 warning $userreq $ipaddr 
-  exit
+rightip=`/pace/etcdget.py ipaddr/$myhost $vtype-$ipaddr | grep -v $vol`
+otherip=`/pace/etcdget.py ipaddr $vtype-$ipaddr | grep -v $myhost | wc -c`
+othervtype=`/pace/etcdget.py ipaddr $ipaddr | grep -v $vtype | wc -c` 
+if [ $otherip -ge 5 ];
+then 
+ echo another host is holding the ip
+ echo otherip=$otherip
+ exit
 fi
-rightip=`/pace/etcdget.py ipaddr/$ipaddr/$ipsubnet`
-echo  rightip=$rightip
-resname=`echo $rightip | awk -F'/' '{print $1}'`
-resname=$vtype-$ipaddr
-echo resname=$resname
-/pace/etcdput.py ipaddr/$ipaddr/$ipsubnet $resname/$vol
-/pace/broadcasttolocal.py ipaddr/$ipaddr/$ipsubnet $resname/$vol 
-pcs resource | grep $ipaddr | grep iscsi
-if [ $? -ne 0 ];
+if [ $othervtype -ge 5 ];
+then 
+ echo the ip is used by another protocol 
+ /TopStor/logmsg.py ISCSIwa01 warning $userreq $ipaddr 
+ exit
+fi
+resname=$vtype'-'$ipaddr
+if [[ $rightip == '' ]];
 then
- echo creating the ip
+ echo nothing found
+ rightip=''
+ rightvols=$vol
+else
+ echo found other vols
+ rightvols=`/pace/etcdget.py ipaddr/$myhost/$ipaddr | sed "s/$resname\///g"`'/'$vol
+fi
+ /pace/etcdput.py ipaddr/$myhost/$ipaddr/$ipsubnet $resname/$rightvols
+ /pace/broadcasttolocal.py ipaddr/$myhost/$ipaddr/$ipsubnet $resname/$rightvols 
  /sbin/pcs resource delete --force $resname  2>/dev/null
  /sbin/pcs resource create $resname ocf:heartbeat:IPaddr2 ip=$ipaddr nic=$enpdev cidr_netmask=$ipsubnet op monitor interval=5s on-fail=restart
  /sbin/pcs resource group add ip-all $resname 
-fi
 echo continue
-cat /TopStordata/iscsi.${vol}>> /TopStordata/iscsi.$ipaddr
 echo /pace/addzfsvolumeastarget.sh $pool ${vol} $ipaddr $portalport $targetiqn $chapuser $chappas
  for i in $(echo $targetiqn | sed "s/,/ /g")
  do
