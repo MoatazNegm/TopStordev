@@ -3,7 +3,7 @@ import subprocess,sys
 from etcdget import etcdget as get
 from etcdput import etcdput as put 
 import json
-dev='enp0s8'
+dev='eno1'
 def updatenamespace(*args):
   put('namespace/mgmtip',args[0])
   print('hihi',args[0])

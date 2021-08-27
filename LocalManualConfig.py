@@ -8,7 +8,7 @@ from ast import literal_eval as mtuple
 import logmsg
 def config(*bargs):
  queuethis('LocalManualConfig.py','running',bargs[-1])
- enpdev='enp0s8'
+ enpdev='eno1'
  needreboot=False
  with open('/root/HostManualconfigtmp3','w') as f:
   f.write(str(bargs))

@@ -2,7 +2,7 @@
 import subprocess,sys
 from etcdget import etcdget as get
 import json
-enpdev='enp0s8'
+enpdev='eno1'
 def cleardataip(*args):
 	nslist=get('volumes','CIFS')
 	for x in nslist:

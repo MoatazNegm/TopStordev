@@ -15,7 +15,7 @@ def config(*bargs):
  arglist = bargs[0]
  #arglist = {'ipaddr': '10.11.11.123', 'ipaddrsubnet': '24', 'id': '0', 'user': 'admin', 'name': 'dhcp32502'}
  queuethis('Hostconfig','running',arglist['user'])
- enpdev='enp0s8'
+ enpdev='eno1'
  needreboot=False
  for key in arglist:
   if arglist[key] == -1:

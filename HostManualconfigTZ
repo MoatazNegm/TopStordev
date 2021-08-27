@@ -8,7 +8,7 @@ if [ $? -eq 0 ]; then
  ./logqueue.py HostManaulconfigTZ running system 
 fi
 hostname=`hostname -s`
-dev='enp0s8'
+dev='eno1'
 web='/var/www/html/des20/Data/HostManualconfigstatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log';
 runningpools='/pacedata/pools/runningpools';

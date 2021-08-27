@@ -1,7 +1,7 @@
 #!/bin/sh
 cd /TopStor
 export ETCDCTL_API=3
-enpdev='enp0s8'
+enpdev='eno1'
 pool=`echo $@ | awk '{print $1}'`;
 i=`echo $@ | awk '{print $2}'`
 resname=`echo $i | awk -F'/' '{print $1}'`
