@@ -53,4 +53,10 @@ do
 	fi
 done
 cd /TopStor
+myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
+leaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip`
+stamp=`date +%s`
+/TopStor/etcddel.py $leaderip sync/cversion --prefix
+/TopStor/etcdput.py $leaderip sync/cversion/_${branch}__/request cversion_$stamp
+/TopStor/etcdput.py $leaderip sync/cversion/_${branch}__/request/$myhost cversion_$stamp
 echo finished

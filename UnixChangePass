@@ -1,64 +1,36 @@
 #!/bin/sh
 echo $@ > /root/tmp
 export ETCDCTL_API=3
-web='/var/www/html/des20/Data/Usersstatus.log';
-logging='/var/www/html/des20/Data/currentinfo2.log';
-resweb='/var/www/html/des20/Data/userpass.txtupdated';
-logthis='/TopStordata/logthis.log'
-glog='/var/www/html/des20/Data/TopStor.log';
-passchange='/TopStordata/passchange'
-txtres='/TopStordata/'`basename $0`'.txt'
+
 cd /TopStor
-rm -rf $txtres 2>/dev/null
 username=`echo $@ | awk '{print $1}'`;
-pas=`/TopStor/etcdgetlocal.py usershash/$username` 
+pas=`docker exec etcdclient /TopStor/etcdgetlocal.py usershash/$username` 
 userpass=`/TopStor/decthis.sh $username $pas | awk -F'_result' '{print $2}'`
 userreq=`echo $@  | awk '{print $2}'`;
-leaderip=` ./etcdgetlocal.py leaderip `
-myhost=`/TopStor/etcdgetlocal.py clusternode`
-myip=`/TopStor/etcdgetlocal.py clusternodeip`
-echo $username, $pas, $userpass
-/TopStor/logqueue.py `basename "$0"` running $userreq 
-/TopStor/logmsg.py Unlin1012 info $userreq $username
-cp $logthis $logging 2>/dev/null ; rm -rf $logthis 2>/dev/null;
-usermod  -p $userpass $username
-#pas=`echo $userpass | openssl enc -e -base64 -aes-256-ctr -nopad -nosalt -k '#skMe22'$username`
-echo __1
-isleader=`/TopStor/etcdgetlocal.py leader `
-echo $isleader | grep $myip
-if [ $? -ne 0 ];
+privilege="Box_Users";
+contrun=`./privthis.sh $privilege $userreq`;
+if [[ $contrun == 'true' ]]
 then
- echo __1.6
- /TopStor/etcdputlocal.py $myip 'usershash/'$username $pas 2>/dev/null
-else
- /TopStor/etcdput.py $myip 'usershash/'$username $pas 2>/dev/null
- stamp=`date +%s`;
- /pace/etcdput.py $myip sync/user/`basename "$0"`_$@ $stamp/request/$myhost UsrChange_$stamp
- /pace/etcdput.py $myip sync/user/`basename "$0"`_$@ $stamp/request UsrChange_$stamp
-
+	leaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip`
+	myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
+	myhostip=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`
+	leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
+	docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq
+	echo $leader | grep $myhost
+	if [ $? -ne 0 ];
+	then
+ 		etcd=$myhostip
+	else
+ 		etcd=$leaderip
+ 
+	fi
+	usermod  -p $userpass $username
+ 	docker exec etcdclient /TopStor/etcdputlocal.py $myip 'usershash/'$username $pas 2>/dev/null
+	echo $username | grep -w admin
+	if [ $? -eq 0 ];
+	then
+ 		usermod $username -c"AdminStor"$pas
+	else
+ 		usermod $username -c"TopStor"$pas
+	fi
 fi
-echo __3
-echo $username | grep -w admin
-if [ $? -eq 0 ];
-then
- echo __3.5
- usermod $username -c"AdminStor"$pas
-else
- echo __3.6
- usermod $username -c"TopStor"$pas
-fi
-echo __4
-echo $userpass > key/${username}fixed
-rm -rf key/${username}fixed.gpg
-gpg -e -u "QuickStor" -r "QuickStor" key/${username}fixed
-chmod 400 key/${username}fixed.gpg;
-rm -rf key/${username}fixed
-if [[ $username == "admin" ]]; then
- rm -rf factory/${username}fixed.gpg
- cp key/${username}fixed.gpg factory/;
-fi
- /TopStor/logmsg.py Unlin1015 info $userreq $username
-resdate=`date +%s`;
-resjson=`./jsonthis3.sh updated $resdate`;
-echo $resjson > $resweb;
-/TopStor/logqueue.py `basename "$0"` finish $userreq 
