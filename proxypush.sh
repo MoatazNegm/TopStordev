@@ -32,7 +32,7 @@ fnupdate () {
 	sync
 }
 
-fnupdate () {
+fnupdateold () {
 	git checkout -b $1
 	git checkout $1
 	git reset --hard
