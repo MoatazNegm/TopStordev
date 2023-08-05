@@ -1,5 +1,38 @@
 #!/usr/bin/sh
 fnupdate () {
+	checkout QSD3.15
+	git branch -D $1
+	remote=`git remote -v | grep 252 | head -1 | awk '{print $1}'`
+	origin=`git remote -v | grep github | head -1 | awk '{print $1}'`
+	git fetch $remote 
+	if [ $? -ne 0 ];
+	then
+		echo something went wrong while pulling from remote $remote, branch: $1, dir:`pwd` .... consult the devleloper
+		exit
+	fi
+	git checkout -b $1  $remote/$1
+	if [ $? -ne 0 ];
+	then
+		echo something went wrong while pulling from remote $remote, branch: $1, dir:`pwd` .... consult the devleloper
+		exit
+	fi
+	git reset --hard $remote/$1
+	git clean -f
+	git config --replace-all pull.rebase false
+	git checkout -- *
+	git rm -rf __py*
+	git push $origin $1
+	if [ $? -ne 0 ];
+	then
+		echo something went wrong while pushing to origin: $origin, branch: $1, dir:`pwd` .... consult the devleloper
+		exit
+	fi
+	sync
+	sync
+	sync
+}
+
+fnupdate () {
 	git checkout -b $1
 	git checkout $1
 	git reset --hard
