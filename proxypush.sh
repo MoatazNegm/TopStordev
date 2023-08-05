@@ -1,6 +1,6 @@
 #!/usr/bin/sh
 fnupdate () {
-	checkout QSD3.15
+	git checkout QSD3.15
 	git branch -D $1
 	remote=`git remote -v | grep 252 | head -1 | awk '{print $1}'`
 	origin=`git remote -v | grep github | head -1 | awk '{print $1}'`
