@@ -1,5 +1,10 @@
 #!/usr/bin/sh
 fnupdate () {
+	git clean -f
+	git config --replace-all pull.rebase false
+	git checkout -- *
+	git rm -rf __py*
+
 	git checkout QSD3.15
 	git branch -D $1
 	origin=`git remote -v | grep 252 | head -1 | awk '{print $1}'`
