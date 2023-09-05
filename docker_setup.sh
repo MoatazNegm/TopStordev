@@ -1,5 +1,6 @@
 #!/usr/bin/sh
 modprobe bnx2
+modprobe hpsa 
 systemctl restart NetworkManager
 myclusterf='/topstorwebetc/mycluster'
 mynodef='/topstorwebetc/mynode'
@@ -21,7 +22,7 @@ firewall-cmd --permanent --add-port=88/udp
 firewall-cmd  --permanent --add-port=2381-2481/tcp
 firewall-cmd  --permanent --add-port=2381-2481/udp
 firewall-cmd --reload
-cat /etc/ssh/sshd_config | grep Gateway | grep no
+cat /etc/ssh/sshd_config | grep Gateway | grep yes 
 if [ $? -ne 0 ];
 then
  echo GatewayPorts yes >> /etc/ssh/sshd_config
@@ -32,6 +33,7 @@ echo l$order | grep  reset
 if [ $? -eq 0 ];
 then 
   cmdline='reset'
+  rm -rf /TopStordata/*
   echo no > /root/nodeconfigured
 fi
 

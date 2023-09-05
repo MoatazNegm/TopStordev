@@ -38,8 +38,8 @@ tun=3
 while [ $tun -ne $tunnelport ];
 do
 	sleep 2 
-	/TopStor/etcdputnoport.py $tunnelport replinextport $tunnelport
+	/TopStor/etcdputnoport.py $leaderip $tunnelport replinextport $tunnelport
 	sleep 1 
-	tun=`/TopStor/etcdgetnoport.py $tunnelport replinextport`
+	tun=`/TopStor/etcdgetnoport.py $leaderip $tunnelport replinextport`
 	echo $tun, $tunnelport
 done

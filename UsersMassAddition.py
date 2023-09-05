@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import subprocess, pandas as pd, sys, os
 from logmsg import sendlog, initlog
 # Replacement for etcdgetjson
@@ -222,4 +223,6 @@ def addUsers(*argv):
 
 
 if __name__=='__main__':
+ with open('/root/fileupload','w') as f:
+    f.write(str(sys.argv))
  addUsers(*sys.argv[1:])

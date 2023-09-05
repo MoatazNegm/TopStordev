@@ -82,7 +82,7 @@ def uploadUsers(data):
       return {'response': 'baduser'}
     uploaded_file = request.files['file']
     if uploaded_file.filename != '':
-      dirPath = '/TopStor/TopStordata'
+      dirPath = '/TopStordata'
       isExist = os.path.exists(dirPath)
       if not isExist:
         os.makedirs(dirPath)

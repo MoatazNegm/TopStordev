@@ -35,9 +35,11 @@ echo keeppluszero=$keep >> $cronout
 timenow=`date`;
 userreq='system';
 replicationflag='hi'
+isreceiver='hi'
 if (( $countsnap >  $keep )); then 
- replicationflag=$oldsnap
- echo $receiver | grep NoReceive
+ replicationflag=$oldsnap 
+ isreceiver=$receiver
+ echo $isreceiver | grep NoReceive
  if [ $? -eq  0 ];
  then
   docker exec etcdclient /TopStor/logmsg.py Snap1022 info $userreq $oldsnap
