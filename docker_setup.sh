@@ -235,7 +235,7 @@ else
 		ping -w 3 $mynodeip
 	done
 # now the port should be up--- or other wise comment out all the above block and uncomment the below sleep
-	#sleep 20
+	sleep 20
 	
 	isconf_prim='yesno'
 	isprimary=0
