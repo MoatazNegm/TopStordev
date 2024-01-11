@@ -73,6 +73,7 @@ then
  oct3=`echo $ipaddr | awk -F'.' '{print $3}'`
 
  who=$oct1'.'$oct2'.'$oct3'.*'
+ who='*'
  ETCDCTL_API=3 /pace/etcdput.py $leaderip volumes/NFS/$myhost/$DG/$name $DG/$name/$who/rw/sync/insecure/no_root_squash/no_all_squash/$writev/$ipaddr/$ipsubnet/$active
  #ETCDCTL_API=3 /pace/broadcasttolocal.py volumes/NFS/$myhost/$DG/$name $DG/$name/$who/rw/sync/insecure/no_root_squash/no_all_squash/$writev/$ipaddr/$ipsubnet/$active
  ls /$DG/ | grep $name

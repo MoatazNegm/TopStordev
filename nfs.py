@@ -4,6 +4,7 @@ from logqueue import queuethis, initqueue
 from etcdgetpy import etcdget as get
 from sendhost import sendhost
 
+
 def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsubnet, vtype,*args):
     volsip = get(etcdip,'volume',ipaddr)
     volsip = [ x for x in volsip if 'active' in str(x) ]
@@ -15,24 +16,45 @@ def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsub
         print(len(notsametype), notsametype)
         print(' the ip address is in use ')
         return
+    resname = vtype+'-'+ipaddr
     cmdline='rm -rf /TopStordata/tempnfs.'+ipaddr
     subprocess.run(cmdline.split(),stdout=subprocess.PIPE)  
+    cmdline='rm -rf /TopStordata/exportsip.'+ipaddr
+    subprocess.run(cmdline.split(),stdout=subprocess.PIPE)  
     mounts =''
-    if len(volsip) < 1 :
-        return
-    who = volsip[0][1].split('/')[2]
-    exports = ''
     for vol in volsip:
         if vol in notsametype:
            continue
-        exp = '/'+vol[0].split('/')[3]+'/'+vol[0].split('/')[4]
-        exports = exp +' '+ who+'('+','.join(vol[1].split('/')[3:8])+')\n'
-        with open('/TopStordata/exportip.'+vol[0].split('/')[4]+'_'+ipaddr,'w') as fip:
-            fip.write(exports)
-    
-    cmdline = '/TopStor/nfs.sh '+ipaddr+' '+ipsubnet
+        leftvol = vol[0].split('/')[4]
+        print('leftvol',leftvol)
+        print('leftvol','/'+pool+'/exports.'+leftvol)
+        mounts += '-v/'+pool+'/'+leftvol+':/'+pool+'/'+leftvol+':rw'
+        with open('/TopStordata/tempnfs.'+ipaddr,'a') as fip:
+            try:
+                with open('/'+pool+'/exports.'+leftvol, 'r') as fvol:
+                    fip.write(fvol.read())
+            except:
+               continue 
+    cmdline = 'cp /TopStordata/tempnfs.'+ipaddr+' /TopStordata/exportsip.'+ipaddr
     subprocess.run(cmdline.split(),stdout=subprocess.PIPE)  
-
+    #if '_' not in vtype:
+    #    cmdline = 'cp /TopStor/VolumeNFSupdate.sh /etc/'
+    #    subprocess.run(cmdline.split(),stdout=subprocess.PIPE)  
+    print('hihihihi')
+    print('/TopStor/nfs.sh '+resname+' '+mounts+' '+ipaddr+' '+ipsubnet+' '+vtype+' '+" ".join(args))
+    cmdline = '/TopStor/nfs.sh '+resname+' '+mounts+' '+ipaddr+' '+ipsubnet+' '+vtype+' '+" ".join(args)
+    subprocess.run(cmdline.split(),stdout=subprocess.PIPE)  
+    #if '_' not in vtype:
+    #    users=get(etcdip,'usershash','--prefix')
+    #    users=[x for x in users if 'admin' not in x[0] ]
+    #    for user in users:
+    #        username = user[0].split('/')[1]
+    #        cmdline = '/TopStor/decthis.sh '+username+' '+user[1]
+    #        passwd = subprocess.run(cmdline.split(),stdout=subprocess.PIPE).stdout.decode().split('_result')[1]
+    #        cmdline = 'docker exec '+resname+' /hostetc/smbuserfix.sh x '+username+' '+passwd
+    #        subprocess.run(cmdline.split(),stdout=subprocess.PIPE)  
+            
+    print(mounts)
     return
     #if len(checkipaddr1) != 0 or len :
 
@@ -50,6 +72,6 @@ if __name__=='__main__':
  ipsubnet = sys.argv[9]
  vtype = sys.argv[10]
  initqueue(leaderip, myhost)
- with open('/root/cifspytmp','w') as f:
+ with open('/root/nfspytmp','w') as f:
   f.write(str(sys.argv))
  create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsubnet, vtype,*sys.argv[11:])

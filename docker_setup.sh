@@ -30,6 +30,7 @@ myclusterf='/topstorwebetc/mycluster'
 mynodef='/topstorwebetc/mynode'
 myhost=`hostname`
 firewall-cmd --permanent --add-service={nfs,rpc-bind,mountd}
+firewall-cmd --permanent --add-port=32765/tcp
 firewall-cmd --permanent --add-port=5672/tcp
 firewall-cmd --permanent --add-port=5672/udp
 firewall-cmd --permanent --add-port=137/tcp

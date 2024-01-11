@@ -5,7 +5,7 @@ prot=`echo $@ | awk '{print $1}'`
 
 if [[ $prot == 'nfs' ]];
 then
- head -n 2 /pdhcp*/exports.* | grep NFS | grep SUMMARY |  awk '{print $3}' 2>/dev/null
+ head -n 2 /pdhcp*/exports.* | grep NFS | grep SUMMARY |  awk '{print $4}' 2>/dev/null
  exit
 fi
 
