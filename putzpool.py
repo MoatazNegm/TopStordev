@@ -102,7 +102,7 @@ def putzpool():
     cachetime='notset'
    #put('pools/'+b[0],myhost)
    poolsstatus.append(('pools/'+b[0],myhost))
-   zdict={ 'name':b[0],'changeop':b[1], 'availtype':availtype, 'status':b[1],'host':myhost, 'used':str(zfslist[0].split()[6]),'available':str(zfslist[0].split()[11]), 'alloc': str(zlist[2]), 'size': zlist[1], 'empty': zlist[3], 'dedup': zlist[7], 'compressratio': zlist2[2],'timestamp':str(cachetime), 'raidlist': raidlist ,'volumes':volumelist, 'silvering':'no'}
+   zdict={ 'name':b[0],'changeop':b[1], 'availtype':availtype, 'status':b[1],'host':myhost, 'used':str(zfslist[0].split()[6]),'available':str(zfslist[0].split()[11]), 'alloc': str(zlist[2]), 'size': zlist[1], 'empty': zlist[3], 'dedup': zlist[8], 'compressratio': zlist2[2],'timestamp':str(cachetime), 'raidlist': raidlist ,'volumes':volumelist, 'silvering':'no'}
    zpool.append(zdict)
    lpools.append(zdict) 
    for vol in zfslist:

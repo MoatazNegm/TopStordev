@@ -555,6 +555,8 @@ else
      zfs set acltype=posixacl p$nextpool
      zfs set avail:type=Availability p$nextpool
      zfs set expand:yes=no  p$nextpool
+     zfs set compression=lz4 p$nextpool
+     zfs set dedup=on p$nextpool
      ETCDCTL_API=3 /pace/etcdput.py $leaderip pools/p$nextpool $myhost
      stamp=`date +%s`
      guid=`zpool get guid p$nextpool -H | awk '{print $3}'`
