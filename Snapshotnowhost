@@ -61,7 +61,7 @@ then
  then
  	waiting=0
  else
- 	waiting=1
+ 	waiting=
  fi
  echo $receiver, $waiting
  waiting=0
@@ -94,6 +94,7 @@ then
   #./etcdput.py $leaderip running/$myhost/$receiver $receiver 
   #./etcdput.py $leaderip sync/running/____/request running_$stamp
   #./etcdput.py $leaderip sync/running/____/request/$leader running_$stamp
+  zfs set partner:receiver=$receiver $snapshot
   echo /TopStor/replicatenow.py $leaderip $etcd $snapshot $receiver >/root/snapshotpls
   echo /TopStor/replicatenow.py $leaderip $etcd $snapshot $receiver 
   #result=`/TopStor/replicatenow.py $leaderip $etcd $snapshot $receiver 2>/root/replicatenow`
@@ -129,7 +130,7 @@ then
     docker exec etcdclient /TopStor/logmsg.py Snap1025 info $userreq $soldsnap
    fi
     echo successfulwork
-    docker exec etcdclient /TopStor/logmsg.py Replispacesu01 info $userreq $vol $shortreceiver
+    docker exec etcdclient /TopStor/logmsg.py Replispacesu02 info $userreq $vol $shortreceiver
   fi 
   docker exec etcdclient /TopStor/logqueue.py `basename "$0"` stop system 
  fi

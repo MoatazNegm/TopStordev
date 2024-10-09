@@ -16,4 +16,6 @@ def delcifs(*args):
    
    
 if __name__=='__main__':
+ with open('/root/volumedockerchange','w') as f:
+    f.write(str(sys.argv[1:])+'\n')
  delcifs(*sys.argv[1:])

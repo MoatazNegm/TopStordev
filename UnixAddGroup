@@ -2,10 +2,20 @@
 echo $@ > /root/unixaddgrp
 export ETCDCTL_API=3
 cd /TopStor
+
 leaderip=`echo $@  | awk '{print $1}'`;
 username=`echo $@ | awk '{print $2}'`;
 groupusers=`echo $@ | awk '{print $3}'`;
-userreq=`echo $@  | awk '{print $4}'`;
+pullsync=`echo $@ | awk '{print $4}'`;
+echo s$pullsync | grep pull
+if [ $? -eq 0 ]
+then
+	userid=`echo $@ | awk '{print $5}'`;
+	usergd=`echo $@ | awk '{print $6}'`;
+	userreq=`echo $@ | awk '{print $7}'`;
+else
+	userreq=`echo $@ | awk '{print $4}'`;
+fi
 privilege="Box_Users";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
@@ -16,31 +26,54 @@ then
 	myhostip=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`
 	leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
 echo 2222222222222222222222222222222222222222222222
- docker exec etcdclient /TopStor/logmsg.py Unlin1118 info $userreq $username
-	echo $leader | grep $myhost
-	if [ $? -ne 0 ];
-	then
- 		etcd=$myhostip
-	else
+ echo s$pullsync | grep pull
+ if [ $? -eq 0 ]
+ then
+ 	docker exec etcdclient /TopStor/logmsg.py Unlin1118 info $userreq $username
+ fi
+ echo $leader | grep $myhost
+ if [ $? -ne 0 ];
+ then
+		etcd=$myhostip
+ else
  		etcd=$leaderip
- 		/pace/etcdget.py $leaderip volumes --prefix | grep -w $username
- 		if [ $? -eq 0 ];
- 		then
-  		docker exec etcdclient /TopStor/logmsg.py Unlin1021gv warning $userreq $username
-  		exit
- 	fi
- 	./etcdget.py $leaderip user --prefix | grep $username
- 	if [ $? -eq 0 ];
- 	then
-  		docker exec etcdclient /TopStor/logmsg.py Unlin1021gg warning $userreq $username
-  		exit
- 	fi
-fi
+ fi
+ echo s$pullsync | grep pull
+ if [ $? -ne 0 ]
+ then
+ 			/pace/etcdget.py $leaderip volumes --prefix | grep -w $username
+ 			if [ $? -eq 0 ];
+ 			then
+  				docker exec etcdclient /TopStor/logmsg.py Unlin1021gv warning $userreq $username
+  				exit
+ 			fi
+                        /TopStor/etcdget.py $etcd user --prefix | grep -w $username 
+                        if [ $? -eq 0 ];
+                        then
+                                docker exec etcdclient /TopStor/logmsg.py Unlin1021uu warning $userreq $username
+                                docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq 
+                                exit
+                        fi
+ else
+	cat /etc/group | grep $username
+	if [ $? -eq 0 ];
+	then
+ 		/TopStor/UnixDelGrouplocal $myhost $username system
+	fi
+ fi
  groupdel $username
  homebase='-b /NoHome -M'
  userpass=${RANDOM}$RANDOM;
  pas=`/TopStor/encthis.sh $username $userpass | awk -F'_result' '{print $2}'` 
- useradd -c"TopStorGroup"$pas $homebase -p $userpass -s /usr/sbin/nologin $username 
+ echo s$pullsync | grep pull
+ if [ $? -ne 0 ]
+ then
+ 	useradd -c"TopStorGroup"$pas $homebase -p $userpass -s /usr/sbin/nologin $username 
+ else
+	useradd -c"TopStorGroup"$pas $homebase -u $userid -p $userpass -s /usr/sbin/nologin $username
+	groupmod -g $usergd $username
+ fi
+
 # /bin/smbpasswd -e $username
  sleep 2;
  userline=`cat /etc/passwd | grep $username`
@@ -51,21 +84,26 @@ fi
   usergd=`echo $userline | awk -F':' '{print $4}'`
   /TopStor/etcdput.py $etcd 'usersigroup/'$username $userid':'$usergd':'nogrouphome/nogroupsize'/NoUser/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no'
   #/TopStor/broadcast.py GroupAdd /TopStor/pump.sh UnixAddGroup_sync -d$myhost $username $userid $usergd $groupusers
-  echo /TopStor/UnixChangeGroup $leaderip $username $groupusers $userreq create
-  /TopStor/UnixChangeGroup $leaderip $username $groupusers $userreq create
-  docker exec etcdclient /TopStor/logmsg.py Unlin1122 info $userreq $username
+  echo /TopStor/UnixChangeGroup $leaderip $username $groupusers $userreq create $pullsync
+  /TopStor/UnixChangeGroup $leaderip $username $groupusers $userreq create $pullsync
+  echo s$pullsync | grep pull
+  if [ $? -eq 0 ]
+  then
+  	docker exec etcdclient /TopStor/logmsg.py Unlin1122 info $userreq $username
+  fi
  fi 
-fi
-ln -f /etc/passwd  /opt/passwds/passwd
-ln -f /etc/group  /opt/passwds/group
-ln -f /etc/shadow  /opt/passwds/shadow
-echo $leader | grep $myhost
-if [ $? -eq 0 ];
-then
+ ln -f /etc/passwd  /opt/passwds/passwd
+ ln -f /etc/group  /opt/passwds/group
+ ln -f /etc/shadow  /opt/passwds/shadow
+ echo leader=$leader, myhost=$myhost
+ echo $leader | grep $myhost
+ if [ $? -eq 0 ];
+ then
 	stamp=`date +%s%N`
 	myscript=`basename "$0"`
 	params=`echo $myscript $@ $stamp | sed 's\ \\_\g'`
 	/pace/etcdput.py $etcd sync/group/$params/request/$myhost group_${username}_$stamp
 	/pace/etcdput.py $etcd sync/group/$params/request group_${username}_$stamp
+ fi
+ docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
 fi
-docker exec etcdclient /TopStor/logqueue.py `basename "$0"` stop $userreq

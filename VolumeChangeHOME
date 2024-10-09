@@ -32,10 +32,6 @@ then
         else
                 etcd=$leaderip
         fi
- echo $perfmon | grep 1
- if [ $? -eq 0 ]; then
- docker exec etcdclient /TopStor/logqueue.py VolumeChangeHOME start system
- fi
  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq
  if [ $writev != 'nogroup' ];
  then
@@ -84,8 +80,5 @@ echo /pace/etcdput.py $leaderip volumes/HOMEE/$myhost/$DG/$name $DG/$name/no/yes
  /pace/putzpool.py 
  /TopStor/logmsg.py VolCsu01 info $userreq $name
  echo ready ;
-fi
-echo $perfmon | grep 1
-if [ $? -eq 0 ]; then
- /TopStor/logqueue.py VolumeChangeHome stop system 
+ docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
 fi

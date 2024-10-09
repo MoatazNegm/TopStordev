@@ -44,4 +44,5 @@ then
 		fi
  
 	fi
+	docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
 fi

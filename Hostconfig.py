@@ -38,7 +38,7 @@ def config(leader, leaderip, myhost, *bargs):
   put(leaderip, 'sync/alias/Add_'+arglist['name']+'_'+arglist['alias'].replace('_',':::').replace('/',':::')+'/request','alias_'+stampi)
   put(leaderip, 'sync/alias/Add_'+arglist['name']+'_'+arglist['alias'].replace('_',':::').replace('/',':::')+'/request/'+myhost,'alias_'+stampi)
   logmsg.sendlog('HostManual1su5','info',arglist['user'],oldarg, arglist['alias'])
-  queuethis('Hostconfig_alias','running',arglist['user'])
+  queuethis('Hostconfig_alias','finish',arglist['user'])
 ######### changing cluster address ###############
  if 'cluster' in arglist:
   queuethis('Hostconfig_cluster','running',arglist['user'])
@@ -162,7 +162,9 @@ def config(leader, leaderip, myhost, *bargs):
 
   put(leaderip, 'sync/ipaddr/Add_ActivePartners_'+arglist['name']+'_'+arglist['ipaddr'].replace('/','::')+'/request/'+leader,'ActivePartners_'+arglist['name']+'_'+stampi)
   logmsg.sendlog('HostManual1su6','info',arglist['user'], str(oldipaddr),arglist['ipaddr']+'/'+arglist['ipaddrsubnet'])
+  queuethis('Hostconfig_ip','finish',arglist['user'])
 ######################################
+ queuethis('Hostconfig','finish',arglist)
  return 1
 
 

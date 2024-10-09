@@ -7,6 +7,7 @@ groupname=`echo $@ | awk '{print $2}'`;
 groupusers=`echo $@ | awk  '{print $3}' | sed 's/users//g'`
 userreq=`echo $@  | awk '{print $4}'`;
 ischange=`echo $@  | awk '{print $5}'`;
+pullsync=`echo $@  | awk '{print $6}'`;
 allusres=`echo $groupusers | sed 's/\,/ /g'`;
 allusersel=`echo $allusers | wc -w`;
 groupusersn=`echo $groupusers | wc -c `
@@ -30,9 +31,18 @@ then
 	else
 		etcd=$myhostip
 	fi
-
+ #if a change happens before a group is created, no need to proceed, the script will be run again in the AddGroup
+ id $groupname
+ if [ $? -ne 0 ];
+ then
+	exit
+ fi
  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq 
- docker exec etcdclient /TopStor/logmsg.py Unst1025 info $userreq $groupname
+ echo s$pullsync | grep pull
+ if [ $? -ne 0 ]
+ then
+ 	docker exec etcdclient /TopStor/logmsg.py Unst1025 info $userreq $groupname
+ fi
  echo $groupusers | grep NoUser
  if [ $? -ne 0 ];
  then
@@ -89,7 +99,7 @@ then
    then
     continue
    fi
-   usergroups=`id -Gn $l | sed 's/ /,/g' | sed "s/$l,//g" | sed "s/$groupname//g" | sed "s/Everyone//g" | sed "s/,,/,/g" | sed 's/,,,/,/g' | sed 's/,,,,/,/g' | sed 's/^,//g' | sed 's/,$//g' `
+   usergroups=`id -Gn $l | sed 's/ /,/g' | sed "s/$l,//g" | sed "s/$groupname//g" |  sed "s/,,/,/g" | sed 's/,,,/,/g' | sed 's/,,,,/,/g' | sed 's/^,//g' | sed 's/,$//g' `
    usergroupsn=`echo $usergroups | wc -c`
    if [ $usergroupsn -le 2 ];
    then
@@ -99,24 +109,27 @@ then
    fi 
     echo ------------------------------------------------------------------------------
    echo /TopStor/UnixChangeUser $l groups$usergroups $userreq 
-   /TopStor/UnixChangeUser $leaderip $l groups$usergroups $userreq $ischange 2&>/root/UnixChangeUser
+   /TopStor/UnixChangeUser $leaderip $l groups$usergroups $userreq $ischange $pullsync &>/root/UnixChangeUser
   done 
  else
     echo ---------------0000000000000000000000000------------------- 
-   /TopStor/UnixChangeUser $leaderip NoUser groups$groupname $userreq $ischange 2&>/root/UnixChangeUser
+   /TopStor/UnixChangeUser $leaderip NoUser groups$groupname $userreq $ischange $pullsync &>/root/UnixChangeUser
  fi 
  #/TopStor/broadcast.py GroupChange /TopStor/pump.sh UnixChangeGroup_sync -d$myhost $@ 
- docker exec etcdclient /TopStor/logmsg.py Unsu1025 info $userreq $groupname
-fi 
-echo ${ischange}$leader | grep change$myhost
-if [ $? -eq 0 ];
-then
- stamp=`date +%s`;
- myscript=`basename "$0"`
- params=`echo $myscript $@ $stamp | sed 's\ \\_\g'`
- echo params=$params
- /pace/etcdput.py $etcd sync/user/$params/request/$myhost GrpChange_${groupname}_$stamp
- /pace/etcdput.py $etcd sync/user/$params/request GrpChange_${groupname}_$stamp
+ echo s$pullsync | grep pull
+ if [ $? -ne 0 ]
+ then
+ 	docker exec etcdclient /TopStor/logmsg.py Unsu1025 info $userreq $groupname
+ fi
+ echo ${ischange}$leader | grep change$myhost
+ if [ $? -eq 0 ];
+ then
+  stamp=`date +%s`;
+  myscript=`basename "$0"`
+  params=`echo $myscript $@ pull | sed 's\ \\_\g'`
+  echo params=$params
+  /pace/etcdput.py $etcd sync/GrpChange/$params/request/$myhost GrpChange_${groupname}_$stamp
+  /pace/etcdput.py $etcd sync/GrpChange/$params/request GrpChange_${groupname}_$stamp
+ fi
+ docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq 
 fi
-
-docker exec etcdclient /TopStor/logqueue.py `basename "$0"` stop $userreq 

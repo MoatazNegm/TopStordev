@@ -7,6 +7,7 @@ username=`echo $@ | awk '{print $2}'`;
 usergroups=`echo $@ | awk  '{print $3}' | sed 's/groups//g' `;
 userreq=`echo $@  | awk '{print $4}'`;
 ischange=`echo $@  | awk '{print $5}'`;
+pullsync=`echo $@  | awk '{print $6}'`;
 stablegrp=""
 privilege="Box_Users";
 contrun=`./privthis.sh $privilege $userreq`;
@@ -23,11 +24,21 @@ then
 	else
 		etcd=$myhostip
 	fi
-
+ #if a change happens before a user is created, no need to proceed, the script will be run again in the AddUser
+ id $username
+ if [ $? -ne 0 ];
+ then
+	docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq 
+	exit 
+ fi
  echo 'NoUser' | grep $username
  if [ $? -ne 0 ];
  then
-  docker exec etcdclient /TopStor/logmsg.py Unst1024 info $userreq $username
+ 	echo s$pullsync | grep pull 
+ 	if [ $? -ne 0 ];
+ 	then
+  		docker exec etcdclient /TopStor/logmsg.py Unst1024 info $userreq $username
+	fi
  fi
  echo $username | grep NoUser
  if [ $? -ne 0 ];
@@ -39,7 +50,7 @@ then
    usermod -G '' $username
    usermod -G $usergroups $username
   fi
-  usermod -a -G Everyone $username
+  usermod -a -G $username  $username
   cgrps=`/pace/etcdget.py $etcd usersigroup $username`
   cgrpsl=${#cgrps}
   while [ $cgrpsl  -gt 4 ];
@@ -80,13 +91,18 @@ then
    usergroups=`echo $usergroups | sed 's/ /,/g' | cut -d, -f2-`
    usergroups=$usergroups','
    grpsl=` echo ${usergroups} | sed 's/,/ /g' | wc -w`
-   echo l=$l
+   echo $l | grep -w $username
+   if [ $? -eq 0 ];
+   then
+	continue
+   fi
    echo usrgroups=$usergroups
    echo grpsl=$grpsl
    echo stablegrp=$stablegrp
    echo $l | grep -w NoGroup 
    if [ $? -ne 0 ];
    then
+    echo 'kdsl' $stablegrp | grep -w $l 
     echo 'kdsl' $stablegrp | grep -w $l >/dev/null
     if [ $? -ne 0 ];
     then
@@ -142,20 +158,24 @@ then
  echo 'NoUser' | grep $username
  if [ $? -ne 0 ];
  then
-  docker exec etcdclient /TopStor/logmsg.py Unsu1024 info $userreq $username
+	echo s$pullsync | grep pull 
+ 	if [ $? -ne 0 ];
+ 	then
+  		docker exec etcdclient /TopStor/logmsg.py Unsu1024 info $userreq $username
+	fi
  fi
-fi 
-echo dddddddddddddddddddddddddd $leader, $myhost
-echo $leader | grep $myhost
-if [ $? -eq 0 ];
-then
+ echo dddddddddddddddddddddddddd $leader, $myhost
+ echo $leader | grep $myhost
+ if [ $? -eq 0 ];
+ then
 	stamp=`date +%s`;
 	stamp=$((stamp+10))
 	myscript=`basename "$0"`
-	params=`echo $myscript $@ $stamp | sed 's\ \\_\g'`
+	params=`echo $myscript $@ pull | sed 's\ \\_\g'`
 	echo params=$params
 	echo /pace/etcdput.py $etcd sync/UsrChange/$params/request/$myhost UsrChange_$stamp
 	/TopStor/etcdput.py $etcd sync/UsrChange/$params/request/$myhost UsrChange_$stamp
 	/TopStor/etcdput.py $etcd sync/UsrChange/$params/request UsrChange_$stamp
+ fi
+ docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq 
 fi
-docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq 

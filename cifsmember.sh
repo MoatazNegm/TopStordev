@@ -1,5 +1,6 @@
 #!/bin/sh
 cd /TopStor
+echo $@ > /root/cifsmember
 export ETCDCTL_API=3
 enpdev='enp0s8'
 leaderip=`echo $@ | awk '{print $1}'`

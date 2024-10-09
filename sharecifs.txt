@@ -2,8 +2,8 @@
 ;;;;;;;; SUMMARY Vtype Rpool/Rname/Rreadv/Rbrows/Rwritev/Radmin/Rwritea/Ripadd/Ripsub/ACTIVE
 [NAMECIFS]
 path = /POOL/NAMECIFS
-create mask = 0777
-directory mask = 0777
+create mask = 0644
+directory mask = 0755
 read only = no
 browsable = yes
 write list = @everyone

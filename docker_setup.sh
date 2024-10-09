@@ -4,6 +4,14 @@ eth2='enp0s8';
 
 # Get the current directory
 ports='/TopStordata/ports'
+if grep -q 'reset' /root/nodestatus; then
+	pports=$(ip a | grep -Po '(?<=^\d: )[^\:]+')
+	eth1=$(echo "$pports" | sed -n '2p')
+	eth2=$(echo "$pports" | sed -n '2p')
+	echo "$eth1" > $ports
+	echo "$eth2" >> $ports
+fi
+
 # Create an empty list
 eth_list=()
 if [ ! -f $ports ];
@@ -351,6 +359,13 @@ then
  /pace/watchdoginit & disown
  /pace/keepsendingprim & disown
 fi
+
+echo /TopStor/setipports.sh $myclusterip $leader $myhost sync
+/TopStor/setipports.sh $myclusterip $leader $myhost sync
+
+
+
+
 echo starting intstub 
 docker run -itd --rm --privileged \
   -v /TopStor/smb.conf:/etc/samba/smb.conf:rw \
@@ -559,7 +574,6 @@ fi
  /TopStor/refreshdisown.sh & disown 
  /TopStor/etcdput.py $etcd refreshdisown/$myhost yes 
  #/pace/syncrequestlooper.sh $leaderip $myhost & disown
- #/pace/zfsping.py $leaderip $myhost & disown
  /pace/rebootmeplslooper.sh $myclusterip $myhost & disown
  #/TopStor/receivereplylooper.sh & disown
  #/TopStor/iscsiwatchdoglooper.sh $mynodeip $myhost & disown 
@@ -597,4 +611,5 @@ docker rm -f promexport
 docker run -d -p $mynodeip:9100:9100 -v /proc:/proc -v /sys:/sys --name promexport prom/node-exporter
 docker rm -f promcadvisor
 docker run   --volume=/:/rootfs:ro   --volume=/var/run:/var/run:ro   --volume=/sys:/sys:ro   --volume=/var/lib/docker/:/var/lib/docker:ro   --volume=/dev/disk/:/dev/disk:ro   --publish=$mynodeip:9101:8080   --detach=true   --name=promcadvisor   --privileged   --device=/dev/kmsg   gcr.io/cadvisor/cadvisor
+ #/pace/zfsping.py $leaderip $myhost & disown #### it is in refreshdisown
  /pace/fapilooper.sh & disown

@@ -63,7 +63,6 @@ else
   --name $resname 10.11.11.124:5000/smb
   sleep 3
   docker exec $resname sh /hostetc/VolumeCIFSupdate.sh
-  /docker exec etcdclient TopStor/logqueue.py `basename "$0"` stop $userreq
 fi
 /TopStor/etcddel.py $leaderip vol $vol
 /TopStor/etcddel.py $leaderip replivol $vol

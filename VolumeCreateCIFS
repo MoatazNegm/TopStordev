@@ -117,6 +117,7 @@ then
   writevtemp=`echo $writev | sed 's/\,/ /g'`
   for grp in $writevtemp ;do  setfacl -R -m g:$grp:rwx /$DG/$name; done
  fi
+ setfacl -d -m o::--- /$DG/$name
 
  /TopStor/cifs.py $leader $leaderip $myhost $myhostip $etcd $DG $name $ipaddr $ipsubnet CIFS
     #/TopStor/cifs.sh $leaderip $pool $name $ipaddr $ipsubnet cifs

@@ -306,7 +306,7 @@ else
      #ETCDCTL_API=3 /pace/etcdput.py $myhostip fixpool/p$nextpool running 
     docker exec etcdclient /TopStor/logmsg.py DGsu13 info $userreq p${nextpool} $diskns
   else
-    docker exec etcdclient /TopStor/logmsg.py DGfa13 info $userreq p${nextpool} $diskns
+    docker exec etcdclient /TopStor/logmsg.py DGfa13 error $userreq p${nextpool} $diskns
   fi
  fi  
  if [[ $raid == "addparity2" ]]; then
@@ -316,7 +316,7 @@ else
   disk1=" "
   diskns=""
   /pace/diskchange.sh dgsetpool dgsetpool dgsetpool
-  while [ $i -lt $((diskargs-3)) ]; do
+  while [ $i -lt $((diskargs)) ]; do
    i=$((i+1));
    disk=`echo ${params[$i]} | awk -F':' '{print $1}'`
    diskn=`echo ${params[$i]} | awk -F':' '{print $2}'`
@@ -324,6 +324,7 @@ else
    diskns=${diskns}$diskn","
   done;
    docker exec etcdclient /TopStor/logmsg.py DGst14 info $userreq p${nextpool} $diskns
+  echo /sbin/zpool add -f ${nextpool} raidz2 ${disk1} 
   /sbin/zpool add -f ${nextpool} raidz2 ${disk1} 
   if [ $? -eq 0 ]; then
      ETCDCTL_API=3 /pace/etcdput.py $leaderip 'pools/'$nextpool $myhost
@@ -488,7 +489,7 @@ else
      ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/pools/Add_p${nextpool}_$myhost/request/$leader pools_$stamp 
     docker exec etcdclient /TopStor/logmsg.py DGsu18 info $userreq ${nextpool} $diskn1
   else
-    docker exec etcdclient /TopStor/logmsg.py DGfa18 info $userreq ${nextpool} $diskn1
+    docker exec etcdclient /TopStor/logmsg.py DGfa18 error $userreq ${nextpool} $diskn1
   fi
  fi 
  if [[ $raid == "stripeset" ]]; then

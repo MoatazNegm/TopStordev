@@ -7,10 +7,10 @@ mounts=`echo $@ | awk '{print $2}' | sed 's/\-v/ \-v /g'`
 ipaddr=`echo $@ | awk '{print $3}'`
 ipsubnet=`echo $@ | awk '{print $4}'`
 vtype=`echo $@ | awk '{print $5}'`
-echo $@ > /root/cifstmp
-echo $resname >> /root/cifstmp
-echo $mounts >> /root/cifstmp
-echo $ipaddr $ipsubnet >> /root/cifstmp
+echo params $@ > /root/cifstmp
+echo name $resname >> /root/cifstmp
+echo mounts $mounts >> /root/cifstmp
+echo ip and subnet $ipaddr $ipsubnet >> /root/cifstmp
 docker rm -f $resname
 nmcli conn mod cmynode -ipv4.addresses ${ipaddr}/$ipsubnet
 nmcli conn mod cmynode +ipv4.addresses ${ipaddr}/$ipsubnet
@@ -45,6 +45,7 @@ else
 	sed -i "s/DOMAINIP/$domainsrvi/g" /etc/smbmember.conf_$membername
 	sed -i "s/DOMAIN/${domain^^}/g" /etc/smbmember.conf_$membername
   	cat /TopStordata/smb.${ipaddr} >> /etc/smbmember.conf_$membername
+	echo nameserver $domainsrvi > /TopStordata/resolv_$wrkgrp
 	#cp /TopStordata/smbmember.conf_$membername /etc/smbmember.conf_$membername
  	echo -e 'notyet=1 \nwhile [ $notyet -eq 1 ];\ndo\nsleep 3' > /etc/smb${membername}.sh
  	echo -e 'cat /etc/samba/smb.conf | grep' "'\[public\]'" >> /etc/smb${membername}.sh
@@ -52,7 +53,7 @@ else
  	echo -e ' cat /etc/samba/smb.conf | grep' "'\[private\]'" >> /etc/smb${membername}.sh
  	echo -e ' if [ $? -eq 0 ];\nthen' >> /etc/smb${membername}.sh
  	echo -e '  cat /etc/samba/smb.conf | grep' "'\[home\]'" >> /etc/smb${membername}.sh
- 	echo -e '  if [ $? -eq 0 ];\nthen\nnotyet=0\nfi\nfi\nfi\ndone' >> /etc/smb${membername}.sh
+ 	echo -e '  if [ $? -eq 0 ];\nthen\nnotyet=0\nsleep 10\nfi\nfi\nfi\ndone' >> /etc/smb${membername}.sh
 	echo -e "cat /hostetc/smbmember.conf_$membername > /etc/samba/smb.conf" >> /etc/smb${membername}.sh
  	echo  "service samba --full-restart"  >> /etc/smb${membername}.sh
  	chmod +w /etc/smb${membername}.sh
@@ -80,7 +81,7 @@ else
   		-v /etc/localtime:/etc/localtime:ro \
   		-v /etc/:/hostetc/   \
   		-v /TopStordata/smb.${ipaddr}:/etc/smb.conf:rw \
-		-v /TopStordata/resolv.conf:/etc/resolv.conf \
+		-v /TopStordata/resolv_$wrkgrp:/etc/resolv.conf \
   		-e DOMAIN_NAME=$domain \
   		-e ADMIN_SERVER=$domainsrvi \
   		-e WORKGROUP=$wrkgrp  \

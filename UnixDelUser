@@ -6,6 +6,7 @@ export ETCDCTL_API=3
 leaderip=`echo $@  | awk '{print $1}'`;
 username=`echo $@ | awk '{print $2}'`;
 userreq=`echo $@ | awk '{print $3}'`;
+pullsync=`echo $@ | awk '{print $4}'`;
 echo $username | grep -w Everyone
 if [ $? -eq 0 ];
 then
@@ -31,7 +32,11 @@ then
 	myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
 	myhostip=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`
 	leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
-  	docker exec etcdclient /TopStor/logmsg.py Unlin1004 info $userreq $username
+ 	echo s$pullsync | grep pull
+ 	if [ $? -ne 0 ];
+ 	then
+  		docker exec etcdclient /TopStor/logmsg.py Unlin1004 info $userreq $username
+	fi
 	echo $leader | grep $myhost
 	if [ $? -ne 0 ];
 	then
@@ -46,7 +51,11 @@ then
  datenow=`date +%m/%d/%Y`;timenow=`date +%T`;
  cat /etc/passwd |  grep -w $username
  if [ $? -eq 0 ]; then
-   docker exec etcdclient /TopStor/logmsg.py Unlin11001 error $userreq $myhost
+ 	echo s$pullsync | grep pull
+ 	if [ $? -ne 0 ];
+ 	then
+   		docker exec etcdclient /TopStor/logmsg.py Unlin11001 error $userreq $myhost
+	fi
  else
   #/TopStor/broadcast.py UserDel /TopStor/pump.sh UnixDelUser_sync -d$myhost $username $userreq
   echo usename=$username
@@ -80,7 +89,11 @@ then
   fi
   /pace/etcddel.py $etcd users /$username/
   /pace/etcddel.py $etcd usershash $username
-  docker exec etcdclient /TopStor/logmsg.py Unlin1010 info $userreq $username
+  echo s$pullsync | grep pull
+  if [ $? -ne 0 ];
+  then
+  	docker exec etcdclient /TopStor/logmsg.py Unlin1010 info $userreq $username
+  fi
  fi;
 fi
 echo $leader | grep $myhost

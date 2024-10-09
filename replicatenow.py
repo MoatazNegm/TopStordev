@@ -73,7 +73,7 @@ def usetunnelport(receiver,cmd):
     print(cmdlst)
     globals()[cmdlst[0]](*cmdlst[1:]) 
 
-def createnodeloc(receiver, cmd, userreq):
+def createnodeloc(receiver, cmd, userreq="system"):
  global allinfo, phrase, myclusterip, pport, nodeloc, replitype, leaderip, etcdip
  cmdline = 'ps -ef'
  result = subprocess.run(cmdline.split(),stdout=subprocess.PIPE).stdout.decode('utf-8').split('\n')
@@ -84,7 +84,7 @@ def createnodeloc(receiver, cmd, userreq):
  return nodeloc
  
 
-def replistream(receiver, snapshot, nodeowner, poolvol, pool, volume, csnaps):
+def replistream(receiver, snapshot, nodeowner, poolvol, pool, volume, csnaps, userreq='system'):
  global allinfo, phrase, myclusterip, pport, nodeloc, replitype, leaderip, etcdip
  myvol = pool+'/'+volume 
  mysnaps = sorted(allinfo['volumes'][volume]['snapshots'], key= lambda x : x.split('.')[-1], reverse=True)
@@ -130,16 +130,19 @@ def replistream(receiver, snapshot, nodeowner, poolvol, pool, volume, csnaps):
  if oldsnap == 'noold':
   response[1] = 'newvol/@new'
  if 'problem/@problem' in response[1]:
+  logmsg.sendlog('Streamfa02','error',userreq, receiver, response[1])
   print(' a problem creating/using the volume in the remote cluster')
-  return
+  return 'failed'
  elif 'newvol/@new' in response[1]:
   remvol = result.split('volume_')[1]
+  logmsg.sendlog('Streamst01','info',userreq, myvol+'@'+snapshot,receiver)
   print('/TopStor/sendzfs.sh new '+ myvol+'@'+snapshot +' '+ remvol +' '+ nodeloc.replace(' ','%%'))
   cmd = '/TopStor/sendzfs.sh new '+ myvol+'@'+snapshot +' '+ remvol +' '+ nodeloc.replace(' ','%%')
  else:
   #cmd = './sendzfs.sh old '+myvol+'@'+lastsnap+' '+myvol+'@'+snapshot+' '+poolvol+' '+nodeloc
   remvol = result.split('volume_')[1]
   myoldsnap = oldsnap.split('@')[1]
+  logmsg.sendlog('Streamst01','info',userreq, myvol+'@'+snapshot,receiver)
   cmd = '/TopStor/sendzfs.sh old '+myvol+'@'+myoldsnap+' '+myvol+'@'+snapshot+' '+remvol +' '+nodeloc.replace(' ','%%')
   print('/TopStor/sendzfs.sh old '+myvol+'@'+myoldsnap+' '+myvol+'@'+snapshot+' '+remvol +' '+nodeloc.replace(' ','%%'))
  put(leaderip,'running/'+receiver, 'running')
@@ -169,9 +172,11 @@ def replistream(receiver, snapshot, nodeowner, poolvol, pool, volume, csnaps):
  print('-----------------------------------')
  if snapshot in str(snaps):
     print('replicatenow_successreplicatenow_')
+    logmsg.sendlog('Streamsu01','info',userreq, myvol+'@'+snapshot,receiver)
     return 'success' 
  else:
     print('replicatenow_failreplciatenow_')
+    logmsg.sendlog('Streamfa01','error',userreq, myvol+'@'+snapshot,receiver)
     return 'fail'
  return stream
 
@@ -194,9 +199,11 @@ def repliparam(snapshot, receiver, userreq='system'):
  finalresponse = subprocess.run(cmd.split(' '),stdout=subprocess.PIPE).stdout.decode().split('result_')[1]
  print('finalresponse',finalresponse)
  if 'fail' in finalresponse:
+  logmsg.sendlog('Partnerfa02','error',userreq, receiver.split('_')[0])
   print('(fail) no node is open for replication in the '+receiver)
   return 'closed'
  if 'No_vol_space' in str(finalresponse):
+  logmsg.sendlog('Partnerfa03','error',userreq, receiver.split('_')[0])
   print('(fail) No space in the receiver: '+receiver)
   return 'No_Sppue'
  print('selection',finalresponse)
@@ -210,7 +217,7 @@ def repliparam(snapshot, receiver, userreq='system'):
   csnaps = finalresonse.split('@')[1]
  except:
   csnaps = 'noold'
- result = replistream(receiver, snapshot, nodeowner, poolvol, pool, volume, csnaps)
+ result = replistream(receiver.split('_')[0], snapshot, nodeowner, poolvol, pool, volume, csnaps)
  if 'fail' in result:
   print('fail')
   cmd = '/usr/sbin/zfs destroy -r '+' '+pool+'/'+volume+'@'+snapshot 
@@ -254,7 +261,7 @@ def packagekeys(key,exception):
  print(keystring)
  return keystring 
 
-def syncpush(receiver, userreq):
+def syncpush(receiver, userreq="system"):
  global allinfo, phrase, myclusterip, pport, nodeloc, replitype, leaderip, etcdip, leader
  logmsg.sendlog('Partnerst01','info',userreq, receiver.split('_')[0])
  #usershash = getusershash()

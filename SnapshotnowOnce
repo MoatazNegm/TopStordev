@@ -70,6 +70,7 @@ done
 echo $receiver | grep NoReceive
 if [ $? -ne 0 ];
 then
+ zfs set partner:receiver=$receiver $snapshot 
  /TopStor/etcdput.py $leaderip running/$receiver $receiver
  /TopStor/etcdput.py $leaderip sync/running/____/request running_$stamp
  /TopStor/etcdput.py $leaderip sync/running/____/request/$leader running_$stamp
@@ -85,7 +86,7 @@ then
   #./logmsg.py Replispacefa01 error $userreq $shortreceiver $vol
   docker exec etcdclient /TopStor/logmsg.py Streamfa01 error $userreq $vol $shortreceiver
  else
-  docker exec etcdclient /TopStor/logmsg.py Replispacesu01 info $userreq $shortreceiver $vol
+  docker exec etcdclient /TopStor/logmsg.py Replispacesu01 info $userreq $vol $shortreceiver
  fi 
  /TopStor/etcdput.py $leaderip running/$receiver finish 
  /TopStor/etcdput.py $leaderip sync/running/____/request running_$stamp

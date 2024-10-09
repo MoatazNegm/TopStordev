@@ -224,5 +224,5 @@ def addUsers(*argv):
 
 if __name__=='__main__':
  with open('/root/fileupload','w') as f:
-    f.write(str(sys.argv))
+    f.write(' '.join(sys.argv[1:]))
  addUsers(*sys.argv[1:])

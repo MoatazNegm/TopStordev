@@ -1,5 +1,10 @@
 #!/usr/bin/sh
+cd /TopStor/
+echo hihi>/root/tmpgetdiscovery
 etcd='10.11.11.253'
+/TopStor/etcddel.py $etcd possible --prefix
+leaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip`
+/TopStor/etcddel.py $leaderip possible --prefix
 for pid in $(pidof -x getdiscovery.sh); do
     if [ $pid != $$ ]; then
         echo "[$(date)] : discovery.sh : Process is already running with PID $pid"
@@ -29,6 +34,8 @@ sed -i "s/ETCDIP/$newip/g" /TopStordata/discovery.sh
 docker run  -itd --rm --name discovery --hostname discovery -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $etcd:2379:2379 -v /TopStor/:/TopStor -v /root/discovery:/default.etcd -v /TopStordata/discovery.sh:/runme.sh --net bridge0 moataznegm/quickstor:etcd
 counter=0
 ./etcdput.py $etcd tostop no 
+/TopStor/etcddel.py $etcd possible --prefix
+/TopStor/etcddel.py $leaderip  possible --prefix
 while true
 do
 	lines=`/TopStor/etcdget.py $etcd possible --prefix`
@@ -41,11 +48,11 @@ do
 	then
 		break
 	fi
-	if [ $counter -ge 120 ];
+	if [ $counter -ge 600  ];
 	then
 		break
 	fi
-	sleep 5 
+	sleep 1 
 
 done
 

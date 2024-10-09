@@ -6,14 +6,14 @@ from sendhost import sendhost
 
 
 def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsubnet, vtype,*args):
-    volsip = get(etcdip,'volume',ipaddr)
+    volsip = get(etcdip,'volume','/'+ipaddr+'/')
     volsip = [ x for x in volsip if 'active' in str(x) ]
-    nodesip = get(etcdip, 'Active',ipaddr) 
+    nodesip = get(etcdip, 'Active','/'+ipaddr+'/') 
     notsametype = [ x for x in volsip if vtype not in str(x) ]
     if (len(nodesip) > 0 and 'Active' in str(nodesip))or len(notsametype) > 0:
-        print(ipaddr)
-        print(len(nodesip), nodesip)
-        print(len(notsametype), notsametype)
+        print('ipaddr',ipaddr)
+        print('nodesip',len(nodesip), nodesip)
+        print('nodtsametype',len(notsametype), notsametype)
         print(' the ip address is in use ')
         return
     resname = vtype+'-'+ipaddr
@@ -39,7 +39,8 @@ def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsub
         cmdline = 'cp /TopStor/VolumeCIFSupdate.sh /etc/'
         subprocess.run(cmdline.split(),stdout=subprocess.PIPE)  
     print('hihihihi')
-    print('/TopStor/cifs.sh '+resname+' '+mounts+' '+ipaddr+' '+ipsubnet+' '+vtype+' '+" ".join(args))
+    print('cmd: '+'/TopStor/cifs.sh '+resname+' '+mounts+' '+ipaddr+' '+ipsubnet+' '+vtype+' '+" ".join(args))
+    print('end of cmd')
     cmdline = '/TopStor/cifs.sh '+resname+' '+mounts+' '+ipaddr+' '+ipsubnet+' '+vtype+' '+" ".join(args)
     subprocess.run(cmdline.split(),stdout=subprocess.PIPE)  
     if '_' not in vtype:

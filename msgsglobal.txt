@@ -76,8 +76,8 @@ Unlin11044:0: : from :: Deleting group : (syncing)
 Unlin1003:User : is added
 Unlin1006:0: : from :: Users are synced
 Unlin1106:0: : from :: Groups are synced
-Unlin1005:0: : from :: syncing users
-Unlin1105:0: : from :: syncing groups 
+Unlin1005:0: : from :: syncing users between nodes 
+Unlin1105:0: : from :: syncing groups between nodes 
 Unlin1011: Changing user password for :
 Unlin1012:1: : from :: Changing password for user :
 Unlinfa12:1: : from :: Failed chaning password for user : it is too small
@@ -108,6 +108,10 @@ Unlin1024:2: : from :: user : will have a home directory in pool :
 Unlin1025:0: : from :: File uploaded successfully! Adding users started
 Unlin1026:0: : from :: Failed uploading file
 Unlin1027:0: : from :: Finished adding users
+IPaddrfa:0: : from :: Invalid IP address in the request 
+IPadduqfa:0: : from :: The IP address is already in use 
+IPnamuqfa:0: : from :: The name is already in use 
+IPaddrclufa:0: : from :: The cluster ip address is the same node address, this is not valid 
 Unst1024:1: : from :: Changing profile of user :
 Unsu1024:1: : from :: Success changing profile of user :
 Unfa1024:1: : from :: failed changing profile of user :
@@ -183,6 +187,8 @@ Partsu06:0: : from :: finished checking and syncing this partner active pools
 Partnerst01:0: : from :: Start pushing cluster users, groups,...etc. to the partner receiver : 
 Partnersu01:0: : from :: Succeeded pushing cluster users, groups,...etc. to the partner receiver : 
 Partnerfa01:0: : from :: failed pushing cluster users, groups,...etc. to the partner receiver : 
+Partnerfa02:0: : from :: No node is open for replication in the  receiver : 
+Partnerfa03:0: : from :: No No space for receiving replication in the  receiver : 
 Partner1000:2: : from :: Adding partner : in : mode.
 Partner1001:1: : from :: Partner : already exists
 Partner1002:1: : from :: Success adding partner : in : mode
@@ -203,9 +209,13 @@ Replica1005: Success deleting period :
 Replica1006: Rolling back snapshot : ......
 Replica1007: Problem occurred while rolling back snapshot :
 Replispacest01:1: : from :: Preparing to replicate volume : to the replication partner :
-Replispacesu01:1: : from :: Success to replicate volume : to the replication partner : 
+Replispacesu01:1: : from :: Success to send a mnually created snapshot of  volume : to the replication partner : 
+Replispacesu02:1: : from :: Success to send a periodically created snapshot of  volume : to the replication partner : 
 Replispacefa01:1: : from :: No Space is found in replication partner : to replicate volume :
-Streamfa01:1: : from :: Couldn't replicate the volume : to Partner :
+Streamst01:1: : from :: Start to replicate the volume : to Partner :
+Streamfa01:1: : from :: Failed to replicate the volume : to Partner :
+Streamsu01:1: : from :: Success to replicate the volume : to Partner :
+Streamfa02:1: : from :: We cannot replicate the volume : to Partner : due to :
 NotSupported:1: : from :: Not Supported notification code : ......
 DGst5:1: : from :: Deleting Pool : ......
 DGsu5:2: : from :: Success deleting Pool :
@@ -324,7 +334,8 @@ NFS1007:2: : from :: Success creating volume :
 Evacuaest01:1: : from :: Start Evacuating node :
 Evacuaesu01:1: : from :: Success Evacuating node :
 AddHostst01:2: : from :: Start Adding the new node : to the cluster
-AddHostsu01:2: : from :: Success Adding the new node : to the cluster
+AddHostsu01:2: : from :: Success adding the new node : to the cluster
+AddHostfa01:2: : from :: Failed adding the new node : to the cluster, please try again by pressing on the discovery button and wiating for some time
 Snap1022:0: : from :: Deleting Snapshot :
 Snap1023:2: : from :: Problem while deleting snapshot :
 Snap1024: Success in deleting snapshot :

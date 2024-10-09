@@ -1,30 +1,30 @@
 #!/usr/bin/sh
 fnupdate () {
-	git checkout QSD3.15
-	git branch -D $1
 	origin=`git remote -v | grep 252 | head -1 | awk '{print $1}'`
-	remote=`git remote -v | grep github | grep $2 |  head -1 | awk '{print $1}'`
-	git fetch $origin 
+	remote=`git remote -v | grep github | grep $2  |  head -1 | awk '{print $1}'`
+	git fetch $remote 
 	if [ $? -ne 0 ];
 	then
-		echo something went wrong while pulling from remote $origin, branch: $1, dir:`pwd` .... consult the devleloper
+		echo something went wrong while pulling from remote $remote, branch: $1, dir:`pwd` .... consult the devleloper
 		exit
 	fi
-	git checkout -b $1  $origin/$1
-	if [ $? -ne 0 ];
-	then
-		echo something went wrong while pulling from remote $origin, branch: $1, dir:`pwd` .... consult the devleloper
-		exit
-	fi
-	git reset --hard $origin/$1
+	git branch -D tempb
 	git clean -f
 	git config --replace-all pull.rebase false
 	git checkout -- *
 	git rm -rf __py*
-	git push $remote $1
+	git checkout -b tempb	
+	git branch -D $1
+	git checkout -b $1  $remote/$1
+	git reset --hard 
+	git clean -f
+	git config --replace-all pull.rebase false
+	git checkout -- *
+	git rm -rf __py*
+	git push $origin $1
 	if [ $? -ne 0 ];
 	then
-		echo something went wrong while pushing to origin: $remote, branch: $1, dir:`pwd` .... consult the devleloper
+		echo something went wrong while pushing to origin: $origin, branch: $1, dir:`pwd` .... consult the devleloper
 		exit
 	fi
 	sync
@@ -32,31 +32,7 @@ fnupdate () {
 	sync
 }
 
-fnupdateold () {
-	git checkout -b $1
-	git checkout $1
-	git reset --hard
-	git clean -f
-	git config --replace-all pull.rebase false
-	git rm -rf __py*
-	origin=`git remote -v | grep 252 | head -1 | awk '{print $1}'`
-	remote=`git remote -v | grep github | head -1 | awk '{print $1}'`
-	git pull $origin $1
-	if [ $? -ne 0 ];
-	then
-		echo something went wrong while pulling from remote $remote, branch: $1 .... consult the devleloper
-		exit
-	fi
-	git push $remote $1
-	if [ $? -ne 0 ];
-	then
-		echo something went wrong while pushing to origin: $origin, branch: $1 .... consult the devleloper
-		exit
-	fi
-	sync
-	sync
-	sync
-}
+echo nameserver 8.8.8.8 > /etc/resolv.conf
 cjobs=(`echo TopStor pace topstorweb`)
 branch=$1
 branchc=`echo $branch | wc -c`
@@ -89,7 +65,6 @@ then
 fi
 
 developer=`echo $ondevtopstor | awk -F'_' '{print $NF}'`
-f
 flag=1
 while [ $flag -ne 0 ];
 do
@@ -97,7 +72,6 @@ do
 	echo rjobs=${rjobs[@]}
 	for job in "${rjobs[@]}";
 	do
-		echo '###########################################'
 		echo '###########################################'
  		echo ${job}_${developer}
 		isexit=1
@@ -107,7 +81,6 @@ do
 				echo the directory $job is not found... exiting
 				exit
 		fi
-
 		fnupdate $branch $developer 
 		cjobs=(`echo "${cjobs[@]}" | sed "s/$job//g" `)
   	done
@@ -117,6 +90,11 @@ do
 		flag=0
 	fi
 done
+cd /topstorweb_$developer
+if [ $? -ne 0 ]
+then
+	cd /var/www/html/des20/
+fi
 git show | grep commit
 cd /pace_$developer
 git show | grep commit

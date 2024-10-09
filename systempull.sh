@@ -58,6 +58,10 @@ do
 		flag=0
 	fi
 done
+cd /topstorweb
+git show | grep commit
+cd /pace
+git show | grep commit
 cd /TopStor
 git show | grep commit
 echo finished

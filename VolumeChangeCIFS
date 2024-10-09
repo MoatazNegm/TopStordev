@@ -3,8 +3,8 @@ export ETCDCTL_API=3
 cd /TopStor/
 echo $@ > /root/volchange
 leaderip=`echo $@ | awk '{print $1}'`;
-name=`echo $@ | awk '{print $3}'`;
 pDG=`echo $@ | awk '{print $2}'`;
+name=`echo $@ | awk '{print $3}'`;
 quota=`echo $@ | awk '{print $4}'`;
 writev=`echo $@ | awk '{print $5}'`;
 ipaddr=`echo $@ | awk '{print $6}'`;
@@ -12,11 +12,6 @@ ipsubnet=`echo $@ | awk '{print $7}'`;
 active=`echo $@ | awk '{print $8}'`;
 myhost=`echo $@ | awk '{print $9}'`;
 userreq=` echo $@ | awk '{print $10}'`;
-domain=` echo $@ | awk '{print $11}'`;
-domainsrvn=` echo $@ | awk '{print $12}'`;
-domainsrvi=` echo $@ | awk '{print $13}'`;
-domadm=` echo $@ | awk '{print $14}'`;
-dompass=` echo $@ | awk '{print $15}'`;
 DG=`echo $pDG `;
 privilege="CIFS";
 contrun=`./privthis.sh $privilege $userreq`;
@@ -33,42 +28,88 @@ then
  		etcd=$leaderip
  	fi
 
- echo $perfmon | grep 1
- if [ $? -eq 0 ]; then
- docker exec etcdclient /TopStor/logqueue.py VolumeChangeCIFS start system 
- fi 
  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq
  if [ $writev != 'nogroup' ];
  then
   writev=`echo $writev | sed 's/nogroup//g'`
  fi
- echo $pDG $name $quota $writev $ipaddr $ipsubnet $myhost $userreq $extraparms>> /root/volchange
  docker exec etcdclient /TopStor/logmsg.py VolCst01 info $userreq $name
  echo name=$name
  myhost=`hostname -s`
  older=`ETCDCTL_API=3 /pace/etcdget.py $etcd volumes $name `
- echo $older | grep DOMAIN
- if [ $? -ne 0 ];
- then
-  extraparms=''
- else
-  isparams=`echo $domain | wc -c`
-  if [ $isparams -ge 3 ];
-  then 
-   extraparms='/'$domain'/'$domainsrvn'/'$domainsrvi'/'$domadm'/'$dompass
-  else
-    #extraparms='/'`echo $older | awk -F'/' '{for(i=NF-4;i<=NF;i++) printf $i"/"; print ""}' | sed "s/')\///g"`
-    extraparms='/'$active
-  fi
- fi
- echo /pace/etcdput.py $leaderip volumes/CIFS/$myhost/$DG/$name $DG/$name/no/yes/$writev/administrator/yes/$oldipaddr/${oldipsubnet}$extraparms/$active >> /root/volchange
  oldipaddr=`zfs get -H ip:addr $DG/$name | awk '{print $3}'`
  oldipsubnet=`zfs get -H ip:subnet $DG/$name | awk '{print $3}'`
- #/TopStor/VolumefixChangeCIFS $leaderip $pDG $name CIFS $oldipaddr $userreq 
- /TopStor/VolumeDockerChange.py $oldipaddr $oldipsubnet CIFS 
-
+ halfdocname=`zfs get -H prot:kind $DG/$name | awk '{print $3}'`
+ /TopStor/VolumeDockerChange.py $oldipaddr $oldipsubnet $halfdocname 
+ props=`/TopStor/etcdget.py $leaderip volumes/$halfdocname/$myhost/$DG/$name`
  ETCDCTL_API=3 /pace/etcddel.py $leaderip volumes $name
  ETCDCTL_API=3 /pace/etcddel.py $leaderip sync $name
+ rm -rf /$DG/smb.$name
+ /pace/VolumeCheck.py $leaderip $myhost 
+
+ echo s$writev | grep DOMAIN
+ if [ $? -eq 0 ];
+ then
+	 echo it is a domain change props
+ 	 domname=`echo $halfdocname | awk -F'_' '{print $2}'`
+	 /sbin/zfs set prot:kind=CIFS_$domname $DG/$name
+	 /sbin/zfs set ip:addr=$ipaddr $DG/$name
+	 /sbin/zfs set ip:subnet=$ipsubnet $DG/$name
+	 /sbin/zfs set status:mount=$active $DG/$name
+	 newprops=`echo $props | sed "s/$oldipaddr/$ipaddr/g" | sed  "s/$oldipsubnet/$ipsubnet/g" | sed  "s/active/$active/g" | sed "s/disabled/$active/g"`
+	 echo the newprops $newprops
+
+	 /pace/etcdput.py $leaderip volumes/CIFS_$domname/$myhost/$DG/$name $newprops 
+	 ./VolumeActivateCIFSdom $leaderip vol=$name user=$userreq
+ else
+	 /sbin/zfs set prot:kind=CIFS $DG/$name
+	 /sbin/zfs set ip:addr=$ipaddr $DG/$name
+	 /sbin/zfs set ip:subnet=$ipsubnet $DG/$name
+	 /sbin/zfs set status:mount=$active $DG/$name
+	 shortname=`echo ${name} | rev | cut -d_ -f2- | rev`
+	 yes | cp sharecifs.txt /TopStordata/smb.${name}
+	 sed -i "s/Vtype/CIFS/g"  /TopStordata/smb.${name}
+	 sed -i "s/Rpool/$DG/g"  /TopStordata/smb.${name}
+	 sed -i "s/Rname/$name/g"  /TopStordata/smb.${name}
+	 sed -i "s/Rreadv/no/g"  /TopStordata/smb.${name}
+	 sed -i "s/Rbrows/yes/g"  /TopStordata/smb.${name}
+	 sed -i "s/Rwritev/$writev/g"  /TopStordata/smb.${name}
+	 sed -i "s/Radmin/administrator/g"  /TopStordata/smb.${name}
+	 sed -i "s/Rwritea/yes/g"  /TopStordata/smb.${name}
+	 sed -i "s/Ripadd/$ipaddr/g"  /TopStordata/smb.${name}
+	 sed -i "s/Ripsub/$ipsubnet/g"  /TopStordata/smb.${name}
+	 sed -i "s/SHORTNAME/$shortname/g"  /TopStordata/smb.${name}
+	 sed -i "s/NAMECIFS/$name/g"  /TopStordata/smb.${name}
+	 sed -i "s/POOL/$DG/g" /TopStordata/smb.${name}
+	 sed -i "s/no/no/g" /TopStordata/smb.${name}
+	 sed -i "s/yes/yes/g" /TopStordata/smb.${name}
+	 sed -i "s/administrator/administrator/g" /TopStordata/smb.${name}
+	 sed -i "s/Yes/yes/g" /TopStordata/smb.${name}
+	 sed -i "s/\@everyone/$writev/g" /TopStordata/smb.${name}
+	 sed -i "s/IPADDRESS/$ipaddr/g" /TopStordata/smb.${name}
+	 sed -i "s/IPSUBNET/$ipsubnet/g" /TopStordata/smb.${name}
+	 sed -i "s/ACTIVE/$active/g" /TopStordata/smb.${name}
+	 yes | cp /TopStordata/smb.$name /$DG/
+	 
+	 echo /pace/etcdput.py $leaderip volumes/CIFS/$myhost/$DG/$name $DG/$name/no/yes/$writev/administrator/yes/$ipaddr/$ipsubnet/$active
+	 stamp=`date +%s`
+	 ETCDCTL_API=3 /pace/etcdput.py $leaderip volumes/CIFS/$myhost/$DG/$name $DG/$name/no/yes/$writev/administrator/yes/$ipaddr/$ipsubnet/$active
+	 ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request volumes_$stamp
+	 ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request/$leader volumes_$stamp
+	 chmod 2770 /$DG/$name
+	 setfacl -b -R /$DG/$name
+	 echo $writev | grep -w nogroup
+	 if [ $? -ne 0 ];
+	 then
+	  writevtemp=`echo $writev | sed 's/\,/ /g'`
+	  for grp in $writevtemp ;do  setfacl -R -m g:$grp:rwx /$DG/$name; done
+	 fi
+
+ fi
+
+
+
+
  /sbin/zfs set ip:addr=$ipaddr $DG/$name
  /sbin/zfs set ip:subnet=$ipsubnet $DG/$name
  /sbin/zfs set status:mount=$active $DG/$name
@@ -108,17 +149,18 @@ then
  stamp=`date +%s`
  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request volumes_$stamp
  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request/$leader volumes_$stamp
- echo $writev | grep DOMAIN
- if [ $? -eq 0 ];
- then
-   echo imaheeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer
-  /TopStor/VolumeActivateCIFS $leaderip vol=$name user=$userreq
- else 
-   /TopStor/cifs.py $leader $leaderip $myhost $myhostip $etcd $DG $name $ipaddr $ipsubnet CIFS
- fi
+ #echo $writev | grep DOMAIN
+ #if [ $? -eq 0 ];
+ #then
+ #  echo imaheeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer
+ # /TopStor/VolumeActivateCIFS $leaderip vol=$name user=$userreq
+ #else 
+ #  /TopStor/cifs.py $leader $leaderip $myhost $myhostip $etcd $DG $name $ipaddr $ipsubnet CIFS
+ #fi
  /pace/putzpool.py $leaderip 
  docker exec etcdclient /TopStor/logmsg.py VolCsu01 info $userreq $name
  echo ready ;
+ /pace/VolumeCheck.py $leaderip $myhost 
+ ETCDCTL_API=3 /pace/etcdput.py $etcd dirty/volume 0
+ docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
 fi
-docker exec etcdclient /TopStor/logqueue.py `basename "$0"` stop $userreq
-ETCDCTL_API=3 /pace/etcdput.py $etcd dirty/volume 0

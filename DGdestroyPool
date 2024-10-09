@@ -99,5 +99,5 @@ echo iam in >> /root/tmp2
 fi
 /pace/etcddel.py $leaderip requests/DGdestroypool/$myhost $myhost/$userreq
 #systemctl restart zfs-zed
- docker exec etcdclient /TopStor/logqueue.py `basename "$0"` stop $userreq 
+ docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq 
 /pace/putzpool.py $leaderip
