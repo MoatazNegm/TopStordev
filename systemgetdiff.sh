@@ -7,4 +7,11 @@ then
 	exit
 fi
 runbranch=`echo $currentbranch | awk -F'_' '{print $1}'`
-git diff -U3 $currentbranch $runbranch
+cd /ToStor/
+git diff -U3 $runbranch..$currentbranch
+cd /pace/
+git diff -U3 $runbranch..$currentbranch
+cd /topstorweb/
+#git diff -U3 $currentbranch..$runbranch
+git diff -U3 $runbranch..$currentbranch
+cd /TopStor
