@@ -19,6 +19,7 @@ fnupdate () {
 	git checkout -- *
 	git rm -rf __py*
 	rm -rf __py*
+	git branch -D tempb
 	sync
 	sync
 	sync
