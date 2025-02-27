@@ -28,13 +28,23 @@ then
  docker exec etcdclient /TopStor/logmsg.py NFS1000 info $userreq $pDG/$volname
  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq
  ipaddr=`/TopStor/etcdget.py $etcd volume $volname | awk -F'_u_' '{ print $NF}' | awk -F'/' '{print $2}'`
+ echo hh$ipaddr | grep '.'
+ if [ $? -ne 0 ];
+ then
+ 	ipaddr=`zfs get -H ip:addr $DG/$name | awk '{print $3}'`
+ fi
  ipsubnet=`/TopStor/etcdget.py $etcd volume $volname | awk -F'_u_' '{ print $NF}' | awk -F'/' '{print $3}'`
+ echo hh$ipsubnet | grep '2'
+ if [ $? -ne 0 ];
+ then
+ 	ipaddr='24'
+ fi
  vtype=`/TopStor/etcdget.py $etcd volume $volname | awk -F'/' '{print $2}'`
  echo ip=$ipaddr
  stamp=`date +%s`
  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${pDG}_$name/request volumes_$stamp
  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${pDG}_$name/request/$leader volumes_$stamp
- /TopStor/nfsremove.sh $leaderip $pDG $volname $ipaddr $ipsubnet$vtype 2>/root/errcifsremove
+ /TopStor/nfsremove.sh $leaderip $pDG $volname $ipaddr $ipsubnet $vtype 2>/root/errcifsremove
  /TopStor/SnapShotPeriodDelete $leaderip $volname $userreq
  echo /sbin/zfs destroy -rf $pDG/$volname 
  /sbin/zfs unmount -f $pDG/$volname 

@@ -31,5 +31,5 @@ rm -rf /$pool/group_$vol
 /TopStor/etcddel.py $leaderip replivol $vol
 nmcli conn mod cmynode -ipv4.addresses ${volip}/$volsubnet
 nmcli conn up cmynode
-/pace/VolumeCheck.py $leaderip `hostname`
+#/pace/VolumeCheck.py $leaderip `hostname`
 docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
