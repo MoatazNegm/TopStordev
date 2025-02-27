@@ -92,10 +92,12 @@ then
   echo '# SUMMARY' volumes/NFS/$myhost/$DG/$name $l  > /TopStordata/exports.${name}
   echo /$DG/$name' '$who'('rw','sync','insecure','no_root_squash','no_all_squash')' >> /TopStordata/exports.$name 
   mv /TopStordata/exports.${name} /$DG/
-  rm -rf /$DG'/user_'$name
-  rm -rf /$DG'/group_'$name
-  cp /TopStor/user_NFS /$DG'/user_'$name
-  cp /TopStor/group_NFS /$DG'/group_'$name
+  if [ ! -f /$DG'/user_'$ipaddr ];
+  then
+  	rm -rf  /$DG'/group_'$ipaddr
+  	cp /TopStor/user_NFS /$DG'/user_'$ipaddr
+  	cp /TopStor/group_NFS /$DG'/group_'$ipaddr
+  fi
   docker exec etcdclient /TopStor/logmsg.py NFS1007 info $userreq $name
  fi;
  /TopStor/SnapshotCreateHourlytrend $leaderip $DG $name 0 24 7 system 

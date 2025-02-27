@@ -25,6 +25,7 @@ def cpuperf(leaderip):
 
 
 def dskperf(leaderip):
+ return []
  perfs = get(leaderip,'dskperf','--prefix')
  perfslst = []
  for perf in perfs:

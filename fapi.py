@@ -687,9 +687,10 @@ def userchange(data):
      if 'NFS' in volinfo[0]:
         owner = volinfo[0].split('/')[2]
         pool = volinfo[0].split('/')[3]
+        ipaddr = volinfo[0].split('/')[9]
         if len(grps) < 3:
             grps = 'NoGroup'
-     cmndstring = '/TopStor/TenantChangeUser '+leaderip+' '+data['name']+' groups'+grps+' '+pool+' '+data['tenant']+' '+data['response']
+     cmndstring = '/TopStor/TenantChangeUser '+leaderip+' '+data['name']+' groups'+grps+' '+pool+' '+data['tenant']+' '+ipaddr+' '+data['response']
      postchange(cmndstring,owner)
      return data
  allgroups = getgroups()
@@ -1273,10 +1274,11 @@ def TenantAddUser(data):
  if 'NFS' in volinfo[0]:
     owner = volinfo[0].split('/')[2]
     pool = volinfo[0].split('/')[3]
+    ipaddr = volinfo[1].split('/')[9]
     grp = data['groups']
     if len(grp) < 3:
         grp = 'NoGroup'
-    cmndstring = '/TopStor/TenantAddUser '+leaderip+' '+data['response']+' '+pool+' '+data['tenant']+' '+data['name']+' '+data['userid']+' '+grp
+    cmndstring = '/TopStor/TenantAddUser '+leaderip+' '+data['response']+' '+pool+' '+data['tenant']+' '+ipaddr+' '+data['name']+' '+data['userid']+' '+grp
  postchange(cmndstring,owner)
  return data
  
@@ -1288,7 +1290,8 @@ def TenantDelUser(data):
  if 'NFS' in volinfo[0]:
     owner = volinfo[0].split('/')[2]
     pool = volinfo[0].split('/')[3]
-    cmndstring = '/TopStor/TenantDelUser '+leaderip+' '+data['response']+' '+pool+' '+data['tenant']+' '+data['name']
+    ipaddr = volinfo[0].split('/')[9]
+    cmndstring = '/TopStor/TenantDelUser '+leaderip+' '+data['response']+' '+pool+' '+data['tenant']+' '+ipaddr+' '+data['name']
  postchange(cmndstring,owner)
  return data
 

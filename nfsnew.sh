@@ -31,8 +31,8 @@ docker run -d $mounts --rm --privileged \
 		-e SHARED_DIRECTORY=$share \
   		-p $ipaddr:2049:2049/tcp \
   		-v /TopStor/:/TopStor \
-		-v $pool'/user_'$volume:/etc/passwd:rw \
-		-v $pool'/group_'$volume:/etc/group:rw \
+		-v $pool'/user_'$ipaddr:/etc/passwd:rw \
+		-v $pool'/group_'$ipaddr:/etc/group:rw \
   		--name $resname itsthenetwork/nfs-server-alpine
 counter=20
 while [ $counter -gt 1 ];
@@ -63,8 +63,8 @@ else
 		if [ $? -ne 0 ];
 		then
 			#docker exec $resname adduser $rootname -H -D -s /sbin/nologin -u $rootid
-			sed -i "/$rootname/d" $pool'/user_'$volume
-			echo "$rootname:x:$rootid:$rootid:$rootname:/NoHome:/sbin/nologin" >> $pool'/user_'$volume
+			sed -i "/$rootname/d" $pool'/user_'$ipaddr
+			echo "$rootname:x:$rootid:$rootid:$rootname:/NoHome:/sbin/nologin" >> $pool'/user_'$ipaddr
 		fi	
 		echo $groupname | grep -w root
 		if [ $? -ne 0 ];
@@ -72,12 +72,12 @@ else
 			echo $groupname | grep -w $rootname
 			if [ $? -ne 0 ];
 			then
-				cat $pool'/group_'$volume | grep -w $groupname
+				cat $pool'/group_'$ipaddr | grep -w $groupname
 				if [ $? -ne 0 ];
 				then
 			#		docker exec $resname addgroup $groupname -g $groupid
-					#sed -i "/$groupname/d" $pool'/group_'$volume
-					echo $groupname:x:$groupid: >> $pool'/group_'$volume
+					#sed -i "/$groupname/d" $pool'/group_'$ipaddr
+					echo $groupname:x:$groupid: >> $pool'/group_'$ipaddr
 				fi
 			fi
 		fi	

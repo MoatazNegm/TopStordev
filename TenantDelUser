@@ -6,12 +6,13 @@ leaderip=`echo $@  | awk '{print $1}'`;
 userreq=`echo $@  | awk '{print $2}'`;
 pool=`echo $@  | awk '{print $3}'`;
 volume=`echo $@  | awk '{print $4}'`;
-username=`echo $@ | awk '{print $5}'`;
+ipaddr=`echo $@  | awk '{print $5}'`;
+username=`echo $@ | awk '{print $6}'`;
 docker exec etcdclient /TopStor/logmsg.py Tenantst02 info $userreq $username $volume 
-sed -i "/$username/d" /$pool'/user_'$volume
-sed -i "s/,$username//g" /$pool'/group_'$volume
-sed -i "s/:$username/:/g" /$pool'/group_'$volume
-sed -i  "/$username/d" /$pool'/group_'$volume
+sed -i "/$username/d" /$pool'/user_'$ipaddr
+sed -i "s/,$username//g" /$pool'/group_'$ipaddr
+sed -i "s/:$username/:/g" /$pool'/group_'$ipaddr
+sed -i  "/$username/d" /$pool'/group_'$ipaddr
 docker exec $container cat /etc/passwd | grep $username
 if [ $? -ne 0 ];
 then	

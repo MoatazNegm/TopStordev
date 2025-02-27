@@ -6,17 +6,18 @@ leaderip=`echo $@  | awk '{print $1}'`;
 userreq=`echo $@  | awk '{print $2}'`;
 pool=`echo $@  | awk '{print $3}'`;
 volume=`echo $@  | awk '{print $4}'`;
-username=`echo $@ | awk '{print $5}'`;
-userid=`echo $@ | awk '{print $6}'`;
-grp=`echo $@ | awk '{print $7}'`;
+ipaddr=`echo $@  | awk '{print $5}'`;
+username=`echo $@ | awk '{print $6}'`;
+userid=`echo $@ | awk '{print $7}'`;
+grp=`echo $@ | awk '{print $8}'`;
 docker exec etcdclient /TopStor/logmsg.py Tenantst01 info $userreq $username $volume 
-cat /$pool'/user_'$volume | grep $username
+cat /$pool'/user_'$ipaddr | grep $username
 if [ $? -eq 0 ];
 then	
 	docker exec etcdclient /TopStor/logmsg.py Tenantfa01 error $userreq $username $volume 
 	exit
 fi
-cat /$pool'/user_'$volume | grep $userid
+cat /$pool'/user_'$ipaddr | grep $userid
 if [ $? -eq 0 ];
 then	
 	docker exec etcdclient /TopStor/logmsg.py Tenantfa01 error $userreq $username $volume 
@@ -26,11 +27,11 @@ echo $grp | grep 'NoGroup'
 if [ $? -eq 0 ];
 then
 	grp='frezer'
-	sed -i "/^${grp}:/s/$/,${username}/" /$pool'/group_'$volume
-	sed -i "s/:,/:/g" /$pool'/group_'$volume
+	sed -i "/^${grp}:/s/$/,${username}/" /$pool'/group_'$ipaddr
+	sed -i "s/:,/:/g" /$pool'/group_'$ipaddr
 fi
-echo "$username:x:$userid:$userid:$username:/NoHome:/sbin/nologin" >> /$pool'/user_'$volume
-cat /$pool'/user_'$volume | grep $username
+echo "$username:x:$userid:$userid:$username:/NoHome:/sbin/nologin" >> /$pool'/user_'$ipaddr
+cat /$pool'/user_'$ipaddr | grep $username
 if [ $? -eq 0 ];
 then	
 	docker exec etcdclient /TopStor/logmsg.py Tenantsu01 info $userreq $username $volume 
