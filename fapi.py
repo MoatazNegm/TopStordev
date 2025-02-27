@@ -867,6 +867,11 @@ def volumecreate(data):
  print(datastr)
  print('###########################')
  cmndstring = '/TopStor/VolumeCreate'+data['type']+' '+leaderip+' '+datastr
+ #with open('/TopStor/tempfapi','w') as f:
+ #   f.write('data\n'+str(data)+'\n')
+ #   f.write('owner: '+ownerip+'\n')
+ #   f.write(datastr+'\n')
+ #   f.write(cmndstring)
  z= cmndstring.split(' ')
  msg={'req': 'Pumpthis', 'reply':z}
  sendhost(ownerip, str(msg),'recvreply',myhost)

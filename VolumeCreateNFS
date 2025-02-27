@@ -64,6 +64,13 @@ then
  else
   docker exec etcdclient /TopStor/logmsg.py NFS1004 info  $userreq $name
  fi
+ cips=`/pace/etcdget.py $leaderip vol --prefix``/pace/etcdget.py $leaderip Activ --prefix``/pace/etcdget.py $leaderip repl --prefix`
+ echo $cips | grep $ipaddr
+ if [ $? -eq 0 ];
+ then
+	/TopStor/logmsg.py IPadduqfa info $userreq
+	exit
+ fi
  cd /TopStor
  /sbin/zfs create -o overlay=on -o acltype=posixacl -o aclinherit=passthrough -o xattr=sa -o atime=off -o redundant_metadata=most -o quota=$quota -o dedup=on -o compression=lz4  $DG/$name
  /sbin/zfs set prot:kind=NFS $DG/$name 

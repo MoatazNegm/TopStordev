@@ -2,66 +2,46 @@
 echo $@ >/root/volchangenfs
 cd /TopStor
 export ETCDCTL_API=3
-leaderip=` ./etcdgetlocal.py leaderip `
-perfmon=`cat /pacedata/perfmon`
-echo $perfmon | grep 1
-if [ $? -eq 0 ]; then
- /TopStor/logqueue.py VolumeChangeNFS start system 
-fi
-myhost=`hostname -s`
-web='/var/www/html/des20/Data/NFSstatus.log';
-logging='/var/www/html/des20/Data/currentinfo2.log'
-glog='/var/www/html/des20/Data/TopStor.log';
-runningpools='/pacedata/pools/runningpools'
-name=`echo $@ | awk '{print $2}'`;
-pDG=`echo $@ | awk '{print $1}'`;
-quota=`echo $@ | awk '{print $3}'`;
-writev=`echo $@ | awk '{print $4}'`;
-ipaddr=`echo $@ | awk '{print $5}'`;
-ipsubnet=`echo $@ | awk '{print $6}'`;
-active=`echo $@ | awk '{print $7}'`;
-userreq=` echo $@ | awk '{print $9}'`;
+leaderip=`echo $@ | awk '{print $1}'`;
+pDG=`echo $@ | awk '{print $2}'`;
+name=`echo $@ | awk '{print $3}'`;
+quota=`echo $@ | awk '{print $4}'`;
+writev=`echo $@ | awk '{print $5}'`;
+ipaddr=`echo $@ | awk '{print $6}'`;
+ipsubnet=`echo $@ | awk '{print $7}'`;
+active=`echo $@ | awk '{print $8}'`;
+myhost=`echo $@ | awk '{print $9}'`;
+userreq=` echo $@ | awk '{print $10}'`;
+
 DG=`echo $pDG `;
 echo $@ > /root/VolChange
-txtres='/TopStordata'`basename $0`'.txt'
 rm -rf $txtres 2>/dev.null
 privilege="NFS";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
 then
- if [ $writev != 'nogroup' ];
- then
-  writev=`echo $writev | sed 's/nogroup//g'`
- fi
-/TopStor/logmsg.py VolCst01 info $userreq $name
- older=`ETCDCTL_API=3 /pace/etcdgetlocal.py volumes $name `
- oct1=`echo $ipaddr | awk -F'.' '{print $1}'`
  oct2=`echo $ipaddr | awk -F'.' '{print $2}'`
  oct3=`echo $ipaddr | awk -F'.' '{print $3}'`
- who=$oct1'.'$oct2'.'$oct3'.*'
+ who='*'
+ cips=`/pace/etcdget.py $leaderip vol --prefix``/pace/etcdget.py $leaderip Activ --prefix``/pace/etcdget.py $leaderip repl --prefix`
+ echo $cips | grep $ipaddr
+ if [ $? -eq 0 ];
+ then
+	/TopStor/logmsg.py IPadduqfa info $userreq
+	exit
+ fi
  ETCDCTL_API=3 /pace/etcdput.py $leaderip volumes/NFS/$myhost/$DG/$name $DG/$name/$who/rw/sync/insecure/no_root_squash/no_all_squash/$writev/$ipaddr/$ipsubnet/$active
   stamp=`date +%s`
-  leader=` ./etcdgetlocal.py leader `
   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request volumes_$stamp
   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request/$leader volumes_$stamp
- #ETCDCTL_API=3 /pace/broadcasttolocal.py volumes/NFS/$myhost/$DG/$name $DG/$name/$who/rw/sync/insecure/no_root_squash/no_all_squash/$writev/$ipaddr/$ipsubnet/$active
  oldipaddr=`zfs get -H ip:addr $DG/$name | awk '{print $3}'`
+ docker rm -f NFS-$ipaddr
  oldipsubnet=`zfs get -H ip:subnet $DG/$name | awk '{print $3}'`
  sed -i "s/$oldipaddr/$ipaddr/g" /$DG/exports.$name
  sed -i "s/$oldipsubnet/$ipsubnet/g" /$DG/exports.$name
  /sbin/zfs set ip:addr=$ipaddr $DG/$name
  /sbin/zfs set ip:subnet=$ipsubnet $DG/$name
  /sbin/zfs set status:mount=$active $DG/$name
- /TopStor/VolumeActivateNFS vol=$name user=$userreq
- echo $older | grep -w $ipaddr/$ipsubnet
- if [ $? -ne 0 ];
- then 
-  echo /TopStor/VolumeActivateNFS vol=$name user=$userreq
- fi
+ docker rm -f NFS-$ipaddr
 /TopStor/logmsg.py VolCsu01 info $userreq $name
 fi;
- /pace/putzpool.py &
-echo $perfmon | grep 1
-if [ $? -eq 0 ]; then
- /TopStor/logqueue.py VolumeChangeNFS stop system 
-fi

@@ -1,0 +1,3 @@
+data
+{'type': 'NFS', 'pool': 'pdhcp1055322164', 'name': 'nft2', 'token': '64e3bb85f2fa048c010c2154377828f5', 'ipaddress': '10.11.11.22', 'domtype': 'workgroup', 'active': 'active', 'Subnet': '24', 'rootid': '9499', 'rootname': 'welwejk', 'groupname': 'lkdfjek', 'groupid': '8889', 'Myname': 'mezo', 'size': '1G', 'owner': 'dhcp128212', 'response': 'admin', 'user': 'admin'}
+owner: 10.11.11.38
