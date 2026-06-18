@@ -203,8 +203,10 @@ Each node runs the following containers (managed by `docker_setup.sh`):
 # Restart heartbeat
 /pace/heartbeatlooper.sh
 
-# Rebuild React UI (using the standard rebuild script)
-/TopStor/rebuild_react.sh
+# Rebuild React UI (on leader)
+cd /topstorweb
+docker run --rm -v /topstorweb/build_react:/app/build_react quickstor-ui:latest npm run build
+
 # Restart Apache
 /TopStor/httpdflask.sh <leaderip> no
 
