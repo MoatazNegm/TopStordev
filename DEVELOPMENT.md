@@ -223,6 +223,45 @@ docker run --rm -v /topstorweb/build_react:/app/build_react quickstor-ui:latest 
 - **Sync debug**: Run `/pace/checksyncs.py syncrequest <leaderip> <myhost>` manually and watch stdout.
 - **Message codes**: `/TopStor/msgsglobal.txt` maps codes like `Lognsu0` to human-readable templates.
 
+### 4.5 Committing, Pushing, and Pulling Code Versions
+
+TopStor uses three on-disk Git repositories that must stay in sync across the cluster:
+
+- `/TopStor`
+- `/pace`
+- `/topstorweb`
+
+#### Pushing local changes
+
+To commit all local changes in `/TopStor`, `/pace`, and `/topstorweb` and push them to the remote repository under a new or existing version branch:
+
+```bash
+/TopStor/systempush.sh <VersionName>
+```
+
+What it does:
+1. Runs `git add --all`, removes `__py*` cache directories, commits, and pushes the branch in `/TopStor`, `/pace`, and `/topstorweb`.
+2. Writes `sync/cversion/_<VersionName>__/request` keys into etcd so the rest of the cluster is notified of the new version.
+3. Calls `/TopStor/myrepopush.sh <VersionName>`.
+
+> A valid `<VersionName>` must be more than 3 characters long.
+
+#### Pulling a remote version
+
+To fetch and check out a remote branch on the local node for all three repositories:
+
+```bash
+/TopStor/systempull.sh <VersionName>
+```
+
+What it does:
+1. Fetches the branch from origin in `/TopStor`, `/pace`, and `/topstorweb`.
+2. Resets each repository to the remote branch state (removes local changes and `__py*` cache directories).
+3. Updates etcd `sync/cversion/...` keys and runs `/TopStor/getcversion.sh` so the node reports the new version.
+4. Executes `/TopStor/pre_apply.sh` if the pulled branch ships one.
+
+> Use `samebranch` as `<VersionName>` to pull the branch that is currently checked out locally.
+
 ---
 
 ## 5. Important Files Cheat Sheet
@@ -231,6 +270,8 @@ docker run --rm -v /topstorweb/build_react:/app/build_react quickstor-ui:latest 
 |---------|-------|
 | API | `/TopStor/fapi.py` |
 | Node Init | `/TopStor/docker_setup.sh`, `/TopStor/docker_primary.sh` |
+| Push Code Version | `/TopStor/systempush.sh` |
+| Pull Code Version | `/TopStor/systempull.sh` |
 | Sync Engine | `/pace/checksyncs.py` |
 | Heartbeat | `/pace/heartbeat.py`, `/pace/heartbeatlooper.sh` |
 | API Looper | `/pace/fapilooper.sh` |

@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# Stop existing UI/API containers
+docker rm -f httpd flask react-dev-ui 2>/dev/null
+
+# Get leader/cluster IP from etcd
+myclusterip=$(docker exec etcdclient /TopStor/etcdgetlocal.py leaderip 2>/dev/null | tr -d '[:space:]')
+if [ -z "$myclusterip" ]; then
+    echo "Could not determine cluster IP from etcd"
+    exit 1
+fi
+
+templhttp='/TopStor/httpd_template.conf'
+shttpdf='/TopStordata/httpd.conf'
+
+# Prepare httpd config
+rm -rf "$shttpdf"
+cp /TopStor/httpd.conf /TopStordata/ 2>/dev/null || true
+cp "$templhttp" "$shttpdf"
+sed -i "s/MYCLUSTERH/$myclusterip/g" "$shttpdf"
+sed -i "s/MYCLUSTER/$myclusterip/g" "$shttpdf"
+
+# Build React UI using host source
+echo "Building React UI into /topstorweb/build_react ..."
+mkdir -p /topstorweb/build_react
+docker run --rm \
+  -v /topstorweb/build_react:/app/build_react \
+  -v /topstorweb/src:/app/src \
+  -v /topstorweb/public:/app/public \
+  -v /topstorweb/index.html:/app/index.html \
+  -v /topstorweb/vite.config.js:/app/vite.config.js \
+  -v /topstorweb/postcss.config.js:/app/postcss.config.js \
+  -v /topstorweb/tailwind.config.js:/app/tailwind.config.js \
+  quickstor-ui:latest npm run build
+
+# Start httpd container
+echo "Starting httpd container ..."
+docker run --rm --name httpd --hostname shttpd --net bridge0 \
+  -v /etc/localtime:/etc/localtime:ro \
+  -v /root/gitrepo/resolv.conf:/etc/resolv.conf \
+  -p "$myclusterip":19999:19999 \
+  -p "$myclusterip":81:81 \
+  -p "$myclusterip":443:443 \
+  -v "$shttpdf":/usr/local/apache2/conf/httpd.conf \
+  -v /root/topstorwebetc:/usr/local/apache2/topstorwebetc \
+  -v /topstorweb:/usr/local/apache2/htdocs/ \
+  -itd moataznegm/quickstor:git
+
+# Start flask container
+echo "Starting flask container ..."
+docker run -itd --rm --name flask --hostname apisrv \
+  -v /etc/localtime:/etc/localtime:ro \
+  -v /pace/:/pace \
+  -v /pacedata/:/pacedata/ \
+  -v /root/gitrepo/resolv.conf:/etc/resolv.conf \
+  --net bridge0 \
+  -p "$myclusterip":5001:5001 \
+  -v /TopStor/:/TopStor \
+  -v /TopStordata/:/TopStordata \
+  moataznegm/quickstor:flask3
+
+echo "React UI rebuild and container startup completed."
