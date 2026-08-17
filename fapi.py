@@ -171,13 +171,13 @@ def uploadUsers(data):
 
 
 def postchange(cmndstring,host='leader'):
- global leaderip, myhost
+ global leaderip, myhost, myhostip
  z= cmndstring.split(' ')
  if 'leader' in host:
     host=myhost
  msg={'req': 'Pumpthis', 'reply':z}
  if myhost in host:
-    ownerip=leaderip
+     ownerip=myhostip
  else:
     try:
         ownerip=get('ready/'+host,'--prefix')[0][1]
@@ -186,6 +186,7 @@ def postchange(cmndstring,host='leader'):
  with open('/TopStordata/tempdata','a') as f:
   f.write(str((ownerip, str(msg),'recvreply',myhost))+'\n')
  sendhost(ownerip, str(msg),'recvreply',myhost)
+ return 'queued'
 
 def dict_factory(cursor, row):
     d = {}
@@ -1915,4 +1916,5 @@ if __name__=='__main__':
     getalltime()
    #myhostip = sys.argv[5]
     app.run(host="0.0.0.0", port=5001)
+
 
