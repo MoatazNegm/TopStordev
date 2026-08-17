@@ -12,11 +12,15 @@ for pid in $(pidof -x getdiscovery.sh); do
     fi
 done
 cd /TopStor
-rm -rf /root/discovery/*
-mkdir /root/discovery
+rm -rf /root/discovery
+mkdir -p /root/discovery
 
-nmcli conn mod cmynode +ipv4.addresses $etcd/24
-nmcli conn up cmynode
+node_device=`nmcli -g connection.interface-name connection show cmynode | head -n 1`
+if [ -z "$node_device" ]; then
+	echo "cmynode has no active device"
+	exit 1
+fi
+ip address add $etcd/24 dev $node_device
 rm -rf /TopStordata/discovery.sh
 cp /TopStor/discovery.sh /TopStordata/
 sed -i 's/SLEEP/sleep 10/g' /TopStordata/discovery.sh
@@ -59,5 +63,5 @@ done
 
 ./etcdput.py $etcd tostop yes 
 docker rm -f discovery
-nmcli conn mod cmynode -ipv4.addresses $etcd/24
-nmcli conn up cmynode
+ip address del $etcd/24 dev $node_device 2>/dev/null
+
