@@ -67,6 +67,8 @@ def is_valid_ip(ip):
 
 def is_unique_ip(ip, vtype='NZ#@A' ):
         global leaderip
+        if not ip or not str(ip).strip():
+            return 0
         allvols = get('vol', '--prefix')
         allvols = [x for x in allvols if vtype not in str(x)]
         allvols = str(allvols)
