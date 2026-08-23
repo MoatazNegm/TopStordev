@@ -1759,12 +1759,13 @@ def offlineOrOnlineDisk(data):
 @app.route('/api/v1/hosts/getConfig', methods=['GET','POST'])
 @login_required
 def getNodeConfigFile(data):
-    global leaderip
+    global leaderip, myhost
     if 'baduser' in data['response']:
       return {'response': 'baduser'}
     nodeName = data["nodeName"]
-    nodeConfig = getConfig(leaderip, nodeName)
-    file_path = "/TopStordata/" + nodeName + "_config.txt"
+    getConfig(leaderip, nodeName)
+    downloadConfig(leaderip, myhost)
+    file_path = "/TopStordata/config_" + nodeName + ".txt"
     return send_file(file_path, mimetype='text/plain', as_attachment=True)
 
 @app.route('/api/v1/hosts/getAllConfig', methods=['GET','POST'])
@@ -1918,5 +1919,6 @@ if __name__=='__main__':
     getalltime()
    #myhostip = sys.argv[5]
     app.run(host="0.0.0.0", port=5001)
+
 
 

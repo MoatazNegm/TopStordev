@@ -55,8 +55,7 @@ def getConfig(ldrip, mynode):
         f.write(leaderip+' '+mynode)
     stamp=str(time())
     dels(leaderip,'getconfig','--prefix')
-    if readies == 0:
-        readies = get(leaderip, 'ready/','--prefix')
+    readies = get(leaderip,'ready/','--prefix')
     for ready in readies:
      readyname = ready[0].split('/')[1]
      readyip = ready[1]   
@@ -78,16 +77,18 @@ def downloadConfig(ldrip,mynode):
     myhost = mynode
     cmdline = 'rm -rf /TopStordata/config*'.split()
     content = subprocess.run(cmdline,stdout=subprocess.PIPE, text=True).stdout
-    if readies == 0:
-        readies = get(leaderip, 'ready/','--prefix')
+    readies = get(leaderip, 'ready/','--prefix')
     for ready in readies:
         noden = ready[0].split('/')[1]
         nodeip = ready[1]
-        zipped = get(leaderip, 'getconfig/'+noden )[0]
-        unzipped = json_unzip(zipped)
-        with open("/TopStordata/" + 'config_'+ noden + ".txt", "w") as file:
-            file.write(unzipped)
-    return unzipped
+        try:
+            zipped = get(leaderip, 'getconfig/'+noden )[0]
+            unzipped = json_unzip(zipped)
+            with open("/TopStordata/" + 'config_'+ noden + ".txt", "w") as file:
+                file.write(unzipped)
+        except Exception as e:
+            print(f"Error downloading config for {noden}: {e}")
+    return unzipped if 'unzipped' in dir() else ''
 
 if __name__=='__main__':
     leaderip = sys.argv[1]
@@ -96,3 +97,4 @@ if __name__=='__main__':
         f.write(leaderip+' '+myhost)
     getConfig(leaderip, myhost)
     downloadConfig(leaderip, myhost)
+
