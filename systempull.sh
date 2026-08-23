@@ -59,27 +59,31 @@ do
 		flag=0
 	fi
 done
-echo running any needed scripts
-leaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip`
-leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
-myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
-stamp=`date +%s`
-/TopStor/etcddel.py $leaderip sync/cversion --prefix
-/TopStor/etcdput.py $leaderip sync/cversion/_${branch}__/request cversion_$stamp
-/TopStor/etcdput.py $leaderip sync/cversion/_${branch}__/request/$myhost cversion_$stamp
-/TopStor/getcversion.sh $leaderip $leader $myhost
-cd /TopStor
-commit=`git show --abbrev-commit | grep commit | head -1 | awk '{print $2}'`
-echo /TopStor/etcdput.py $leaderip cversion/$myhost $branch-$commit
-/TopStor/etcdput.py $leaderip cversion/$myhost $branch-$commit
-echo $leader | grep $myhost
-if [ $? -ne 0 ];
+docker ps 2>/dev/null | grep software
+if [ $? -eq 0 ];
 then
-	myhostip=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`
-	echo ip=$myhostip
-	/TopStor/etcdput.py $myhostip cversion/$myhost $branch-$commit
+	echo running any needed scripts
+	leaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip`
+	leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
+	myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
+	stamp=`date +%s`
+	/TopStor/etcddel.py $leaderip sync/cversion --prefix
+	/TopStor/etcdput.py $leaderip sync/cversion/_${branch}__/request cversion_$stamp
+	/TopStor/etcdput.py $leaderip sync/cversion/_${branch}__/request/$myhost cversion_$stamp
+	/TopStor/getcversion.sh $leaderip $leader $myhost
+	cd /TopStor
+	commit=`git show --abbrev-commit | grep commit | head -1 | awk '{print $2}'`
+	echo /TopStor/etcdput.py $leaderip cversion/$myhost $branch-$commit
+	/TopStor/etcdput.py $leaderip cversion/$myhost $branch-$commit
+	echo $leader | grep $myhost
+	if [ $? -ne 0 ];
+	then
+		myhostip=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`
+		echo ip=$myhostip
+		/TopStor/etcdput.py $myhostip cversion/$myhost $branch-$commit
+	fi
+	/TopStor/myrepopush.sh $branch
 fi
-/TopStor/myrepopush.sh $branch
 /TopStor/pre_apply.sh	
 cd /topstorweb
 git show | grep commit
