@@ -53,17 +53,21 @@ do
 	fi
 done
 cd /TopStor
-myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
-leaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip`
-stamp=`date +%s`
-/TopStor/etcddel.py $leaderip sync/cversion --prefix
-/TopStor/etcdput.py $leaderip sync/cversion/_${branch}__/request cversion_$stamp
-/TopStor/etcdput.py $leaderip sync/cversion/_${branch}__/request/$myhost cversion_$stamp
+docker ps 2>/dev/null | grep software
+if [ $? -eq 0 ];
+then
+	myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
+	leaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip`
+	stamp=`date +%s`
+	/TopStor/etcddel.py $leaderip sync/cversion --prefix
+	/TopStor/etcdput.py $leaderip sync/cversion/_${branch}__/request cversion_$stamp
+	/TopStor/etcdput.py $leaderip sync/cversion/_${branch}__/request/$myhost cversion_$stamp
+	/TopStor/myrepopush.sh $branch
+fi
 cd /topstorweb
 git show | grep commit
 cd /pace
 git show | grep commit
 cd /TopStor
 git show | grep commit
-/TopStor/myrepopush.sh $branch
 echo finished
