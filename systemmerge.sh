@@ -18,6 +18,8 @@ fnupdate () {
 	sync
 	sync
 }
+rm -rf /root/systempull.sh
+cp /TopStor/systempull.sh /root/
 cjobs=(`echo TopStor pace topstorweb`)
 branch=$1
 branchc=`echo $branch | wc -c`
@@ -32,8 +34,9 @@ if [ $? -eq 0 ];
 then
 	branch=`git branch | grep '*' | awk '{print $2}'`
 fi
-/TopStor/systempull.sh $branch
-/TopStor/systempull.sh $currentbranch
+
+/root/systempull.sh $branch
+/root/systempull.sh $currentbranch
 echo .............................................................................
 echo start mergin
 flag=1
