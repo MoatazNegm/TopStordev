@@ -1,6 +1,5 @@
 #!/usr/bin/sh
 fnupdate () {
-	#rm -rf pre_apply.sh	
 	echo '###########################################' $1
 	git fetch origin $1
 	if [ $? -ne 0 ];
@@ -83,6 +82,10 @@ then
 		/TopStor/etcdput.py $myhostip cversion/$myhost $branch-$commit
 	fi
 	/TopStor/myrepopush.sh $branch
+fi
+docker ps >/dev/null
+if [ $? -eq 0 ];
+then
 	/TopStor/pre_apply.sh	
 fi
 cd /topstorweb
