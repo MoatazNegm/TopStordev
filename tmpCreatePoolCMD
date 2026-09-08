@@ -4,3 +4,5 @@ cash disk found: scsi-360014051063392980a242a2bf927078e
 /sbin/zpool create -o cachefile=/TopStordata/pdhcp3236118307 -o ashift=12 -o autoexpand=on -o autoreplace=on -f pdhcp3236118307 mirror  scsi-360014057e314cd970c4412583a49f1e0 scsi-36001405c58b0009978c4f289d0f079f5   
 /sbin/zpool create -o cachefile=/TopStordata/pdhcp987526388 -o ashift=12 -o autoexpand=on -o autoreplace=on -f pdhcp987526388 mirror  scsi-360014050b6907759f534fdaa7d68899e scsi-360014052199a13eabbf40b98846da874   
 /sbin/zpool create -o cachefile=/TopStordata/pdhcp1891332376 -o ashift=12 -o autoexpand=on -o autoreplace=on -f pdhcp1891332376 mirror  scsi-3600140503edd41193654b47825d2622e scsi-3600140501a1c2c2364342138c0a4c60c   
+/sbin/zpool create -o cachefile=/TopStordata/pdhcp2006522819 -o ashift=12 -o autoexpand=on -o autoreplace=on -f pdhcp2006522819 mirror  scsi-360014055971db50250c4a3fbd1c876f8 scsi-3600140521f4587607014aa78071d8109   
+/sbin/zpool create -o cachefile=/TopStordata/pdhcp2516426 -o ashift=12 -o autoexpand=on -o autoreplace=on -f pdhcp2516426 mirror  scsi-36001405791c6ccb78ee4d319ea87a530 scsi-36001405b0dda1653d64491982496ad77   
