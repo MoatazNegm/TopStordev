@@ -560,6 +560,11 @@ def dgsnewpool(data):
 
     getalltime('yes')
 
+    manual_cache = data.get('cache')
+    if not isinstance(manual_cache, list):
+        manual_cache = []
+    excluded_disks = ','.join(manual_cache)
+
     if data.get('disks'):
         selecteddisks = data['disks']
     else:
@@ -579,27 +584,45 @@ def dgsnewpool(data):
         disks = dgsinfo['newraid'][data['redundancy']][data['useable']]
 
         if 'single' in data['redundancy']:
-            selecteddisks = disks
+            selecteddisks = [disk for disk in disks if disk not in manual_cache][:1]
         elif 'raid10' in data['redundancy']:
-            bestdisks = selectraid10(leaderip, disks, allinfo['disks'])
+            bestdisks = selectraid10(leaderip, disks, allinfo['disks'], '', excluded_disks)
             if len(bestdisks) < 1:
-                return jsonify(data)
+                return jsonify({
+                    'response': 'error',
+                    'message': 'No eligible data disks are available for this configuration'
+                }), 400
             selecteddisks = bestdisks.split(',')
         elif 'raid50' in data['redundancy']:
-            bestdisks = selectraid50(leaderip, disks, allinfo['disks'])
+            bestdisks = selectraid50(leaderip, disks, allinfo['disks'], '', excluded_disks)
             if len(bestdisks) < 1:
-                return jsonify(data)
+                return jsonify({
+                    'response': 'error',
+                    'message': 'No eligible data disks are available for this configuration'
+                }), 400
             selecteddisks = bestdisks.split(',')
         elif 'raid60' in data['redundancy']:
-            bestdisks = selectraid60(leaderip, disks, allinfo['disks'])
+            bestdisks = selectraid60(leaderip, disks, allinfo['disks'], '', excluded_disks)
             if len(bestdisks) < 1:
-                return jsonify(data)
+                return jsonify({
+                    'response': 'error',
+                    'message': 'No eligible data disks are available for this configuration'
+                }), 400
             selecteddisks = bestdisks.split(',')
         else:
-            bestdisks = selectdisks(leaderip, disks, allinfo['disks'])
+            bestdisks = selectdisks(leaderip, disks, allinfo['disks'], '', excluded_disks)
             if len(bestdisks) < 1:
-                return jsonify(data)
+                return jsonify({
+                    'response': 'error',
+                    'message': 'No eligible data disks are available for this configuration'
+                }), 400
             selecteddisks = bestdisks.split(',')
+
+    if not selecteddisks:
+        return jsonify({
+            'response': 'error',
+            'message': 'No eligible data disks are available for this configuration'
+        }), 400
 
     diskstring = ''
     for dsk in selecteddisks:
@@ -611,7 +634,6 @@ def dgsnewpool(data):
     cachestring = ''
     if str(data.get('cache_bool')).lower() == 'true':
 
-        manual_cache = data.get('cache')
         if manual_cache and isinstance(manual_cache, list) and len(manual_cache) > 0:
             cachestring = "cache "
             for dsk in manual_cache:
@@ -1919,6 +1941,5 @@ if __name__=='__main__':
     getalltime()
    #myhostip = sys.argv[5]
     app.run(host="0.0.0.0", port=5001)
-
 
 
