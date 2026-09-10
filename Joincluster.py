@@ -29,16 +29,17 @@ def do(data):
  logmsg.sendlog('AddHostst01','info',user,name)
  put(discip, 'tojoin/'+name,leaderip)
  put(leaderip, 'allowedPartners',name)
- nameip = '_1'
- counter = 1 
- while '_1' in str(nameip):
-    nameip = get(discip,'possible/'+name)[0]
-    sleep(2)
-    counter += 1
-    if counter > 5:
-        logmsg.sendlog('AddHostfa01','error',user,name)
-        queuethis('AddHost','stop',user)
-        return
+ nameip = data.get('ipaddr', '_1')
+ if '_1' in str(nameip):
+   counter = 1
+   while '_1' in str(nameip):
+     nameip = get(discip,'possible/'+name)[0]
+     sleep(2)
+     counter += 1
+     if counter > 5:
+       logmsg.sendlog('AddHostfa01','error',user,name)
+       queuethis('AddHost','stop',user)
+       return
         
  print('nameip', nameip, name)
  put(leaderip, 'ActivePartners/'+name, nameip) 
@@ -51,3 +52,4 @@ def do(data):
 if __name__=='__main__':
  data = { 'name' : 'dhcp195391', 'user':'admin' , 'leaderip': '10.11.11.100', 'myhost': 'dhcp932129' }
  do(data)
+

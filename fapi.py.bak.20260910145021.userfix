@@ -1322,11 +1322,6 @@ def hostjoincluster(data):
  # so the rest of this handler and downstream config() / Joincluster.do()
  # can keep reading flat keys like data['ipaddr'].
  payload = data.get('name') if isinstance(data.get('name'), dict) else data
- # Propagate the auth fields the downstream config() / Joincluster.do()
- # expect on the same dict they receive (e.g. arglist['user']).
- if payload is not data:
-  payload['user'] = data['user']
-  payload['response'] = data['response']
 
  if 'ipaddr' in payload:
     isvu = int(is_valid_ip(payload['ipaddr'])) + int(is_unique_ip(payload['ipaddr']))
