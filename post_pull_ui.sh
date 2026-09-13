@@ -9,11 +9,8 @@ TOPSTORWEB=/topstorweb
 TOPSTOR=/TopStor
 TAR="$TOPSTOR/quickstor-ui.tar.gz"
 
-echo "[post_pull_ui] -> $TOPSTORWEB"
-cd "$TOPSTORWEB" || { echo "[post_pull_ui] cannot cd to $TOPSTORWEB" >&2; exit 1; }
-
-echo "[post_pull_ui] running build-ui.sh ..."
-if ! ./build-ui.sh; then
+echo "[post_pull_ui] running /TopStor/build-ui.sh (it cds to /topstorweb itself) ..."
+if ! /TopStor/build-ui.sh; then
 	echo "[post_pull_ui] build failed - aborting (no save, no reboot)" >&2
 	exit 1
 fi
