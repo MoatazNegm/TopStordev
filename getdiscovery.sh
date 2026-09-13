@@ -20,9 +20,13 @@ if [ -z "$node_device" ]; then
 	echo "cmynode has no active device"
 	exit 1
 fi
+<<<<<<< HEAD
 #ip address add $etcd/24 dev $node_device
 nmcli conn modify cmynode +ipv4.address $etcd/24
 nmcli conn up cmynode
+=======
+ip address add $etcd/24 dev $node_device
+>>>>>>> fix-build-ui3
 rm -rf /TopStordata/discovery.sh
 cp /TopStor/discovery.sh /TopStordata/
 sed -i 's/SLEEP/sleep 10/g' /TopStordata/discovery.sh
@@ -65,7 +69,12 @@ done
 
 ./etcdput.py $etcd tostop yes 
 docker rm -f discovery
+<<<<<<< HEAD
 #ip address del $etcd/24 dev $node_device 2>/dev/null
 nmcli conn modify cmynode -ipv4.address $etcd/24
 nmcli conn up cmynode
+=======
+ip address del $etcd/24 dev $node_device 2>/dev/null
+
+>>>>>>> fix-build-ui3
 
