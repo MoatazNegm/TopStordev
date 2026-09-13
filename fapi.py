@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import flask, os, Evacuate, subprocess, Joincluster, sys, re, shlex
+import flask, os, Evacuate, subprocess, Joincluster, sys, re
 from getversions import getversions
 from functools import wraps
 from copy import deepcopy
@@ -12,9 +12,7 @@ from UnixChkUser import setlogin
 import sqlite3
 from etcdget2 import etcdgetjson
 from etcdgetlocalpy import etcdget  as get
-from etcdgetpy import etcdget as remote_get
 from etcddellocal import etcddel  as dels 
-from etcddel import etcddel as remote_dels
 from etcdput import etcdput as put
 from sendhost import sendhost
 from socket import gethostname as hostname
@@ -115,30 +113,17 @@ def login_required(f):
  @wraps(f)
  def decorated_function(*args, **kwargs):
   global loggedusers
-  # Support PHP/Rails-style nested query parameters.
-  #   foo=bar              -> data['foo']            = 'bar'
-  #   foo[]=a&foo[]=b      -> data['foo']            = ['a','b']
-  #   foo[bar]=baz         -> data['foo']['bar']     = 'baz'
-  #   name[ipaddr]=1.2.3.4 -> data['name']['ipaddr'] = '1.2.3.4'
-  # Legacy disks[] / cache[] / cache_disks[] list keys still work because
-  # we walk request.args.keys() (a MultiDict) and collapse repeated keys.
-  data = {}
-  for raw_key in request.args.keys():
-   values = request.args.getlist(raw_key)
-   if raw_key.endswith(']') and '[' in raw_key:
-    top, sub = raw_key[:-1].split('[', 1)
-    if sub == '':
-     # foo[] -> list
-     if top not in data or not isinstance(data[top], list):
-      data[top] = []
-     data[top].extend(values)
-    else:
-     # foo[bar] -> dict
-     if top not in data or not isinstance(data[top], dict):
-      data[top] = {}
-     data[top][sub] = values[-1] if values else ''
-   else:
-    data[raw_key] = values[-1] if values else ''
+  data = request.args.to_dict()
+  if 'disks[]' in data:
+   data['disks'] = request.args.getlist('disks[]')
+   del data['disks[]']
+  if 'cache[]' in data:
+   data['cache'] = request.args.getlist('cache[]')
+   del data['cache[]']
+  if 'cache_disks[]' in data:
+   data['cache_disks'] = request.args.getlist('cache_disks[]')
+   del data['cache_disks[]']
+
 
   for dat in data:
    if isinstance(data[dat], str):
@@ -1303,7 +1288,10 @@ def hostconfig(data):
  print('###########################')
 
  if 'discovered' in data:
-  return jsonify({'response': 'error', 'message': 'Discovered nodes must be configured while joining'}), 400
+  dleaderip = "10.11.11.250"
+  dleader   = get(dleaderip, 'leader')[0]
+  config(dleader, dleaderip, myhost, data)
+  return data
 
  config(leader, leaderip, myhost, data)
  return data
@@ -1315,71 +1303,10 @@ def hostjoincluster(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
  data['user'] = data['response']
-
- # The join-cluster payload is wrapped under a single top-level key
- # (the frontend sends ?name[ipaddr]=...&name[name]=dhcp218282&...).
- # After login_required parses those, data['name'] is a dict. Unwrap it
- # so the rest of this handler and downstream config() / Joincluster.do()
- # can keep reading flat keys like data['ipaddr'].
- payload = data.get('name') if isinstance(data.get('name'), dict) else data
- # Propagate the auth fields the downstream config() / Joincluster.do()
- # expect on the same dict they receive (e.g. arglist['user']).
- if payload is not data:
-  payload['user'] = data['user']
-  payload['response'] = data['response']
-
- if 'ipaddr' in payload:
-    isvu = int(is_valid_ip(payload['ipaddr'])) + int(is_unique_ip(payload['ipaddr']))
-    if isvu != 0:
-     return jsonify({'response': 'error', 'message': 'Invalid or duplicate node address'}), 400
-
- if 'ipaddr' in payload or 'alias' in payload:
-    dleaderip = '10.11.11.250'
-    nodename = payload.get('name', '')
-    nodeip = get('possible/'+nodename)[0]
-    if not nodename or nodeip == '_1':
-     return jsonify({'response': 'error', 'message': 'Discovered node address is unavailable'}), 404
-
-    dleader = remote_get(dleaderip, 'leader')[0]
-    if dleader == '_1':
-     return jsonify({'response': 'error', 'message': 'Discovery cluster is unavailable'}), 503
-    config(dleader, dleaderip, myhost, payload)
-
-    if 'ipaddr' in payload:
-     ackkey = 'ipchange-ready/'+nodename
-     remote_dels(dleaderip, ackkey)
-     applycmd = ' '.join([
-          'printf',
-          "'%s\\n'",
-        shlex.quote(payload['ipaddr']+'/'+str(payload.get('ipaddrsubnet', 24))),
-          '>',
-          '/root/newipaddr',
-        '&&',
-        '/TopStor/etcdput.py',
-        shlex.quote(dleaderip),
-        shlex.quote(ackkey),
-        shlex.quote(payload['ipaddr'])
-     ])
-     nodemsg = {'req': 'LocalManualConfig', 'reply': ['/bin/sh', '-c', applycmd]}
-     try:
-        sendhost(nodeip, str(nodemsg), 'recvreply', myhost)
-     except Exception as error:
-        print('Failed to send discovered node IP change:', error)
-        return jsonify({'response': 'error', 'message': 'Failed to send node address change'}), 502
-
-     ipchange_ready = False
-     for _ in range(15):
-        if remote_get(dleaderip, ackkey)[0] == payload['ipaddr']:
-         ipchange_ready = True
-         break
-        sleep(1)
-     remote_dels(dleaderip, ackkey)
-     if not ipchange_ready:
-        return jsonify({'response': 'error', 'message': 'Secondary node did not stage its new address'}), 504
-
- payload['leaderip'] = leaderip
- payload ['myhost'] = myhost
- Joincluster.do(payload)
+ discover()
+ data['leaderip'] = leaderip
+ data ['myhost'] = myhost
+ Joincluster.do(data) 
  cmndstring = '/TopStor/promserver.sh '+leaderip+' from fapi'
  postchange(cmndstring)
  return data

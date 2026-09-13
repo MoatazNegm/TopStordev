@@ -29,17 +29,16 @@ def do(data):
  logmsg.sendlog('AddHostst01','info',user,name)
  put(discip, 'tojoin/'+name,leaderip)
  put(leaderip, 'allowedPartners',name)
- nameip = data.get('ipaddr', '_1')
- if '_1' in str(nameip):
-   counter = 1
-   while '_1' in str(nameip):
-     nameip = get(discip,'possible/'+name)[0]
-     sleep(2)
-     counter += 1
-     if counter > 5:
-       logmsg.sendlog('AddHostfa01','error',user,name)
-       queuethis('AddHost','stop',user)
-       return
+ nameip = '_1'
+ counter = 1 
+ while '_1' in str(nameip):
+    nameip = get(discip,'possible/'+name)[0]
+    sleep(2)
+    counter += 1
+    if counter > 5:
+        logmsg.sendlog('AddHostfa01','error',user,name)
+        queuethis('AddHost','stop',user)
+        return
         
  print('nameip', nameip, name)
  put(leaderip, 'ActivePartners/'+name, nameip) 

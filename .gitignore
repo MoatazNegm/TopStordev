@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.pyo
+*.pyd
+
+# Editor / IDE swap & backup
+*.swp
+*.swo
+*.bak
+*.bak.*
+*.tmp
+*.orig
+*.rej
+.idea/
+.vscode/
+.DS_Store
+
+# Local data / DB snapshots that have leaked in
+*.db
+*.sqlite
+*.sqlite3
