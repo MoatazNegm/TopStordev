@@ -1,13 +1,5 @@
 #!/usr/bin/sh
 
-# if reset -> delete all nmcli conns
-echo "$@" | grep -q "reset"
-if [ $? -eq 0 ]; then
-    nmcli -t -f NAME conn show | grep -Ev '^(docker0|lo|br-)' | while read -r conn; do
-        nmcli conn delete "$conn"
-    done
-fi
-
 # clean up logical connections before proceeding
 #nmcli -t -f NAME conn show | grep -E '(node|cluster)' | while read -r conn; do
 #    echo "[*] Deleting old logical connection: $conn"
@@ -94,6 +86,7 @@ then
 	echo $myhost > /etc/hostname
 	echo frstreboot > /root/hostname
 	echo InitiatorName=iqn.1994-05.com.redhat:$myhost > /etc/iscsi/initiatorname.iscsi
+	/TopStor/resetdocker.sh
 	reboot
 fi
 cat /root/hostname | grep frstreboot
@@ -131,6 +124,14 @@ then
 			nmcli conn delete mynode 
 			nmcli conn delete mycluster 
 			hostname localhost
+			# if reset -> delete all nmcli conns
+			echo "$@" | grep -q "reset"
+			if [ $? -eq 0 ]; then
+    				nmcli -t -f NAME conn show | grep -Ev '^(docker0|lo|br-)' | while read -r conn; do
+        			nmcli conn delete "$conn"
+    				done
+			fi
+
 			echo localhost > /etc/hostname
 		fi
 		echo $cmdline | egrep 'reboot|reset'
