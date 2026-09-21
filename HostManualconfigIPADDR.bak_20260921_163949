@@ -1,0 +1,40 @@
+#!/bin/sh
+export ETCDCTL_API=3
+cd /TopStor/
+echo $@ > /root/myip
+leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
+leaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip`
+myhost=`echo $@ | awk '{print $1}'`
+hostip=`echo $@ | awk '{print $2}'`
+realhost=`hostname`
+echo $realhost | grep $myhost
+if [ $? -ne 0 ];
+then
+ echo $realhost | grep $leader
+ if [ $? -ne 0 ];
+ then
+  ./etcdput.py $leaderip rebootme/$myhost pls_fromIPADDR
+ fi
+ exit
+fi
+dev='enp0s8'
+newip=`/TopStor/etcdget.py $leaderip ipaddr/$myhost`
+oldip=`nmcli conn show mynode`
+
+echo nmcli conn mod mynode ipv4.addresses $newip >/root/tmpmyip
+echo $oldip | grep $newip
+if [ $? -ne 0 ];
+then
+ echo running sleep >>/root/tmpmyip
+ echo $newip > /root/newipaddr
+ ./etcdput.py $leaderip rebootme/$myhost pls_fromIPADDR
+ echo $leader | grep $myhost
+ if [ $? -ne 0 ];
+ then
+  /TopStor/etcdput.py $hostip ipaddr/$myhost $newip
+ fi
+# sleep 5
+# /TopStor/resetdocker.sh
+# reboot
+fi
+#/sbin/reboot

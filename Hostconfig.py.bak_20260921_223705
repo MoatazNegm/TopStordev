@@ -171,19 +171,10 @@ def config(leader, leaderip, myhost, *bargs):
    # Node hasn't joined the cluster yet, so it has no ActivePartners entry.
    # Fall back to the address discovery last saw it reachable at, so the
    # push below still reaches it instead of being silently skipped.
-   # The discovery cache can be transiently empty right when this runs
-   # (e.g. a scan just cleared it and hasn't repopulated yet), so retry
-   # briefly instead of a single one-shot check.
-   curip = ''
-   for _ in range(5):
-    try:
-     candidate = str(get(leaderip, 'possible/'+arglist['name'])[0])
-    except:
-     candidate = ''
-    if candidate and '.' in candidate and '_1' not in candidate:
-     curip = candidate
-     break
-    sleep(1)
+   try:
+    curip = str(get(leaderip, 'possible/'+arglist['name'])[0])
+   except:
+    curip = ''
   logmsg.sendlog('HostManual1st6','info',arglist['user'],str(oldipaddr),arglist['ipaddr']+'/'+arglist['ipaddrsubnet'])
   put(leaderip, 'ipaddr/'+arglist['name'],arglist['ipaddr']+'/'+arglist['ipaddrsubnet'])
   dels(leaderip, 'sync', 'ActivePartners_'+arglist['name'])

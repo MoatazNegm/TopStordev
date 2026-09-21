@@ -619,9 +619,8 @@ then
 	/TopStor/promserver.sh $myclusterip
 fi
 mydns=`/TopStor/etcdget.py $myclusterip dnsname/$myhost`
-if [ -n "$mydns" ] && [ "$mydns" != "_1" ]; then
-	nmcli conn modify cmynode ipv4.dns $mydns
-fi
+#nmcli conn modify cmynode ipv4.dns ''
+nmcli conn modify cmynode ipv4.dns $mydns
 nmcli con modify cmynode bond.options "mode=active-backup,miimon=100,fail_over_mac=1"
 nmcli conn down cmynode && nmcli conn up cmynode
 docker rm -f promexport

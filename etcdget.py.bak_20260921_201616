@@ -13,18 +13,10 @@ def etcdctl(etcd, key,prefix):
  #print(' '.join(cmdline))
  try:
     result=subprocess.run(cmdline,stdout=subprocess.PIPE, timeout=2)
-    return result
+    return result 
  except:
-    # Used to print('not reachable') and return the string '_1' here, which
-    # callers store in `result` and then access `result.stdout` on below —
-    # since '_1' has no .stdout, that raised and fell into etcdget()'s own
-    # except, which prints its own '_1'. Combined, shell callers doing
-    # `x=\`etcdget.py ...\`` captured both lines as "not reachable _1" and
-    # echoed that unquoted wherever they used $x (e.g. writing a "new IP"
-    # into a config file), corrupting state instead of cleanly failing.
-    # Returning None here lets etcdget()'s single except handle it, so
-    # failures always come back as the one-line '_1' sentinel.
-    return None
+    print('not reachable')
+    return '_1' 
 def etcdget(etcd, key, prefix=''):
  result = etcdctl(etcd, key,prefix)
  z=[]
