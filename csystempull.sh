@@ -4,26 +4,18 @@
 # Container-aware variant of systempull.sh. Kept separate so the
 # original physical-server flow is untouched.
 #
-# Container-only fix: in a worktree-pinned bind mount, the original
+# Container-only fix: the original's
 #     git branch -D tempb
 #     git checkout -b tempb
 #     git branch -D $1
 #     git checkout -b $1 origin/$1
-#     git reset --hard
-#     git checkout -- *
-#     git rm -rf __py*
-# fails because:
-#   - `git branch -D tempb` refuses to delete the checked-out branch
-#   - `git checkout -b tempb` fails because tempb is already checked-out
-#   - `git checkout -b $1 origin/$1` tries to switch to $1, which the
-#     worktree refuses since it is pinned to its current branch
-#   - `git reset --hard` etc. would corrupt the pinned working tree
-#
-# We replace that whole block with:
-#     git fetch origin refs/heads/$1:refs/remotes/origin/$1
-#     git branch -f $1 origin/$1 2>/dev/null || true
-# which force-creates / force-moves local $1 to the fetched tip
-# without touching the worktree's pinned branch.
+# is replaced by a single `git checkout -B $1 origin/$1` (atomic
+# create-or-move + switch), and the bare `git fetch origin $1`
+# is replaced by an explicit refspec so the tracking ref updates
+# reliably in this git version. Everything else is byte-identical
+# to systempull.sh (including `git checkout -- *` to discard
+# uncommitted changes, the `git rm -rf __py*` cleanup, and the
+# final `git push $origin $1` push).
 #
 # Falls through to the original systempull.sh behaviour on a real
 # physical server (when /.dockerenv is absent).
@@ -39,16 +31,24 @@ fi
 fnupdate () {
 	echo '###########################################' $1
 	if [ "$ISCONTAINER" = "1" ]; then
-		# Container: explicit refspec so tracking ref updates,
-		# and force-create/move $1 atomically (don't try to
-		# switch branches in a pinned worktree).
+		# Container: explicit refspec so the tracking ref
+		# actually updates in this git version, then a single
+		# `git checkout -B` replaces the original's tempb
+		# dance + `branch -D` + `checkout -b`.
 		git fetch origin refs/heads/$1:refs/remotes/origin/$1
 		if [ $? -ne 0 ];
 		then
 			echo something went wrong while updating $1 .... consult the devleloper
 			exit
 		fi
-		git branch -f $1 origin/$1 2>/dev/null || true
+		git checkout -- *
+		git rm -rf __py*
+		rm -rf __py*
+		git checkout -B $1 origin/$1
+		git reset --hard
+		git checkout -- *
+		git rm -rf __py*
+		rm -rf __py*
 	else
 		git fetch origin $1
 		if [ $? -ne 0 ];

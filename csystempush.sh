@@ -4,13 +4,12 @@
 # Container-aware variant of systempush.sh. Kept separate so the
 # original physical-server flow is untouched.
 #
-# Container-only fix: in a worktree-pinned bind mount, the original
+# Container-only fix: the original's
 #     git checkout -b $1
 #     git checkout  $1
-# fails because the worktree is already checked out on its pinned
-# branch (e.g. tempb / QSD5.179_temp-container). We replace those
-# two lines with `git branch -f $1` which force-creates / force-moves
-# local branch $1 to current HEAD without leaving the pinned branch.
+# is replaced by a single `git checkout -B $1` (atomic create-or-move
+# + switch). The git-identity safety-net block stays because it's a
+# real container-only fix (commit fails silently without it).
 # Everything else is byte-identical to systempush.sh.
 
 set +e
@@ -43,12 +42,10 @@ fnupdate () {
 	git rm -rf __py*
 	git commit -am 'fixing' --allow-empty
 	if [ "$ISCONTAINER" = "1" ]; then
-		# Worktree is pinned to a different branch — don't try to switch.
-		# Force-move local $1 to current HEAD. The `|| true` swallows
-		# git's "cannot force update checked-out branch" error in the
-		# edge case where $1 IS the worktree's pinned branch (branch is
-		# already at HEAD anyway, so the no-op is fine).
-		git branch -f $1 2>/dev/null || true
+		# Container: atomic create-or-move + switch. Equivalent
+		# to the original's two `git checkout` lines; `-B` also
+		# handles the case where $1 already exists locally.
+		git checkout -B $1
 	else
 		git checkout -b $1
 		git checkout  $1

@@ -4,20 +4,16 @@
 # Container-aware variant of proxypush.sh. Kept separate so the
 # original physical-server flow is untouched.
 #
-# Container-only fix: in a worktree-pinned bind mount, the original
+# Container-only fix: the original's
 #     git checkout QSD3.15
 #     git checkout -b $1 $origin/$1
-#     git reset --hard $origin/$1
-#     git checkout -- *
-#     git rm -rf __py*
-# fails because the worktree refuses to switch branches and the
-# reset/checkout/rm would corrupt the pinned working tree.
-#
-# We replace those with:
-#     git fetch $origin refs/heads/$1:refs/remotes/$origin/$1
-#     git branch -f $1 $origin/$1 2>/dev/null || true
-# which force-creates / force-moves local $1 to the fetched tip
-# without touching the worktree's pinned branch.
+# is replaced by a single `git checkout -B $1 $origin/$1` (atomic
+# create-or-move + switch), the bare `git fetch $origin` is
+# replaced by an explicit refspec so the tracking ref updates
+# reliably in this git version, and the `git branch -D $1` is
+# made non-fatal (it can fail when $1 is the current branch).
+# Everything else (reset, clean, config, checkout -- *, __py*
+# cleanup, push) is byte-identical to proxypush.sh.
 #
 # Falls through to the original proxypush.sh behaviour on a real
 # physical server (when /.dockerenv is absent).
@@ -31,23 +27,25 @@ else
 fi
 
 fnupdate () {
+	origin=`git remote -v | grep 252 | head -1 | awk '{print $1}'`
+	remote=`git remote -v | grep github | head -1 | awk '{print $1}'`
 	if [ "$ISCONTAINER" = "1" ]; then
-		# Container: skip the `git checkout QSD3.15` (worktree is pinned).
+		# Container: skip the `git checkout QSD3.15` (we
+		# stay on the current branch). `git branch -D $1`
+		# is made non-fatal — it can fail when $1 IS the
+		# current branch, which is fine since `-B` handles
+		# it. Single `checkout -B` replaces `checkout -b`.
 		git branch -D $1 2>/dev/null || true
-		origin=`git remote -v | grep 252 | head -1 | awk '{print $1}'`
-		remote=`git remote -v | grep github | head -1 | awk '{print $1}'`
 		git fetch $origin refs/heads/$1:refs/remotes/$origin/$1
 		if [ $? -ne 0 ];
 		then
 			echo something went wrong while pulling from remote $origin, branch: $1, dir:`pwd` .... consult the devleloper
 			exit
 		fi
-		git branch -f $1 $origin/$1 2>/dev/null || true
+		git checkout -B $1 $origin/$1
 	else
 		git checkout QSD3.15
 		git branch -D $1
-		origin=`git remote -v | grep 252 | head -1 | awk '{print $1}'`
-		remote=`git remote -v | grep github | head -1 | awk '{print $1}'`
 		git fetch $origin
 		if [ $? -ne 0 ];
 		then

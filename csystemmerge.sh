@@ -4,21 +4,15 @@
 # Container-aware variant of systemmerge.sh. Kept separate so the
 # original physical-server flow is untouched.
 #
-# Container-only fix: in a worktree-pinned bind mount, the original
+# Container-only fix: the original's
 #     git branch -D $1_$currentbranch
 #     git checkout -b $1_$currentbranch
-#     git merge $1 -m'mergin'$1' on '$3
-# fails because the worktree refuses to switch branches.
-#
-# The original also calls /root/systempull.sh which it builds by
-# `rm -rf /root/systempull.sh; cp /TopStor/systempull.sh /root/`.
-# In the container, we already have /TopStor/csystempull.sh (the
-# container-aware sibling) so we skip the cp step and call it directly.
-#
-# Container mode also replaces the merge-dance with a non-switching
-# variant: `git branch -f $1_$currentbranch HEAD` then a
-# `git merge-tree` preview (since the actual merge-commit can't be
-# created without checking out the target branch).
+# is replaced by a single `git checkout -B $1_$currentbranch` (atomic
+# create-or-move + switch), and `git branch -D` is made non-fatal
+# (it can fail when $1_$currentbranch IS the current branch).
+# The merge + diff + the systempull.sh call at the bottom are
+# byte-identical to systemmerge.sh (we just call /TopStor/csystempull.sh
+# directly instead of copying systempull.sh to /root).
 #
 # Falls through to the original systemmerge.sh behaviour on a real
 # physical server (when /.dockerenv is absent).
@@ -35,25 +29,27 @@ fnupdate () {
 	echo '###########################################' $1
 	currentbranch=$3
 	if [ "$ISCONTAINER" = "1" ]; then
-		# Container: don't switch branches in a pinned worktree.
-		# Force-move the merge target to current HEAD (no switch),
-		# then show what `git merge $1` would produce.
-		git branch -f $1_$currentbranch HEAD 2>/dev/null || true
-		git merge-tree $1 $1_$currentbranch
+		# Container: `git branch -D` is made non-fatal (it
+		# fails if $1_$currentbranch is the current branch —
+		# fine since `-B` will handle that case). A single
+		# `checkout -B` replaces the original's `branch -D`
+		# + `checkout -b` pair.
+		git branch -D $1_$currentbranch 2>/dev/null || true
+		git checkout -B $1_$currentbranch
 	else
 		git branch -D $1_$currentbranch
 		git checkout -b $1_$currentbranch
-		git merge $1 -m'mergin'$1' on '$3
-		#if [ $? -ne 0 ];
-		#then
-#			echo something went wrong while updating $1 .... consult the devleloper
-#			exit
-#		fi
-		echo '------checking differrences in '$2' between the branches '$1' and '$currentbranch'-------------'
-		git diff --name-status  $1 $1_$currentbranch
-		#git diff -U3 $1_$currentbranch $1
-		echo '------end of deifferrences in '$2'  between the branches '$1' and '$currentbranch'-------------'
 	fi
+	git merge $1 -m'mergin'$1' on '$3
+	#if [ $? -ne 0 ];
+	#then
+#		echo something went wrong while updating $1 .... consult the devleloper
+#		exit
+#	fi
+	echo '------checking differrences in '$2' between the branches '$1' and '$currentbranch'-------------'
+	git diff --name-status  $1 $1_$currentbranch
+	#git diff -U3 $1_$currentbranch $1
+	echo '------end of deifferrences in '$2'  between the branches '$1' and '$currentbranch'-------------'
 	sync
 	sync
 	sync

@@ -11,8 +11,6 @@ def syncpls(*args):
  excepts = [] 
  poses = get(discip,'possible','--prefix')
  for pos in poses:
-    if not pos or not pos[0] or len(pos[0].split('/')) < 2:
-        continue
     host=pos[0].split('/')[1]
     if host not in str(donemembers) and host not in str(excepts):
         dels(leaderip,pos[0])

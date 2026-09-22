@@ -3,19 +3,9 @@ export ETCDCTL_API=3
 cd /TopStor/
 echo $@ > /root/myip
 leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
-locleaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip`
-leaderip=$locleaderip
+leaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip`
 myhost=`echo $@ | awk '{print $1}'`
 hostip=`echo $@ | awk '{print $2}'`
-passedleaderip=`echo $@ | awk '{print $3}'`
-# A node that hasn't joined the cluster yet runs its own standalone etcd
-# where it is trivially "the leader" of nothing, so the local lookup above
-# resolves to a bogus self-referential leaderip on that node. Prefer the
-# real leaderip the caller (Hostconfig.py) already knows, when provided.
-if [ -n "$passedleaderip" ];
-then
- leaderip=$passedleaderip
-fi
 realhost=`hostname`
 echo $realhost | grep $myhost
 if [ $? -ne 0 ];
@@ -24,10 +14,6 @@ then
  if [ $? -ne 0 ];
  then
   ./etcdput.py $leaderip rebootme/$myhost pls_fromIPADDR
-  if [ "$locleaderip" != "$leaderip" ];
-  then
-   ./etcdput.py $locleaderip rebootme/$myhost pls_fromIPADDR
-  fi
  fi
  exit
 fi
@@ -54,13 +40,6 @@ then
  echo running sleep >>/root/tmpmyip
  echo $newip > /root/newipaddr
  ./etcdput.py $leaderip rebootme/$myhost pls_fromIPADDR
- if [ "$locleaderip" != "$leaderip" ];
- then
-  # The node's own rebootmeplslooper.sh was started at boot watching its
-  # local self-referential leaderip and won't re-resolve it, so mirror the
-  # flag there too, or the running watcher will never see this request.
-  ./etcdput.py $locleaderip rebootme/$myhost pls_fromIPADDR
- fi
  echo $leader | grep $myhost
  if [ $? -ne 0 ];
  then

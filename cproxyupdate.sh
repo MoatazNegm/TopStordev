@@ -4,22 +4,17 @@
 # Container-aware variant of proxyupdate.sh. Kept separate so the
 # original physical-server flow is untouched.
 #
-# Container-only fix: in a worktree-pinned bind mount, the original
+# Container-only fix: the original's
 #     git branch -D tempb
 #     git checkout -b tempb
 #     git branch -D $1
 #     git checkout -b $1 $remote/$1
-#     git reset --hard
-#     git checkout -- *
-#     git rm -rf __py*
-# fails because the worktree refuses to switch branches and the
-# reset/checkout/rm would corrupt the pinned working tree.
-#
-# We replace that whole block with:
-#     git fetch $remote refs/heads/$1:refs/remotes/$remote/$1
-#     git branch -f $1 $remote/$1 2>/dev/null || true
-# which force-creates / force-moves local $1 to the fetched tip
-# without touching the worktree's pinned branch.
+# is replaced by a single `git checkout -B $1 $remote/$1` (atomic
+# create-or-move + switch), and the bare `git fetch $remote` is
+# replaced by an explicit refspec so the tracking ref updates
+# reliably in this git version. Everything else (clean, config,
+# checkout -- *, __py* cleanup, reset, push) is byte-identical
+# to proxyupdate.sh.
 #
 # Falls through to the original proxyupdate.sh behaviour on a real
 # physical server (when /.dockerenv is absent).
@@ -36,16 +31,25 @@ fnupdate () {
 	origin=`git remote -v | grep 252 | head -1 | awk '{print $1}'`
 	remote=`git remote -v | grep github | grep -v devremote | head -1 | awk '{print $1}'`
 	if [ "$ISCONTAINER" = "1" ]; then
-		# Container: explicit refspec so tracking ref updates,
-		# and force-create/move $1 atomically (don't try to
-		# switch branches in a pinned worktree).
+		# Container: explicit refspec, then a single `checkout -B`
+		# replaces the original's tempb dance + `branch -D` +
+		# `checkout -b`.
 		git fetch $remote refs/heads/$1:refs/remotes/$remote/$1
 		if [ $? -ne 0 ];
 		then
 			echo something went wrong while pulling from remote $remote, branch: $1, dir:`pwd` .... consult the devleloper
 			exit
 		fi
-		git branch -f $1 $remote/$1 2>/dev/null || true
+		git clean -f
+		git config --replace-all pull.rebase false
+		git checkout -- *
+		git rm -rf __py*
+		git checkout -B $1 $remote/$1
+		git reset --hard
+		git clean -f
+		git config --replace-all pull.rebase false
+		git checkout -- *
+		git rm -rf __py*
 	else
 		git fetch $remote
 		if [ $? -ne 0 ];
