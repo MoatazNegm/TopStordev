@@ -31,6 +31,9 @@ echo "    Data2 Device: $dbond"
 #systemctl restart NetworkManager
 myclusterf='/topstorwebetc/mycluster'
 mynodef='/topstorwebetc/mynode'
+hostname=`cat /TopStordata/myhostname`
+hostname $hostname
+echo $hostname > /etc/hostname
 myhost=`hostname`
 firewall-cmd --permanent --add-service={nfs,rpc-bind,mountd}
 firewall-cmd --permanent --add-port=5672/tcp
@@ -94,6 +97,7 @@ then
 	myhost='dhcp'`echo $RANDOM$RANDOM | cut -c -6`
 	hostname $myhost
 	echo $myhost > /etc/hostname
+	echo $myhsot /TopStordata/myhostname
 	echo frstreboot > /root/hostname
 	echo InitiatorName=iqn.1994-05.com.redhat:$myhost > /etc/iscsi/initiatorname.iscsi
 	/TopStor/resetdocker.sh
@@ -137,6 +141,8 @@ then
 			nmcli conn delete mynode 
 			nmcli conn delete mycluster 
 			hostname localhost
+			echo localhost  > /etc/hostname
+			echo localhost  > /TopStordata/myhostname
 			# if reset -> delete all nmcli conns
 			echo "$@" | grep -q "reset"
 			if [ $? -eq 0 ]; then
@@ -145,7 +151,6 @@ then
     				done
 			fi
 
-			echo localhost > /etc/hostname
 		fi
 		echo $cmdline | egrep 'reboot|reset'
 		if [ $? -eq 0 ];
