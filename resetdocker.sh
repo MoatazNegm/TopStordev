@@ -30,7 +30,7 @@ do
 	docker stop $doc
 done
 
-systemctl stop docker
+#systemctl stop docker
 pkill rebootme 
 targetcli clearconfig confirm=True
 systemctl stop rabbitmq-server

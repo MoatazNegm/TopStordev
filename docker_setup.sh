@@ -1,5 +1,4 @@
 #!/usr/bin/sh
-
 # --- NO-ARG FALLBACK ---
 # If docker_setup.sh is invoked without any arguments, reset the
 # network to its baked-in image state by running /TopStor/cleannw.sh
@@ -118,6 +117,9 @@ then
 	if [ $? -eq 0 ];
 	then
 		/TopStor/resetdocker.sh
+#/TopStor/reboot.sh
+#echo checking in reboot reset
+#exit
 		echo $cmdline | grep reset
 		if [ $? -eq 0 ];
 		then
