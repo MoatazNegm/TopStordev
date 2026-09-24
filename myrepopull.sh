@@ -1,7 +1,9 @@
 #!/usr/bin/sh
 fnupdate () {
 	git remote remove leaderrepo
-	git remote add leaderrepo http://$3/git/$2 
+	# git:// protocol — matches git-daemon's --base-path=/srv/git in the
+	# software container. $3 is the leader IP (passed by the caller).
+	git remote add leaderrepo git://$3/$2
 	rm -rf pre_apply.sh	
 	echo '###########################################' $1
 	git fetch leaderrepo $1

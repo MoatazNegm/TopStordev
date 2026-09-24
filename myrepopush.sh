@@ -23,29 +23,25 @@ fnupdate () {
 
 cd /TopStor/
 branch=`echo $@ | awk '{print $1}'`
-cjobs=(`echo TopStor_TopStordev pace_HC topstorweb_TopStorweb`)
+cjobs=(`echo TopStor_TopStordev pace_HC topstorweb_TopStorWeb`)
 branchc=`echo $branch | wc -c`
 if [ $branchc -le 3 ];
 then
 	echo no valid branch is supplied .... exiting
 	exit
-fi 
+fi
 flag=1
 echo branch $branch
 chown 33:33 /root/gitrepo/git/*  -R
 chown 33:33 /root/gitrepo/git/  -R
-myhostip=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`
-echo myhostip=$myhostip
-# Guard: myhostip must be a valid IPv4 address. Without this check, the
-# later `cd /root/gitrepo/git/$gitrepo` fails silently under `set +e`,
-# and the subsequent `rm -rf *` and `git init --bare` run in the wrong
-# cwd, destroying the working tree of whichever repo the loop processes
-# first. (See csystempull.sh incident Sep 24 2026.)
-echo "$myhostip" | grep -Eq '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
-if [ $? -ne 0 ]; then
-	echo "myrepopush: myhostip '$myhostip' is empty or not a valid IPv4 address; exiting"
-	exit 1
+# Try etcdclient first (dynamic cluster-node IP); fall back to the static
+# software-container IP (10.11.12.10) when etcdclient is not running.
+myhostip=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip 2>/dev/null`
+if [ -z "$myhostip" ]; then
+	myhostip="10.11.12.10"
+	echo "myrepopush: etcdclient unreachable, falling back to static software container IP $myhostip"
 fi
+echo myhostip=$myhostip
 while [ $flag -ne 0 ];
 do
 	rjobs=(`echo "${cjobs[@]}"`)
@@ -56,32 +52,42 @@ do
 		job=`echo $jobinfo | awk -F'_' '{print $1}'`
 		gitrepo=`echo $jobinfo | awk -F'_' '{print $2}'`'.git'
 		cd /$job
-	        repoloc=${myhostip}'/git/'$gitrepo
-		git remote -v | grep $repoloc 
+		repoloc=${myhostip}'/'$gitrepo
+		git remote -v | grep $repoloc
 		if [ $? -ne 0 ];
 		then
 			cd /$job
 			git remote remove myrepo
-			echo git remote add myrepo http://${myhostip}/git/$gitrepo
-			git remote add myrepo http://${myhostip}/git/$gitrepo
-			cd /root/gitrepo/git/$gitrepo
-			rm -rf *
-			git init --bare
-			cd ..
-			echo chown 33:33 /root/gitrepo/git/$gitrepo -R
-			chown 33:33 /root/gitrepo/git/$gitrepo -R
+			# git:// protocol — matches git-daemon's --base-path=/srv/git in
+			# the software container running on $myhostip.
+			echo git remote add myrepo git://${myhostip}/$gitrepo
+			git remote add myrepo git://${myhostip}/$gitrepo
+			# Ensure the bare repo exists on the mirror WITHOUT wiping it.
+			# The original script did 'rm -rf *; git init --bare' here,
+			# which would have destroyed any branches that had been pushed.
+			if [ ! -d /root/gitrepo/git/$gitrepo ]; then
+				mkdir -p /root/gitrepo/git
+				git init --bare /root/gitrepo/git/$gitrepo
+			fi
+			# git-daemon-export-ok is required by git-daemon unless
+			# --export-all is also given (abdopuppet uses --export-all, but
+			# the file is harmless and matches abdopuppet's convention).
+			touch /root/gitrepo/git/$gitrepo/git-daemon-export-ok
+			# Allow git operations across uid boundaries (the bare repo is
+			# owned by the host DinD user; we run as root in the container).
+			git config --global --add safe.directory '*'
 		fi
- 		echo $job
+		echo $job
 		cd /$job
 		if [ $? -ne 0 ];
 		then
 			echo the directory $job is not found... exiting
 			exit
 		fi
-		fnupdate $branch 
+		fnupdate $branch
 		echo hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
 		cjobs=(`echo "${cjobs[@]}" | sed "s/$jobinfo//g" `)
-  	done
+	done
 	lencjobs=`echo $cjobs | wc -c`
 	if [ $lencjobs -le 3 ];
 	then
@@ -89,8 +95,8 @@ do
 	fi
 done
 cd /TopStor
-myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
-leaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip`
+myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode 2>/dev/null`
+leaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip 2>/dev/null`
 stamp=`date +%s`
 cd /topstorweb
 git show | grep commit
