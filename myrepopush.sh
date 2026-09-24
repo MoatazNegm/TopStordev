@@ -36,6 +36,16 @@ chown 33:33 /root/gitrepo/git/*  -R
 chown 33:33 /root/gitrepo/git/  -R
 myhostip=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`
 echo myhostip=$myhostip
+# Guard: myhostip must be a valid IPv4 address. Without this check, the
+# later `cd /root/gitrepo/git/$gitrepo` fails silently under `set +e`,
+# and the subsequent `rm -rf *` and `git init --bare` run in the wrong
+# cwd, destroying the working tree of whichever repo the loop processes
+# first. (See csystempull.sh incident Sep 24 2026.)
+echo "$myhostip" | grep -Eq '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+if [ $? -ne 0 ]; then
+	echo "myrepopush: myhostip '$myhostip' is empty or not a valid IPv4 address; exiting"
+	exit 1
+fi
 while [ $flag -ne 0 ];
 do
 	rjobs=(`echo "${cjobs[@]}"`)
