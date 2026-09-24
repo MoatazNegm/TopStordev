@@ -1,5 +1,16 @@
 #!/usr/bin/sh
 
+# --- NO-ARG FALLBACK ---
+# If docker_setup.sh is invoked without any arguments, reset the
+# network to its baked-in image state by running /TopStor/cleannw.sh
+# before the rest of the setup proceeds. This keeps re-runs idempotent
+# so a bare `docker_setup.sh` always lands on a known-clean network.
+if [ "$#" -eq 0 ];
+then
+	echo "[docker_setup] no arguments supplied -> running /TopStor/cleannw.sh to clean the network"
+	/TopStor/cleannw.sh
+fi
+
 # clean up logical connections before proceeding
 #nmcli -t -f NAME conn show | grep -E '(node|cluster)' | while read -r conn; do
 #    echo "[*] Deleting old logical connection: $conn"
@@ -16,9 +27,9 @@ echo "    Cluster Device: $cmbond"
 echo "    Data1 Device: $dbond"
 echo "    Data2 Device: $dbond"
 
-modprobe bnx2
-modprobe hpsa 
-systemctl restart NetworkManager
+#modprobe bnx2
+#modprobe hpsa 
+#systemctl restart NetworkManager
 myclusterf='/topstorwebetc/mycluster'
 mynodef='/topstorwebetc/mynode'
 myhost=`hostname`
@@ -87,13 +98,13 @@ then
 	echo frstreboot > /root/hostname
 	echo InitiatorName=iqn.1994-05.com.redhat:$myhost > /etc/iscsi/initiatorname.iscsi
 	/TopStor/resetdocker.sh
-	reboot
+	/TopStor/reboot.sh
 fi
 cat /root/hostname | grep frstreboot
 if [ $? -eq 0 ];
 then
 	echo $myhost > /root/hostname
-	reboot
+	/TopStor/reboot.sh
 fi
 echo l$cmdline | grep restart
 if [ $? -eq 0 ];
@@ -137,7 +148,7 @@ then
 		echo $cmdline | egrep 'reboot|reset'
 		if [ $? -eq 0 ];
 		then
-			reboot
+			/TopStor/reboot.sh
 		fi
 		echo $cmdline | grep 'stop'
 		if [ $? -eq 0 ];
@@ -331,8 +342,8 @@ systemctl start target
 echo starting iscsid
 systemctl start iscsid 
 fi
-echo starting docker
-systemctl start docker
+echo starting docker containers
+#systemctl start docker
 rm -rf /root/newipaddr
 rm -rf /root/newcaddr
 docker run --rm --name software  --hostname software  -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $myhostip:80:80 -v /root/gitrepo/httpd.conf:/usr/local/apache2/conf/httpd.conf -v /root/gitrepo:/usr/local/apache2/htdocs/ -itd moataznegm/quickstor:git
