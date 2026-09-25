@@ -31,7 +31,7 @@ echo "    Data2 Device: $dbond"
 #systemctl restart NetworkManager
 myclusterf='/topstorwebetc/mycluster'
 mynodef='/topstorwebetc/mynode'
-hostname=`cat /TopStordata/myhostname`
+hostname=`cat /root/myhostname`
 hostname $hostname
 echo $hostname > /etc/hostname
 myhost=`hostname`
@@ -53,8 +53,8 @@ firewall-cmd --permanent --add-port=88/udp
 firewall-cmd  --permanent --add-port=2381-2481/tcp
 firewall-cmd  --permanent --add-port=2381-2481/udp
 firewall-cmd --reload
-systemctl stop nfs-server
-systemctl  disable nfs-server
+#systemctl stop nfs-server
+#systemctl  disable nfs-server
 cat /etc/ssh/sshd_config | grep Gateway | grep yes 
 if [ $? -ne 0 ];
 then
@@ -86,7 +86,10 @@ rm -rf /TopStordata/exportip.*
 echo ${myhost}$cmdline | grep reboot
 if [ $? -ne 0 ];
 then
+echo $myhost and $cmdline
  nmcli conn up mynode
+ hostname $hostname
+ echo $hostname > /etc/hostname
  zpool export -a
 fi
 /usr/bin/targetcli clearconfig confirm=True	
@@ -97,7 +100,7 @@ then
 	myhost='dhcp'`echo $RANDOM$RANDOM | cut -c -6`
 	hostname $myhost
 	echo $myhost > /etc/hostname
-	echo $myhsot /TopStordata/myhostname
+	echo $myhost >  /root/myhostname
 	echo frstreboot > /root/hostname
 	echo InitiatorName=iqn.1994-05.com.redhat:$myhost > /etc/iscsi/initiatorname.iscsi
 	/TopStor/resetdocker.sh
@@ -142,14 +145,14 @@ then
 			nmcli conn delete mycluster 
 			hostname localhost
 			echo localhost  > /etc/hostname
-			echo localhost  > /TopStordata/myhostname
+			echo localhost  > /root/myhostname
 			# if reset -> delete all nmcli conns
-			echo "$@" | grep -q "reset"
-			if [ $? -eq 0 ]; then
-    				nmcli -t -f NAME conn show | grep -Ev '^(docker0|lo|br-)' | while read -r conn; do
-        			nmcli conn delete "$conn"
-    				done
-			fi
+			#echo "$@" | grep -q "reset"
+			#if [ $? -eq 0 ]; then
+    		#		nmcli -t -f NAME conn show | grep -Ev '^(docker0|lo|br-)' | while read -r conn; do
+        #			nmcli conn delete "$conn"
+    #				done
+#			fi
 
 		fi
 		echo $cmdline | egrep 'reboot|reset'
@@ -353,6 +356,8 @@ echo starting docker containers
 #systemctl start docker
 rm -rf /root/newipaddr
 rm -rf /root/newcaddr
+hostname $hostname
+echo $hostname > /etc/hostname
 docker run --rm --name software  --hostname software  -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $myhostip:80:80 -v /root/gitrepo/httpd.conf:/usr/local/apache2/conf/httpd.conf -v /root/gitrepo:/usr/local/apache2/htdocs/ -itd moataznegm/quickstor:git
 echo starting intdns
 docker run --rm --name intdns --hostname intdns --net intdns-net -e DNS_DOMAIN=qs.dom -e DNS_IP=10.11.12.7 -e LOG_QUERIES=true -itd --ip 10.11.12.7 -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/dnshosts:/etc/hosts moataznegm/quickstor:dns
@@ -378,7 +383,6 @@ if [[ $isconf_prim == 'nono' ]];
 then
 exit
 fi
-
 echo /TopStor/setipports.sh $myclusterip $leader $myhost sync
 /TopStor/setipports.sh $myclusterip $leader $myhost sync
 
