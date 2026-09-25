@@ -42,6 +42,19 @@ fnupdate () {
 			echo something went wrong while pulling from remote $origin, branch: $1, dir:`pwd` .... consult the devleloper
 			exit
 		fi
+		# Container-only fix: the physical-server branch follows the
+		# checkout with `git reset --hard $origin/$1` + `git clean -f`
+		# so any local modifications or untracked files in the working
+		# tree are discarded before the new branch takes over. The
+		# container variant was missing this step, so any uncommitted
+		# change (e.g. `M docker_setup.sh`) caused `git checkout -B` to
+		# abort with "Your local changes would be overwritten by
+		# checkout", which then made `git push` fail with "src refspec
+		# <branch> does not match any" because the local branch never
+		# got created. Force-resetting to origin/$1 first unblocks the
+		# checkout.
+		git reset --hard $origin/$1
+		git clean -fd
 		git checkout -B $1 $origin/$1
 	else
 		git checkout QSD3.15
@@ -59,7 +72,7 @@ fnupdate () {
 			exit
 		fi
 		git reset --hard $origin/$1
-		git clean -f
+		git clean -fd
 		git config --replace-all pull.rebase false
 		git checkout -- *
 		git rm -rf __py*
@@ -79,7 +92,7 @@ fnupdateold () {
 	git checkout -b $1
 	git checkout $1
 	git reset --hard
-	git clean -f
+	git clean -fd
 	git config --replace-all pull.rebase false
 	git rm -rf __py*
 	origin=`git remote -v | grep 252 | head -1 | awk '{print $1}'`

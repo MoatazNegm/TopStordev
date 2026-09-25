@@ -41,6 +41,13 @@ fnupdate () {
 			echo something went wrong while updating $1 .... consult the devleloper
 			exit
 		fi
+		# Container-only fix: the original has no pre-checkout
+		# `git clean` at all, so any untracked file in the working
+		# tree would block `git checkout -B` with "would be
+		# overwritten by checkout" — same bug class as the one
+		# that hit cproxypush.sh. `clean -fd` (not just `-f`) so
+		# untracked directories also get pruned before checkout.
+		git clean -fd
 		git checkout -- *
 		git rm -rf __py*
 		rm -rf __py*

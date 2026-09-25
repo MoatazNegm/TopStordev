@@ -42,6 +42,17 @@ fnupdate () {
 			echo something went wrong while pulling from remote $origin, branch: $1, dir:`pwd` .... consult the devleloper
 			exit
 		fi
+		# Container-only fix: same root bug as cproxypush.sh had.
+		# The fetch was followed by `git checkout -B` with no
+		# pre-checkout reset/clean, so any local modification or
+		# untracked file/dir in the working tree caused the
+		# checkout to abort with "would be overwritten", which
+		# then made `git push` fail with "src refspec <branch>
+		# does not match any" because the local branch was never
+		# created. Force-resetting to origin/$1 and pruning
+		# untracked files/dirs first unblocks the checkout.
+		git reset --hard $origin/$1
+		git clean -fd
 		git checkout -B $1 $origin/$1
 	else
 		git checkout QSD3.15
@@ -59,7 +70,7 @@ fnupdate () {
 			exit
 		fi
 		git reset --hard $origin/$1
-		git clean -f
+		git clean -fd
 		git config --replace-all pull.rebase false
 		git checkout -- *
 		git rm -rf __py*
@@ -79,7 +90,7 @@ fnupdateold () {
 	git checkout -b $1
 	git checkout $1
 	git reset --hard
-	git clean -f
+	git clean -fd
 	git config --replace-all pull.rebase false
 	git rm -rf __py*
 	origin=`git remote -v | grep 252 | head -1 | awk '{print $1}'`

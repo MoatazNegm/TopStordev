@@ -40,13 +40,13 @@ fnupdate () {
 			echo something went wrong while pulling from remote $remote, branch: $1, dir:`pwd` .... consult the devleloper
 			exit
 		fi
-		git clean -f
+		git clean -fd
 		git config --replace-all pull.rebase false
 		git checkout -- *
 		git rm -rf __py*
 		git checkout -B $1 $remote/$1
 		git reset --hard
-		git clean -f
+		git clean -fd
 		git config --replace-all pull.rebase false
 		git checkout -- *
 		git rm -rf __py*
@@ -58,7 +58,7 @@ fnupdate () {
 			exit
 		fi
 		git branch -D tempb
-		git clean -f
+		git clean -fd
 		git config --replace-all pull.rebase false
 		git checkout -- *
 		git rm -rf __py*
@@ -66,7 +66,7 @@ fnupdate () {
 		git branch -D $1
 		git checkout -b $1  $remote/$1
 		git reset --hard
-		git clean -f
+		git clean -fd
 		git config --replace-all pull.rebase false
 		git checkout -- *
 		git rm -rf __py*
