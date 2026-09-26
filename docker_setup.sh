@@ -10,6 +10,21 @@ then
 	/TopStor/cleannw.sh
 fi
 
+# --- HOSTNAME RESOLVER ---
+# Keep /etc/hosts in sync with whatever hostname this script just assigned.
+# Without this, services that resolve the node name via the container
+# hostname (RabbitMQ's Erlang distribution is the canonical offender — it
+# fails with "TCP connection succeeded but Erlang distribution failed"
+# because the broker was started under the *previous* hostname while the
+# init/local branch later randomised the hostname to a dhcpNNNNNN form).
+# Idempotent: no-op if 127.0.0.1 <h> is already present.
+resolve_local_host () {
+	local h="$1"
+	[ -z "$h" ] && return 0
+	grep -qE "^127\.0\.0\.1[[:space:]]+${h}([[:space:]]|$)" /etc/hosts \
+		|| echo "127.0.0.1 $h" >> /etc/hosts
+}
+
 # clean up logical connections before proceeding
 #nmcli -t -f NAME conn show | grep -E '(node|cluster)' | while read -r conn; do
 #    echo "[*] Deleting old logical connection: $conn"
@@ -34,6 +49,7 @@ mynodef='/topstorwebetc/mynode'
 hostname=`cat /root/myhostname`
 hostname $hostname
 echo $hostname > /etc/hostname
+resolve_local_host "$hostname"
 myhost=`hostname`
 firewall-cmd --permanent --add-service={nfs,rpc-bind,mountd}
 firewall-cmd --permanent --add-port=5672/tcp
@@ -90,6 +106,7 @@ then
 	nmcli conn up mynode
 	hostname $hostname
 	echo $hostname > /etc/hostname
+	resolve_local_host "$hostname"
 	zpool export -a
 fi
 /usr/bin/targetcli clearconfig confirm=True	
@@ -100,6 +117,7 @@ then
 	myhost='dhcp'`echo $RANDOM$RANDOM | cut -c -6`
 	hostname $myhost
 	echo $myhost > /etc/hostname
+	resolve_local_host "$myhost"
 	echo $myhost >  /root/myhostname
 	echo frstreboot > /root/hostname
 	echo InitiatorName=iqn.1994-05.com.redhat:$myhost > /etc/iscsi/initiatorname.iscsi
@@ -146,6 +164,7 @@ then
 			hostname localhost
 			echo localhost  > /etc/hostname
 			echo localhost  > /root/myhostname
+			resolve_local_host localhost
 			# if reset -> delete all nmcli conns
 			#echo "$@" | grep -q "reset"
 			#if [ $? -eq 0 ]; then
@@ -358,6 +377,7 @@ rm -rf /root/newipaddr
 rm -rf /root/newcaddr
 hostname $hostname
 echo $hostname > /etc/hostname
+resolve_local_host "$hostname"
 docker run --rm --name software  --hostname software  -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $myhostip:80:80 -v /root/gitrepo/httpd.conf:/usr/local/apache2/conf/httpd.conf -v /root/gitrepo:/usr/local/apache2/htdocs/ -itd moataznegm/quickstor:git
 echo starting intdns
 docker run --rm --name intdns --hostname intdns --net intdns-net -e DNS_DOMAIN=qs.dom -e DNS_IP=10.11.12.7 -e LOG_QUERIES=true -itd --ip 10.11.12.7 -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/dnshosts:/etc/hosts moataznegm/quickstor:dns
@@ -550,6 +570,7 @@ docker rm -f flask 2>/dev/null
 docker rm -f react-dev-ui 2>/dev/null
 rm -rf $httpdf
 /TopStor/ioperf.py $etcd $myhost >/dev/null & disown
+echo /TopStor/ioperf.py $etcd $myhost 
 echo 111111111111111111111
 exit
 echo docker exec etcdclient /TopStor/etcdput.py $myclusterip ready/$myhost $mynodeip 
