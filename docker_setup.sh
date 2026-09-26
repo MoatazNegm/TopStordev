@@ -91,6 +91,8 @@ then
 	cp /root/bootdiskf /TopStordata/
 	rm -rf /root/bootdiskf
 	echo no > /root/nodeconfigured
+	rm -rf /dev/disk
+	mkdir -p /dev/disk/by-id
 fi
 
 mypid='/TopStordata/diskchange'
