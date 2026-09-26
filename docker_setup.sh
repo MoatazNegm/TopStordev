@@ -576,6 +576,7 @@ rm -rf $httpdf
 echo /TopStor/ioperf.py $etcd $myhost 
 echo docker exec etcdclient /TopStor/etcdput.py $myclusterip ready/$myhost $mynodeip 
 /TopStor/etcdput.py $myclusterip ready/$myhost $mynodeip 
+echo InitiatorName=iqn.1994-05.com.redhat:$myhost > /etc/iscsi/initiatorname.iscsi
 /pace/cdiskref.sh $leader $myclusterip $myhost $mynodeip 
 echo /pace/diskref.sh $leader $myclusterip $myhost $mynodeip 
 echo 111111111111111111111
