@@ -560,6 +560,8 @@ then
 	/pace/checksyncs.py syncinit $etcd $myhost >/dev/null & disown 
 fi
 /TopStor/etcdput.py $etcd ready/$myhost $mynodeip 
+echo 111111111111111111111
+exit
 
 templhttp='/TopStor/httpd_template.conf'
 rm -rf /TopStordata/httpd.conf
@@ -571,8 +573,6 @@ docker rm -f react-dev-ui 2>/dev/null
 rm -rf $httpdf
 /TopStor/ioperf.py $etcd $myhost >/dev/null & disown
 echo /TopStor/ioperf.py $etcd $myhost 
-echo 111111111111111111111
-exit
 echo docker exec etcdclient /TopStor/etcdput.py $myclusterip ready/$myhost $mynodeip 
 /TopStor/etcdput.py $myclusterip ready/$myhost $mynodeip 
 /pace/diskref.sh $leader $myclusterip $myhost $mynodeip 
