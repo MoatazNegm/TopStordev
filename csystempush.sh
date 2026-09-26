@@ -106,7 +106,7 @@ then
 	/TopStor/etcddel.py $leaderip sync/cversion --prefix
 	/TopStor/etcdput.py $leaderip sync/cversion/_${branch}__/request cversion_$stamp
 	/TopStor/etcdput.py $leaderip sync/cversion/_${branch}__/request/$myhost cversion_$stamp
-	/TopStor/myrepopush.sh $branch
+	/TopStor/cmyrepopush.sh $branch
 fi
 cd /topstorweb
 git show | grep commit
