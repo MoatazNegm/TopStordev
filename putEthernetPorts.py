@@ -1,4 +1,6 @@
-#!/bin/python
+#!/usr/bin/python3
+import os, sys, subprocess, re
+from time import time as stamp
 import os, sys, subprocess, re
 from time import time as stamp
 from etcdput import etcdput as put
