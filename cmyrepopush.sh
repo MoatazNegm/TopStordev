@@ -43,9 +43,9 @@ git config --global --add safe.directory '*' 2>/dev/null
 git config --global --add protocol.git.allow always 2>/dev/null
 
 fnupdate () {
-	#git reset --hard
-	git add --all
-	git rm -rf __py*
+	git reset --hard HEAD
+	#git add --all
+	#git rm -rf __py*
 	#git commit -am 'fixing' --allow-empty
 	#git checkout -b $1
 	git checkout  $1

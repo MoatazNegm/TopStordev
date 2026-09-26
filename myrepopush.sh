@@ -1,8 +1,8 @@
 #!/usr/bin/sh
 fnupdate () {
-	#git reset --hard
-	git add --all
-	git rm -rf __py*
+	git reset --hard HEAD
+	#git add --all
+	#git rm -rf __py*
 	#git commit -am 'fixing' --allow-empty
 	#git checkout -b $1
 	git checkout  $1
