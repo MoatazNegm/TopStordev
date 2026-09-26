@@ -43,6 +43,7 @@ echo "    Data2 Device: $dbond"
 
 #modprobe bnx2
 #modprobe hpsa 
+modprobe target_core_mod iscsi_target_mod target_core_iblock 
 #systemctl restart NetworkManager
 myclusterf='/topstorwebetc/mycluster'
 mynodef='/topstorwebetc/mynode'
