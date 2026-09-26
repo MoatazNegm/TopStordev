@@ -560,8 +560,6 @@ then
 	/pace/checksyncs.py syncinit $etcd $myhost >/dev/null & disown 
 fi
 /TopStor/etcdput.py $etcd ready/$myhost $mynodeip 
-echo 111111111111111111111
-exit
 
 templhttp='/TopStor/httpd_template.conf'
 rm -rf /TopStordata/httpd.conf
@@ -600,6 +598,8 @@ else
 	/TopStor/etcdput.py $myclusterip sync/nextlead/Add_er_${myhost}/request nextlead_$stamp
 	/TopStor/etcdput.py $myclusterip sync/nextlead/Add_er_${myhost}/request/$leader nextlead_$stamp
 fi
+echo 111111111111111111111
+exit
 #/TopStor/etcddel.py $myclusterip sync/diskref --prefix
 #/TopStor/etcdput.py $myclusterip sync/diskref/add_add_add______/request diskref_$stamp
 #/pace/diskref.sh $leader $myclusterip $myhost $mynodeip >/dev/null & disown 
