@@ -114,6 +114,7 @@ then
 fi
 /usr/bin/targetcli clearconfig confirm=True	
 targetcli saveconfig
+mkdir -p /dev/disk/by-id/
 echo ${myhost}$cmdline | egrep 'init|local'
 if [ $? -eq 0 ];
 then
