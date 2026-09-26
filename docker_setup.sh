@@ -124,6 +124,13 @@ then
 	echo $myhost >  /root/myhostname
 	echo frstreboot > /root/hostname
 	echo InitiatorName=iqn.1994-05.com.redhat:$myhost > /etc/iscsi/initiatorname.iscsi
+	# iscsid caches the InitiatorName from /etc/iscsi/initiatorname.iscsi
+	# at startup; a fresh write alone is invisible to iscsid until we
+	# restart it. The next line (resetdocker.sh; reboot.sh) is about to
+	# reboot this container, so this restart is mostly belt-and-suspenders
+	# for the brief window before the reboot (and covers the manual-recovery
+	# path where the reboot is skipped).
+	systemctl restart iscsid 2>/dev/null || /usr/local/sbin/start-iscsid.sh
 	/TopStor/resetdocker.sh
 	/TopStor/reboot.sh
 fi
@@ -577,6 +584,11 @@ echo /TopStor/ioperf.py $etcd $myhost
 echo docker exec etcdclient /TopStor/etcdput.py $myclusterip ready/$myhost $mynodeip 
 /TopStor/etcdput.py $myclusterip ready/$myhost $mynodeip 
 echo InitiatorName=iqn.1994-05.com.redhat:$myhost > /etc/iscsi/initiatorname.iscsi
+# Reload iscsid so the freshly-written InitiatorName takes effect NOW,
+# not on the next container restart. iscsiadm talks to iscsid via its
+# AF_UNIX management socket; iscsid has the name cached in memory from
+# startup and ignores file changes until restarted.
+systemctl restart iscsid 2>/dev/null || /usr/local/sbin/start-iscsid.sh
 /pace/cdiskref.sh $leader $myclusterip $myhost $mynodeip 
 echo /pace/diskref.sh $leader $myclusterip $myhost $mynodeip 
 echo 111111111111111111111
