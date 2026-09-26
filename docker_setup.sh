@@ -574,6 +574,9 @@ echo /TopStor/ioperf.py $etcd $myhost
 echo docker exec etcdclient /TopStor/etcdput.py $myclusterip ready/$myhost $mynodeip 
 /TopStor/etcdput.py $myclusterip ready/$myhost $mynodeip 
 /pace/diskref.sh $leader $myclusterip $myhost $mynodeip 
+echo /pace/diskref.sh $leader $myclusterip $myhost $mynodeip 
+echo 111111111111111111111
+exit
 /TopStor/etcdput.py $myclusterip ActivePartners/$myhost $mynodeip 
 stamp=`date +%s%N`
 /pace/etcddel.py $myclusterip sync/ready/Add_${myhost} --prefix
@@ -598,8 +601,6 @@ else
 	/TopStor/etcdput.py $myclusterip sync/nextlead/Add_er_${myhost}/request nextlead_$stamp
 	/TopStor/etcdput.py $myclusterip sync/nextlead/Add_er_${myhost}/request/$leader nextlead_$stamp
 fi
-echo 111111111111111111111
-exit
 #/TopStor/etcddel.py $myclusterip sync/diskref --prefix
 #/TopStor/etcdput.py $myclusterip sync/diskref/add_add_add______/request diskref_$stamp
 #/pace/diskref.sh $leader $myclusterip $myhost $mynodeip >/dev/null & disown 
