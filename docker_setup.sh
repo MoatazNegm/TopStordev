@@ -573,7 +573,7 @@ rm -rf $httpdf
 echo /TopStor/ioperf.py $etcd $myhost 
 echo docker exec etcdclient /TopStor/etcdput.py $myclusterip ready/$myhost $mynodeip 
 /TopStor/etcdput.py $myclusterip ready/$myhost $mynodeip 
-/pace/diskref.sh $leader $myclusterip $myhost $mynodeip 
+/pace/cdiskref.sh $leader $myclusterip $myhost $mynodeip 
 echo /pace/diskref.sh $leader $myclusterip $myhost $mynodeip 
 echo 111111111111111111111
 exit
