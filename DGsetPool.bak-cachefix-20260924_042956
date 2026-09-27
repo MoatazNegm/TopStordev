@@ -594,10 +594,10 @@ else
    echo stop disks $diskns >>/root/tmp2
    docker exec etcdclient /TopStor/logmsg.py DGst17 info $userreq ${nextpool} $diskns
    echo stop loggging  >>/root/tmp2
-  echo /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on cachefile=/TopStordata/p${nextpool} -f p${nextpool} raidz1 ${disk1} ${cache_disks} >/root/tmp
-  echo /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on cachefile=/TopStordata/p${nextpool} -f p${nextpool} raidz1 ${disk1} ${cache_disks}
+  echo /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on cachefile=/TopStordata/p${nextpool} -f p${nextpool} raidz1 ${disk1} >/root/tmp
+  echo /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on cachefile=/TopStordata/p${nextpool} -f p${nextpool} raidz1 ${disk1}
    echo stop creating p$nextpool  >>/root/tmp2
-  /sbin/zpool create -o ashift=12 -o autoexpand=on -o cachefile=/TopStordata/p${nextpool} -o autoreplace=on -f p${nextpool} raidz1 ${disk1} ${cache_disks}
+  /sbin/zpool create -o ashift=12 -o autoexpand=on -o cachefile=/TopStordata/p${nextpool} -o autoreplace=on -f p${nextpool} raidz1 ${disk1}
   if [ $? -eq 0 ]; then
      echo itisdone >> /root/tmp2
      zfs set acltype=posixacl p$nextpool

@@ -1,6 +1,5 @@
 found cash disks!!!
-cash disk found: scsi-360014051063392980a242a2bf927078e
-/sbin/zpool create -o cachefile=/TopStordata/pdhcp3087829321 -o ashift=12 -o autoexpand=on -o autoreplace=on -f pdhcp3087829321 mirror  scsi-360014050e1d2ac6b047422a9617132f1 scsi-36001405b0255b65c20f4978a37aa36b2  cache scsi-360014051063392980a242a2bf927078e 
-/sbin/zpool create -o cachefile=/TopStordata/pdhcp3236118307 -o ashift=12 -o autoexpand=on -o autoreplace=on -f pdhcp3236118307 mirror  scsi-360014057e314cd970c4412583a49f1e0 scsi-36001405c58b0009978c4f289d0f079f5   
-/sbin/zpool create -o cachefile=/TopStordata/pdhcp987526388 -o ashift=12 -o autoexpand=on -o autoreplace=on -f pdhcp987526388 mirror  scsi-360014050b6907759f534fdaa7d68899e scsi-360014052199a13eabbf40b98846da874   
-/sbin/zpool create -o cachefile=/TopStordata/pdhcp1891332376 -o ashift=12 -o autoexpand=on -o autoreplace=on -f pdhcp1891332376 mirror  scsi-3600140503edd41193654b47825d2622e scsi-3600140501a1c2c2364342138c0a4c60c   
+cash disk found: scsi-36001405688835bf66b14b82961f1ef59
+/sbin/zpool create -o cachefile=/TopStordata/pdhcp1125020284 -o ashift=12 -o autoexpand=on -o autoreplace=on -f pdhcp1125020284 mirror  scsi-36001405bce1ccc3d65048a3af085f32e scsi-36001405fc0e9661920843f0b3d2c9aa6  cache scsi-36001405688835bf66b14b82961f1ef59 
+/sbin/zpool create -o cachefile=/TopStordata/pdhcp448030022 -o ashift=12 -o autoexpand=on -o autoreplace=on -f pdhcp448030022 mirror  scsi-36001405fc0e9661920843f0b3d2c9aa6 scsi-36001405688835bf66b14b82961f1ef59   
+/sbin/zpool create -o cachefile=/TopStordata/pdhcp125597642 -o ashift=12 -o autoexpand=on -o autoreplace=on -f pdhcp125597642 mirror  scsi-3600140579f0129cd2d14115a22ddda82 scsi-36001405688835bf66b14b82961f1ef59   

@@ -317,24 +317,7 @@ else
    nextpool='dhcp'${RANDOM}$RANDOM;
    docker exec etcdclient /TopStor/logmsg.py DG1st6 info $userreq ${nextpool} $diskn1
   /pace/diskchange.sh dgsetpool dgsetpool dgsetpool
-  cache_disks=" "
-  diskargs=${#params[@]}
-  i=6
-  while [ $i -lt $diskargs ]; do
-   arg=${params[$i]}
-   if [[ $arg == "nopool" ]]; then
-    break
-   fi
-   if [[ $arg == "cache" ]]; then
-    cache_disks="cache "
-   else
-    cdisk=`echo $arg | awk -F':' '{print $1}'`
-    cdisk=`ls /dev/disk/by-id/ | grep -v part | grep $cdisk`
-    cache_disks=${cache_disks}$cdisk" "
-   fi
-   i=$((i+1));
-  done;
-  /sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} ${disk1} ${cache_disks}
+  /sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} ${disk1}
   if [ $? -ne 0 ]; then
     docker exec etcdclient /TopStor/logmsg.py DG1fa6 error $userreq ${nextpool} $diskn1 
   else 
@@ -392,34 +375,19 @@ else
   diskargs=$((diskargs-1));
   i=3
   disk1=" "
-  cache_disks=" "
-  mode="data"
   diskns=""
   /pace/diskchange.sh dgsetpool dgsetpool dgsetpool
-  while [ $i -lt $diskargs ]; do
+  while [ $i -lt $((diskargs-3)) ]; do
    i=$((i+1));
-   arg=${params[$i]}
-   if [[ $arg == "nopool" ]]; then
-    break
-   fi
-   if [[ $arg == "cache" ]]; then
-    mode="cache"
-    cache_disks="cache "
-   else
-    disk=`echo ${params[$i]} | awk -F':' '{print $1}'`
-    diskn=`echo ${params[$i]} | awk -F':' '{print $2}'`
-    disk=`ls /dev/disk/by-id/ | grep -v part | grep $disk`
-    if [[ $mode == "data" ]]; then
-     disk1=${disk1}$disk" "
-    else
-     cache_disks=${cache_disks}$disk" "
-    fi
-    diskns=${diskns}$diskn","
-   fi
+   disk=`echo ${params[$i]} | awk -F':' '{print $1}'`
+   diskn=`echo ${params[$i]} | awk -F':' '{print $2}'`
+   disk=`ls /dev/disk/by-id/ | grep -v part | grep $disk`
+   disk1=${disk1}$disk" "
+   diskns=${diskns}$diskn","
   done;
   nextpool='dhcp'${RANDOM}$RANDOM;
    docker exec etcdclient /TopStor/logmsg.py DGst13 info $userreq p${nextpool} $diskns
-  /sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} raidz3 ${disk1} ${cache_disks}
+  /sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} raidz3 ${disk1} 
   if [ $? -eq 0 ]; then
      zfs set acltype=posixacl p$nextpool
      zfs set avail:type=Availbility p$nextpool
@@ -480,34 +448,19 @@ else
   diskargs=$((diskargs-1));
   i=3
   disk1=" "
-  cache_disks=" "
-  mode="data"
   diskns="";
   /pace/diskchange.sh dgsetpool dgsetpool dgsetpool
-  while [ $i -lt $diskargs ]; do
+  while [ $i -lt $((diskargs-3)) ]; do
    i=$((i+1));
-   arg=${params[$i]}
-   if [[ $arg == "nopool" ]]; then
-    break
-   fi
-   if [[ $arg == "cache" ]]; then
-    mode="cache"
-    cache_disks="cache "
-   else
-    disk=`echo ${params[$i]} | awk -F':' '{print $1}'`
-    diskn=`echo ${params[$i]} | awk -F':' '{print $2}'`
-    disk=`ls /dev/disk/by-id/ | grep -v part | grep $disk`
-    if [[ $mode == "data" ]]; then
-     disk1=${disk1}$disk" "
-    else
-     cache_disks=${cache_disks}$disk" "
-    fi
-    diskns=${diskns}$diskn","
-   fi
+   disk=`echo ${params[$i]} | awk -F':' '{print $1}'`
+   diskn=`echo ${params[$i]} | awk -F':' '{print $2}'`
+   disk=`ls /dev/disk/by-id/ | grep -v part | grep $disk`
+   disk1=${disk1}$disk" "
+   diskns=${diskns}$diskn","
   done;
   nextpool='dhcp'${RANDOM}$RANDOM;
    docker exec etcdclient /TopStor/logmsg.py DGst15 info $userreq p${nextpool} $diskns
-  /sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} raidz2 ${disk1} ${cache_disks}
+  /sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} raidz2 ${disk1} 
   if [ $? -eq 0 ]; then
      zfs set acltype=posixacl p$nextpool
      zfs set avail:type=Availbility p$nextpool
@@ -561,43 +514,27 @@ else
  if [[ $raid == "parity" ]]; then
   echo Iam parity>>/root/tmp2
   diskargs=${#params[@]};
-  diskargs=$((diskargs-1));
+  diskargs=$((diskargs-2));
   i=3
   disk1=" "
-  cache_disks=" "
-  mode="data"
   diskns=""
   nextpool='dhcp'${RANDOM}$RANDOM;
   /pace/diskchange.sh dgsetpool dgsetpool dgsetpool
-  while [ $i -lt $diskargs ]; do
+  while [ $i -lt $((diskargs)) ]; do
    echo inwhile, i, $diskn >>/root/tmp2
    i=$((i+1));
-   arg=${params[$i]}
-   if [[ $arg == "nopool" ]]; then
-    break
-   fi
-   if [[ $arg == "cache" ]]; then
-    mode="cache"
-    cache_disks="cache "
-   else
-    disk=`echo ${params[$i]} | awk -F':' '{print $1}'`
-    diskn=`echo ${params[$i]} | awk -F':' '{print $2}'`
-    disk=`ls /dev/disk/by-id/ | grep -v part | grep $disk`
-    if [[ $mode == "data" ]]; then
-     disk1=${disk1}$disk" "
-    else
-     cache_disks=${cache_disks}$disk" "
-    fi
-    diskns=${diskns}$diskn","
-   fi
+   disk=`echo ${params[$i]} | awk -F':' '{print $1}'`
+   diskn=`echo ${params[$i]} | awk -F':' '{print $2}'`
+   disk1=${disk1}$disk" "
+   diskns=${diskns}$diskn","
   done;
    echo stop disks $diskns >>/root/tmp2
    docker exec etcdclient /TopStor/logmsg.py DGst17 info $userreq ${nextpool} $diskns
    echo stop loggging  >>/root/tmp2
-  echo /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on cachefile=/TopStordata/p${nextpool} -f p${nextpool} raidz1 ${disk1} ${cache_disks} >/root/tmp
-  echo /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on cachefile=/TopStordata/p${nextpool} -f p${nextpool} raidz1 ${disk1} ${cache_disks}
+  echo /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on cachefile=/TopStordata/p${nextpool} -f p${nextpool} raidz1 ${disk1} >/root/tmp
+  echo /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on cachefile=/TopStordata/p${nextpool} -f p${nextpool} raidz1 ${disk1}
    echo stop creating p$nextpool  >>/root/tmp2
-  /sbin/zpool create -o ashift=12 -o autoexpand=on -o cachefile=/TopStordata/p${nextpool} -o autoreplace=on -f p${nextpool} raidz1 ${disk1} ${cache_disks}
+  /sbin/zpool create -o ashift=12 -o autoexpand=on -o cachefile=/TopStordata/p${nextpool} -o autoreplace=on -f p${nextpool} raidz1 ${disk1}
   if [ $? -eq 0 ]; then
      echo itisdone >> /root/tmp2
      zfs set acltype=posixacl p$nextpool
@@ -667,35 +604,20 @@ else
   diskargs=$((diskargs-1));
   i=3
   disk1=" "
-  cache_disks=" "
-  mode="data"
   diskns=""
   /pace/diskchange.sh dgsetpool dgsetpool dgsetpool
-  while [ $i -lt $diskargs ]; do
+  while [ $i -lt $((diskargs-3)) ]; do
    i=$((i+1));
-   arg=${params[$i]}
-   if [[ $arg == "nopool" ]]; then
-    break
-   fi
-   if [[ $arg == "cache" ]]; then
-    mode="cache"
-    cache_disks="cache "
-   else
-    disk=`echo ${params[$i]} | awk -F':' '{print $1}'`
-    diskn=`echo ${params[$i]} | awk -F':' '{print $2}'`
-    disk=`ls /dev/disk/by-id/ | grep -v part | grep $disk`
-    if [[ $mode == "data" ]]; then
-     disk1=${disk1}$disk" "
-    else
-     cache_disks=${cache_disks}$disk" "
-    fi
-    diskns=${diskns}$diskn","
-   fi
+   disk=`echo ${params[$i]} | awk -F':' '{print $1}'`
+   diskn=`echo ${params[$i]} | awk -F':' '{print $2}'`
+   disk=`ls /dev/disk/by-id/ | grep -v part | grep $disk`
+   disk1=${disk1}$disk" "
+   diskns=${diskns}$diskn","
   done;
   nextpool='dhcp'${RANDOM}$RANDOM;
    docker exec etcdclient /TopStor/logmsg.py DGst21 info $userreq p${nextpool} $diskns
-  echo /sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} ${disk1} ${cache_disks} > /root/dgsetzpool
-  /sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} ${disk1} ${cache_disks}
+  echo /sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} ${disk1} > /root/dgsetzpool
+  /sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} ${disk1}
   if [ $? -eq 0 ]; then
      echo zfs set acltype=posixacl p$nextpool
      zfs set acltype=posixacl p$nextpool
