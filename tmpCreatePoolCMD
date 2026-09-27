@@ -1,5 +1,0 @@
-found cash disks!!!
-cash disk found: scsi-36001405688835bf66b14b82961f1ef59
-/sbin/zpool create -o cachefile=/TopStordata/pdhcp1125020284 -o ashift=12 -o autoexpand=on -o autoreplace=on -f pdhcp1125020284 mirror  scsi-36001405bce1ccc3d65048a3af085f32e scsi-36001405fc0e9661920843f0b3d2c9aa6  cache scsi-36001405688835bf66b14b82961f1ef59 
-/sbin/zpool create -o cachefile=/TopStordata/pdhcp448030022 -o ashift=12 -o autoexpand=on -o autoreplace=on -f pdhcp448030022 mirror  scsi-36001405fc0e9661920843f0b3d2c9aa6 scsi-36001405688835bf66b14b82961f1ef59   
-/sbin/zpool create -o cachefile=/TopStordata/pdhcp125597642 -o ashift=12 -o autoexpand=on -o autoreplace=on -f pdhcp125597642 mirror  scsi-3600140579f0129cd2d14115a22ddda82 scsi-36001405688835bf66b14b82961f1ef59   
