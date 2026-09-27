@@ -74,10 +74,9 @@ then
     ETCDCTL_API=3 /pace/etcdput.py $leaderip activepool/$nextpool imported 
     ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/activepool/Add_${nextpool}_imported/request activepool_$stamp 
     ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/activepool/Add_${nextpool}_imported/request/$leader activepool_$stamp 
-    #ETCDCTL_API=3 /pace/broadcasttolocal.py activepool/$nextpool imported
-    #ETCDCTL_API=3 /pace/etcdput.py $myhostip fixpool/$nextpool imported
-   docker exec etcdclient /TopStor/logmsg.py DGsu22 info $userreq ${nextpool}
-   /usr/bin/python3 /TopStor/fixcachelocality.py $leaderip $nextpool $myhost >> /root/tmp2 2>&1
+    #ETCDCTL_API=3 /pace/broadcasttolocal.py activepool/$nextpool imported 
+    #ETCDCTL_API=3 /pace/etcdput.py $myhostip fixpool/$nextpool imported 
+   docker exec etcdclient /TopStor/logmsg.py DGsu22 info $userreq ${nextpool} 
   fi
  else
   /pace/etcddel.py $leaderip active $nextpool
@@ -990,53 +989,7 @@ else
   else
     docker exec etcdclient /TopStor/logmsg.py DGfa19  error $userreq p${nextpool} $diskns
   fi
- fi
- if [[ $raid == "updatecache" ]]; then
-  pool=${params[4]}
-  diskargs=${#params[@]}
-  diskargs=$((diskargs-1))
-  i=5
-  mode=""
-  old_disks=()
-  new_disks=()
-  while [ $i -lt $diskargs ]; do
-   arg=${params[$i]}
-   if [[ $arg == "nopool" ]]; then
-    break
-   fi
-   if [[ $arg == "old" ]]; then
-    mode="old"
-   elif [[ $arg == "new" ]]; then
-    mode="new"
-   else
-    disk=`echo $arg | awk -F':' '{print $1}'`
-    disk=`ls /dev/disk/by-id/ | grep -v part | grep $disk`
-    if [[ $mode == "old" ]]; then
-     old_disks+=(${disk})
-    elif [[ $mode == "new" ]]; then
-     new_disks+=(${disk})
-    fi
-   fi
-   i=$((i+1));
-  done
-  docker exec etcdclient /TopStor/logmsg.py DGst25 info $userreq ${pool} .
-  /pace/diskchange.sh dgsetpool dgsetpool dgsetpool
-  ok=1
-  for od in "${old_disks[@]}"; do
-   /sbin/zpool remove ${pool} ${od} 2>/root/dgcreateerror
-   if [ $? -ne 0 ]; then ok=0; fi
-  done
-  for nd in "${new_disks[@]}"; do
-   /sbin/zpool add -f ${pool} cache ${nd} 2>>/root/dgcreateerror
-   if [ $? -ne 0 ]; then ok=0; fi
-  done
-  if [ $ok -eq 1 ]; then
-     docker exec etcdclient /TopStor/logmsg.py DGsu25 info $userreq ${pool} .
-  else
-     cat /root/dgcreateerror
-     docker exec etcdclient /TopStor/logmsg.py DGfa25 error $userreq ${pool} .
-  fi
- fi
+ fi 
 fi
 #rm txt/${0:2}$userreq.txt
 #sed -i "/p${nextpool}/c\\" $runningpools
