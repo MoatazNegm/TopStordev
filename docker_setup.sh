@@ -641,8 +641,6 @@ else
 	BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)  # Get the current branch name
 	/TopStor/cmyrepopush.sh $BRANCH_NAME & disown
 fi
-echo 111111111111111111111
-exit
 echo I a hhhhhhhhhhhhhhhhhhhhhhhhere
 #if [ $isprimary -ne 0 ];
 #then
@@ -672,8 +670,10 @@ fi
 /TopStor/etcdput.py $myclusterip sync/ready/Add_${myhost}_$mynodeip/request/$leader ready_$stamp 
 #/pace/diskchange.sh add initial disk >/dev/null  & disown
 rm -rf /promgraf/grafana.db
-cp /TopStor/grafana.db /promgraf/
+cp -p /TopStor/grafana.db /promgraf/
 echo /TopStor/getcversion.sh $myclusterip $leader $myhost >/dev/null & disown
+echo 111111111111111111111
+exit
 /TopStor/getcversion.sh $myclusterip $leader $myhost >/dev/null & disown
 if [ $isprimary -ne 0 ];
 then
