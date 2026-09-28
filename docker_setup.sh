@@ -114,6 +114,7 @@ then
 fi
 /usr/bin/targetcli clearconfig confirm=True	
 targetcli saveconfig
+/TopStor/cleanlioluns.sh
 mkdir -p /dev/disk/by-id/
 echo ${myhost}$cmdline | egrep 'init|local'
 if [ $? -eq 0 ];
@@ -168,6 +169,7 @@ then
 			systemctl start target
 			targetcli clearconfig confirm=True	
 			targetcli saveconfig 
+			/TopStor/cleanlioluns.sh
 			/TopStor/resetdocker.sh	
 			nmcli conn up clusterstub 
 			nmcli conn delete mynode 
@@ -215,6 +217,8 @@ data2dev=$dbond
 setenforce 0
 aliast='alias'
 targetcli clearconfig confirm=true
+targetcli saveconfig
+/TopStor/cleanlioluns.sh
 #nmcli conn delete clusterstub 
 #nmcli conn delete mynode 
 #nmcli conn delete mycluster 
@@ -589,9 +593,13 @@ echo InitiatorName=iqn.1994-05.com.redhat:$myhost > /etc/iscsi/initiatorname.isc
 # not on the next container restart. iscsiadm talks to iscsid via its
 # AF_UNIX management socket; iscsid has the name cached in memory from
 # startup and ignores file changes until restarted.
-systemctl restart iscsid 2>/dev/null || /usr/local/sbin/start-iscsid.sh
+#systemctl restart iscsid 2>/dev/null || /usr/local/sbin/start-iscsid.sh
+echo 'lllllllllllllllllllllllllllllllllllllllllllllllllll'
+lsscsi -is
+ip a | grep bond
+echo 'lllllllllllllllllllllllllllllllllllllllllllllllllll'
 /pace/cdiskref.sh $leader $myclusterip $myhost $mynodeip 
-echo /pace/diskref.sh $leader $myclusterip $myhost $mynodeip 
+echo /pace/cdiskref.sh $leader $myclusterip $myhost $mynodeip 
 echo 111111111111111111111
 exit
 /TopStor/etcdput.py $myclusterip ActivePartners/$myhost $mynodeip 
