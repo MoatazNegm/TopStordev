@@ -400,7 +400,7 @@ rm -rf /root/newcaddr
 hostname $hostname
 echo $hostname > /etc/hostname
 resolve_local_host "$hostname"
-docker run --rm -d --name software --hostname software --network intdns-net --ip 10.11.12.10 --restart unless-stopped -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf:ro -v /root/gitrepo/git:/srv/git -v /TopStor/abdopuppet-entrypoint.sh:/usr/local/bin/entrypoint.sh:ro topstor/abdopuppet:latest
+docker run --rm -d --name software --hostname software --network intdns-net --ip 10.11.12.10 -p $mynodeip:9418:9418 -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf:ro -v /root/gitrepo/git:/srv/git -v /TopStor/abdopuppet-entrypoint.sh:/usr/local/bin/entrypoint.sh:ro topstor/abdopuppet:latest
 echo starting intdns
 docker run --rm --name intdns --hostname intdns --net intdns-net -e DNS_DOMAIN=qs.dom -e DNS_IP=10.11.12.7 -e LOG_QUERIES=true -itd --ip 10.11.12.7 -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/dnshosts:/etc/hosts moataznegm/quickstor:dns
 
