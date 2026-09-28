@@ -379,13 +379,14 @@ else
 fi
 echo adding cmynode
 nmcli conn up cmynode
-ping -w 10 $mynodeip
-if [ $? -ne 0 ];
-then
-	echo sever problem: nodeip is not in cmynode profile
-	exit
+# Wait for node to be up
+ping -w 3 $mynodeip
+while [ $? -ne 0 ];
+do
+	sleep 1
+	ping -w 3 $mynodeip
+done 
 
-fi
 if [[ $isconf == 'yes' ]];
 then
 	echo strting target
@@ -440,7 +441,7 @@ docker run -itd --rm --privileged \
 docker exec intsmb sh /hostetc/VolumeCIFSupdate.sh
 #docker run -d --rm --name rmq --hostname rmq  -v /root/gitrepo/resolv.conf:/etc/resolv.conf --net intdns-net -p $etcd:5672:5672 -v /TopStor/:/TopStor -v /pace/:/pace moataznegm/quickstor:rabbitmq 
 echo starting rabbitmq 
-systemctl restart rabbitmq-server &
+systemctl start rabbitmq-server &
 systemctl is-active rabbitmq-server
 while [ $? -ne 0 ];
 do
