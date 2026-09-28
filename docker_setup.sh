@@ -659,10 +659,10 @@ echo I a hhhhhhhhhhhhhhhhhhhhhhhhere
 #fi
 /TopStor/etcdput.py $etcd refreshdisown/$myhost yes 
 /TopStor/refreshdisown.sh > /dev/null & disown 
-#/pace/diskref.sh $leader $leaderip $myhost $myhostip & disown
-/pace/rebootmeplslooper.sh $myclusterip $myhost >/dev/null & disown 
 echo 111111111111111111111
 exit
+#/pace/diskref.sh $leader $leaderip $myhost $myhostip & disown
+/pace/rebootmeplslooper.sh $myclusterip $myhost >/dev/null & disown 
 #/TopStor/receivereplylooper.sh & disown
 #/TopStor/iscsiwatchdoglooper.sh $mynodeip $myhost & disown 
 /pace/heartbeatlooper.sh >/dev/null & disown 
