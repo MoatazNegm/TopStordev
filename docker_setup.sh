@@ -463,6 +463,7 @@ do
 		sleep 1
 	fi
 done
+/TopStor/rabbitnodefix.sh
 echo starting > /root/dockerlogs.txt
 checkcluster='0'
 echo hihi$checkcluster | grep $myclusterip
