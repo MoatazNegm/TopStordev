@@ -433,7 +433,7 @@ docker run -itd --rm --privileged \
 docker exec intsmb sh /hostetc/VolumeCIFSupdate.sh
 #docker run -d --rm --name rmq --hostname rmq  -v /root/gitrepo/resolv.conf:/etc/resolv.conf --net intdns-net -p $etcd:5672:5672 -v /TopStor/:/TopStor -v /pace/:/pace moataznegm/quickstor:rabbitmq 
 echo starting rabbitmq 
-systemctl start rabbitmq-server &
+systemctl restart rabbitmq-server &
 systemctl is-active rabbitmq-server
 while [ $? -ne 0 ];
 do
@@ -627,6 +627,7 @@ fi
 #/TopStor/etcddel.py $myclusterip sync/diskref --prefix
 #/TopStor/etcdput.py $myclusterip sync/diskref/add_add_add______/request diskref_$stamp
 #/pace/diskref.sh $leader $myclusterip $myhost $mynodeip >/dev/null & disown 
+cd /TopStor/
 if [ $isprimary -ne 1 ];
 then
 	leaderversion=`/TopStor/etcdget.py $myclusterip cversion/$leader | awk -F'-' '{print $1}'`
