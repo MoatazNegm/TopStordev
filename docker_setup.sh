@@ -379,6 +379,13 @@ else
 fi
 echo adding cmynode
 nmcli conn up cmynode
+ping -w 10 $mynodeip
+if [ $? -ne 0 ];
+then
+	echo sever problem: nodeip is not in cmynode profile
+	exit
+
+fi
 if [[ $isconf == 'yes' ]];
 then
 	echo strting target
@@ -638,6 +645,7 @@ then
 		/TopStor/cmyrepopull.sh $leaderversion	
 	fi 
 else
+	cd /TopStor/
 	BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)  # Get the current branch name
 	/TopStor/cmyrepopush.sh $BRANCH_NAME & disown
 fi
