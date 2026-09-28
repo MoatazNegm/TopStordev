@@ -393,7 +393,7 @@ rm -rf /root/newcaddr
 hostname $hostname
 echo $hostname > /etc/hostname
 resolve_local_host "$hostname"
-docker run -d --name software --hostname software --network intdns-net --ip 10.11.12.10 --restart unless-stopped -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf:ro -v /root/gitrepo/git:/srv/git -v /TopStor/abdopuppet-entrypoint.sh:/usr/local/bin/entrypoint.sh:ro topstor/abdopuppet:latest
+docker run --rm -d --name software --hostname software --network intdns-net --ip 10.11.12.10 --restart unless-stopped -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf:ro -v /root/gitrepo/git:/srv/git -v /TopStor/abdopuppet-entrypoint.sh:/usr/local/bin/entrypoint.sh:ro topstor/abdopuppet:latest
 echo starting intdns
 docker run --rm --name intdns --hostname intdns --net intdns-net -e DNS_DOMAIN=qs.dom -e DNS_IP=10.11.12.7 -e LOG_QUERIES=true -itd --ip 10.11.12.7 -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/dnshosts:/etc/hosts moataznegm/quickstor:dns
 
@@ -600,8 +600,6 @@ ip a | grep bond
 echo 'lllllllllllllllllllllllllllllllllllllllllllllllllll'
 /pace/cdiskref.sh $leader $myclusterip $myhost $mynodeip 
 echo /pace/cdiskref.sh $leader $myclusterip $myhost $mynodeip 
-echo 111111111111111111111
-exit
 /TopStor/etcdput.py $myclusterip ActivePartners/$myhost $mynodeip 
 stamp=`date +%s%N`
 /pace/etcddel.py $myclusterip sync/ready/Add_${myhost} --prefix
@@ -636,12 +634,14 @@ then
 	echo c$leaderversion | grep c$myversion 
 	if [ $? -ne 0 ];
 	then
-		/TopStor/myrepopull.sh $leaderversion	
+		/TopStor/cmyrepopull.sh $leaderversion	
 	fi 
 else
 	BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)  # Get the current branch name
-	/TopStor/myrepopush.sh $BRANCH_NAME & disown
+	/TopStor/cmyrepopush.sh $BRANCH_NAME & disown
 fi
+echo 111111111111111111111
+exit
 echo I a hhhhhhhhhhhhhhhhhhhhhhhhere
 #if [ $isprimary -ne 0 ];
 #then
