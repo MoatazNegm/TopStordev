@@ -661,6 +661,8 @@ echo I a hhhhhhhhhhhhhhhhhhhhhhhhere
 /TopStor/refreshdisown.sh > /dev/null & disown 
 #/pace/diskref.sh $leader $leaderip $myhost $myhostip & disown
 /pace/rebootmeplslooper.sh $myclusterip $myhost >/dev/null & disown 
+echo 111111111111111111111
+exit
 #/TopStor/receivereplylooper.sh & disown
 #/TopStor/iscsiwatchdoglooper.sh $mynodeip $myhost & disown 
 /pace/heartbeatlooper.sh >/dev/null & disown 
@@ -679,10 +681,9 @@ fi
 /TopStor/etcdput.py $myclusterip sync/ready/Add_${myhost}_$mynodeip/request/$leader ready_$stamp 
 #/pace/diskchange.sh add initial disk >/dev/null  & disown
 rm -rf /promgraf/grafana.db
+mkdir /promgraf
 cp -p /TopStor/grafana.db /promgraf/
 echo /TopStor/getcversion.sh $myclusterip $leader $myhost >/dev/null & disown
-echo 111111111111111111111
-exit
 /TopStor/getcversion.sh $myclusterip $leader $myhost >/dev/null & disown
 if [ $isprimary -ne 0 ];
 then
