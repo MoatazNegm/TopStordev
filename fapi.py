@@ -32,6 +32,21 @@ import zipfile
 from time import sleep
 import socket
 import json
+import threading
+
+_cmdctx = threading.local()
+_orig_popen_init = subprocess.Popen.__init__
+
+def _cmdaudit_popen_init(self, args, *a, **kw):
+ try:
+  cmds = getattr(_cmdctx, 'commands', None)
+  if cmds is not None:
+   cmds.append(args if isinstance(args, str) else ' '.join(str(x) for x in args))
+ except:
+  pass
+ return _orig_popen_init(self, args, *a, **kw)
+
+subprocess.Popen.__init__ = _cmdaudit_popen_init
 
 getalltimestamp = 0
 os.environ['ETCDCTL_API'] = '3'
@@ -148,8 +163,77 @@ def login_required(f):
     return f({'response':'baduser'})
  return decorated_function
 
+COMMAND_LOG_PATH = '/TopStordata/cmdaudit.log'
+
+def record_command(data, endpoint, method, commands=None):
+ try:
+  user = data.get('user')
+  if not user:
+   return
+  excluded = ('response', 'user', 'token')
+  params = dict()
+  for k in data:
+   if k in excluded:
+    continue
+   if 'pass' in k.lower():
+    continue
+   params[k] = data[k]
+  entry = {
+   'date': datetime.now().strftime('%m/%d/%Y'),
+   'time': datetime.now().strftime('%H:%M:%S'),
+   'ts': timestamp(),
+   'user': user,
+   'host': hostname(),
+   'endpoint': endpoint,
+   'method': method,
+   'params': params,
+   'commands': commands or [],
+  }
+  with open(COMMAND_LOG_PATH, 'a') as fh:
+   fh.write(json.dumps(entry)+'\n')
+ except:
+  pass
+
+def get_command_log(user=None, limit=200):
+ if not os.path.exists(COMMAND_LOG_PATH):
+  return []
+ with open(COMMAND_LOG_PATH) as fh:
+  rows = fh.readlines()[-5000:]
+ entries = []
+ for row in reversed(rows):
+  row = row.strip()
+  if not row:
+   continue
+  try:
+   entry = json.loads(row)
+  except:
+   continue
+  if user and entry.get('user') != user:
+   continue
+  entries.append(entry)
+  if len(entries) >= limit:
+   break
+ return entries
+
+def audit_command(f):
+ @wraps(f)
+ def decorated_function(data, *args, **kwargs):
+  _cmdctx.commands = []
+  try:
+   result = f(data, *args, **kwargs)
+  finally:
+   cmds = getattr(_cmdctx, 'commands', [])
+   _cmdctx.commands = None
+   try:
+    record_command(data, request.path, request.method, cmds)
+   except:
+    pass
+  return result
+ return decorated_function
+
 @app.route('/api/v1/users/uploadUsers', methods=['GET','POST'])
 @login_required
+@audit_command
 def uploadUsers(data):
     global allgroups, leaderip, myhost
     if 'baduser' in data['response']:
@@ -249,6 +333,7 @@ def getpools():
 
 @app.route('/api/v1/volumes/connections', methods=['GET','POST'])
 @login_required
+@audit_command
 def getconns(data):
  global leaderip
  if 'baduser' in data['response']:
@@ -272,6 +357,7 @@ def getconns(data):
 
 @app.route('/api/v1/software/setversion', methods=['GET','POST'])
 @login_required
+@audit_command
 def setversion(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
@@ -283,6 +369,7 @@ def setversion(data):
 
 @app.route('/api/v1/software/versions', methods=['GET','POST'])
 @login_required
+@audit_command
 def versions(data):
  if 'baduser' in data['response']:
       return {'response': 'baduser'}
@@ -292,6 +379,7 @@ def versions(data):
 
 @app.route('/api/v1/software/apply', methods=['GET','POST'])
 @login_required
+@audit_command
 def swapply(data):
  if 'baduser' in data['response']:
       return {'response': 'baduser'}
@@ -310,6 +398,7 @@ def hostsinfo():
 
 @app.route('/api/v1/hosts/allinfo', methods=['GET','POST'])
 @login_required
+@audit_command
 def hostsallinfo(data):
  global allhosts, readyhosts, activehosts, losthosts, possiblehosts
  if 'baduser' in data['response']:
@@ -349,6 +438,7 @@ def hostsactive():
 
 @app.route('/api/v1/hosts/discover', methods=['GET','POST'])
 @login_required
+@audit_command
 def discover(data):
     if 'baduser' in data['response']:
       return {'response': 'baduser'}
@@ -384,6 +474,7 @@ def hostslost():
 
 @app.route('/api/v1/pools/dgsinfo', methods=['GET','POST'])
 @login_required
+@audit_command
 def dgsinfo(data):
  global allinfo 
  if 'baduser' in data['response']:
@@ -395,6 +486,7 @@ def dgsinfo(data):
 
 @app.route('/api/v1/pools/delpool', methods=['GET','POST'])
 @login_required
+@audit_command
 def dgsdelpool(data):
  global allinfo, myhost
  if 'baduser' in data['response']:
@@ -412,6 +504,7 @@ def dgsdelpool(data):
 
 @app.route('/api/v1/pools/addtopool', methods=['GET','POST'])
 @login_required
+@audit_command
 def dgsaddtopool(data):
  global allinfo, myhost, leaderip
  if 'baduser' in data['response']:
@@ -486,6 +579,7 @@ def dgsaddtopool(data):
  
 @app.route('/api/v1/pools/cachespares', methods=['GET', 'POST'])
 @login_required
+@audit_command
 def dgscachespares(data):
     global allinfo, myhost, leaderip
 
@@ -521,6 +615,7 @@ def dgscachespares(data):
 
 @app.route('/api/v1/pools/delcachespares', methods=['GET', 'POST'])
 @login_required
+@audit_command
 def dgsdelcachespares(data):
     global allinfo, myhost, leaderip
 
@@ -552,6 +647,7 @@ def dgsdelcachespares(data):
 
 @app.route('/api/v1/pools/newpool', methods=['GET','POST'])
 @login_required
+@audit_command
 def dgsnewpool(data):
     global allinfo, myhost, leaderip
 
@@ -690,6 +786,7 @@ def dgsnewpool(data):
 
 @app.route('/api/v1/pools/updatecache', methods=['GET','POST'])
 @login_required
+@audit_command
 def dgsupdatecache(data):
     global allinfo, myhost, leaderip
 
@@ -739,6 +836,7 @@ def dgsupdatecache(data):
 
 @app.route('/api/v1/volumes/stats', methods=['GET','POST'])
 @login_required
+@audit_command
 def volumestats(data):
  global allinfo 
  if 'baduser' in data['response']:
@@ -749,6 +847,7 @@ def volumestats(data):
 
 @app.route('/api/v1/volumes/volumelist', methods=['GET','POST'])
 @login_required
+@audit_command
 def volumeslist(data):
  global allinfo 
  if 'baduser' in data['response']:
@@ -763,6 +862,7 @@ def volumeslist(data):
 
 @app.route('/api/v1/tenants/tenantinfo', methods=['GET','POST'])
 @login_required
+@audit_command
 def tenantsinfo(data):
  if 'baduser' in data['response']:
       return {'response': 'baduser'}
@@ -774,6 +874,7 @@ def tenantsinfo(data):
 
 @app.route('/api/v1/volumes/poolsinfo', methods=['GET','POST'])
 @login_required
+@audit_command
 def volpoolsinfo(data):
  global allpools
  if 'baduser' in data['response']:
@@ -790,6 +891,7 @@ def dskperfs():
 
 @app.route('/api/v1/volumes/snapshots/snapshotsinfo', methods=['GET','POST'])
 @login_required
+@audit_command
 def volumessnapshotsinfo(data):
  global allvolumes, alldsks, allinfo
  if 'baduser' in data['response']:
@@ -846,6 +948,7 @@ def volumesinfo(prot='all'):
 
 @app.route('/api/v1/volumes/CIFS/volumesinfo', methods=['GET','POST'])
 @login_required
+@audit_command
 def volumescifsinfo(data):
  if 'baduser' in data['response']:
       return {'response': 'baduser'}
@@ -854,6 +957,7 @@ def volumescifsinfo(data):
 
 @app.route('/api/v1/volumes/ISCSI/volumesinfo', methods=['GET','POST'])
 @login_required
+@audit_command
 def volumesiscsiinfo(data):
  if 'baduser' in data['response']:
       return {'response': 'baduser'}
@@ -862,6 +966,7 @@ def volumesiscsiinfo(data):
 
 @app.route('/api/v1/volumes/NFS/volumesinfo', methods=['GET','POST'])
 @login_required
+@audit_command
 def volumesnfsinfo(data):
  if 'baduser' in data['response']:
       return {'response': 'baduser'}
@@ -870,6 +975,7 @@ def volumesnfsinfo(data):
 
 @app.route('/api/v1/volumes/HOME/volumesinfo', methods=['GET','POST'])
 @login_required
+@audit_command
 def volumeshomeinfo(data):
  if 'baduser' in data['response']:
       return {'response': 'baduser'}
@@ -878,6 +984,7 @@ def volumeshomeinfo(data):
 
 @app.route('/api/v1/volumes/volumesinfo', methods=['GET','POST'])
 @login_required
+@audit_command
 def volumesallinfo(data):
  if 'baduser' in data['response']:
       return {'response': 'baduser'}
@@ -888,6 +995,7 @@ def volumesallinfo(data):
 
 @app.route('/api/v1/pools/poolsinfo', methods=['GET','POST'])
 @login_required
+@audit_command
 def poolsinfo(data):
  global allpools
  if 'baduser' in data['response']:
@@ -898,6 +1006,7 @@ def poolsinfo(data):
 
 @app.route('/api/v1/groups/groupchange', methods=['GET','POST'])
 @login_required
+@audit_command
 def pgroupchange(data):
  global leaderip
  if 'baduser' in data['response']:
@@ -918,6 +1027,7 @@ def pgroupchange(data):
 
 @app.route('/api/v1/replication/addpartner', methods=['GET','POST'])
 @login_required
+@audit_command
 def partneradd(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
@@ -927,6 +1037,7 @@ def partneradd(data):
 
 @app.route('/api/v1/users/userchange', methods=['GET','POST'])
 @login_required
+@audit_command
 def userchange(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
@@ -958,6 +1069,7 @@ def userchange(data):
  
 @app.route('/api/v1/info/onedaylog', methods=['GET','POST'])
 @login_required
+@audit_command
 def getonedaylog(data):
  if 'baduser' in data['response']:
       return {'response': 'baduser'}
@@ -965,15 +1077,26 @@ def getonedaylog(data):
  return result 
 @app.route('/api/v1/info/logs', methods=['GET','POST'])
 @login_required
+@audit_command
 def getalllogs(data):
  if 'baduser' in data['response']:
       return {'response': 'baduser'}
  notif = getlogs()
  return jsonify({'alllogs': notif})
 
+@app.route('/api/v1/info/commandlog', methods=['GET','POST'])
+@login_required
+@audit_command
+def getcommandlog(data):
+ if 'baduser' in data['response']:
+      return {'response': 'baduser'}
+ commands = get_command_log(data['user'])
+ return jsonify({'response': 'Ok', 'commands': commands})
+
 
 @app.route('/api/v1/login/renewtoken', methods=['GET','POST'])
 @login_required
+@audit_command
 def renewtoken(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
@@ -984,6 +1107,7 @@ def renewtoken(data):
 
 @app.route('/api/v1/info/cversion', methods=['GET','POST'])
 @login_required
+@audit_command
 def getcversion(data):
     global leaderip, leader, myhost
     if 'baduser' in data['response']:
@@ -998,6 +1122,7 @@ def getcversion(data):
 
 @app.route('/api/v1/info/notification', methods=['GET','POST'])
 @login_required
+@audit_command
 def getnotification(data):
  global leaderip, myhost
  if 'baduser' in data['response']:
@@ -1044,6 +1169,7 @@ def getnotification(data):
 
 @app.route('/api/v1/volumes/snapshots/create', methods=['GET','POST'])
 @login_required
+@audit_command
 def volumesnapshotscreate(data):
  global allinfo, myhost
  if 'baduser' in data['response']:
@@ -1080,6 +1206,7 @@ def volumesnapshotscreate(data):
 
 @app.route('/api/v1/volumes/create', methods=['GET','POST'])
 @login_required
+@audit_command
 def volumecreate(data):
  global allinfo, myhost
  if 'baduser' in data['response']:
@@ -1206,6 +1333,7 @@ def login():
  return jsonify({'token':token})
 @app.route('/api/v1/users/usersauth', methods=['GET','POST'])
 @login_required
+@audit_command
 def usersauth(data):
  global allinfo
  if 'baduser' in data['response']:
@@ -1216,6 +1344,7 @@ def usersauth(data):
 
 @app.route('/api/v1/volumes/config', methods=['GET','POST'])
 @login_required
+@audit_command
 def volumeconfig(data):
  global allinfo, myhost
  if 'baduser' in data['response']:
@@ -1280,6 +1409,7 @@ def volumeconfig(data):
 
 @app.route('/api/v1/user/changepass', methods=['GET','POST'])
 @login_required
+@audit_command
 def changepass(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
@@ -1294,6 +1424,7 @@ def changepass(data):
 
 @app.route('/api/v1/hosts/config', methods=['GET','POST'])
 @login_required
+@audit_command
 def hostconfig(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
@@ -1347,6 +1478,7 @@ def hostconfig(data):
 
 @app.route('/api/v1/hosts/joincluster', methods=['GET','POST'])
 @login_required
+@audit_command
 def hostjoincluster(data):
  global leaderip, myhost
  if 'baduser' in data['response']:
@@ -1363,6 +1495,7 @@ def hostjoincluster(data):
 
 @app.route('/api/v1/hosts/evacuate', methods=['GET','POST'])
 @login_required
+@audit_command
 def hostevacuate(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
@@ -1375,6 +1508,7 @@ def hostevacuate(data):
 
 @app.route('/api/v1/volumes/snapshots/snaprollback', methods=['GET','POST'])
 @login_required
+@audit_command
 def volumesnapshotrol(data):
  global allinfo, myhost
  if 'baduser' in data['response']:
@@ -1398,6 +1532,7 @@ def volumesnapshotrol(data):
 
 @app.route('/api/v1/volumes/snapshots/perioddelete', methods=['GET','POST'])
 @login_required
+@audit_command
 def volumesnapshotperioddel(data):
  global allinfo, myhost
  if 'baduser' in data['response']:
@@ -1415,6 +1550,7 @@ def volumesnapshotperioddel(data):
 
 @app.route('/api/v1/volumes/snapshots/snapshotdel', methods=['GET','POST'])
 @login_required
+@audit_command
 def volumesnapshotdel(data):
  global allinfo, myhost 
  if 'baduser' in data['response']:
@@ -1437,6 +1573,7 @@ def volumesnapshotdel(data):
 
 @app.route('/api/v1/volumes/volumeactive', methods=['GET','POST'])
 @login_required
+@audit_command
 def volumeactive(data):
  global allinfo, myhost
  if 'baduser' in data['response']:
@@ -1459,6 +1596,7 @@ def volumeactive(data):
 
 @app.route('/api/v1/volumes/volumedel', methods=['GET','POST'])
 @login_required
+@audit_command
 def volumedel(data):
  global allinfo, myhost
  if 'baduser' in data['response']:
@@ -1480,6 +1618,7 @@ def volumedel(data):
 
 @app.route('/api/v1/groups/groupdel', methods=['GET','POST'])
 @login_required
+@audit_command
 def groupdel(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
@@ -1489,6 +1628,7 @@ def groupdel(data):
 
 @app.route('/api/v1/partners/partnerdel', methods=['GET','POST'])
 @login_required
+@audit_command
 def partnerdel(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
@@ -1500,6 +1640,7 @@ def partnerdel(data):
 
 @app.route('/api/v1/users/userdel', methods=['GET','POST'])
 @login_required
+@audit_command
 def userdel(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
@@ -1512,6 +1653,7 @@ def userdel(data):
 
 @app.route('/api/v1/groups/UnixAddgroup', methods=['GET','POST'])
 @login_required
+@audit_command
 def UnixAddGroup(data):
  global allusers, allgroups
  if 'baduser' in data['response']:
@@ -1536,6 +1678,7 @@ def UnixAddGroup(data):
 
 @app.route('/api/v1/partners/AddPartner', methods=['GET','POST'])
 @login_required
+@audit_command
 def AddPartner(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'} 
@@ -1561,6 +1704,7 @@ def AddPartner(data):
 
 @app.route('/api/v1/tenant/adduser', methods=['GET','POST'])
 @login_required
+@audit_command
 def TenantAddUser(data):
  global allgroups, leaderip
  if 'baduser' in data['response']:
@@ -1594,6 +1738,7 @@ def TenantDelUser(data):
 
 @app.route('/api/v1/users/UnixAddUser', methods=['GET','POST'])
 @login_required
+@audit_command
 def UnixAddUser(data):
  global allgroups, leaderip
  if 'baduser' in data['response']:
@@ -1638,6 +1783,7 @@ def UnixAddUser(data):
 
 @app.route('/api/v1/volumes/grouplist', methods=['GET'])
 @login_required
+@audit_command
 def api_volumes_groupslist(data):
  global allgroups, allusers
  if 'baduser' in data['response']:
@@ -1659,6 +1805,7 @@ def api_volumes_groupslist(data):
 
 @app.route('/api/v1/groups/grouplist', methods=['GET'])
 @login_required
+@audit_command
 def api_groups_groupslist(data):
  global allgroups, allusers
  if 'baduser' in data['response']:
@@ -1684,6 +1831,7 @@ def api_groups_groupslist(data):
 
 @app.route('/api/v1/users/userauths', methods=['GET'])
 @login_required
+@audit_command
 def userauths(data):
  global allgroups, allusers, leaderip
  if 'baduser' in data['response']:
@@ -1700,6 +1848,7 @@ def userauths(data):
 
 @app.route('/api/v1/partners/partnerlist', methods=['GET'])
 @login_required
+@audit_command
 def api_partners_userslist(data):
  global leaderip
  if 'baduser' in data['response']:
@@ -1714,6 +1863,7 @@ def api_partners_userslist(data):
 
 @app.route('/api/v1/users/userlist', methods=['GET'])
 @login_required
+@audit_command
 def api_users_userslist(data):
  global allgroups, allusers, leaderip
  if 'baduser' in data['response']:
@@ -1777,6 +1927,7 @@ def api_users_userslist(data):
 
 @app.route('/api/v1/groups/userlist', methods=['GET'])
 @login_required
+@audit_command
 def api_groups_userlist(data):
  global allusers
  if 'baduser' in data['response']:
@@ -1790,6 +1941,7 @@ def api_groups_userlist(data):
 
 @app.route('/api/v1/users/grouplist', methods=['GET'])
 @login_required
+@audit_command
 def api_users_grouplist(data):
  global allgroups
  if 'baduser' in data['response']:
@@ -1808,6 +1960,7 @@ def api_users_grouplist(data):
 
 @app.route('/api/v1/pools/actionOnDisk', methods=['GET','POST'])
 @login_required
+@audit_command
 def offlineOrOnlineDisk(data):
     global allinfo, myhost, leaderip
     if 'baduser' in data['response']:
@@ -1829,6 +1982,7 @@ def offlineOrOnlineDisk(data):
 
 @app.route('/api/v1/hosts/getConfig', methods=['GET','POST'])
 @login_required
+@audit_command
 def getNodeConfigFile(data):
     global leaderip, myhost
     if 'baduser' in data['response']:
@@ -1841,6 +1995,7 @@ def getNodeConfigFile(data):
 
 @app.route('/api/v1/hosts/getAllConfig', methods=['GET','POST'])
 @login_required
+@audit_command
 def getAllConfigFiles(data):
     global leaderip, readyhosts
     if 'baduser' in data['response']:
@@ -1862,6 +2017,7 @@ def getAllConfigFiles(data):
 
 @app.route('/api/v1/software/update', methods=['GET','POST'])
 @login_required
+@audit_command
 def updateSoftware(data):
     if data.get('response') == 'baduser':
         return {'response': 'baduser'}
@@ -1894,6 +2050,7 @@ def updateSoftware(data):
 
 @app.route('/api/v1/software/localFileUpdate', methods=['GET','POST'])
 @login_required
+@audit_command
 def localFileUpdate(data):
     if 'baduser' in data['response']:
       return {'response': 'baduser'}
