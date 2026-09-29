@@ -4,7 +4,7 @@ fnupdate () {
 	git fetch origin $1
 	if [ $? -ne 0 ];
 	then
-		echo something went wrong while updating $1 .... consult the devleloper
+		echo something went wrong while updating $1 .... consult the devlelope
 		exit
 	fi
 	git branch -D tempb
@@ -70,7 +70,7 @@ then
 	/TopStor/etcdput.py $leaderip sync/cversion/_${branch}__/request cversion_$stamp
 	/TopStor/etcdput.py $leaderip sync/cversion/_${branch}__/request/$myhost cversion_$stamp
 	/TopStor/getcversion.sh $leaderip $leader $myhost
-	cd /TopStor
+	cd /TopSto
 	commit=`git show --abbrev-commit | grep commit | head -1 | awk '{print $2}'`
 	echo /TopStor/etcdput.py $leaderip cversion/$myhost $branch-$commit
 	/TopStor/etcdput.py $leaderip cversion/$myhost $branch-$commit
@@ -86,12 +86,13 @@ fi
 docker ps >/dev/null
 if [ $? -eq 0 ];
 then
-	/TopStor/pre_apply.sh	
+	/TopStor/pre_apply.sh
+	/TopStor/post_apply.sh
 fi
 cd /topstorweb
 git show | grep commit
 cd /pace
 git show | grep commit
-cd /TopStor
+cd /TopSto
 git show | grep commit
 echo finished
