@@ -948,6 +948,7 @@ else
     if [[ $arg == "cache" ]]; then
         mode="cache"
         cache_disks="cache "
+	echo "found cash disks!!!" > /TopStor/tmpCreatePoolCMD
     else
         disk=`echo ${params[$i]} | awk -F':' '{print $1}'`
         diskn=`echo ${params[$i]} | awk -F':' '{print $2}'`
@@ -956,6 +957,7 @@ else
             data_disks=${data_disks}$disk" "
         else
             cache_disks=${cache_disks}$disk" "
+	    echo "cash disk found: "$disk >> /TopStor/tmpCreatePoolCMD
         fi
         diskns=${diskns}$diskn","
     fi
@@ -964,6 +966,7 @@ else
   docker exec etcdclient /TopStor/logmsg.py DGst19 info $userreq p${nextpool} $diskns
   #/sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} mirror ${disk1} 2>/root/dgcreateerror
   /sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} mirror ${data_disks} ${cache_disks} 2>/root/dgcreateerror
+  echo "/sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} mirror ${data_disks} ${cache_disks}" >> /TopStor/tmpCreatePoolCMD
 
   if [ $? -eq 0 ]; then
      zfs set acltype=posixacl p$nextpool
