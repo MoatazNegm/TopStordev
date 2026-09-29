@@ -799,47 +799,17 @@ def dgsupdatecache(data):
     if not pool or pool not in allinfo['pools']:
         return jsonify({'response': 'error', 'message': 'Pool not found'}), 400
 
-    CACHE_SIZE_THRESHOLD_GB = 10
+    new_cache = data.get('cache')
+    if not isinstance(new_cache, list):
+        new_cache = [new_cache] if new_cache else []
+    if not new_cache:
+        return jsonify({'response': 'error', 'message': 'No cache disk selected'}), 400
 
     pool_data = allinfo['pools'][pool]
     old_cache_disks = []
     for raidId in pool_data.get('raids', []):
         if raidId.split('_')[0] == 'cache':
             old_cache_disks.extend(allinfo['raids'].get(raidId, {}).get('disks', []))
-
-    data['owner'] = pool_data['host']
-
-    new_cache = data.get('cache')
-    if not isinstance(new_cache, list):
-        new_cache = [new_cache] if new_cache else []
-
-    if not new_cache:
-        # Smart auto-selection: the smallest free disk under the threshold
-        # that is local to this pool's owner node (so the cache stays fast
-        # and, per the locality rule, never crosses to another host) and
-        # isn't already this pool's current cache disk.
-        free_disk_ids = allinfo['raids'].get('free', {}).get('disks', [])
-        candidates = []
-        for did in free_disk_ids:
-            disk_info = allinfo['disks'].get(did, {})
-            if disk_info.get('host') != data['owner']:
-                continue
-            if did in old_cache_disks:
-                continue
-            try:
-                if float(disk_info.get('size', 0)) >= CACHE_SIZE_THRESHOLD_GB:
-                    continue
-            except (TypeError, ValueError):
-                continue
-            candidates.append(did)
-        if candidates:
-            new_cache = [min(candidates, key=lambda d: float(allinfo['disks'][d].get('size', 0)))]
-
-    if not new_cache:
-        return jsonify({
-            'response': 'error',
-            'message': f'No free disk under {CACHE_SIZE_THRESHOLD_GB}GB is available locally on {data["owner"]} to use as cache'
-        }), 400
 
     new_cache = [d for d in new_cache if d not in old_cache_disks]
     if not new_cache:
@@ -848,6 +818,7 @@ def dgsupdatecache(data):
             'message': 'Selected disk is already this pool\'s cache'
         }), 400
 
+    data['owner'] = pool_data['host']
     ownerip = allinfo['hosts'][data['owner']]['ipaddress']
 
     oldstring = ''

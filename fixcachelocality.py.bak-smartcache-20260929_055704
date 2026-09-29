@@ -3,16 +3,13 @@
 # just got imported here has a cache (L2ARC) vdev that lives on a different
 # host than the one now owning the pool, that disk is no longer local -
 # reachable only over the network - so it's worse than useless as a read
-# cache. Swap it for a free disk under CACHE_SIZE_THRESHOLD_GB that actually
-# lives on this host, if one is available - the same smart-selection rule
-# the manual "Update Cache" button uses (see fapi.py's dgsupdatecache).
+# cache. Swap it for a spare cache disk that actually lives on this host,
+# if one is available.
 import sys
 import subprocess
 
 sys.path.insert(0, '/TopStor')
 from allphysicalinfo import getall, initallphy
-
-CACHE_SIZE_THRESHOLD_GB = 10
 
 
 def resolve_by_id(disk_substr):
@@ -53,21 +50,15 @@ def main():
 
     print(f"fixcachelocality: pool {pool}'s cache disk(s) {remote_cache_disks} are not local to {myhost}, relocating")
 
-    free_disk_ids = info['raids'].get('free', {}).get('disks', [])
-    candidates = []
-    for did in free_disk_ids:
-        disk_info = info['disks'].get(did, {})
-        if disk_info.get('host') != myhost:
-            continue
-        if did in cache_disks:
-            continue
-        try:
-            if float(disk_info.get('size', 0)) >= CACHE_SIZE_THRESHOLD_GB:
-                continue
-        except (TypeError, ValueError):
-            continue
-        candidates.append(did)
-    local_spare = min(candidates, key=lambda d: float(info['disks'][d].get('size', 0))) if candidates else None
+    local_spare = None
+    for raid_data in info['raids'].values():
+        if raid_data.get('status') == 'cache':
+            for d in raid_data.get('disks', []):
+                if info['disks'].get(d, {}).get('host') == myhost and d not in cache_disks:
+                    local_spare = d
+                    break
+        if local_spare:
+            break
 
     for d in remote_cache_disks:
         resolved = resolve_by_id(d)
@@ -80,10 +71,10 @@ def main():
     if local_spare:
         resolved = resolve_by_id(local_spare)
         if resolved:
-            print(f"fixcachelocality: adding local disk {resolved} as new cache for {pool}")
+            print(f"fixcachelocality: adding local spare {resolved} as new cache for {pool}")
             subprocess.run(['/sbin/zpool', 'add', '-f', pool, 'cache', resolved])
     else:
-        print(f"fixcachelocality: no free disk under {CACHE_SIZE_THRESHOLD_GB}GB available locally on {myhost}, pool {pool} now has no cache")
+        print(f"fixcachelocality: no local spare cache disk available on {myhost}, pool {pool} now has no cache")
 
 
 if __name__ == '__main__':
