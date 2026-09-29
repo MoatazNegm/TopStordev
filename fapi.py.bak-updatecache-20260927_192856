@@ -688,55 +688,6 @@ def dgsnewpool(data):
 
     return jsonify(data)
 
-@app.route('/api/v1/pools/updatecache', methods=['GET','POST'])
-@login_required
-def dgsupdatecache(data):
-    global allinfo, myhost, leaderip
-
-    if 'baduser' in data['response']:
-        return {'response': 'baduser'}
-
-    getalltime('yes')
-
-    pool = data.get('pool')
-    if not pool or pool not in allinfo['pools']:
-        return jsonify({'response': 'error', 'message': 'Pool not found'}), 400
-
-    new_cache = data.get('cache')
-    if not isinstance(new_cache, list):
-        new_cache = [new_cache] if new_cache else []
-    if not new_cache:
-        return jsonify({'response': 'error', 'message': 'No cache disk selected'}), 400
-
-    pool_data = allinfo['pools'][pool]
-    old_cache_disks = []
-    for raidId in pool_data.get('raids', []):
-        if raidId.split('_')[0] == 'cache':
-            old_cache_disks.extend(allinfo['raids'].get(raidId, {}).get('disks', []))
-
-    new_cache = [d for d in new_cache if d not in old_cache_disks]
-    if not new_cache:
-        return jsonify({
-            'response': 'error',
-            'message': 'Selected disk is already this pool\'s cache'
-        }), 400
-
-    data['owner'] = pool_data['host']
-    ownerip = allinfo['hosts'][data['owner']]['ipaddress']
-
-    oldstring = ''
-    for dsk in old_cache_disks:
-        oldstring += dsk+":"+dsk[-5:]+" "
-    newstring = ''
-    for dsk in new_cache:
-        newstring += dsk+":"+dsk[-5:]+" "
-
-    datastr = 'updatecache '+data['user']+' '+data['owner']+' '+pool+' old '+oldstring+'new '+newstring+'nopool'
-    cmndstring = '/TopStor/DGsetPool '+leaderip+' '+datastr+' '+data['user']
-    postchange(cmndstring, data['owner'])
-
-    return jsonify(data)
-
 @app.route('/api/v1/volumes/stats', methods=['GET','POST'])
 @login_required
 def volumestats(data):
