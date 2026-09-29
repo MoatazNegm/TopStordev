@@ -3,17 +3,16 @@
 # just got imported here has a cache (L2ARC) vdev that lives on a different
 # host than the one now owning the pool, that disk is no longer local -
 # reachable only over the network - so it's worse than useless as a read
-# cache. Swap it for a free disk on this host that sits at the smallest
-# size tier - strictly smaller than the rest of this host's free disks -
-# if one is available. Same relative-size rule the manual "Update Cache"
-# button uses (see fapi.py's dgsupdatecache); if every free disk on the
-# host is the same size, nothing is "smaller than the rest" and there's
-# no candidate.
+# cache. Swap it for a free disk under CACHE_SIZE_THRESHOLD_GB that actually
+# lives on this host, if one is available - the same smart-selection rule
+# the manual "Update Cache" button uses (see fapi.py's dgsupdatecache).
 import sys
 import subprocess
 
 sys.path.insert(0, '/TopStor')
 from allphysicalinfo import getall, initallphy
+
+CACHE_SIZE_THRESHOLD_GB = 10
 
 
 def resolve_by_id(disk_substr):
@@ -55,7 +54,7 @@ def main():
     print(f"fixcachelocality: pool {pool}'s cache disk(s) {remote_cache_disks} are not local to {myhost}, relocating")
 
     free_disk_ids = info['raids'].get('free', {}).get('disks', [])
-    local_sizes = {}
+    candidates = []
     for did in free_disk_ids:
         disk_info = info['disks'].get(did, {})
         if disk_info.get('host') != myhost:
@@ -63,17 +62,12 @@ def main():
         if did in cache_disks:
             continue
         try:
-            local_sizes[did] = float(disk_info.get('size', 0))
+            if float(disk_info.get('size', 0)) >= CACHE_SIZE_THRESHOLD_GB:
+                continue
         except (TypeError, ValueError):
             continue
-
-    local_spare = None
-    if local_sizes:
-        smallest = min(local_sizes.values())
-        largest = max(local_sizes.values())
-        if smallest < largest:
-            candidates = [d for d, s in local_sizes.items() if s == smallest]
-            local_spare = min(candidates, key=lambda d: local_sizes[d])
+        candidates.append(did)
+    local_spare = min(candidates, key=lambda d: float(info['disks'][d].get('size', 0))) if candidates else None
 
     for d in remote_cache_disks:
         resolved = resolve_by_id(d)
@@ -89,7 +83,7 @@ def main():
             print(f"fixcachelocality: adding local disk {resolved} as new cache for {pool}")
             subprocess.run(['/sbin/zpool', 'add', '-f', pool, 'cache', resolved])
     else:
-        print(f"fixcachelocality: no disk on {myhost} is smaller than the rest, pool {pool} now has no cache")
+        print(f"fixcachelocality: no free disk under {CACHE_SIZE_THRESHOLD_GB}GB available locally on {myhost}, pool {pool} now has no cache")
 
 
 if __name__ == '__main__':
