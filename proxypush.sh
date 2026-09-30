@@ -4,21 +4,29 @@
 #
 # Copy one branch of all three projects from abdopuppet out to github.
 #
-# This container is only a relay, so the script never looks at, checks out,
-# resets, cleans, stashes or deletes anything in /TopStor, /pace or
-# /topstorweb.  Every project is copied through its own throwaway bare
-# repository, so a branch that is checked out in a worktree, a dirty working
-# tree, a leftover temp branch, a stale local copy or an ambiguous branch name
-# cannot affect the result.  The old version broke on exactly those: it tried
-# to delete the branch locally, which fails when a worktree has it checked out.
+# The branch is taken from abdopuppet EXACTLY AS IT IS.  It is never merged
+# with, rebased onto, or combined with whatever branch happens to be checked
+# out here -- this container is only a relay, and the current branch is
+# irrelevant to the result.  To make that true by construction, the script
+# never looks at, checks out, resets, cleans, stashes or deletes anything in
+# /TopStor, /pace or /topstorweb.  Every project is copied through its own
+# throwaway bare repository, so a branch that is checked out in a worktree, a
+# dirty working tree, a leftover temp branch or an ambiguous branch name cannot
+# affect anything.
 #
-# How it works, per project:
+# Per project:
 #   1. ask abdopuppet and github what commit the branch is at   (cheap, no
 #      objects moved).  If they already agree, that project is skipped and
 #      nothing is downloaded.
 #   2. otherwise fetch just that one branch, shallowly, into a scratch repo
 #   3. push that ref straight across to github
 #   4. if github rejects the shallow push, deepen the history and retry once
+#   5. ask github what it has now, so the result is proven and not assumed
+#
+# The github side is always the MoatazNegm account.  The per developer
+# repositories in this container also carry a 'remote' pointing at that
+# developer's own fork; this script never touches those, which is what stops
+# a copy meant for upstream landing in somebody's fork.
 #
 # overrides (environment):
 #   PROXY_BRANCH      branch to copy, if not given on the command line
@@ -26,24 +34,47 @@
 #   PROXY_ABDOPUPET   host holding the bare repositories
 #   PROXY_GITHUB      github account / organisation
 #   PROXY_DRYRUN      1 = report what would happen, never push
+#   PROXY_WORKROOT    where the scratch repositories are made
 # ---------------------------------------------------------------------------
 
 PROJECTS=${PROXY_PROJECTS:-"TopStordev HC TopStorWeb"}
 ABDOPUPET=${PROXY_ABDOPUPET:-10.11.11.252}
 GITHUB_USER=${PROXY_GITHUB:-MoatazNegm}
 DRYRUN=${PROXY_DRYRUN:-0}
-WORKROOT=${PROXY_WORKROOT:-/tmp/proxypush}
+WORKROOT=${PROXY_WORKROOT:-/tmp/proxyrelay}
 
 branch=$1
 [ -n "$branch" ] || branch=$PROXY_BRANCH
 
 if [ -z "$branch" ]; then
 	echo "usage: proxypush.sh <branch>" >&2
-	echo "  copies that branch of every project from $ABDOPUPET out to github" >&2
+	echo "  copies that branch of every project from $ABDOPUPET out to github," >&2
+	echo "  exactly as it is, without merging with anything local" >&2
 	exit 1
 fi
 
-# github needs a working resolver; the old script forced this too
+# abdopuppet answers on two different url forms depending on which repository
+# copy is asking; try the fast one first and fall back to the other.
+abdopuppet_urls() {
+	echo "git://$ABDOPUPET/$1.git http://$ABDOPUPET/git/$1.git"
+}
+
+pick_abdopuppet() {
+	project=$1
+	for u in `abdopuppet_urls "$project"`; do
+		sha=`timeout 60 git ls-remote --heads "$u" "$branch" 2>/dev/null | awk 'NR==1 { print $1 }'`
+		if [ -n "$sha" ]; then
+			SRC_URL=$u
+			SRC_SHA=$sha
+			return 0
+		fi
+	done
+	SRC_URL=
+	SRC_SHA=
+	return 1
+}
+
+# github needs a working resolver
 if [ -w /etc/resolv.conf ]; then
 	echo 'nameserver 8.8.8.8' > /etc/resolv.conf 2>/dev/null
 fi
@@ -54,23 +85,25 @@ missing=0
 failed=0
 
 for project in $PROJECTS; do
-	from_url="git://$ABDOPUPET/$project.git"
 	to_url="https://github.com/$GITHUB_USER/$project.git"
 
 	echo
 	echo '###########################################'
 	echo "  $project"
-	echo "  from : $from_url"
-	echo "  to   : $to_url"
 
 	# ---- 1. what is where, without moving any objects ----
-	src_sha=`timeout 60 git ls-remote --heads "$from_url" "$branch" 2>/dev/null | awk 'NR==1 { print $1 }'`
-	if [ -z "$src_sha" ]; then
+	if ! pick_abdopuppet "$project"; then
 		echo "  abdopuppet has no branch '$branch' - nothing to copy"
 		missing=`expr $missing + 1`
 		continue
 	fi
+	from_url=$SRC_URL
+	src_sha=$SRC_SHA
+
 	dst_sha=`timeout 60 git ls-remote --heads "$to_url" "$branch" 2>/dev/null | awk 'NR==1 { print $1 }'`
+
+	echo "  from : $from_url"
+	echo "  to   : $to_url"
 	echo "  abdopuppet : $src_sha"
 	if [ -z "$dst_sha" ]; then
 		echo "  github     : (no such branch yet)"
@@ -122,34 +155,34 @@ for project in $PROJECTS; do
 		cd /; rm -rf "$scratch"
 		continue
 	fi
-	echo "  have $got locally"
+	echo "  have $got locally, exactly as abdopuppet has it"
 
 	# ---- 3. push the ref straight across ----
 	if timeout 600 git push github "$ref" > "$scratch/push" 2>&1; then
 		echo "  PUSHED $branch to github"
 		ok=`expr $ok + 1`
+	elif timeout 900 git fetch --no-tags --deepen 200 abdopuppet "$ref" > "$scratch/deepen" 2>&1 &&
+	     timeout 600 git push github "$ref" > "$scratch/push2" 2>&1; then
+		# ---- 4. a shallow pack is refused when github lacks the history ----
+		echo "  push refused, deepened the history, PUSHED on the second attempt"
+		ok=`expr $ok + 1`
 	else
-		# ---- 4. a shallow push can be refused when github lacks the
-		#         history.  Deepen and try once more. ----
-		echo "  push refused, deepening the history and trying once more ..."
-		sed 's/^/     /' "$scratch/push" | head -6
-		if timeout 900 git fetch --no-tags --deepen 200 abdopuppet "$ref" > "$scratch/deepen" 2>&1; then
-			if timeout 600 git push github "$ref" > "$scratch/push2" 2>&1; then
-				echo "  PUSHED $branch to github on the second attempt"
-				ok=`expr $ok + 1`
-			else
-				echo "  FAILED to push $branch to github"
-				tail -8 "$scratch/push2" | sed 's/^/     /'
-				failed=`expr $failed + 1`
-			fi
-		else
-			echo "  FAILED to deepen the history"
-			tail -5 "$scratch/deepen" | sed 's/^/     /'
-			failed=`expr $failed + 1`
-		fi
+		echo "  FAILED to push $branch to github"
+		[ -f "$scratch/push" ] && sed 's/^/     /' "$scratch/push" | head -6
+		[ -f "$scratch/push2" ] && tail -6 "$scratch/push2" | sed 's/^/     /'
+		[ -f "$scratch/deepen" ] && tail -4 "$scratch/deepen" | sed 's/^/     /'
+		failed=`expr $failed + 1`
 	fi
 
+	# ---- 5. prove github really has it now ----
 	cd /
+	now=`timeout 60 git ls-remote --heads "$to_url" "$branch" 2>/dev/null | awk 'NR==1 { print $1 }'`
+	if [ "$now" = "$src_sha" ]; then
+		echo "  verified: github now has $now"
+	else
+		echo "  *** github reports '$now', expected $src_sha"
+		failed=`expr $failed + 1`
+	fi
 	rm -rf "$scratch"
 done
 
