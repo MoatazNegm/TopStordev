@@ -435,3 +435,9 @@ Upfe1010:0: : from :: Fetching new firmware from QuickStor
 Upnv1010:2: : from :: Update file is not valid
 Upfa1010:2: : from :: Failed updating from version : to version :
 Upsu1010:2: : from :: Success updating from version : to version :
+DGst23:1: : from :: Adding RAID10 array to pool : using disks : ......
+DGsu23:2: : from :: Success adding RAID10 array to pool : using disks :
+DGfa23:2: : from :: Failed adding RAID10 array to pool : using disks :
+DGst24:1: : from :: Creating RAID10 pool : using mirror pairs of disks : ......
+DGsu24:2: : from :: Success creating RAID10 pool : using mirror pairs of disks :
+DGfa24:2: : from :: Failed creating RAID10 pool : using mirror pairs of disks :

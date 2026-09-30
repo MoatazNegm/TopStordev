@@ -1926,8 +1926,15 @@ def get_service_summary():
         print(f"Telemetry Summary Error: {traceback.format_exc()}")
         return jsonify({"error": str(e)}), 500
   
-leaderip =0 
-myhost=0
+try:
+    leaderip = get('leaderip')[0]
+    myhost = get('clusternode')[0]
+    myhostip = get('clusternodeip')[0]
+except Exception:
+    leaderip = ''
+    myhost = ''
+    myhostip = ''
+
 if __name__=='__main__':
     #leader = sys.argv[2]
     #leaderip = sys.argv[1]
