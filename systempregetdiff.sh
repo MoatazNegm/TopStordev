@@ -912,8 +912,13 @@ def main():
                 plan_drop(a.plan, RK, "delete", a.path)
                 out.write(E + "H" + E + "2J")
                 out.write(BOLD + "  mark this file" + R + "\n\n")
-                out.write("  " + F_ADD + "1" + R + "  keep the " + FN + " version after merging\n")
-                out.write("  " + I_ADD + "2" + R + "  keep the " + IN + " version after merging\n")
+                out.write("  " + DIM + "(with no mark at all the merge result is used as it is)" + R + "\n\n")
+                out.write("  " + F_ADD + "1" + R + "  use the " + FN + " version")
+                out.write(("\n" if A is not None else
+                           "  " + DIM + "- but " + FN + " has no such file, so it will not be added") + R + "\n")
+                out.write("  " + I_ADD + "2" + R + "  use the " + IN + " version")
+                out.write(("\n" if B is not None else
+                           "  " + DIM + "- but " + IN + " has no such file, so it will NOT be added") + R + "\n")
                 out.write("  " + WARN + "3" + R + "  delete this file after merging\n")
                 out.write("  " + DIM + "0" + R + "  clear the mark for this file\n\n")
                 out.write(REV + " choose 1-3 or 0: " + R)
@@ -1388,17 +1393,33 @@ preview_repo() {
 					esac
 				fi
 				printf '   %3d  %s\n' "$pr_n" "$pr_pth"
+				# Say what will ACTUALLY happen to this file, not just what the
+				# merge alone would do.  A "delete" instruction beats the
+				# merge, and before this the list still said "would be
+				# created" for files the plan was about to remove.
 				pr_mk=`plan_mark_of "$pr_repo" "$pr_pth"`
-				case "$pr_mk" in
-				keep\|*)   say "        ${C_FROM_ADD}<- instruction: keep the `echo $pr_mk | cut -d'|' -f2` version${C_OFF}" ;;
-				delete\|*) say "        ${C_WARN}<- instruction: DELETE after merging${C_OFF}" ;;
+				pr_mact=`printf '%s' "$pr_mk" | cut -d'|' -f1`
+				pr_mside=`printf '%s' "$pr_mk" | cut -d'|' -f2`
+				case "$pr_mact" in
+				keep)
+					case "$pr_mside" in
+					into) say "        ${C_INTO_ADD}<- your plan: use the $P_INTO version${C_OFF}"
+					       [ "$pr_kind" = only-from ] && \
+					       say "           ${C_INTO_ADD}$P_INTO has no such file, so it will NOT be added${C_OFF}" ;;
+					*)    say "        ${C_FROM_ADD}<- your plan: use the $P_FROM version${C_OFF}" ;;
+					esac ;;
+				delete) say "        ${C_WARN}<- your plan: DELETE it, so the merge result will not have it${C_OFF}" ;;
 				esac
-				case "$pr_verdict" in
-				clean)    say "        ${C_OK}<- both changes merge${C_OFF}" ;;
-				conflict) say "        ${C_WARN}<- COLLISION, neither wins${C_OFF}" ;;
-				added)    say "        ${C_FROM_ADD}<- would be created${C_OFF}" ;;
-				kept)     say "        ${C_DIM}<- unchanged by the merge${C_OFF}" ;;
-				esac
+				if [ -z "$pr_mact" ]; then
+					case "$pr_kind" in
+					only-from) say "        ${C_OK}<- no instruction: the merge WILL ADD this file${C_OFF}" ;;
+					only-into) say "        ${C_DIM}<- no instruction: the merge leaves this file alone${C_OFF}" ;;
+					esac
+					case "$pr_verdict" in
+					clean)    say "                 ${C_OK}<- both changes merge${C_OFF}" ;;
+					conflict) say "                 ${C_WARN}<- COLLISION, neither wins - choose with m${C_OFF}" ;;
+					esac
+				fi
 			done < "$pr_rec.s"
 		fi
 		say ""
@@ -1705,10 +1726,27 @@ apply_all() {
 				ap_src="$ap_from"
 				[ "$ap_d1" = into ] && ap_src="$ap_into"
 				say "  ${C_FROM_ADD}keep${C_OFF} $ap_f  ${C_DIM}(the $ap_d1 side)${C_OFF}"
-				if git checkout "$ap_src" -- "$ap_f" 2>/dev/null; then
-					say "    ${C_OK}done${C_OFF}"
+				if git cat-file -e "$ap_src:$ap_f" 2>/dev/null; then
+					if git checkout "$ap_src" -- "$ap_f" 2>/dev/null; then
+						say "    ${C_OK}done${C_OFF}"
+					else
+						say "    ${C_WARN}failed - is the file in $ap_src?${C_OFF}"
+					fi
 				else
-					say "    ${C_WARN}failed - is the file in $ap_src?${C_OFF}"
+					# The chosen side has no such file, so "keep that side"
+					# means the result must not have it either.  Otherwise a
+					# file that only exists in the from branch could never be
+					# left out.
+					say "    ${C_DIM}$ap_d1 has no such file, so it will NOT be in the result${C_OFF}"
+					if git ls-files --error-unmatch -- "$ap_f" >/dev/null 2>&1; then
+						if git rm -q -- "$ap_f" 2>/dev/null; then
+							say "    ${C_OK}removed${C_OFF}"
+						else
+							say "    ${C_WARN}could not remove it${C_OFF}"
+						fi
+					else
+						say "    ${C_DIM}it is not in the merge result anyway - nothing to do${C_OFF}"
+					fi
 				fi ;;
 			delete)
 				say "  ${C_WARN}delete${C_OFF} $ap_f"
