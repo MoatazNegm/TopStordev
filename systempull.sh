@@ -86,7 +86,7 @@ fi
 docker ps >/dev/null
 if [ $? -eq 0 ];
 then
-	/TopStor/post_pull_ui.sh
+	/TopStor/pre_apply.sh	
 fi
 cd /topstorweb
 git show | grep commit
@@ -95,4 +95,3 @@ git show | grep commit
 cd /TopStor
 git show | grep commit
 echo finished
-

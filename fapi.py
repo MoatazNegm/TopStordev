@@ -32,7 +32,6 @@ import zipfile
 from time import sleep
 import socket
 import json
-
 getalltimestamp = 0
 os.environ['ETCDCTL_API'] = '3'
 loggedusers = dict() 
@@ -56,15 +55,12 @@ for log in logcatalog:
  msgcode= log.split(':')[0]
  logdict[msgcode] = log.replace(msgcode+':','').split(' ')
 allinfo = 0
-
 def is_valid_ip(ip):
     try:
         ipaddress.ip_address(ip)
         return 0 
     except ValueError:
         return 10 
-
-
 def is_unique_ip(ip, vtype='NZ#@A' ):
         global leaderip
         if not ip or not str(ip).strip():
@@ -83,7 +79,6 @@ def is_unique_ip(ip, vtype='NZ#@A' ):
                     return 100 
         print("Valid IP")
         return 0 
-
 def is_unique_name(name):
         global leaderip
         allvols = str(get('vol', '--prefix'))
@@ -96,9 +91,6 @@ def is_unique_name(name):
                     return 1000 
         print("Valid Name")
         return 0 
-
-
-
 def getalltime(renew='no'):
  global allinfo,alldsks, getalltimestamp, leaderip
  #if (getalltimestamp+30) < timestamp() or renew == 'yes':
@@ -107,7 +99,6 @@ def getalltime(renew='no'):
   allinfo = deepcopy(getall(leaderip, alldsks))
   getalltimestamp = timestamp()
  return
-
 def login_required(f):
  global loggedusers
  @wraps(f)
@@ -123,8 +114,6 @@ def login_required(f):
   if 'cache_disks[]' in data:
    data['cache_disks'] = request.args.getlist('cache_disks[]')
    del data['cache_disks[]']
-
-
   for dat in data:
    if isinstance(data[dat], str):
     data[dat] = data[dat].replace(' ','')
@@ -147,7 +136,6 @@ def login_required(f):
    except:
     return f({'response':'baduser'})
  return decorated_function
-
 @app.route('/api/v1/users/uploadUsers', methods=['GET','POST'])
 @login_required
 def uploadUsers(data):
@@ -170,8 +158,6 @@ def uploadUsers(data):
     else:
       logmsg.sendlog('Unlin1026', 'error', data["user"])
       return 'Error while uploading file!'
-
-
 def postchange(cmndstring,host='leader'):
  global leaderip, myhost, myhostip
  z= cmndstring.split(' ')
@@ -189,13 +175,11 @@ def postchange(cmndstring,host='leader'):
   f.write(str((ownerip, str(msg),'recvreply',myhost))+'\n')
  sendhost(ownerip, str(msg),'recvreply',myhost)
  return 'queued'
-
 def dict_factory(cursor, row):
     d = {}
     for idx, col in enumerate(cursor.description):
         d[col[0]] = row[idx]
     return d
-
 def getusers():
  global leaderip
  userlst = etcdgetjson(leaderip,'usersinfo','--prefix') 
@@ -206,7 +190,6 @@ def getusers():
   users.append([username,str(uid)]) 
   uid += 1
  return users
-
 def getgroups():
  global leaderip
  groupslst = etcdgetjson(leaderip, 'usersigroup','--prefix') 
@@ -218,12 +201,10 @@ def getgroups():
   groups.append([groupname,str(gid), grpusers]) 
   gid += 1
  return groups
-
 @app.route('/', methods=['GET'])
 def home():
     return '''<h1>Distant Reading Archive</h1>
 <p>A prototype API for distant reading of science fiction novels.</p>'''
-
 def gettenants():
  global leaderip
  vols = get('vol','/NFS/')
@@ -235,7 +216,6 @@ def gettenants():
   volinfo.append({'id':pid, 'pool': vol[0].split('/')[3], 'text':vol[0].split('/')[4]})
   pid += 1
  return volinfo
-
 def getpools():
  global pooldict, leaderip
  pools = get('pools/','--prefix')
@@ -246,7 +226,6 @@ def getpools():
   pid += 1
   pooldict[pool[0].split('/')[1]] = {'id': pid, 'owner': pool[1] }
  return poolinfo
-
 @app.route('/api/v1/volumes/connections', methods=['GET','POST'])
 @login_required
 def getconns(data):
@@ -268,8 +247,6 @@ def getconns(data):
    conndict['connections'].append({"volume": volume, 'user': subcon[0], 'device':subcon[1] })
  conndict['response'] = data['response']
  return conndict 
-
-
 @app.route('/api/v1/software/setversion', methods=['GET','POST'])
 @login_required
 def setversion(data):
@@ -280,7 +257,6 @@ def setversion(data):
   cmdline = '/TopStor/updateversion '+data['version']
   postchange(cmdline)
  return data 
-
 @app.route('/api/v1/software/versions', methods=['GET','POST'])
 @login_required
 def versions(data):
@@ -289,7 +265,6 @@ def versions(data):
  res = getversions()
  res['response'] = data['response']
  return res
-
 @app.route('/api/v1/software/apply', methods=['GET','POST'])
 @login_required
 def swapply(data):
@@ -300,14 +275,11 @@ def swapply(data):
  versionlst = versions(data)
  versionlst['response'] = data['response']
  return versionlst
-
-
 #@app.route('/api/v1/hosts/info', methods=['GET','POST'])
 def hostsinfo():
  global allhosts, readyhosts, activehosts, losthosts, possiblehosts
  allhosts = Hostsconfig.getall()
  return jsonify(allhosts)
-
 @app.route('/api/v1/hosts/allinfo', methods=['GET','POST'])
 @login_required
 def hostsallinfo(data):
@@ -318,8 +290,6 @@ def hostsallinfo(data):
  hostslost()  
  hostspossible()
  return jsonify({'all': allhosts, 'active': activehosts, 'ready':readyhosts, 'possible':possiblehosts, 'lost':losthosts})
-
-
 #@app.route('/api/v1/hosts/ready', methods=['GET','POST'])
 def hostsready():
  global allhosts, readyhosts, activehosts, losthosts, possiblehosts, leaderip
@@ -332,7 +302,6 @@ def hostsready():
   readyhosts.append({'name':name, 'ip': ip, 'id': hid}) 
   hid +=1
  return jsonify(readyhosts)
-
 #@app.route('/api/v1/hosts/active', methods=['GET','POST'])
 def hostsactive():
  global allhosts, readyhosts, activehosts, losthosts, possiblehosts, leaderip
@@ -345,8 +314,6 @@ def hostsactive():
   activehosts.append({'name':name, 'ip': ip, 'id': hid}) 
   hid +=1
  return jsonify(activehosts)
-
-
 @app.route('/api/v1/hosts/discover', methods=['GET','POST'])
 @login_required
 def discover(data):
@@ -355,7 +322,6 @@ def discover(data):
     cmndstring = '/TopStor/getdiscovery.sh '
     postchange(cmndstring)
     return data 
-
 #@app.route('/api/v1/hosts/possible', methods=['GET','POST'])
 def hostspossible():
  global allhosts, readyhosts, activehosts, losthosts, possiblehosts, leaderip
@@ -368,7 +334,6 @@ def hostspossible():
   possiblehosts.append({'name':name, 'ip': ip, 'id': hid}) 
   hid +=1
  return jsonify(possiblehosts)
-
 #@app.route('/api/v1/hosts/lost', methods=['GET','POST'])
 def hostslost():
  global allhosts, readyhosts, activehosts, losthosts, possiblehosts
@@ -381,7 +346,6 @@ def hostslost():
    losthosts.append({'id': hid, 'name': active['name'], 'ip': active['ip']})
   hid += 1
  return jsonify(losthosts)
-
 @app.route('/api/v1/pools/dgsinfo', methods=['GET','POST'])
 @login_required
 def dgsinfo(data):
@@ -392,7 +356,6 @@ def dgsinfo(data):
  dgsinfo = {'raids':allinfo['raids'], 'pools':allinfo['pools'], 'disks':allinfo['disks']}
  dgsinfo['newraid'] = newraids(allinfo['disks'])
  return jsonify(dgsinfo)
-
 @app.route('/api/v1/pools/delpool', methods=['GET','POST'])
 @login_required
 def dgsdelpool(data):
@@ -409,7 +372,6 @@ def dgsdelpool(data):
 # msg={'req': 'Pumpthis', 'reply':z}
 # sendhost(ownerip, str(msg),'recvreply',myhost)
  return jsonify(data)
-
 @app.route('/api/v1/pools/addtopool', methods=['GET','POST'])
 @login_required
 def dgsaddtopool(data):
@@ -488,90 +450,70 @@ def dgsaddtopool(data):
 @login_required
 def dgscachespares(data):
     global allinfo, myhost, leaderip
-
     if 'baduser' in data['response']:
         return {'response': 'baduser'}
-
     try:
         cache_disks = data.get('cache_disks', [])
         if not cache_disks:
             return jsonify({'response': 'success', 'message': 'No disks to add.'})
-
         disk_ids_to_store = []
         for disk_id in cache_disks:
             if disk_id.startswith('/dev/disk/by-id/'):
                 disk_ids_to_store.append(disk_id.split('/')[-1])
             else:
                 disk_ids_to_store.append(disk_id)
-
         disks_str = " ".join(disk_ids_to_store)
         cmndstring = f"/TopStor/cachedisks.py add {leaderip} {disks_str}"
         postchange(cmndstring)
-
         return jsonify({
             'response': 'success',
             'message': f'Queued adding of {len(disk_ids_to_store)} spare cache disks.'
         })
-
     except Exception as e:
         return jsonify({
             'response': 'error',
             'message': f'Failed to process spare cache list via etcd: {str(e)}'
         }), 500
-
 @app.route('/api/v1/pools/delcachespares', methods=['GET', 'POST'])
 @login_required
 def dgsdelcachespares(data):
     global allinfo, myhost, leaderip
-
     if 'baduser' in data['response']:
         return {'response': 'baduser'}
-
     try:
         disks_to_remove = data.get('cache_disks', [])
-
         if not disks_to_remove:
             return jsonify({'response': 'error', 'message': 'No disks provided'}), 400
-
         disks_str = " ".join(disks_to_remove)
-
         cmndstring = f"/TopStor/cachedisks.py del {leaderip} {disks_str}"
         postchange(cmndstring)
-
         return jsonify({
             'response': 'success',
             'message': f'Queued removal of {len(disks_to_remove)} cache disks'
         })
-
     except Exception as e:
         print(f"Error processing request: {e}")
         return jsonify({
             'response': 'error',
             'message': f'Failed to queue cache disk removal: {str(e)}'
         }), 500
-
 @app.route('/api/v1/pools/newpool', methods=['GET','POST'])
 @login_required
 def dgsnewpool(data):
     global allinfo, myhost, leaderip
-
     if 'baduser' in data['response']:
         return {'response': 'baduser'}
-
     getalltime('yes')
-
     manual_cache = data.get('cache')
     if not isinstance(manual_cache, list):
         manual_cache = []
     excluded_disks = ','.join(manual_cache)
-
     if data.get('disks'):
         selecteddisks = data['disks']
     else:
         keys = []
         dgsinfo = {'raids':allinfo['raids'], 'pools':allinfo['pools'], 'disks':allinfo['disks']}
         dgsinfo['newraid'] = newraids(allinfo['disks'])
-
         if data['useable'] not in dgsinfo['newraid'][data['redundancy']]:
             keys = list(dgsinfo['newraid'][data['redundancy']].keys())
             keys.append(float(data['useable']))
@@ -580,9 +522,7 @@ def dgsnewpool(data):
             if diskindx == len(keys):
                 diskindx = len(keys) - 2
             data['useable'] = keys[diskindx]
-
         disks = dgsinfo['newraid'][data['redundancy']][data['useable']]
-
         if 'single' in data['redundancy']:
             selecteddisks = [disk for disk in disks if disk not in manual_cache][:1]
         elif 'raid10' in data['redundancy']:
@@ -617,28 +557,22 @@ def dgsnewpool(data):
                     'message': 'No eligible data disks are available for this configuration'
                 }), 400
             selecteddisks = bestdisks.split(',')
-
     if not selecteddisks:
         return jsonify({
             'response': 'error',
             'message': 'No eligible data disks are available for this configuration'
         }), 400
-
     diskstring = ''
     for dsk in selecteddisks:
         diskstring += dsk+":"+dsk[-5:]+" "
-
     data['owner'] = allinfo['disks'][selecteddisks[0]]['host']
     ownerip = allinfo['hosts'][data['owner']]['ipaddress']
-
     cachestring = ''
     if str(data.get('cache_bool')).lower() == 'true':
-
         if manual_cache and isinstance(manual_cache, list) and len(manual_cache) > 0:
             cachestring = "cache "
             for dsk in manual_cache:
                 cachestring += dsk+":"+dsk[-5:]+" "
-
         else:
             cache_candidates = []
             if 'raids' in allinfo:
@@ -648,22 +582,18 @@ def dgsnewpool(data):
                              disk_info = allinfo['disks'].get(d)
                              if disk_info and disk_info.get('host') == data['owner']:
                                  cache_candidates.append(d)
-
             available_cache = [d for d in cache_candidates if d not in selecteddisks]
             if available_cache:
                 cid = available_cache[0]
                 cachestring = "cache " + cid + ":" + cid[-5:] + " "
             else:
                 print(f"LOG: Cache requested for host {data['owner']}, but no matching disks found in Spare Cache List.")
-
     print('#############################3')
     print(';;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;')
     print(selecteddisks)
     print('#########################333')
-
     data['owner'] = allinfo['disks'][selecteddisks[0]]['host']
     ownerip = allinfo['hosts'][data['owner']]['ipaddress']
-
     if 'single' in data['redundancy']:
         datastr = 'Single '+data['user']+' '+data['owner']+" "+selecteddisks[0]+" "+selecteddisks[0][-5:]+" "+cachestring+" "+" nopool "+data['user']+" "+data['owner']
     elif 'mirror' in data['redundancy']:
@@ -682,12 +612,9 @@ def dgsnewpool(data):
         datastr = 'raid60 '+data['user']+' '+data['owner']+" "+diskstring+" "+cachestring+" nopool "+data['user']+" "+data['owner']
     elif 'raid6' in data['redundancy']:
         datastr = 'parity2 '+data['user']+' '+data['owner']+" "+diskstring+" "+cachestring+" "+data['user']+" "+data['owner']
-
     cmndstring = '/TopStor/DGsetPool '+leaderip+' '+datastr+' '+data['user']
     postchange(cmndstring, data['owner'])
-
     return jsonify(data)
-
 @app.route('/api/v1/volumes/stats', methods=['GET','POST'])
 @login_required
 def volumestats(data):
@@ -697,7 +624,6 @@ def volumestats(data):
  getalltime()
  volstats = allvolstats(leaderip, deepcopy(allinfo))
  return jsonify(volstats)
-
 @app.route('/api/v1/volumes/volumelist', methods=['GET','POST'])
 @login_required
 def volumeslist(data):
@@ -711,7 +637,6 @@ def volumeslist(data):
   volumes.append({'id':vid, 'text':vol.split('_')[0], 'fullname':vol,'pool':allinfo['volumes'][vol]['pool']})
   vid += 1
  return jsonify(volumes)
-
 @app.route('/api/v1/tenants/tenantinfo', methods=['GET','POST'])
 @login_required
 def tenantsinfo(data):
@@ -720,9 +645,6 @@ def tenantsinfo(data):
  alltenants = gettenants()
  alltenants.append({'id':len(allpools), 'text':'Cluster'})
  return jsonify({'results':alltenants})
-
-
-
 @app.route('/api/v1/volumes/poolsinfo', methods=['GET','POST'])
 @login_required
 def volpoolsinfo(data):
@@ -731,14 +653,11 @@ def volpoolsinfo(data):
       return {'response': 'baduser'}
  allpools = getpools()
  return jsonify({'results':allpools})
-
 @app.route('/api/v1/stats/dskperf', methods=['GET','POST'])
 def dskperfs():
  #ioperf(leaderip,myhost)
  global leaderip
  return jsonify({'dsk':dskperf(leaderip), 'cpu':cpuperf(leaderip)})
-
-
 @app.route('/api/v1/volumes/snapshots/snapshotsinfo', methods=['GET','POST'])
 @login_required
 def volumessnapshotsinfo(data):
@@ -762,7 +681,6 @@ def volumessnapshotsinfo(data):
   snappriods.append(allinfo['snapperiods'][period].copy())
   periodlist[allinfo['snapperiods'][period]['periodtype']].append(allinfo['snapperiods'][period].copy())
  return jsonify({'allsnaps':alllist, 'Once':snaplist['Once'], 'Hourly':snaplist['Hourly'], 'Weekly':snaplist['Weekly'], 'Minutely':snaplist['Minutely'] ,'allperiods':snappriods, 'Minutelyperiod':periodlist['Minutely'], 'Hourlyperiod':periodlist['Hourly'], 'Weeklyperiod':periodlist['Weekly']})
-
 def volumesinfo(prot='all'):
  global allvolumes, alldsks, allinfo
  getalltime()
@@ -793,8 +711,6 @@ def volumesinfo(prot='all'):
    volumes.append(deepcopy(allinfo['volumes'][volume]))
    volumes[-1]['groups'] = deepcopy(volgrps)
  return volumes
-
-
 @app.route('/api/v1/volumes/CIFS/volumesinfo', methods=['GET','POST'])
 @login_required
 def volumescifsinfo(data):
@@ -802,7 +718,6 @@ def volumescifsinfo(data):
       return {'response': 'baduser'}
  volumes = volumesinfo('CIFS') 
  return jsonify({'allvolumes':volumes})
-
 @app.route('/api/v1/volumes/ISCSI/volumesinfo', methods=['GET','POST'])
 @login_required
 def volumesiscsiinfo(data):
@@ -810,7 +725,6 @@ def volumesiscsiinfo(data):
       return {'response': 'baduser'}
  volumes = volumesinfo('ISCSI') 
  return jsonify({'allvolumes':volumes})
-
 @app.route('/api/v1/volumes/NFS/volumesinfo', methods=['GET','POST'])
 @login_required
 def volumesnfsinfo(data):
@@ -818,7 +732,6 @@ def volumesnfsinfo(data):
       return {'response': 'baduser'}
  volumes = volumesinfo('NFS') 
  return jsonify({'allvolumes':volumes})
-
 @app.route('/api/v1/volumes/HOME/volumesinfo', methods=['GET','POST'])
 @login_required
 def volumeshomeinfo(data):
@@ -826,7 +739,6 @@ def volumeshomeinfo(data):
       return {'response': 'baduser'}
  volumes = volumesinfo('HOME') 
  return jsonify({'allvolumes':volumes})
-
 @app.route('/api/v1/volumes/volumesinfo', methods=['GET','POST'])
 @login_required
 def volumesallinfo(data):
@@ -834,9 +746,6 @@ def volumesallinfo(data):
       return {'response': 'baduser'}
  volumes = volumesinfo() 
  return jsonify({'allvolumes':volumes})
-
-
-
 @app.route('/api/v1/pools/poolsinfo', methods=['GET','POST'])
 @login_required
 def poolsinfo(data):
@@ -846,7 +755,6 @@ def poolsinfo(data):
  allpools = getpools()
  allpools.append({'id':len(allpools), 'text':'-------'})
  return jsonify({'results':allpools})
-
 @app.route('/api/v1/groups/groupchange', methods=['GET','POST'])
 @login_required
 def pgroupchange(data):
@@ -866,7 +774,6 @@ def pgroupchange(data):
  cmndstring = '/TopStor/UnixChangeGroup '+leaderip+' '+' '+data.get('name')+' users'+usrstr+' '+data['user']+' '+'change'
  postchange(cmndstring)
  return data
-
 @app.route('/api/v1/replication/addpartner', methods=['GET','POST'])
 @login_required
 def partneradd(data):
@@ -875,7 +782,6 @@ def partneradd(data):
  cmndstring = '/TopStor/PartnerAdd.py '+data.get('partnerip')+' '+data.get('partneralias')+' '+data.get('replitype')+' '+data.get('repliport')+' '+data.get('phrase')+' '+data.get('user')
  postchange(cmndstring)
  return data
-
 @app.route('/api/v1/users/userchange', methods=['GET','POST'])
 @login_required
 def userchange(data):
@@ -904,8 +810,6 @@ def userchange(data):
  cmndstring = '/TopStor/UnixChangeUser '+leaderip+' '+data.get('name')+' groups'+groupstr+' '+data['user']+' '+'change'
  postchange(cmndstring)
  return data
-
-
  
 @app.route('/api/v1/info/onedaylog', methods=['GET','POST'])
 @login_required
@@ -921,8 +825,6 @@ def getalllogs(data):
       return {'response': 'baduser'}
  notif = getlogs()
  return jsonify({'alllogs': notif})
-
-
 @app.route('/api/v1/login/renewtoken', methods=['GET','POST'])
 @login_required
 def renewtoken(data):
@@ -931,8 +833,6 @@ def renewtoken(data):
  user = loggedusers[data['token']]['user']
  setlogin(leaderip,myhost, user,'!',data['token'])
  return data
-
-
 @app.route('/api/v1/info/cversion', methods=['GET','POST'])
 @login_required
 def getcversion(data):
@@ -944,9 +844,6 @@ def getcversion(data):
     #postchange(cmdline)
     cversions = get('cversion/'+myhost)[0]
     return { 'response':'Ok', 'cversion': str(cversions)}
-
-
-
 @app.route('/api/v1/info/notification', methods=['GET','POST'])
 @login_required
 def getnotification(data):
@@ -992,7 +889,6 @@ def getnotification(data):
  notif = { 'isinsync': isinsync, 'importance':msg[0].replace(':',''), 'msgcode': notifbody[3], 'date':notifbody[0], 'time':notifbody[1],
 	 'host':notifbody[2], 'type':notifbody[4], 'user': notifbody[5], 'msgbody': msgbody[1:],'requests':requestdict, 'response':'Ok'}
  return jsonify(notif)
-
 @app.route('/api/v1/volumes/snapshots/create', methods=['GET','POST'])
 @login_required
 def volumesnapshotscreate(data):
@@ -1024,11 +920,6 @@ def volumesnapshotscreate(data):
 # msg={'req': 'Pumpthis', 'reply':z}
 # sendhost(ownerip, str(msg),'recvreply',myhost)
  return data
-
-
-
-
-
 @app.route('/api/v1/volumes/create', methods=['GET','POST'])
 @login_required
 def volumecreate(data):
@@ -1059,32 +950,25 @@ def volumecreate(data):
   data['chappas']='MezoAdmin'
   datastr = data['pool']+' '+data['name']+' '+data['size']+' '+data['ipaddress']+' '+data['Subnet']+' '+data['portalport']+' '+data['initiators']+' '+data['chapuser']+' '+data['chappas']+' '+data['active']+' '+data['user']+' '+data['owner']+' '+data['user']
  elif 'CIFSdom' in data['type']:
-
   cmdline=['/TopStor/encthis.sh',data["domname"],data["dompass"]]
   data["dompass"]=subprocess.run(cmdline,stdout=subprocess.PIPE).stdout.decode().split('_result')[1].replace('/','@@sep')
-
   # Call resolve script if domsrv is passed and domip is not
   if data['domsrv']:
     cmdline = ['/TopStor/resolve_dns.sh', leaderip, data['domsrv']]
     result = subprocess.run(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output = result.stdout.decode().strip()
-
     resolved_ip = ""
     if output.startswith("RESOLVEDIP="):
      resolved_ip = output.split("=")[1]
-
     if resolved_ip and int(is_valid_ip(resolved_ip)) == 0:
      data['domip'] = resolved_ip
      data['domsrv'] = ''
     else:
      logmsg.sendlog('CIFS1033', 'error', 'system', data['name'],data["domsrv"])
      return data
-
   datastr = data['pool']+' '+data['name']+' '+data['size']+' '+' '+data['ipaddress']+' '+data['Subnet']+' '+data['active']+' '+data['user']+' '+data['owner']+' '+data['user']+' '+ data["domname"]+' '+ data["domsrv"]+' '+ data["domip"]+' '+ data["domadmin"]+' '+ data["dompass"]
-
  elif 'NFS' in data['type']:
   datastr = data['pool']+' '+data['name']+' '+data['size']+' '+data['rootname']+' '+data['rootid']+' '+data['groupname']+' '+data['groupid']+' '+data['ipaddress']+' '+data['Subnet']+' '+data['active']+' '+data['user']+' '+data['owner']+' '+data['user']
-
  else:
   datastr = data['pool']+' '+data['name']+' '+data['size']+' '+data['groups']+' '+data['ipaddress']+' '+data['Subnet']+' '+data['active']+' '+data['user']+' '+data['owner']+' '+data['user']
  print('#############################')
@@ -1099,7 +983,6 @@ def volumecreate(data):
  #sendhost(ownerip, str(msg),'recvreply',myhost)
  postchange(cmndstring,data['owner'])
  return data
-
 def getlogin(token):
  global leaderip
  logindata = get('login',token)[0]
@@ -1124,7 +1007,6 @@ def getlogin(token):
  loggedusers[token] = userdict.copy()
  print('iamokkkkkkkkkkkkkkkkkk')
  return user 
-
 @app.route('/api/v1/logout', methods=['GET','POST'])
 def logout():
  global leaderip
@@ -1132,13 +1014,11 @@ def logout():
  dels('login',data['token'])
  loggedusers.pop(data['token'], None)
  return data
-
 @app.route('/api/v1/login/test', methods=['GET','POST'])
 def testlogin():
  data = request.args.to_dict()
  loginresponse = getlogin(data['token'])
  return { 'response': loginresponse }
-
 @app.route('/api/v1/login', methods=['GET','POST'])
 def login():
  data = request.args.to_dict()
@@ -1164,7 +1044,6 @@ def usersauth(data):
  cmndstring = '/TopStor/Priv.py '+leader+' '+leaderip+' '+myhost+' '+myhostip+' '+data['tochange']+' '+data['auths'].replace(',','/')+' '+data['user']
  postchange(cmndstring)
  return data
-
 @app.route('/api/v1/volumes/config', methods=['GET','POST'])
 @login_required
 def volumeconfig(data):
@@ -1181,7 +1060,6 @@ def volumeconfig(data):
         datatype='ANYthing'
     else:
         datatype=volume['prot']
-
     if data['ipaddress'] != volume['ipaddress']:
         isvu =  int(is_valid_ip(data['ipaddress']))+int(is_unique_ip(data['ipaddress'],datatype))
         if isvu == 0:
@@ -1211,7 +1089,6 @@ def volumeconfig(data):
    volume[ele] = data[ele] 
   datastr = volume['pool']+' '+volume['name']+' '+str(volume['quota'])+' '+data['ipaddress']+' '+str(volume['Subnet'])+' '+data['portalport']+' '+data['initiators']+' '+data['chapuser']+' '+data['chappas']+' '+volume['statusmount']+' '+data['user']+' '+data['owner']+' '+data['user']
  else:
-
   if 'groups' in data and len(data['groups']) < 1: 
    data['groups'] = 'NoGroup'
   for ele in data:
@@ -1228,7 +1105,6 @@ def volumeconfig(data):
 # sendhost(ownerip, str(msg),'recvreply',myhost)
  #config(data)
  return data
-
 @app.route('/api/v1/user/changepass', methods=['GET','POST'])
 @login_required
 def changepass(data):
@@ -1240,9 +1116,6 @@ def changepass(data):
  print('###########################')
  config(leader, leaderip,myhost, data)
  return data
-
-
-
 @app.route('/api/v1/hosts/config', methods=['GET','POST'])
 @login_required
 def hostconfig(data):
@@ -1278,7 +1151,6 @@ def hostconfig(data):
         else:
             logmsg.sendlog('IPnamuqfa','error','system',loggedusers[data['token']]['user'])
         return data
-
  datastr = ''
  for ele in data:
   datastr += ele+'='+data[ele]+' '
@@ -1286,16 +1158,13 @@ def hostconfig(data):
  print('#############################')
  print(data)
  print('###########################')
-
  if 'discovered' in data:
   dleaderip = leaderip
   dleader   = get(dleaderip, 'leader')[0]
   config(dleader, dleaderip, myhost, data)
   return data
-
  config(leader, leaderip, myhost, data)
  return data
-
 @app.route('/api/v1/hosts/joincluster', methods=['GET','POST'])
 @login_required
 def hostjoincluster(data):
@@ -1310,8 +1179,6 @@ def hostjoincluster(data):
  cmndstring = '/TopStor/promserver.sh '+leaderip+' from fapi'
  postchange(cmndstring)
  return data
-
-
 @app.route('/api/v1/hosts/evacuate', methods=['GET','POST'])
 @login_required
 def hostevacuate(data):
@@ -1323,7 +1190,6 @@ def hostevacuate(data):
  discover()
  Evacuate.do(leaderip, myhost, data['name'], data['user']) 
  return data
-
 @app.route('/api/v1/volumes/snapshots/snaprollback', methods=['GET','POST'])
 @login_required
 def volumesnapshotrol(data):
@@ -1345,8 +1211,6 @@ def volumesnapshotrol(data):
 # sendhost(ownerip, str(msg),'recvreply',myhost)
         		 
  return data
-
-
 @app.route('/api/v1/volumes/snapshots/perioddelete', methods=['GET','POST'])
 @login_required
 def volumesnapshotperioddel(data):
@@ -1362,8 +1226,6 @@ def volumesnapshotperioddel(data):
 # msg={'req': 'Pumpthis', 'reply':z}
 # sendhost(ownerip, str(msg),'recvreply',myhost)
  return data  
-
-
 @app.route('/api/v1/volumes/snapshots/snapshotdel', methods=['GET','POST'])
 @login_required
 def volumesnapshotdel(data):
@@ -1385,7 +1247,6 @@ def volumesnapshotdel(data):
 # sendhost(ownerip, str(msg),'recvreply',myhost)
         		 
  return data
-
 @app.route('/api/v1/volumes/volumeactive', methods=['GET','POST'])
 @login_required
 def volumeactive(data):
@@ -1405,9 +1266,6 @@ def volumeactive(data):
 # msg={'req': 'Pumpthis', 'reply':z}
 # sendhost(ownerip, str(msg),'recvreply',myhost)
  return data
-
-
-
 @app.route('/api/v1/volumes/volumedel', methods=['GET','POST'])
 @login_required
 def volumedel(data):
@@ -1428,7 +1286,6 @@ def volumedel(data):
 # sendhost(ownerip, str(msg),'recvreply',myhost)
         		 
  return data
-
 @app.route('/api/v1/groups/groupdel', methods=['GET','POST'])
 @login_required
 def groupdel(data):
@@ -1437,7 +1294,6 @@ def groupdel(data):
  cmndstring = '/TopStor/UnixDelGroup '+leaderip+' '+data.get('name')+' '+data['user'] 
  postchange(cmndstring)
  return data
-
 @app.route('/api/v1/partners/partnerdel', methods=['GET','POST'])
 @login_required
 def partnerdel(data):
@@ -1446,9 +1302,6 @@ def partnerdel(data):
  cmndstring = '/TopStor/PartnerDel.py '+data.get('name')+' no '+data['user']
  postchange(cmndstring)
  return data
-
-
-
 @app.route('/api/v1/users/userdel', methods=['GET','POST'])
 @login_required
 def userdel(data):
@@ -1460,7 +1313,6 @@ def userdel(data):
  else:
     TenantDelUser(data)
  return data
-
 @app.route('/api/v1/groups/UnixAddgroup', methods=['GET','POST'])
 @login_required
 def UnixAddGroup(data):
@@ -1477,14 +1329,12 @@ def UnixAddGroup(data):
     if str(suser['id']) == str(usr):
      usrstr += suser['name']+',' 
   usrstr = usrstr[:-1]
-
  if int(is_unique_name(data['name']))==1000:
     logmsg.sendlog('IPnamuqfa','error','system',loggedusers[data['token']]['user'])
     return data
  cmndstring = '/TopStor/UnixAddGroup '+leaderip+' '+data['name']+' '+' users'+usrstr+' '+data['user']
  postchange(cmndstring)
  return data
-
 @app.route('/api/v1/partners/AddPartner', methods=['GET','POST'])
 @login_required
 def AddPartner(data):
@@ -1501,15 +1351,12 @@ def AddPartner(data):
         else:
             logmsg.sendlog('IPnamuqfa','error','system',loggedusers[data['token']]['user'])
         return data
-
  print('##########################33333')
  print(data)
  print('##########################33333')
  cmdstring = '/TopStor/PartnerAdd.py '+data['ip']+' '+data['alias']+' '+data['type']+' '+data['port']+' '+data['pass']+' '+data['user'] + ' init'
  postchange(cmdstring)
  return data
-
-
 @app.route('/api/v1/tenant/adduser', methods=['GET','POST'])
 @login_required
 def TenantAddUser(data):
@@ -1540,9 +1387,6 @@ def TenantDelUser(data):
     cmndstring = '/TopStor/TenantDelUser '+leaderip+' '+data['response']+' '+pool+' '+data['tenant']+' '+data['name']
  postchange(cmndstring,data['owner'])
  return data
-
-
-
 @app.route('/api/v1/users/UnixAddUser', methods=['GET','POST'])
 @login_required
 def UnixAddUser(data):
@@ -1564,8 +1408,6 @@ def UnixAddUser(data):
         else:
             logmsg.sendlog('IPnamuqfa','error','system',loggedusers[data['token']]['user'])
         return data
-
-
  if int(is_unique_name(data['name']))==1000:
     logmsg.sendlog('IPnamuqfa','error','system',loggedusers[data['token']]['user'])
     return data
@@ -1586,7 +1428,6 @@ def UnixAddUser(data):
  print('*************************************************************************')
  postchange(cmndstring)
  return data 
-
 @app.route('/api/v1/volumes/grouplist', methods=['GET'])
 @login_required
 def api_volumes_groupslist(data):
@@ -1604,10 +1445,6 @@ def api_volumes_groupslist(data):
    groupusers=["NoUser"]
   thegroup.append({'text':group[0], 'id':group[1], 'users':groupusers})
  return jsonify({'results':thegroup})
-
-
-
-
 @app.route('/api/v1/groups/grouplist', methods=['GET'])
 @login_required
 def api_groups_groupslist(data):
@@ -1619,7 +1456,6 @@ def api_groups_groupslist(data):
  for group in allgroups:
  # if group[0] == 'Everyone':
  #  continue
-
   groupusers = []
   for user in allusers:
    grpusrs = str(group[2]).split(',')
@@ -1632,7 +1468,6 @@ def api_groups_groupslist(data):
    groupusers=["NoUser"]
   thegroup.append({'name':group[0], 'id':group[1], 'users':groupusers})
  return jsonify({'allgroups':thegroup})
-
 @app.route('/api/v1/users/userauths', methods=['GET'])
 @login_required
 def userauths(data):
@@ -1648,7 +1483,6 @@ def userauths(data):
    priv = '/'.join(user['prop'].split('/')[4:])
    break
  return jsonify({'auths':priv, 'response':data['response']})
-
 @app.route('/api/v1/partners/partnerlist', methods=['GET'])
 @login_required
 def api_partners_userslist(data):
@@ -1662,7 +1496,6 @@ def api_partners_userslist(data):
   split = partner["prop"].split('/') 
   allpartners.append({'alias': alias, "ip":split[0], "type":split[1], "port":split[2]})
  return { "allpartners":allpartners }
-
 @app.route('/api/v1/users/userlist', methods=['GET'])
 @login_required
 def api_users_userslist(data):
@@ -1725,7 +1558,6 @@ def api_users_userslist(data):
  alldict['allgroups'] = allgroups
  alldict['usersnohome'] = usersnohome
  return jsonify(alldict)
-
 @app.route('/api/v1/groups/userlist', methods=['GET'])
 @login_required
 def api_groups_userlist(data):
@@ -1737,8 +1569,6 @@ def api_groups_userlist(data):
  for user in allusers:
   usr.append({'id':user['id'],'text':user['name']})
  return jsonify({'results':usr})
-
-
 @app.route('/api/v1/users/grouplist', methods=['GET'])
 @login_required
 def api_users_grouplist(data):
@@ -1755,8 +1585,6 @@ def api_users_grouplist(data):
     for group in allgroups:
         grp.append({'id':group[1],'text':group[0]})
  return jsonify({'results':grp, 'response':data['response']})
-
-
 @app.route('/api/v1/pools/actionOnDisk', methods=['GET','POST'])
 @login_required
 def offlineOrOnlineDisk(data):
@@ -1777,7 +1605,6 @@ def offlineOrOnlineDisk(data):
 #    msg = {'req': 'Pumpthis', 'reply':z}
 #    sendhost(ownerip, str(msg),'recvreply',myhost)
     return data
-
 @app.route('/api/v1/hosts/getConfig', methods=['GET','POST'])
 @login_required
 def getNodeConfigFile(data):
@@ -1789,7 +1616,6 @@ def getNodeConfigFile(data):
     downloadConfig(leaderip, myhost)
     file_path = "/TopStordata/config_" + nodeName + ".txt"
     return send_file(file_path, mimetype='text/plain', as_attachment=True)
-
 @app.route('/api/v1/hosts/getAllConfig', methods=['GET','POST'])
 @login_required
 def getAllConfigFiles(data):
@@ -1810,23 +1636,18 @@ def getAllConfigFiles(data):
         for file in configFiles:
             zipF.write(file[0], file[1] ,compress_type = zipfile.ZIP_DEFLATED)
     return send_file(zipfilePath, as_attachment=True)
-
 @app.route('/api/v1/software/update', methods=['GET','POST'])
 @login_required
 def updateSoftware(data):
     if data.get('response') == 'baduser':
         return {'response': 'baduser'}
-
     source_type = data.get('source-type')
     source = data.get('source')
     location = data.get('location')
     version = data.get('version')
-
     command = ['./downloadSoftwareUpdate.sh', f'--source-type {source_type}', f'--source {source}']
-
     if version:
         command.append(f'--version {version}')
-
     if source_type == 'cifs':
         username = data.get('username')
         password = data.get('password')
@@ -1837,12 +1658,9 @@ def updateSoftware(data):
         ])
     elif source_type == 'nfs':
         command.append(f'--location {location}')
-
     command_string = ' '.join(command)
     postchange(command_string, 'leader')
-
     return {'data': command_string}
-
 @app.route('/api/v1/software/localFileUpdate', methods=['GET','POST'])
 @login_required
 def localFileUpdate(data):
@@ -1860,8 +1678,6 @@ def localFileUpdate(data):
         uploaded_file.save(filePath)
         return {"data": 'success'}
     return {"data": uploaded_file.filename}
-
-
 @app.route('/api/v1/telemetry/heartbeat', methods=['POST', 'GET'])
 def telemetry_heartbeat():
     # Write the current epoch time to a file
@@ -1871,8 +1687,6 @@ def telemetry_heartbeat():
         return {"status": "boost_active"}, 200
     except Exception as e:
         return {"error": str(e)}, 500
-
-
 @app.route('/api/v1/info/summary', methods=['GET', 'POST'])
 def get_service_summary():
     global leaderip # Use the globally defined leaderip from fapi.py
@@ -1882,21 +1696,17 @@ def get_service_summary():
         # fapi.py native approach: etcdgetjson(leaderip, 'usersinfo', '--prefix')
         users_data = etcdgetjson(leaderip, 'usersinfo', '--prefix')
         users_count = len(users_data) if isinstance(users_data, list) else 0
-
         groups_data = etcdgetjson(leaderip, 'usersigroup', '--prefix')
         groups_count = len(groups_data) if isinstance(groups_data, list) else 0
-
         # 2. Pools (Standard data)
         # fapi.py native approach: get('pools/','--prefix')
         pools_data = get('pools/', '--prefix')
         pools_count = len(pools_data) if isinstance(pools_data, list) else 0
-
         # 3. Categorize Volumes (Standard data)
         # fapi.py native approach: get('vol', '--prefix')
         cifs_count = 0
         nfs_count = 0
         iscsi_count = 0
-
         volumes_data = get('vol', '--prefix')
         if isinstance(volumes_data, list):
             for vol in volumes_data:
@@ -1909,7 +1719,6 @@ def get_service_summary():
                         nfs_count += 1
                     elif '/ISCSI' in key:
                         iscsi_count += 1
-
         # 4. Return the exact JSON structure React expects
         return jsonify({
             "users": users_count,
@@ -1921,26 +1730,13 @@ def get_service_summary():
                 "iscsi": iscsi_count
             }
         }), 200
-
     except Exception as e:
         print(f"Telemetry Summary Error: {traceback.format_exc()}")
         return jsonify({"error": str(e)}), 500
   
-try:
-    leaderip = get('leaderip')[0]
-    myhost = get('clusternode')[0]
-    myhostip = get('clusternodeip')[0]
-except Exception:
-    leaderip = ''
-    myhost = ''
-    myhostip = ''
-
 if __name__=='__main__':
     #leader = sys.argv[2]
     #leaderip = sys.argv[1]
-    leaderip = get('leaderip')[0]
-    myhost = get('clusternode')[0]
-    myhostip = get('clusternodeip')[0]
     leader = get('leader')[0]
     logmsg.initlog(leaderip,myhost)
     initallphy(leaderip)
@@ -1948,5 +1744,3 @@ if __name__=='__main__':
     getalltime()
    #myhostip = sys.argv[5]
     app.run(host="0.0.0.0", port=5001)
-
-
