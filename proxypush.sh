@@ -84,6 +84,17 @@ skipped=0
 missing=0
 failed=0
 
+# Scratch repositories from an interrupted run are ~75 MB each and are pure
+# litter.  Clear them before starting so /tmp does not quietly fill up.
+if [ -d "$WORKROOT" ]; then
+	stale=`ls -1 "$WORKROOT" 2>/dev/null | wc -l`
+	if [ "$stale" -gt 0 ]; then
+		echo "clearing $stale leftover scratch director$([ "$stale" -eq 1 ] && echo y || echo ies) in $WORKROOT"
+		rm -rf "$WORKROOT"/* 2>/dev/null
+	fi
+fi
+mkdir -p "$WORKROOT"
+
 for project in $PROJECTS; do
 	to_url="https://github.com/$GITHUB_USER/$project.git"
 
@@ -158,13 +169,23 @@ for project in $PROJECTS; do
 	echo "  have $got locally, exactly as abdopuppet has it"
 
 	# ---- 3. push the ref straight across ----
-	if timeout 600 git push github "$ref" > "$scratch/push" 2>&1; then
-		echo "  PUSHED $branch to github"
+	# Say what is going to happen before it happens.  A push of a branch that
+	# carries a large file really can sit silent for a minute or more, and
+	# without this it just looks like the script has hung.
+	biggest=`git ls-tree -r -l "refs/heads/$branch" 2>/dev/null | sort -k4 -nr | head -1 | awk '{printf "%.1f MB  %s", $4/1048576, $5}'`
+	echo "  pushing to github -- a big file means a slow upload, this is normal"
+	echo "    largest file in the branch : $biggest"
+
+	pushstart=`date +%s`
+	if timeout 600 git push --progress github "$ref" > "$scratch/push" 2>&1; then
+		pushsecs=`expr \`date +%s\` - $pushstart`
+		echo "  PUSHED $branch to github in ${pushsecs}s"
 		ok=`expr $ok + 1`
 	elif timeout 900 git fetch --no-tags --deepen 200 abdopuppet "$ref" > "$scratch/deepen" 2>&1 &&
-	     timeout 600 git push github "$ref" > "$scratch/push2" 2>&1; then
+	     timeout 600 git push --progress github "$ref" > "$scratch/push2" 2>&1; then
 		# ---- 4. a shallow pack is refused when github lacks the history ----
-		echo "  push refused, deepened the history, PUSHED on the second attempt"
+		pushsecs=`expr \`date +%s\` - $pushstart`
+		echo "  push refused, deepened the history, PUSHED on the second attempt in ${pushsecs}s"
 		ok=`expr $ok + 1`
 	else
 		echo "  FAILED to push $branch to github"

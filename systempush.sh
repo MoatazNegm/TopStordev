@@ -7,7 +7,9 @@
 #
 # Per project (TopStor, pace, topstorweb):
 #   1. git add --all          every file, including ones not tracked yet
-#   2. drop generated __py*   python junk is never committed
+#   2. drop what must not be committed:
+#        __pycache__ junk          -- deleted from disk as well
+#        the SPD_EXCLUDE files     -- untracked, but kept on disk
 #   3. commit                 always, even when there is nothing to commit
 #   4. create <newbranch> at that commit and check it out
 #   5. push <newbranch> to origin
@@ -22,11 +24,14 @@
 #
 # environment:
 #   SPD_PUSH_FORCE=1   pass --force-with-lease to the push
+#   SPD_EXCLUDE        files to untrack and ignore before committing.
+#                      Default: quickstor-ui.tar.gz.  These are left on disk.
 #   SPD_PROJECTS       space separated project directory names
 #   SPD_ROOT           prefix to put in front of every path (default none)
 # ---------------------------------------------------------------------------
 
 SPD_PUSH_FORCE=${SPD_PUSH_FORCE:-0}
+SPD_EXCLUDE=${SPD_EXCLUDE:-'quickstor-ui.tar.gz'}
 SPD_PROJECTS=${SPD_PROJECTS:-'TopStor pace topstorweb'}
 SPD_ROOT=${SPD_ROOT:-}
 PROJECTS=$SPD_PROJECTS
@@ -84,12 +89,34 @@ fnupdate() {
 		return 1
 	fi
 
-	# ---- 1 and 2. stage everything, minus the python junk ---------------
+	# ---- 1 and 2. stage everything, minus what must never be committed ---
 	git add --all
+
 	# __pycache__ turns up at any depth, so a bare '__py*' pathspec is not
 	# enough -- it only ever matches the top level.  :(glob)** reaches them all.
 	git rm -rq --ignore-unmatch -- ':(glob)**/__py*' >/dev/null 2>&1
 	find . -name '.git' -prune -o -name '__py*' -prune -exec rm -rf {} + 2>/dev/null
+
+	# Build artefacts: untracked, but deliberately LEFT ON DISK.  These are
+	# files you still want on the node, you just do not want them in git --
+	# quickstor-ui.tar.gz alone is 75 MB, which is 85% of the tree and is
+	# re-uploaded to github on every single branch, making each push take
+	# about a minute and a half.
+	#
+	# .gitignore does NOT stop this on its own: once a file is tracked the
+	# ignore rules are never applied to it again.  So it has to be removed
+	# from the index as well, which is what this does.
+	for pat in $SPD_EXCLUDE; do
+		if git ls-files --error-unmatch -- "$pat" >/dev/null 2>&1; then
+			git rm -rq --cached --ignore-unmatch -- "$pat" >/dev/null 2>&1
+			echo "  no longer tracking $pat (the file is still on disk)"
+		fi
+		if [ -e "$pat" ] && ! grep -qxF "$pat" .gitignore 2>/dev/null; then
+			echo "$pat" >> .gitignore
+			echo "  added $pat to .gitignore"
+		fi
+	done
+
 	git add --all
 
 	if git diff --cached --quiet; then
