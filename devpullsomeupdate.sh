@@ -1,6 +1,7 @@
 #!/usr/bin/sh
 # ---------------------------------------------------------------------------
 # devpullsomeupdate.sh <branch> <developer> [repository ...]
+# devpullsomeupdate.sh <anything> <new-developer> init [clone] [repository ...]
 #
 # Take one of a developer's branches off their github fork and land it on
 # abdopuppet, ready for you to review and merge into a newer QSD line.
@@ -9,6 +10,38 @@
 #                 "all" means all three.  A name may also be any unique part
 #                 of one, so "web" picks topstorweb.  Listing more than one
 #                 is fine.
+#
+#   developer:     the whole name, or any part of it that fits exactly one
+#                 developer, so "Ahmed" finds Ahmed395593.  Two developers
+#                 containing the same part is an error, never a guess.
+#
+# The developer directories are /TopStor_<developer>, /pace_<developer> and
+# /topstorweb_<developer>, so a developer's full name is whatever follows the
+# underscore.  Both the repository and the developer argument are resolved
+# before any work starts, and an unresolvable or ambiguous one stops the run
+# rather than half way through it.
+#
+# Making room for a NEW developer:
+#   'init' in the repository position is a mode rather than a project, and
+#   none of the three is called init so the two can never collide.  The name
+#   given is then taken whole -- nothing is matched against anybody -- and the
+#   directories are created:
+#     devpullsomeupdate.sh - Ahmed123 init          the three empty directories
+#     devpullsomeupdate.sh - Ahmed123 init clone    also clone and set remotes
+#     devpullsomeupdate.sh - Ahmed123 init pace     just the one repository
+#   There is no bookkeeping to keep, because the developer list is read back
+#   out of the directories themselves, so a new name is immediately usable as
+#   a full name and as a unique part of one.  Running init twice is safe: the
+#   directories that are already there are reported and left alone.
+#
+#   'clone' is deliberately a separate word.  A fresh TopStor from abdopuppet
+#   is around 860 MB, and that should never happen because someone typed
+#   'init' expecting a directory.
+#
+#   The fork remote is https://github.com/<developer>/<project>_mydev.git,
+#   which need not exist yet -- a remote is only a name and an address until
+#   something is fetched from it, so the developer can be set up before they
+#   have created anything on github.
 #
 # The branch is taken from the developer's fork EXACTLY AS IT IS.  Nothing is
 # merged, rebased or committed on the way through: the commit that lands on
@@ -69,6 +102,20 @@ list_developers() {
 branch=$1
 dev=$2
 shift 2 2>/dev/null
+
+# An 'init' in the repository position is a mode, not a repository.  No
+# project is called init, so the two can never be confused, and the mode is
+# taken before anything else is resolved.
+INIT=0
+CLONE=0
+if [ "${1:-}" = "init" ]; then
+	INIT=1
+	shift
+	if [ "${1:-}" = "clone" ]; then
+		CLONE=1
+		shift
+	fi
+fi
 want="$*"
 
 if [ -z "$branch" ] || [ -z "$dev" ]; then
@@ -79,10 +126,218 @@ if [ -z "$branch" ] || [ -z "$dev" ]; then
 	echo "  repositories: $ALL_PROJECTS    (default all three, or say 'all')" >&2
 	echo "                a unique part of a name works too, e.g. 'web'" >&2
 	echo "" >&2
+	echo "  developer:     the whole name, or any part of it that fits one" >&2
+	echo "                developer only, e.g. 'Ahmed' for Ahmed395593" >&2
+	echo "" >&2
+	echo "  to make room for a NEW developer, whose name is then used whole:" >&2
+	echo "    devpullsomeupdate.sh <anything> <new-developer> init" >&2
+	echo "      creates /$project_<developer> for each project, so that any" >&2
+	echo "      part of the new name works from then on.  Add 'clone' after" >&2
+	echo "      init to also clone them and set the three remotes up." >&2
+	echo "" >&2
 	echo "developers that exist:" >&2
 	list_developers | sed 's/^/    /' >&2
 	exit 1
 fi
+
+# Each project is one directory here, but it is called something else on
+# abdopuppet and on github.  pace is HC and topstorweb is TopStorweb, which is
+# exactly the sort of thing worth writing down once instead of remembering.
+repo_name() {
+	case $1 in
+	TopStor) echo TopStordev ;;
+	pace) echo HC ;;
+	topstorweb) echo TopStorweb ;;
+	esac
+}
+
+# ---- init: make room for a developer --------------------------------------
+if [ "$INIT" = 1 ]; then
+	case $dev in
+	'') echo "init needs the name of the developer to make room for" >&2; exit 1 ;;
+	*/*) echo "'$dev' cannot be used, it contains a '/'" >&2; exit 1 ;;
+	esac
+	if ! echo "$dev" | grep -q '^[A-Za-z0-9][A-Za-z0-9._-]*$'; then
+		echo "'$dev' cannot be used as a directory name." >&2
+		echo "  letters, digits, dot, dash and underscore only" >&2
+		exit 1
+	fi
+
+	# resolve the repositories the same way, so 'init pace' is allowed
+	projects=""
+	if [ -z "$want" ] || [ "$want" = "all" ]; then
+		projects=$ALL_PROJECTS
+	else
+		for w in $want; do
+			found=""
+			n=0
+			for job in $ALL_PROJECTS; do
+				case $job in
+				*"$w"* | "$w"*)
+					n=`expr $n + 1`
+					found=$job
+					;;
+				esac
+			done
+			case $n in
+			0) echo "'$w' does not name any of: $ALL_PROJECTS" >&2; exit 1 ;;
+			1) projects="$projects $found" ;;
+			*) echo "'$w' matches more than one of: $ALL_PROJECTS" >&2; exit 1 ;;
+			esac
+		done
+	fi
+
+	echo "init: making room for the developer $dev"
+	echo "  repositories: $projects"
+	echo ""
+
+	made=""
+	already=""
+	for job in $projects; do
+		d="/${job}_$dev"
+		if [ -d "$d" ]; then
+			echo "  $d  already there, left alone"
+			already="$already $d"
+			continue
+		fi
+		if mkdir -p "$d" 2>/dev/null; then
+			echo "  $d  created"
+			made="$made $d"
+		else
+			echo "  $d  COULD NOT BE CREATED"
+		fi
+	done
+
+	# ---- optionally make them real working copies ----------------------
+	if [ "$CLONE" = 1 ]; then
+		echo ""
+		echo "  cloning from abdopuppet, which also sets the fork remote up:"
+		for job in $projects; do
+			rn=`repo_name $job`
+			d="/${job}_$dev"
+			if [ ! -d "$d" ]; then
+				echo "    $job  no directory, skipped"
+				continue
+			fi
+			if [ -d "$d/.git" ]; then
+				echo "    $job  already a git repository, left alone"
+				continue
+			fi
+			echo "    $job  cloning $rn from abdopuppet, this takes a while"
+			if git clone -q "http://10.11.11.252/git/$rn.git" "$d" 2>/tmp/initclone.$$; then
+				cd "$d" || continue
+				# the fork need not exist yet: a remote is only a name and
+				# an address until something is fetched from it
+				git remote add QuickStor "https://github.com/MoatazNegm/$rn.git" 2>/dev/null
+				git remote add remote "https://github.com/$dev/${job}_mydev.git" 2>/dev/null
+				latest=`git ls-remote --heads origin 2>/dev/null | awk '{print $2}' \
+					| sed 's#refs/heads/##' | grep '^QSD5\.[0-9]' \
+					| sed 's/^QSD5\.//' | sort -n | tail -1 | sed 's/^/QSD5./'`
+				if [ -n "$latest" ] && git rev-parse --verify --quiet "origin/$latest" >/dev/null; then
+					git checkout -q -B "$latest" "origin/$latest" 2>/dev/null \
+						&& echo "      on $latest, ready to branch from"
+				else
+					git checkout -q "$(git branch -r 2>/dev/null | head -1 | sed 's/^ *//;s#origin/##')" 2>/dev/null
+				fi
+				echo "      fork remote : https://github.com/$dev/${job}_mydev.git"
+				cd / || continue
+			else
+				echo "      CLONE FAILED:"
+				sed 's/^/        /' /tmp/initclone.$$ | head -4
+			fi
+		done
+		rm -f /tmp/initclone.$$
+	fi
+
+	echo ""
+	# warn before a future partial name becomes ambiguous
+	others=""
+	for cand in `list_developers`; do
+		[ "$cand" = "$dev" ] && continue
+		case $cand in
+		*"$dev"* | "$dev"*) others="$others $cand" ;;
+		esac
+	done
+	if [ -n "$others" ]; then
+		echo "  note: the name $dev overlaps $others, so a short part of a"
+		echo "        name may match more than one developer from now on."
+		echo "        Partial names that fit more than one are refused, not guessed."
+	fi
+
+	echo ""
+	if [ -n "$made" ]; then
+		echo "  ready: `echo $made`"
+		echo "  from now on any part of '$dev' that fits only them selects them,"
+		echo "  so  devpullsomeupdate.sh <branch> ${dev%%[0-9]*}  will work."
+	else
+		echo "  nothing new was created; those directories were already there."
+	fi
+	if [ "$CLONE" != 1 ] && [ -n "$made" ]; then
+		echo ""
+		echo "  they are empty directories for now.  To clone and wire up the"
+		echo "  remotes as well, repeat with clone after init:"
+		echo "    devpullsomeupdate.sh $branch $dev init clone"
+	fi
+	echo ""
+	echo "finished"
+	exit 0
+fi
+
+# ---- which developer did the caller mean? ---------------------------------
+# The repositories are /TopStor_<developer>, /pace_<developer> and
+# /topstorweb_<developer>, so the whole of a developer's name is whatever
+# follows the underscore.  Accepting any part of it means you can type 'Ahmed'
+# instead of 'Ahmed395593', on the same rule the repositories use: an exact
+# name always wins, one part that fits is taken, and two is an error rather
+# than a guess.
+devs=`list_developers`
+devmatch=""
+n=0
+for cand in $devs; do
+	if [ "$cand" = "$dev" ]; then
+		devmatch=$cand
+		n=1
+		break
+	fi
+done
+if [ "$n" -eq 0 ]; then
+	want_lc=`echo "$dev" | tr 'A-Z' 'a-z'`
+	hits=""
+	for cand in $devs; do
+		case `echo "$cand" | tr 'A-Z' 'a-z'` in
+		*"$want_lc"*)
+			n=`expr $n + 1`
+			hits="$hits $cand"
+			;;
+		esac
+	done
+	case $n in
+	1) devmatch=`echo $hits` ;;
+	esac
+fi
+
+case $n in
+0)
+	echo "no developer matching '$dev'." >&2
+	echo "" >&2
+	echo "developers that do exist:" >&2
+	echo "$devs" | tr ' ' '\n' | grep -v '^$' | sed 's/^/    /' >&2
+	exit 1
+	;;
+1) ;;
+*)
+	echo "'$dev' matches more than one developer, so it is not safe to guess:" >&2
+	echo "$hits" | tr ' ' '\n' | grep -v '^$' | sed 's/^/    /' >&2
+	echo "" >&2
+	echo "give the whole name of the one you mean." >&2
+	exit 1
+	;;
+esac
+
+if [ "$devmatch" != "$dev" ]; then
+	echo "'$dev' is taken as the developer $devmatch"
+fi
+dev=$devmatch
 
 # ---- which repositories did the caller ask for? ---------------------------
 projects=""
@@ -108,7 +363,7 @@ else
 	done
 fi
 
-# ---- does this developer exist? -------------------------------------------
+# ---- does this developer have those repositories? --------------------------
 dirs=""
 missing=""
 for job in $projects; do
@@ -121,11 +376,11 @@ for job in $projects; do
 done
 
 if [ -z "$dirs" ]; then
-	echo "no developer '$dev' with those repositories." >&2
-	[ -n "$missing" ] && echo "$missing" | tr ' ' '\n' | grep -v '^$' | sed 's/^/    missing: /' >&2
+	echo "developer '$dev' has none of those repositories." >&2
+	echo "$missing" | tr ' ' '\n' | grep -v '^$' | sed 's/^/    missing: /' >&2
 	echo "" >&2
-	echo "developers that do exist:" >&2
-	list_developers | sed 's/^/    /' >&2
+	echo "the directories that do exist for $dev:" >&2
+	ls -d /TopStor_$dev /pace_$dev /topstorweb_$dev 2>/dev/null | sed 's/^/    /' >&2
 	exit 1
 fi
 
