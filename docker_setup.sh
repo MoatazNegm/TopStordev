@@ -655,13 +655,14 @@ echo I a hhhhhhhhhhhhhhhhhhhhhhhhere
 #if [ $isprimary -ne 0 ];
 #then
 /pace/checksyncs.py syncrequest $myclusterip $myhost >/dev/null & disown 
-echo 111111111111111111111
-exit
 #/TopStor/etcddel.py $myclusterip sync/diskref --prefix
 #/TopStor/etcdput.py $myclusterip sync/diskref/add_add_add______/request diskref_$stamp
 #fi
 /TopStor/etcdput.py $etcd refreshdisown/$myhost yes 
 /TopStor/refreshdisown.sh > /dev/null & disown 
+
+echo 111111111111111111111
+exit
 #/pace/diskref.sh $leader $leaderip $myhost $myhostip & disown
 /pace/rebootmeplslooper.sh $myclusterip $myhost >/dev/null & disown 
 #/TopStor/receivereplylooper.sh & disown
