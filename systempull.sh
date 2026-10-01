@@ -101,9 +101,12 @@ fnupdate() {
 	find . -name '.git' -prune -o -name '__py*' -prune -exec rm -rf {} + 2>/dev/null
 
 	# ---- 4. prove the local branch is the same commit -------------------
+	# NB: do not call these two 'want' or 'got' loosely -- 'want' is also the
+	# name of the branch the caller wants every project to end up on, and sh
+	# has no local variables, so reusing it here would clobber that.
 	got=`git rev-parse HEAD`
-	want=`git rev-parse refs/remotes/origin/$branch`
-	if [ "$got" = "$want" ]; then
+	remote_sha=`git rev-parse refs/remotes/origin/$branch`
+	if [ "$got" = "$remote_sha" ]; then
 		echo "  $branch is now $got -- identical to origin/$branch"
 	else
 		echo "  *** ERROR: HEAD is $got but origin/$branch is $want"
@@ -132,6 +135,9 @@ if [ -z "$branch" ]; then
 	echo "  replaces the local <branch> with origin/<branch>, exactly as it is"
 	exit 1
 fi
+
+# the branch every project is expected to be sitting on when this finishes
+want=$branch
 
 echo "systempull: taking $branch from origin, as it is -- no merge, local changes discarded"
 
@@ -192,10 +198,25 @@ fi
 
 echo
 echo '###########################################'
+echo "  commits"
+echo "  --------------------------------------------------------------"
+printf "  %-11s %-16s %-42s %s\n" "project" "branch" "commit" "short"
 for job in $PROJECTS; do
-	cd "$SPD_ROOT/$job" 2>/dev/null || continue
-	echo "$job : `git show --abbrev-commit | grep commit | head -1`"
+	if ! cd "$SPD_ROOT/$job" 2>/dev/null; then
+		printf "  %-11s %s\n" "$job" "(directory not found)"
+		continue
+	fi
+	b=`git rev-parse --abbrev-ref HEAD 2>/dev/null`
+	s=`git rev-parse HEAD 2>/dev/null`
+	k=`git rev-parse --short HEAD 2>/dev/null`
+	flag=
+	if [ -n "$want" ] && [ "$b" != "$want" ]; then
+		flag="   <-- NOT the branch you asked for"
+	fi
+	printf "  %-11s %-16s %-42s %s%s\n" "$job" "$b" "$s" "$k" "$flag"
 done
+echo "  --------------------------------------------------------------"
+echo "  every project should be sitting on $want"
 
 echo
 if [ "$rc" -ne 0 ]; then

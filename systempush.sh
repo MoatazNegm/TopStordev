@@ -283,10 +283,34 @@ fi
 
 echo
 echo '###########################################'
+echo "  commits"
+echo "  --------------------------------------------------------------"
+printf "  %-11s %-16s %-42s %s\n" "project" "branch" "commit" "short"
 for job in $PROJECTS; do
-	cd "$SPD_ROOT/$job" 2>/dev/null || continue
-	echo "$job : `git show --abbrev-commit | grep commit | head -1`"
+	if ! cd "$SPD_ROOT/$job" 2>/dev/null; then
+		printf "  %-11s %s\n" "$job" "(directory not found)"
+		continue
+	fi
+	b=`git rev-parse --abbrev-ref HEAD 2>/dev/null`
+	s=`git rev-parse HEAD 2>/dev/null`
+	k=`git rev-parse --short HEAD 2>/dev/null`
+	flag=
+	if [ "$b" = "$branch" ]; then
+		# ask origin directly rather than trusting that the push worked
+		rem=`git ls-remote origin "refs/heads/$branch" 2>/dev/null | awk 'NR==1 { print $1 }'`
+		if [ "$rem" = "$s" ]; then
+			flag="   origin has this exact commit"
+		elif [ -z "$rem" ]; then
+			flag="   <-- NOT on origin"
+		else
+			flag="   <-- origin has $rem, which is a different commit"
+		fi
+	else
+		flag="   <-- NOT on $branch"
+	fi
+	printf "  %-11s %-16s %-42s %s%s\n" "$job" "$b" "$s" "$k" "$flag"
 done
+echo "  --------------------------------------------------------------"
 
 echo
 if [ "$rc" -ne 0 ]; then

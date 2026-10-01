@@ -5,12 +5,13 @@
 # Copy one branch of all three projects from github back out to abdopuppet.
 # This is the mirror image of proxypush.sh.
 #
-# The branch is taken from github EXACTLY AS IT IS.  It is never merged with,
-# rebased onto, or combined with whatever branch happens to be checked out in
-# this container -- the current branch is irrelevant to the result.  To make
-# that true by construction the script never looks at, checks out, resets,
-# cleans, stashes or deletes anything in /TopStor, /pace or /topstorweb.  Every
-# project is copied through its own throwaway bare repository.
+# The branch is taken from github EXACTLY AS IT IS, and abdopuppet ends up
+# holding the identical commit.  It is never merged with, rebased onto or
+# combined with whatever branch happens to be checked out in this container --
+# the current branch is irrelevant to the result.  To make that true by
+# construction the script never looks at, checks out, resets, cleans, stashes
+# or deletes anything in /TopStor, /pace or /topstorweb.  Every project is
+# copied through its own throwaway bare repository.
 #
 # The old version of this script worked on the local repositories instead.  It
 # had three problems that this one does not:
@@ -59,15 +60,8 @@ if [ -z "$branch" ]; then
 	exit 1
 fi
 
-branch_from_github() {
-	project=$1
-	GIT_URL="https://github.com/$GITHUB_USER/$project.git"
-	GIT_SHA=`timeout 60 git ls-remote --heads "$GIT_URL" "$branch" 2>/dev/null | awk 'NR==1 { print $1 }'`
-}
-
 # abdopuppet answers on two url forms depending on which repository copy asks
 pick_abdopuppet() {
-	project=$1
 	ABD_URL=
 	ABD_SHA=
 	for u in "git://$ABDOPUPET/$1.git" "http://$ABDOPUPET/git/$1.git"; do
@@ -102,61 +96,71 @@ if [ -d "$WORKROOT" ]; then
 fi
 mkdir -p "$WORKROOT"
 
+sumfile=/tmp/proxyupdate.summary.$$
+: > "$sumfile"
+
+note() {
+	printf '  %-11s %-16s %-42s %s\n' "$1" "$2" "$3" "$4" >> "$sumfile"
+}
+
 for project in $PROJECTS; do
 	echo
 	echo '###########################################'
 	echo "  $project"
 
 	# ---- 1. what is where, without moving any objects ----
-	branch_from_github "$project"
-	if [ -z "$GIT_SHA" ]; then
+	from_url="https://github.com/$GITHUB_USER/$project.git"
+	src_sha=`timeout 60 git ls-remote --heads "$from_url" "$branch" 2>/dev/null | awk 'NR==1 { print $1 }'`
+	if [ -z "$src_sha" ]; then
 		echo "  github has no branch '$branch' for $GITHUB_USER/$project - nothing to copy"
+		note "$project" "$branch" "-" "not on github"
 		missing=`expr $missing + 1`
 		continue
 	fi
-	src_url=$GIT_URL
-	src_sha=$GIT_SHA
 
 	if pick_abdopuppet "$project"; then
+		to_url=$ABD_URL
 		dst_sha=$ABD_SHA
-		dst_url=$ABD_URL
 	else
+		to_url="git://$ABDOPUPET/$project.git"
 		dst_sha=
-		dst_url="git://$ABDOPUPET/$project.git"
 	fi
 
-	echo "  from : $src_url"
-	echo "  to   : $dst_url"
+	echo "  from : $from_url"
+	echo "  to   : $to_url"
 	echo "  github     : $src_sha"
 	if [ -z "$dst_sha" ]; then
 		echo "  $ABDOPUPET : (no such branch yet)"
 	elif [ "$dst_sha" = "$src_sha" ]; then
 		echo "  $ABDOPUPET : $dst_sha"
 		echo "  already identical - nothing to do for this project"
+		note "$project" "$branch" "$src_sha" "already the same commit"
 		skipped=`expr $skipped + 1`
 		continue
 	else
-		echo "  $ABDOPUPET : $dst_sha  (different - it will be updated)"
+		echo "  $ABDOPUPET : $dst_sha  (different - it will be replaced by $src_sha)"
 	fi
 
 	if [ "$DRYRUN" = 1 ]; then
 		echo "  PROXY_DRYRUN=1 - would push $src_sha to $ABDOPUPET, not pushing"
+		note "$project" "$branch" "$src_sha" "DRYRUN, abdopuppet still $dst_sha"
 		continue
 	fi
 
 	# ---- a throwaway bare repo, private to this run ----
 	scratch="$WORKROOT/$project.$$"
 	rm -rf "$scratch"
-	mkdir -p "$scratch" || { failed=`expr $failed + 1`; continue; }
+	mkdir -p "$scratch" || { failed=`expr $failed + 1`; note "$project" "$branch" "$src_sha" "could not create scratch repo"; continue; }
 	git init -q --bare "$scratch/relay.git" || {
 		echo "  could not create a scratch repository"
 		failed=`expr $failed + 1`
+		note "$project" "$branch" "$src_sha" "could not create scratch repo"
 		rm -rf "$scratch"
 		continue
 	}
-	cd "$scratch/relay.git" || { failed=`expr $failed + 1`; continue; }
-	git remote add github "$src_url" >/dev/null 2>&1
-	git remote add abdopuppet "$dst_url" >/dev/null 2>&1
+	cd "$scratch/relay.git" || { failed=`expr $failed + 1`; note "$project" "$branch" "$src_sha" "could not enter scratch repo"; continue; }
+	git remote add github "$from_url" >/dev/null 2>&1
+	git remote add abdopuppet "$to_url" >/dev/null 2>&1
 
 	# ---- 2. shallow fetch of the one branch we need ----
 	ref="+refs/heads/$branch:refs/heads/$branch"
@@ -167,6 +171,7 @@ for project in $PROJECTS; do
 			echo "  FAILED to fetch $branch from github"
 			tail -5 "$scratch/fetch" | sed 's/^/     /'
 			failed=`expr $failed + 1`
+			note "$project" "$branch" "$src_sha" "FETCH FAILED"
 			cd /; rm -rf "$scratch"
 			continue
 		fi
@@ -175,30 +180,29 @@ for project in $PROJECTS; do
 	if [ "$got" != "$src_sha" ]; then
 		echo "  FAILED: fetched $got but github said $src_sha"
 		failed=`expr $failed + 1`
+		note "$project" "$branch" "$src_sha" "FETCH MISMATCH $got"
 		cd /; rm -rf "$scratch"
 		continue
 	fi
 	echo "  have $got locally, exactly as github has it"
 
 	# ---- 3. push the ref straight across ----
-	# Say what is going to happen before it happens.  A push of a branch that
-	# carries a large file really can sit silent for a minute or more, and
-	# without this it just looks like the script has hung.
 	biggest=`git ls-tree -r -l "refs/heads/$branch" 2>/dev/null | sort -k4 -nr | head -1 | awk '{printf "%.1f MB  %s", $4/1048576, $5}'`
 	echo "  pushing to $ABDOPUPET -- a big file means a slow transfer, this is normal"
 	echo "    largest file in the branch : $biggest"
 
 	pushstart=`date +%s`
+	pushed=0
 	if timeout 600 git push --progress abdopuppet "$ref" > "$scratch/push" 2>&1; then
 		pushsecs=`expr \`date +%s\` - $pushstart`
 		echo "  PUSHED $branch to $ABDOPUPET in ${pushsecs}s"
-		ok=`expr $ok + 1`
+		pushed=1
 	elif timeout 900 git fetch --no-tags --deepen 200 github "$ref" > "$scratch/deepen" 2>&1 &&
 	     timeout 600 git push --progress abdopuppet "$ref" > "$scratch/push2" 2>&1; then
 		# ---- 4. a shallow pack is refused when the far side lacks history ----
 		pushsecs=`expr \`date +%s\` - $pushstart`
 		echo "  push refused, deepened the history, PUSHED on the second attempt in ${pushsecs}s"
-		ok=`expr $ok + 1`
+		pushed=1
 	else
 		echo "  FAILED to push $branch to $ABDOPUPET"
 		[ -f "$scratch/push" ] && sed 's/^/     /' "$scratch/push" | head -6
@@ -207,14 +211,23 @@ for project in $PROJECTS; do
 		failed=`expr $failed + 1`
 	fi
 
-	# ---- 5. prove abdopuppet really has it now ----
+	# ---- 5. prove abdopuppet really has exactly that commit now ----
 	cd /
-	now=`timeout 60 git ls-remote --heads "$dst_url" "$branch" 2>/dev/null | awk 'NR==1 { print $1 }'`
+	now=`timeout 60 git ls-remote --heads "$to_url" "$branch" 2>/dev/null | awk 'NR==1 { print $1 }'`
 	if [ "$now" = "$src_sha" ]; then
 		echo "  verified: $ABDOPUPET now has $now"
-	else
+		if [ "$pushed" -eq 1 ]; then
+			ok=`expr $ok + 1`
+			note "$project" "$branch" "$src_sha" "PUSHED, abdopuppet has the same commit"
+		else
+			note "$project" "$branch" "$src_sha" "already the same commit"
+		fi
+	elif [ "$pushed" -eq 1 ]; then
 		echo "  *** $ABDOPUPET reports '$now', expected $src_sha"
 		failed=`expr $failed + 1`
+		note "$project" "$branch" "$src_sha" "*** MISMATCH, abdopuppet has ${now:-nothing}"
+	else
+		note "$project" "$branch" "$src_sha" "PUSH FAILED, abdopuppet has ${now:-nothing}"
 	fi
 	rm -rf "$scratch"
 done
@@ -226,6 +239,16 @@ echo "  pushed to $ABDOPUPET : $ok"
 echo "  already identical    : $skipped"
 [ "$missing" -gt 0 ] && echo "  not on github        : $missing"
 [ "$failed" -gt 0 ] && echo "  failed               : $failed"
+echo ""
+echo "  commits -- github is the source, abdopuppet must end up identical"
+echo "  --------------------------------------------------------"
+cat "$sumfile"
+echo "  --------------------------------------------------------"
+echo "  (the three projects hold different commits for the same branch name:"
+echo "   they are separate repositories.  What matters is that the right column"
+echo "   shows abdopuppet holding exactly what the left column names.)"
+rm -f "$sumfile"
+
 echo
 if [ "$failed" -gt 0 ]; then
 	echo "  finished, with errors"
