@@ -24,17 +24,75 @@
 #
 # environment:
 #   SPD_PUSH_FORCE=1   pass --force-with-lease to the push
-#   SPD_EXCLUDE        files to untrack and ignore before committing.
-#                      Default: quickstor-ui.tar.gz.  These are left on disk.
+#   SPD_EXCLUDE_COMMON     untracked in every project (default: the ui bundle)
+#   SPD_EXCLUDE_TOPSTORWEB extra exclusions for topstorweb only
 #   SPD_PROJECTS       space separated project directory names
 #   SPD_ROOT           prefix to put in front of every path (default none)
+#
+# About the exclusions.  They are removed from the index but LEFT ON DISK, and
+# each one is added to .gitignore.  That last part matters: .gitignore on its
+# own does nothing to a file that is already tracked, which is how a 75 MB
+# ui bundle and 74 MB of source maps ended up in every branch in the first
+# place.  Anything listed below has to be taken out of the index as well.
+#
+# topstorweb is built around this: only src/ -- the react source -- is pushed.
+# Every server rebuilds it with the node_modules that came in the deployment
+# image, and vite writes the result to build_react/, which is not tracked.
+# Measured on this repo, from QSD5.179 to HEAD only 7 paths changed and every
+# one of them was under src/: 0.1 MB out of 266.4 MB, so 99.9% of the tree
+# never changes and is already sitting in the image.
+#
+# How each directory was classified, by what actually references it:
+#
+#   src/      THE react source.  vite's entry is index.html -> /src/main.jsx.
+#             This is the only thing that travels.                    KEEP
+#   dist/     /dist/css/* and /dist/js/* in index.html; vite proxies
+#             /dist to Apache, so Apache serves it off the image.  DROP
+#   plugins/  jQuery, bootstrap, select2, fontawesome in index.html, same
+#             proxy.  Vendored libraries, never edited by hand.     DROP
+#   public/   vite's publicDir -- copied verbatim into build_react/.
+#             It must EXIST ON DISK for the build, it just never
+#             travels, because the image already has it.           DROP
+#   Data/     src reads Data/DomName.txt etc, but through
+#             api.get('requestdata.php', {file: ...}) -- PHP reads it
+#             server side, it is not a build input.                 DROP
+#   img/      one asset, img/invaliddisk.png, served by Apache.     DROP
+#   js/ css/  assets/ ar/ fonts/     zero references from src/, dozens
+#             from the legacy *.php pages -- pure apache.          DROP
+#   netdata/  zero references from src/, 2 from php.               DROP
+#
+# Two of these have to be present on disk for the app to work at all, so
+# they must come from the image rather than from a branch:
+#   public/   vite copies it into the build; if it is missing the UI loses
+#             /dist/css/*.css and renders unstyled
+#   Data/     requestdata.php reads these on every page load
+#
+# The cost of that: once a path is untracked AND ignored, git cannot see edits
+# to it at all, by design.  If one of these ever has to change, the change
+# belongs in the deployment image, not in a branch.  The script does check for
+# edits to an excluded path at the moment it drops it and shouts if it finds
+# any, but it cannot warn about edits made after that.
+#
+# To narrow or widen the list:
+#   SPD_EXCLUDE_TOPSTORWEB='node_modules/ build_react/ .vite/ dist/ plugins/ \
+#                          dashboarddev3/ *.zip *.tar *.tar.gz *.map' \
+#     /TopStor/systempush.sh QSD5.199
 # ---------------------------------------------------------------------------
 
 SPD_PUSH_FORCE=${SPD_PUSH_FORCE:-0}
-SPD_EXCLUDE=${SPD_EXCLUDE:-'quickstor-ui.tar.gz'}
+SPD_EXCLUDE_COMMON=${SPD_EXCLUDE_COMMON:-'quickstor-ui.tar.gz'}
+SPD_EXCLUDE_TOPSTORWEB=${SPD_EXCLUDE_TOPSTORWEB:-'node_modules/ build_react/ build_react.bak/ .vite/ dist/ plugins/ dashboarddev3/ public/ assets/ ar/ js/ css/ img/ fonts/ netdata/ Data/ *.zip *.tar *.tar.gz *.map'}
 SPD_PROJECTS=${SPD_PROJECTS:-'TopStor pace topstorweb'}
 SPD_ROOT=${SPD_ROOT:-}
 PROJECTS=$SPD_PROJECTS
+
+# which exclusions apply to this project
+excludes_for() {
+	case $1 in
+	topstorweb) echo "$SPD_EXCLUDE_COMMON $SPD_EXCLUDE_TOPSTORWEB" ;;
+	*)          echo "$SPD_EXCLUDE_COMMON" ;;
+	esac
+}
 
 fnpush() {
 	branch=$1
@@ -82,6 +140,7 @@ fnpush() {
 
 fnupdate() {
 	branch=$1
+	job=$2
 	dir=`pwd`
 
 	if [ ! -e .git ]; then
@@ -98,24 +157,51 @@ fnupdate() {
 	find . -name '.git' -prune -o -name '__py*' -prune -exec rm -rf {} + 2>/dev/null
 
 	# Build artefacts: untracked, but deliberately LEFT ON DISK.  These are
-	# files you still want on the node, you just do not want them in git --
-	# quickstor-ui.tar.gz alone is 75 MB, which is 85% of the tree and is
-	# re-uploaded to github on every single branch, making each push take
-	# about a minute and a half.
+	# files you still want on the node, you just do not want them in git.
+	# Everything here is either regenerable or already ignored, but .gitignore
+	# does NOT stop it on its own -- once a file is tracked the ignore rules
+	# are never applied to it again.  So it has to leave the index too.
 	#
-	# .gitignore does NOT stop this on its own: once a file is tracked the
-	# ignore rules are never applied to it again.  So it has to be removed
-	# from the index as well, which is what this does.
-	for pat in $SPD_EXCLUDE; do
-		if git ls-files --error-unmatch -- "$pat" >/dev/null 2>&1; then
-			git rm -rq --cached --ignore-unmatch -- "$pat" >/dev/null 2>&1
-			echo "  no longer tracking $pat (the file is still on disk)"
+	# set -f matters: without it the shell expands '*' in these patterns
+	# against the working directory before the loop ever sees them, so
+	# '*.zip' silently turns into whichever single file happens to match.
+	set -f
+	for pat in `excludes_for "$job"`; do
+		# a pattern with no slash in it should match at any depth
+		case $pat in
+		*/*) spec=$pat ;;
+		*)   spec=":(glob)**/$pat" ;;
+		esac
+
+		# A file that is still tracked AND has been edited is about to be
+		# dropped, and that edit would not be committed.  Say so before it
+		# happens.  --diff-filter=M matters: without it every file merely
+		# being untracked shows up here too and the warning cries wolf.
+		#
+		# This only covers the transition.  Once a path is untracked and
+		# ignored git cannot see edits to it at all, by design -- so a later
+		# change to one of these has to be made in the deployment image.
+		edited=`git diff --name-only --diff-filter=M HEAD -- "$spec" 2>/dev/null`
+		if [ -n "$edited" ]; then
+			n=`echo "$edited" | wc -l`
+			echo "  *** WARNING: $n EDITED file(s) under $pat will NOT be committed:"
+			echo "$edited" | head -5 | sed 's/^/         /'
+			[ "$n" -gt 5 ] && echo "         ... and $((n - 5)) more"
 		fi
-		if [ -e "$pat" ] && ! grep -qxF "$pat" .gitignore 2>/dev/null; then
+
+		# no -q here: git rm lists what it removed, and the count is the
+		# only honest way to say how much actually came out
+		removed=`git rm -r --cached --ignore-unmatch -- "$spec" 2>/dev/null | wc -l`
+		if [ "$removed" -gt 0 ]; then
+			echo "  untracked $pat ($removed files, still on disk)"
+		fi
+
+		if ! grep -qxF "$pat" .gitignore 2>/dev/null; then
 			echo "$pat" >> .gitignore
-			echo "  added $pat to .gitignore"
+			echo "  added '$pat' to .gitignore"
 		fi
 	done
+	set +f
 
 	git add --all
 
@@ -173,7 +259,7 @@ for job in $PROJECTS; do
 		rc=1
 		continue
 	fi
-	fnupdate "$branch" || rc=1
+	fnupdate "$branch" "$job" || rc=1
 done
 
 echo
