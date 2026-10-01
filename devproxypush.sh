@@ -119,7 +119,7 @@ for job in $PROJECTS; do
 
 	if ! git rev-parse --git-dir >/dev/null 2>&1; then
 		echo "  ERROR: $dir is not a git repository"
-		printf '  %-26s %s\n' "$job_$dev" "not a git repository" >> "$sumfile"
+		printf '  %-26s %s\n' "${job}_$dev" "not a git repository" >> "$sumfile"
 		failed=`expr $failed + 1`
 		continue
 	fi
@@ -128,7 +128,7 @@ for job in $PROJECTS; do
 	if [ -z "$origin" ]; then
 		echo "  ERROR: no remote pointing at abdopuppet (url containing 252)"
 		failed=`expr $failed + 1`
-		printf '  %-26s %s\n' "$job_$dev" "no abdopuppet remote" >> "$sumfile"
+		printf '  %-26s %s\n' "${job}_$dev" "no abdopuppet remote" >> "$sumfile"
 		continue
 	fi
 	devfork=`pick_remote . "$dev" 'the developer fork'`
@@ -137,7 +137,7 @@ for job in $PROJECTS; do
 		echo "         the remotes here are:"
 		git remote -v | sed 's/^/           /'
 		failed=`expr $failed + 1`
-		printf '  %-26s %s\n' "$job_$dev" "no fork for $dev" >> "$sumfile"
+		printf '  %-26s %s\n' "${job}_$dev" "no fork for $dev" >> "$sumfile"
 		continue
 	fi
 	echo "  from : $origin"
@@ -152,14 +152,14 @@ for job in $PROJECTS; do
 			"+refs/heads/$branch:refs/remotes/$origin/$branch"; then
 		echo "  ERROR: could not fetch $branch from $origin"
 		failed=`expr $failed + 1`
-		printf '  %-26s %s\n' "$job_$dev" "FETCH FAILED" >> "$sumfile"
+		printf '  %-26s %s\n' "${job}_$dev" "FETCH FAILED" >> "$sumfile"
 		continue
 	fi
 
 	if ! git rev-parse --verify --quiet "refs/remotes/$origin/$branch" >/dev/null; then
 		echo "  ERROR: $origin has no branch '$branch'"
 		failed=`expr $failed + 1`
-		printf '  %-26s %s\n' "$job_$dev" "no such branch on abdopuppet" >> "$sumfile"
+		printf '  %-26s %s\n' "${job}_$dev" "no such branch on abdopuppet" >> "$sumfile"
 		continue
 	fi
 
@@ -180,7 +180,7 @@ for job in $PROJECTS; do
 	dst_sha=`git ls-remote --heads "$devfork" "$branch" 2>/dev/null | awk 'NR==1 { print $1 }'`
 	if [ "$dst_sha" = "$src_sha" ]; then
 		echo "  the fork already has $src_sha -- nothing to do"
-		printf '  %-26s %s\n' "$job_$dev" "$src_sha" >> "$sumfile"
+		printf '  %-26s %s\n' "${job}_$dev" "$src_sha" >> "$sumfile"
 		skipped=`expr $skipped + 1`
 		continue
 	fi
@@ -189,7 +189,7 @@ for job in $PROJECTS; do
 	if ! git checkout -f -B "$branch" "refs/remotes/$origin/$branch"; then
 		echo "  ERROR: could not check out $branch"
 		failed=`expr $failed + 1`
-		printf '  %-26s %s\n' "$job_$dev" "CHECKOUT FAILED" >> "$sumfile"
+		printf '  %-26s %s\n' "${job}_$dev" "CHECKOUT FAILED" >> "$sumfile"
 		continue
 	fi
 	git reset --hard --quiet
@@ -205,7 +205,7 @@ for job in $PROJECTS; do
 	if [ "$got" != "$src_sha" ]; then
 		echo "  *** ERROR: HEAD is $got but $origin/$branch is $src_sha"
 		failed=`expr $failed + 1`
-		printf '  %-26s %s\n' "$job_$dev" "*** MISMATCH, HEAD $got" >> "$sumfile"
+		printf '  %-26s %s\n' "${job}_$dev" "*** MISMATCH, HEAD $got" >> "$sumfile"
 		continue
 	fi
 	echo "  local branch is $got, exactly as abdopuppet has it"
@@ -231,7 +231,7 @@ for job in $PROJECTS; do
 		else
 			sed 's/^/     /' /tmp/devpush.$$ | head -6
 			failed=`expr $failed + 1`
-			printf '  %-26s %s\n' "$job_$dev" "PUSH FAILED" >> "$sumfile"
+			printf '  %-26s %s\n' "${job}_$dev" "PUSH FAILED" >> "$sumfile"
 		fi
 	else
 		sed 's/^/     /' /tmp/devpush.$$ | head -8
@@ -239,7 +239,7 @@ for job in $PROJECTS; do
 		echo "  not accept a non fast-forward push.  DEV_PROXY_FORCE=1 will use"
 		echo "  --force-with-lease if you are sure the fork should be replaced."
 		failed=`expr $failed + 1`
-		printf '  %-26s %s\n' "$job_$dev" "PUSH FAILED" >> "$sumfile"
+		printf '  %-26s %s\n' "${job}_$dev" "PUSH FAILED" >> "$sumfile"
 	fi
 	rm -f /tmp/devpush.$$
 
@@ -247,11 +247,11 @@ for job in $PROJECTS; do
 	now=`git ls-remote --heads "$devfork" "$branch" 2>/dev/null | awk 'NR==1 { print $1 }'`
 	if [ "$now" = "$src_sha" ]; then
 		echo "  verified: the fork now has $now"
-		printf '  %-26s %s\n' "$job_$dev" "$src_sha" >> "$sumfile"
+		printf '  %-26s %s\n' "${job}_$dev" "$src_sha" >> "$sumfile"
 	else
 		echo "  *** the fork reports '$now', expected $src_sha"
 		failed=`expr $failed + 1`
-		printf '  %-26s %s\n' "$job_$dev" "*** MISMATCH, fork has ${now:-nothing}" >> "$sumfile"
+		printf '  %-26s %s\n' "${job}_$dev" "*** MISMATCH, fork has ${now:-nothing}" >> "$sumfile"
 	fi
 	sync
 done
