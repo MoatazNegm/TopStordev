@@ -659,7 +659,7 @@ echo I a hhhhhhhhhhhhhhhhhhhhhhhhere
 #/TopStor/etcdput.py $myclusterip sync/diskref/add_add_add______/request diskref_$stamp
 #fi
 /TopStor/etcdput.py $etcd refreshdisown/$myhost yes 
-echo/TopStor/etcdput.py $etcd refreshdisown/$myhost yes 
+echo /TopStor/etcdput.py $etcd refreshdisown/$myhost yes 
 
 echo 111111111111111111111
 exit
