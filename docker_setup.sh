@@ -704,12 +704,15 @@ fi
 mydns=`/TopStor/etcdget.py $myclusterip dnsname/$myhost`
 if [ -n "$mydns" ] && [ "$mydns" != "_1" ]; then
 	nmcli conn modify cmynode ipv4.dns $mydns
+	nmcli conn  up cmynode 
 fi
-nmcli con modify cmynode bond.options "mode=active-backup,miimon=100,fail_over_mac=1"
-nmcli conn down cmynode && nmcli conn up cmynode
+#nmcli con modify cmynode bond.options "mode=active-backup,miimon=100,fail_over_mac=1"
+#nmcli conn down cmynode && nmcli conn up cmynode
 docker rm -f promexport
 docker run -d -p $mynodeip:9100:9100 -v /proc:/proc -v /sys:/sys --name promexport prom/node-exporter
 docker rm -f promcadvisor
 docker run   --volume=/:/rootfs:ro   --volume=/var/run:/var/run:ro   --volume=/sys:/sys:ro   --volume=/var/lib/docker/:/var/lib/docker:ro   --volume=/dev/disk/:/dev/disk:ro   --publish=$mynodeip:9101:8080   --detach=true   --name=promcadvisor   --privileged   --device=/dev/kmsg   gcr.io/cadvisor/cadvisor
+echo 11111111111111111111
+exit
 /TopStor/registerports.sh $myclusterip
 /pace/fapilooper.sh & disown
