@@ -71,36 +71,6 @@ OPT_PLAN=0
 OPT_PLANS=0
 OPT_APPLY=0
 PAGER_MODE=builtin
-
-# ---------------------------------------------------------------------------
-# Paths that are never worth comparing.
-#
-# systempush.sh stopped committing these a while ago: they are build caches,
-# archives, source maps and vendored libraries that arrive with the deployment
-# image and get regenerated on the server.  But older branches were pushed
-# before that, so they still carry thousands of them, and comparing such a
-# branch used to walk every single one of them -- which is what made a preview
-# of topstorweb appear to hang.
-#
-# The lists below are the same ones systempush.sh uses.  Keep them in step.
-# The count of skipped files is always printed, so this never hides anything
-# silently.
-#
-#   PREGETDIFF_SKIP_EXCLUDED=0   compare them anyway
-#   PREGETDIFF_SKIP_EXTRA=...     extra patterns, space separated
-# ---------------------------------------------------------------------------
-SPD_SKIP_EXCLUDED=${PREGETDIFF_SKIP_EXCLUDED:-1}
-SPD_EXCLUDE_COMMON=${SPD_EXCLUDE_COMMON:-'quickstor-ui.tar.gz'}
-SPD_EXCLUDE_TOPSTORWEB=${SPD_EXCLUDE_TOPSTORWEB:-'node_modules/ build_react/ build_react.bak/ .vite/ dist/ plugins/ dashboarddev3/ public/ assets/ ar/ js/ css/ img/ fonts/ netdata/ Data/ *.zip *.tar *.tar.gz *.map'}
-SPD_EXCLUDE_EXTRA=${PREGETDIFF_SKIP_EXTRA:-'__py* __pycache__'}
-
-# the patterns that apply to one project
-excludes_for() {
-	case $1 in
-	topstorweb) echo "$SPD_EXCLUDE_COMMON $SPD_EXCLUDE_TOPSTORWEB $SPD_EXCLUDE_EXTRA" ;;
-	*)          echo "$SPD_EXCLUDE_COMMON $SPD_EXCLUDE_EXTRA" ;;
-	esac
-}
 MERGED_BRANCH=""
 
 usage() {
@@ -1304,10 +1274,11 @@ branch_clash() {
 	return 0
 }
 
-# plan_mark_of used to look an instruction up here, one awk per file.  It is
-# gone: the classification awk in preview_repo() now joins the whole
-# instruction file in a single pass and hands back the action and the side
-# as their own fields, so nothing has to be looked up per file any more.
+plan_mark_of() {
+	# plan_mark_of <repo> <path>  ->  the action already recorded, if any
+	[ -f "$PLAN_FILE" ] || return 0
+	awk -F'\t' -v r="$1" -v p="$2" '$1==r && $3==p { print $2 "|" $4; exit }' "$PLAN_FILE"
+}
 
 # ===========================================================================
 # helpers
@@ -1373,91 +1344,24 @@ preview_repo() {
 	[ -s "$TMPD/$pr_repo.conflicts" ] || : > "$TMPD/$pr_repo.conflicts"
 
 	pr_rec="$TMPD/$pr_repo.rec"
-	# Classify every changed file and fold in the instruction file in ONE
-	# pass.  This used to run, PER FILE, two git cat-file probes, a grep, an
-	# awk and two cuts -- roughly seven process spawns for every path.  With
-	# a handful of changed files that is invisible; with the ~8000 paths that
-	# excluding the topstorweb build directories produces it is ~55000
-	# spawns, which is indistinguishable from a hang.  Below this point there
-	# is a single git call and a single awk, and the shell loops that follow
-	# use builtins only.
-	#
-	# --name-status already says which side has the file, so no probing:
-	#   D = present in FROM, gone in INTO  -> only-from, the merge adds it
-	#   A = present in INTO, gone in FROM  -> only-into, kept as it is
-	#   anything else                      -> present on both sides
-	git diff --name-status --no-renames "$pr_fromref" "$pr_intoref" 2>/dev/null \
-		> "$TMPD/$pr_repo.ns"
-	pr_skiprep="$TMPD/$pr_repo.skipped"
-	: > "$pr_skiprep"
-	awk -F'\t' -v repo="$pr_repo" -v plan="$PLAN_FILE" \
-	    -v conf="$TMPD/$pr_repo.conflicts" \
-	    -v skip="$SPD_SKIP_EXCLUDED" -v pats="`excludes_for "$pr_repo"`" \
-	    -v report="$pr_skiprep" '
-		# turn one ignore pattern into a regexp that matches the same paths
-		# git would ignore.  A trailing slash means a directory, a pattern
-		# with a slash inside is anchored, a bare name matches at any depth.
-		function glob2re(p,   r, i, c, last) {
-			r = ""
-			for (i = 1; i <= length(p); i++) {
-				c = substr(p, i, 1)
-				if      (c == "*") r = r "[^/]*"
-				else if (c == "?") r = r "[^/]"
-				else if (c == ".") r = r "\\."
-				else              r = r c
-			}
-			last = substr(p, length(p), 1)
-			if (last == "/") {
-				sub(/\/$/, "", r)
-				return "(^|.*/)" r "/.*"
-			}
-			if (p ~ /\//) return "^" r "$"
-			return "(^|.*/)" r "$"
-		}
-		function isexcluded(p,   k) {
-			for (k = 1; k <= nre; k++) if (p ~ re[k]) return 1
-			return 0
-		}
-		BEGIN {
-			if (skip == "1") {
-				n = split(pats, plist, " ")
-				for (i = 1; i <= n; i++) {
-					if (plist[i] == "") continue
-					nre++
-					re[nre] = glob2re(plist[i])
-				}
-			}
-			if (plan != "") {
-				while ((getline pl < plan) > 0) {
-					n = split(pl, a, "\t")
-					if (n >= 4) pm[a[1] SUBSEP a[3]] = a[2] "\t" a[4]
-				}
-				close(plan)
-			}
-			while ((getline cl < conf) > 0) if (cl != "") conflict[cl] = 1
-			close(conf)
-		}
-		{
-			st = $1; path = $2
-			if (st == "") next
-			if (nre > 0 && isexcluded(path)) { skipped++; next }
-			if (st ~ /^D/)      { kind = "only-from"; verdict = "added" }
-			else if (st ~ /^A/) { kind = "only-into"; verdict = "kept" }
-			else {
-				kind = "both"
-				if (path in conflict) verdict = "conflict"; else verdict = "clean"
-			}
-			act = ""; side = ""
-			if ((repo SUBSEP path) in pm) {
-				split(pm[repo SUBSEP path], b, "\t")
-				act = b[1]; side = b[2]
-			}
-			printf "%s|%s|%s|%s|%s\n", kind, path, verdict, act, side
-		}
-		END {
-			if (skipped > 0) print skipped > report
-		}
-	' "$TMPD/$pr_repo.ns" > "$pr_rec"
+	: > "$pr_rec"
+	git diff --name-only "$pr_fromref" "$pr_intoref" 2>/dev/null | sort -u > "$TMPD/$pr_repo.files"
+	while IFS= read -r pr_f; do
+		[ -n "$pr_f" ] || continue
+		pr_in_from=N
+		pr_in_into=N
+		git cat-file -e "$pr_fromref:$pr_f" 2>/dev/null && pr_in_from=Y
+		git cat-file -e "$pr_intoref:$pr_f" 2>/dev/null && pr_in_into=Y
+		if [ "$pr_in_from" = N ]; then
+			printf 'only-into|%s|%s\n' "$pr_f" "kept" >> "$pr_rec"
+		elif [ "$pr_in_into" = N ]; then
+			printf 'only-from|%s|%s\n' "$pr_f" "added" >> "$pr_rec"
+		elif grep -qxF "$pr_f" "$TMPD/$pr_repo.conflicts"; then
+			printf 'both|%s|%s\n' "$pr_f" "conflict" >> "$pr_rec"
+		else
+			printf 'both|%s|%s\n' "$pr_f" "clean" >> "$pr_rec"
+		fi
+	done < "$TMPD/$pr_repo.files"
 
 	while :; do
 		printf '\n'; rule; printf ' %s\n' "$pr_path"; rule
@@ -1474,18 +1378,12 @@ preview_repo() {
 		if [ ! -s "$pr_rec" ]; then
 			say "  ${C_DIM}These two branches are identical.${C_OFF}"
 		else
-			if [ -s "$pr_skiprep" ]; then
-				say "  ${C_DIM}skipped `cat "$pr_skiprep"` file(s) that systempush no longer commits --${C_OFF}"
-				say "  ${C_DIM}build caches, archives, source maps and vendored libraries that arrive${C_OFF}"
-				say "  ${C_DIM}with the deployment image.  PREGETDIFF_SKIP_EXCLUDED=0 to compare them.${C_OFF}"
-				say ""
-			fi
 			sort -t'|' -k1,1 -k3,3 "$pr_rec" > "$pr_rec.s"
 			pr_n=0
 			pr_last=""
-			while IFS='|' read -r pr_kind pr_pth pr_verdict pr_mact pr_mside; do
+			while IFS='|' read -r pr_kind pr_pth pr_verdict; do
 				[ -n "$pr_kind" ] || continue
-				pr_n=$((pr_n + 1))
+				pr_n=`expr $pr_n + 1`
 				if [ "$pr_kind" != "$pr_last" ]; then
 					pr_last=$pr_kind
 					case "$pr_kind" in
@@ -1499,9 +1397,9 @@ preview_repo() {
 				# merge alone would do.  A "delete" instruction beats the
 				# merge, and before this the list still said "would be
 				# created" for files the plan was about to remove.
-				# pr_mact and pr_mside arrive already joined in from the awk
-				# above; looking them up per file with an awk of its own is
-				# what used to make this unusable on a large diff.
+				pr_mk=`plan_mark_of "$pr_repo" "$pr_pth"`
+				pr_mact=`printf '%s' "$pr_mk" | cut -d'|' -f1`
+				pr_mside=`printf '%s' "$pr_mk" | cut -d'|' -f2`
 				case "$pr_mact" in
 				keep)
 					case "$pr_mside" in
@@ -1551,18 +1449,19 @@ preview_repo() {
 		pr_want=`expr $pr_choice + 0`
 		pr_i=0
 		pr_pick=""
-		while IFS='|' read -r pr_kind pr_pth pr_verdict pr_act pr_side; do
+		while IFS='|' read -r pr_kind pr_pth pr_verdict; do
 			[ -n "$pr_kind" ] || continue
-			pr_i=$((pr_i + 1))
+			pr_i=`expr $pr_i + 1`
 			if [ "$pr_i" = "$pr_want" ]; then
-				pr_pkind=$pr_kind
-				pr_ppath=$pr_pth
-				pr_pverd=$pr_verdict
-				pr_pick=1
+				pr_pick="$pr_kind|$pr_pth|$pr_verdict"
 				break
 			fi
 		done < "$pr_rec.s"
 		[ -z "$pr_pick" ] && { say "  there is no file number $pr_want."; continue; }
+
+		pr_pkind=`echo "$pr_pick"  | cut -d'|' -f1`
+		pr_ppath=`echo "$pr_pick" | cut -d'|' -f2`
+		pr_pverd=`echo "$pr_pick" | cut -d'|' -f3`
 		pr_conf=0
 		case "$pr_pkind" in
 		only-from) pr_verdict="only in $P_FROM - the merge would create it" ;;
