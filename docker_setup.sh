@@ -778,6 +778,10 @@ then
 	echo building React UI into /topstorweb/build_react
 	mkdir -p /topstorweb/build_react
 	docker run --rm -v /topstorweb/build_react:/app/build_react quickstor-ui:latest npm run build
+	# httpd.conf points SSLCertificateFile at topstorwebetc/TopStor.crt; without
+	# it httpd exits at start (and --rm removes it). Provide the repo's cert.
+	mkdir -p /root/topstorwebetc
+	[ -s /root/topstorwebetc/TopStor.crt ] || cp -p /TopStor/topstorwebetc/TopStor.crt /TopStor/topstorwebetc/TopStor.key /root/topstorwebetc/
 	echo running httpd
 	docker run --rm --name httpd --hostname shttpd --net intdns-net -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $myclusterip:19999:19999 -p $myclusterip:81:81 -p $myclusterip:443:443 -v $shttpdf:/usr/local/apache2/conf/httpd.conf -v /root/topstorwebetc:/usr/local/apache2/topstorwebetc -v /topstorweb:/usr/local/apache2/htdocs/ -itd moataznegm/quickstor:git
 	docker run -itd --rm --name flask --hostname apisrv -v /etc/localtime:/etc/localtime:ro -v /pace/:/pace -v /pacedata/:/pacedata/ -v /root/gitrepo/resolv.conf:/etc/resolv.conf --net intdns-net -p $myclusterip:5001:5001 -v /TopStor/:/TopStor -v /TopStordata/:/TopStordata moataznegm/quickstor:flask3
