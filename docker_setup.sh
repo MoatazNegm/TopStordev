@@ -10,6 +10,33 @@ then
 	/TopStor/cleannw.sh
 fi
 
+# Enslave eth10 to bond0 as a real NM port profile (slave-eth10-to-bond0), so
+# nmcli shows it. Call it only AFTER `nmcli conn up cmynode`/bond0 are up. The
+# profile autoconnects, so later `nmcli conn up cmynode` calls by the app
+# (iscsiwatchdog, cifs, nfs...) make NM recreate bond0 and re-enslave eth10 by
+# itself. Idempotent: no-op if the profile is already active on eth10.
+enslave_eth10_to_bond0() {
+	[ -d /sys/class/net/bond0 ] || { echo "[!] enslave_eth10_to_bond0: bond0 does not exist" >&2; return 1; }
+	if nmcli -t -f NAME,DEVICE,STATE conn show --active | grep -q '^slave-eth10-to-bond0:eth10:activated'; then
+		return 0
+	fi
+	echo "[*] Enslaving eth10 to bond0 (NM profile slave-eth10-to-bond0)" >&2
+	# The entrypoint left eth10 unmanaged so cleannw/cmynode deletes could not
+	# take it down; hand it to NM now.
+	nmcli device set eth10 managed yes 2>/dev/null
+	nmcli conn delete slave-eth10-to-bond0 2>/dev/null
+	nmcli conn add type bond ifname eth10 con-name slave-eth10-to-bond0 \
+		master bond0 slave-type bond ipv4.method disabled ipv6.method disabled
+	nmcli conn up slave-eth10-to-bond0
+	if nmcli -t -f NAME,DEVICE,STATE conn show --active | grep -q '^slave-eth10-to-bond0:eth10:activated' \
+	   && grep -qw eth10 /sys/class/net/bond0/bonding/slaves 2>/dev/null; then
+		echo "[*] eth10 is now a slave of bond0 (nmcli: slave-eth10-to-bond0 active)" >&2
+	else
+		echo "[!] enslave_eth10_to_bond0 FAILED: slave-eth10-to-bond0 is not active on eth10" >&2
+		return 1
+	fi
+}
+
 # --- HOSTNAME RESOLVER ---
 # Keep /etc/hosts in sync with whatever hostname this script just assigned.
 # Without this, services that resolve the node name via the container
@@ -107,6 +134,7 @@ if [ $? -ne 0 ];
 then
 	echo $myhost and $cmdline
 	nmcli conn up mynode
+	enslave_eth10_to_bond0
 	hostname $hostname
 	echo $hostname > /etc/hostname
 	resolve_local_host "$hostname"
@@ -172,6 +200,7 @@ then
 			/TopStor/cleanlioluns.sh
 			/TopStor/resetdocker.sh	
 			nmcli conn up clusterstub 
+			enslave_eth10_to_bond0
 			nmcli conn delete mynode 
 			nmcli conn delete mycluster 
 			hostname localhost
@@ -223,33 +252,8 @@ targetcli saveconfig
 #nmcli conn delete mynode 
 #nmcli conn delete mycluster 
 nmcli conn up mynode
+enslave_eth10_to_bond0
 
-# Enslave eth10 to bond0 as a real NM port profile (slave-eth10-to-bond0), so
-# nmcli shows it. Call it only AFTER `nmcli conn up cmynode`/bond0 are up. The
-# profile autoconnects, so later `nmcli conn up cmynode` calls by the app
-# (iscsiwatchdog, cifs, nfs...) make NM recreate bond0 and re-enslave eth10 by
-# itself. Idempotent: no-op if the profile is already active on eth10.
-enslave_eth10_to_bond0() {
-	[ -d /sys/class/net/bond0 ] || { echo "[!] enslave_eth10_to_bond0: bond0 does not exist" >&2; return 1; }
-	if nmcli -t -f NAME,DEVICE,STATE conn show --active | grep -q '^slave-eth10-to-bond0:eth10:activated'; then
-		return 0
-	fi
-	echo "[*] Enslaving eth10 to bond0 (NM profile slave-eth10-to-bond0)" >&2
-	# The entrypoint left eth10 unmanaged so cleannw/cmynode deletes could not
-	# take it down; hand it to NM now.
-	nmcli device set eth10 managed yes 2>/dev/null
-	nmcli conn delete slave-eth10-to-bond0 2>/dev/null
-	nmcli conn add type bond ifname eth10 con-name slave-eth10-to-bond0 \
-		master bond0 slave-type bond ipv4.method disabled ipv6.method disabled
-	nmcli conn up slave-eth10-to-bond0
-	if nmcli -t -f NAME,DEVICE,STATE conn show --active | grep -q '^slave-eth10-to-bond0:eth10:activated' \
-	   && grep -qw eth10 /sys/class/net/bond0/bonding/slaves 2>/dev/null; then
-		echo "[*] eth10 is now a slave of bond0 (nmcli: slave-eth10-to-bond0 active)" >&2
-	else
-		echo "[!] enslave_eth10_to_bond0 FAILED: slave-eth10-to-bond0 is not active on eth10" >&2
-		return 1
-	fi
-}
 
 # ──────────────────────────────────────────────────────────────────────
 # eth10 (the image-baked kernel bond the entrypoint renamed from bond0)
@@ -318,6 +322,7 @@ then
 	nmcli conn add con-name clusterstub type bond ifname $myclusterdev ip4 169.168.12.12 
 	#nmcli conn up clusterstub 
 
+	enslave_eth10_to_bond0
 	ping -w 3 10.11.11.250
 	if [ $? -ne 0 ];
 	then
@@ -343,12 +348,14 @@ else
 		nmcli conn mod mynode connection.interface-name $mynodedev
 		nmcli conn mod mynode ipv4.addresses $ipaddr
 		nmcli conn up mynode 
+		enslave_eth10_to_bond0
 
 	else
 		mynode=`nmcli conn show mynode | grep ipv4.addresses | awk '{print $2}'`
 		if [ "$mynodedev" != "bond0" ]; then
 			nmcli conn mod mynode connection.interface-name $mynodedev
 			nmcli conn up mynode
+			enslave_eth10_to_bond0
 		fi
 	fi
 
@@ -380,6 +387,7 @@ else
 
 	isconf_prim='yesno'
 	isprimary=0
+	enslave_eth10_to_bond0
 	ping -w 3 $myclusterip 
 	counter=`echo $RANDOM | cut -c -1`
 	counter=$((counter+5))
@@ -445,6 +453,7 @@ else
 	if [ $isprimary -ne 0 ];
 	then
 		nmcli conn up cmycluster
+		enslave_eth10_to_bond0
 	fi
 
 fi
