@@ -224,29 +224,29 @@ targetcli saveconfig
 #nmcli conn delete mycluster 
 nmcli conn up mynode
 
-# Enslave eth10 to bond0. Call it only AFTER `nmcli conn up cmynode`/bond0 are
-# up: NM cannot (re)activate a bond that already has a slave ("device could not
-# be readied"), and every cmynode re-up recreates bond0 and releases eth10.
-# Idempotent: no-op if already enslaved.
+# Enslave eth10 to bond0 as a real NM port profile (slave-eth10-to-bond0), so
+# nmcli shows it. Call it only AFTER `nmcli conn up cmynode`/bond0 are up. The
+# profile autoconnects, so later `nmcli conn up cmynode` calls by the app
+# (iscsiwatchdog, cifs, nfs...) make NM recreate bond0 and re-enslave eth10 by
+# itself. Idempotent: no-op if the profile is already active on eth10.
 enslave_eth10_to_bond0() {
-	[ -d /sys/class/net/eth10 ] || { echo "[!] enslave_eth10_to_bond0: eth10 does not exist" >&2; return 1; }
 	[ -d /sys/class/net/bond0 ] || { echo "[!] enslave_eth10_to_bond0: bond0 does not exist" >&2; return 1; }
-	if grep -qw eth10 /sys/class/net/bond0/bonding/slaves 2>/dev/null; then
-		ip addr flush dev eth10 2>/dev/null
+	if nmcli -t -f NAME,DEVICE,STATE conn show --active | grep -q '^slave-eth10-to-bond0:eth10:activated'; then
 		return 0
 	fi
-	echo "[*] Enslaving eth10 to bond0 (kernel)" >&2
-	# eth10 is kept out of NM's hands (entrypoint sets it unmanaged) because
-	# NM deletes NM-created software devices when their profile goes away.
-	nmcli device set eth10 managed no 2>/dev/null
-	ip addr flush dev eth10 2>/dev/null
-	ip link set eth10 down
-	ip link set eth10 master bond0
-	ip link set eth10 up
-	if grep -qw eth10 /sys/class/net/bond0/bonding/slaves 2>/dev/null; then
-		echo "[*] eth10 is now a slave of bond0" >&2
+	echo "[*] Enslaving eth10 to bond0 (NM profile slave-eth10-to-bond0)" >&2
+	# The entrypoint left eth10 unmanaged so cleannw/cmynode deletes could not
+	# take it down; hand it to NM now.
+	nmcli device set eth10 managed yes 2>/dev/null
+	nmcli conn delete slave-eth10-to-bond0 2>/dev/null
+	nmcli conn add type bond ifname eth10 con-name slave-eth10-to-bond0 \
+		master bond0 slave-type bond ipv4.method disabled ipv6.method disabled
+	nmcli conn up slave-eth10-to-bond0
+	if nmcli -t -f NAME,DEVICE,STATE conn show --active | grep -q '^slave-eth10-to-bond0:eth10:activated' \
+	   && grep -qw eth10 /sys/class/net/bond0/bonding/slaves 2>/dev/null; then
+		echo "[*] eth10 is now a slave of bond0 (nmcli: slave-eth10-to-bond0 active)" >&2
 	else
-		echo "[!] enslave_eth10_to_bond0 FAILED: eth10 is not a slave of bond0" >&2
+		echo "[!] enslave_eth10_to_bond0 FAILED: slave-eth10-to-bond0 is not active on eth10" >&2
 		return 1
 	fi
 }
@@ -451,9 +451,6 @@ fi
 echo adding cmynode
 nmcli conn up cmynode
 enslave_eth10_to_bond0
-# Later `nmcli conn up cmynode` calls by the app (iscsiwatchdog, cifs, nfs...)
-# recreate bond0 and release eth10; the guardian re-enslaves it.
-pgrep -f "[e]th10guardian.sh" >/dev/null || setsid nohup /TopStor/eth10guardian.sh >>/var/log/eth10guardian.log 2>&1 </dev/null &
 # Wait for node to be up
 ping -w 3 $mynodeip
 while [ $? -ne 0 ];
