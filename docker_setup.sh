@@ -451,6 +451,9 @@ fi
 echo adding cmynode
 nmcli conn up cmynode
 enslave_eth10_to_bond0
+# Later `nmcli conn up cmynode` calls by the app (iscsiwatchdog, cifs, nfs...)
+# recreate bond0 and release eth10; the guardian re-enslaves it.
+pgrep -f "[e]th10guardian.sh" >/dev/null || setsid nohup /TopStor/eth10guardian.sh >>/var/log/eth10guardian.log 2>&1 </dev/null &
 # Wait for node to be up
 ping -w 3 $mynodeip
 while [ $? -ne 0 ];
