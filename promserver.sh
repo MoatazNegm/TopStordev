@@ -32,4 +32,4 @@ docker rm -f promgraf
 	plhash=`/TopStor/decthis.sh admin $phash | awk -F'_result' '{print $2}'`
 	echo plhash=$plhash > /root/plhashtmp
 	docker restart promgraf
-	docker exec -it promgraf grafana-cli admin reset-admin-password $plhash 
+	docker exec -it promgraf grafana cli admin reset-admin-password $plhash 
