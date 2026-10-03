@@ -775,9 +775,20 @@ then
 	cp $templhttp $shttpdf
 	sed -i "s/MYCLUSTERH/$myclusterip/g" $shttpdf
 	sed -i "s/MYCLUSTER/$myclusterip/g" $shttpdf
-	echo building React UI into /topstorweb/build_react
 	mkdir -p /topstorweb/build_react
-	docker run --rm -v /topstorweb/build_react:/app/build_react quickstor-ui:latest npm run build
+	# Build the React UI only when /TopStor is at a commit not built yet: an empty
+	# marker file in /TopStordata is named after the last 10 chars of the commit.
+	# The repo's src is mounted over the image's baked-in one so pulled changes
+	# are what gets built.
+	reactcommit=`git -C /TopStor rev-parse HEAD 2>/dev/null`
+	reactmark=${reactcommit: -10}
+	if [ -n "$reactmark" ] && [ -e /TopStordata/$reactmark ] && [ -s /topstorweb/build_react/index.html ]; then
+		echo React UI already built for /TopStor commit ...$reactmark -- skipping build
+	else
+		echo building React UI into /topstorweb/build_react
+		docker run --rm -v /topstorweb/src:/app/src -v /topstorweb/build_react:/app/build_react quickstor-ui:latest npm run build \
+			&& [ -n "$reactmark" ] && touch /TopStordata/$reactmark
+	fi
 	# httpd.conf points SSLCertificateFile at topstorwebetc/TopStor.crt; without
 	# it httpd exits at start (and --rm removes it). Provide the repo's cert.
 	mkdir -p /root/topstorwebetc
@@ -802,7 +813,5 @@ docker run   --rm   --volume=/:/rootfs:ro   --volume=/var/run:/var/run:ro   --vo
 
 enslave_eth10_to_bond0
 
-echo 11111111111111111111
-exit
 /TopStor/registerports.sh $myclusterip
 /pace/fapilooper.sh & disown
