@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 jsonfile=$1
 cat $jsonfile | jq -c '.[]' > /dev/null 2>&1
 if [ $? -eq 0 ]; then

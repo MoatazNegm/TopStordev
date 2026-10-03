@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 #res=`echo $@ | awk '{print $1}'`;
 vol=`echo $@ | awk '{print $1}'`;
 count=`/sbin/zfs list | grep -w "$vol" | wc -l`;

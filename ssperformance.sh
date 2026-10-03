@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 cd /TopStor
 ctr="/usr/local/www/apache24/data/des19/Data/ctr.log";
 ctr2="/usr/local/www/apache24/data/des19/Data/ctr.log.";

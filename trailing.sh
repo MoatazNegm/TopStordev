@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 #
 #   Remove CRLF, trailing whitespace and double lining.
 #   $MERHABA: ascii_clean.sh,v 1.0 2007/11/11 15:09:05 kyrre Exp $

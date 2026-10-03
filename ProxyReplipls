@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 oper3=`echo $@ | awk '{print $1}'`
 txtres=`echo $@ | awk '{print $2}'`
 newsnap2=`echo $@ | awk '{print $3}'`

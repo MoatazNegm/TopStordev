@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 export ETCDCTL_API=3
 web='/var/www/html/des20/Data/Replicatestatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log';

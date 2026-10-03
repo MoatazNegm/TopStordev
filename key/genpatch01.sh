@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 #  run as follows: patch <<GIT directory>> <<version number>> 
 #cd /root/scripts
 here=`pwd`;

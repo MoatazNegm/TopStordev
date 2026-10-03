@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 export 
 cd /TopStor
 web='/var/www/html/des20/Data/Replicatestatus.log';

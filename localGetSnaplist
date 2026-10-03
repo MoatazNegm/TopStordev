@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 cd /TopStor/;
 resfile=`echo $@ | awk '{print $1}'`;
 websnaps='/var/www/html/des20/Data/listsnaps.txt';
@@ -17,7 +17,7 @@ do
  time2=` echo $creall | awk -F_ '{print $2}'`;
  sender=`echo $line | awk '{print $7}'`;
  receiver=`echo $line | awk '{print $8}'`;
- subres=`/usr/local/bin/zsh jsonthis3.sh name $name onlyname $onlyname father $father2 creation $creatform time $time2 sender $sender receiver $receiver `;
+ subres=`/bin/bash jsonthis3.sh name $name onlyname $onlyname father $father2 creation $creatform time $time2 sender $sender receiver $receiver `;
  result=$result$subres,;
 done
  result=`echo $result | rev | cut -c 2- | rev`];

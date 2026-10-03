@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 cd /TopStor
 traf=$1
 if [[ -a txt/stopperf ]]; then sleep 2;

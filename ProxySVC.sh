@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 cd /TopStor
 openvpnflag=0;
 stamp=`date +%s`;

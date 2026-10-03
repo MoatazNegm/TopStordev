@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 #-------------------------------------------------------------------------#
 #- Author  of this  Program: Abdo Farag 				 -#
 #- E-Mail Address of Author: abdofarag85@gmail.com    	                 -#

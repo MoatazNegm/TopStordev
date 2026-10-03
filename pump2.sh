@@ -1,2 +1,2 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 echo $@ > tmppump;

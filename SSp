@@ -7,7 +7,7 @@ start_cmd="${name}_start"
 stop_cmd="${name}_stop"
 rcvar=SSp_enable
 command="/TopStor/ssperformance.sh"
-command_interpreter="/usr/local/bin/zsh"
+command_interpreter="/bin/bash"
 load_rc_config $name
 : ${SSp_enable:=yes}
 : ${SSp_msg="SSp started successfuly."}

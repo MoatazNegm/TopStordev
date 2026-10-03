@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 export PRE; export POST; export SEARCHY;
 
 function searchdevice() {

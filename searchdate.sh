@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 device=$1
 date=$2
 search1=`./searchdevice.sh $device`

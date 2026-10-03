@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 currentlog=$1
 backupdir=$2
 backupdir=`echo $backupdir | sed 's:/$::g' | awk '{print $0"/"}'`

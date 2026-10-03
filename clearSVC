@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 cd /TopStor
   
   kill -KILL `ps -axw | grep ProxySVC | awk '{print $1}'` 2>/dev/null;

@@ -449,7 +449,7 @@ docker run --rm -d --name software --hostname software --network intdns-net --ip
 echo starting intdns
 docker run --rm --name intdns --hostname intdns --net intdns-net -e DNS_DOMAIN=qs.dom -e DNS_IP=10.11.12.7 -e LOG_QUERIES=true -itd --ip 10.11.12.7 -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/dnshosts:/etc/hosts moataznegm/quickstor:dns
 
-docker run -d --name wetty   --rm -p $mynodeip:3000:3000 wettyoss/wetty --ssh-host=$mynodeip --ssh-user=root --base=/
+docker run -d --name wetty   --rm -p $mynodeip:3000:3000 moataznegm/aiwork:wetty-patched --ssh-host=$mynodeip --ssh-user=root --base=/
 leaderip=$myclusterip
 if [ $isprimary -eq 1 ];
 then

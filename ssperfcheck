@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 ctr="$1"
 ./checkjson $ctr
 if [[ $? -ne 0 ]];

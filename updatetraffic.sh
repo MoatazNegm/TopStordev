@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 oper1=` echo $@ | awk '{print $1}'`;
 oper2=` echo $@ | awk '{print $2}'`;
 stat=`./iostat.sh $oper1`

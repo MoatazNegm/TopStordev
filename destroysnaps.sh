@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 cd /TopStor
 res=`echo $@ | awk '{print $1}'`;
 instr=`echo $@ | awk '{print $2}'`;

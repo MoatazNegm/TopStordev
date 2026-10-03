@@ -1,4 +1,4 @@
-#! /usr/local/bin/zsh
+#! /bin/bash
 if [ $# -lt 1 ]
 then
   echo "diskname argument not specified!"

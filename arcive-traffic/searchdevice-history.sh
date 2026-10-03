@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 device=$1
 logs=$2
 logs=`cat $logs`

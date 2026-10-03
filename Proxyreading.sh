@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 cd /TopStor
 filepp=`echo $@ | awk '{print $1}'`;

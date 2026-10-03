@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 ClearExit() {
 	echo got a signal > /TopStor/txt/sigstatus.txt
 	exit 0;
