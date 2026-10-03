@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Compiled / Rendered React Build Artifacts
+build_react/
+build_react*/
+dist_react/
+.vite/
+
+# Environment and Archives
+.env
+.DS_Store
+.agent/
+*.tar
+*.tar.gz
+*.zip
+quickstor-ui.tar.gz
+*.map
+build_react.bak/
+dist/
+plugins/
+dashboarddev3/
+public/
+assets/
+ar/
+js/
+css/
+img/
+fonts/
+netdata/
+Data/
