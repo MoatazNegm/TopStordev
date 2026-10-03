@@ -223,6 +223,50 @@ targetcli saveconfig
 #nmcli conn delete mynode 
 #nmcli conn delete mycluster 
 nmcli conn up mynode
+
+# ──────────────────────────────────────────────────────────────────────
+# eth10 (the image-baked kernel bond the entrypoint renamed from bond0)
+# ends up owned by whichever image-baked bond connection won the
+# boot-order race to activate before the entrypoint's rename ran — most
+# often "cmynode", the SAME name this script uses below for its own,
+# separate, dynamically-recreated node-addressing connection (see
+# cleannw.sh's comments for the full baked-connection picture). Left
+# alone, that name collision means the unconditional
+# `nmcli conn delete cmynode` right after this silently destroys the
+# eth10 kernel device. This step only renames that connection out of the
+# way (and repoints its interface-name at the real device, eth10,
+# instead of its stale configured "bond0") — it deliberately does NOT
+# enslave it to bond0 yet, because bond0's owning connection ("mynode")
+# still gets deleted and recreated further down this same script, which
+# destroys and recreates the bond0 kernel device too; enslaving now
+# would just get silently orphaned when that happens. The actual
+# enslave step runs once bond0 has stopped churning, right before this
+# script exits — see rescue_eth10_from_cmynode's twin, below. Idempotent.
+rescue_eth10_from_cmynode() {
+	[ -d /sys/class/net/eth10 ] || return 0
+	local uuid
+	uuid=$(nmcli -t -f NAME,UUID,DEVICE conn show 2>/dev/null | awk -F: '$3=="eth10"{print $2; exit}')
+	if [ -z "$uuid" ]; then
+		local u ifn
+		for u in $(nmcli -t -f UUID conn show 2>/dev/null); do
+			ifn=$(nmcli -g connection.interface-name conn show uuid "$u" 2>/dev/null)
+			if [ "$ifn" = "eth10" ]; then uuid="$u"; break; fi
+		done
+	fi
+	if [ -z "$uuid" ]; then
+		echo "[!] rescue_eth10_from_cmynode: no NM connection owns eth10; leaving it alone." >&2
+		return 0
+	fi
+	if [ "$(nmcli -g connection.id conn show uuid "$uuid" 2>/dev/null)" = "slave-eth10-to-bond0" ]; then
+		return 0
+	fi
+	echo "[*] Rescuing eth10's connection (uuid=${uuid:0:8}) from the cmynode name collision" >&2
+	nmcli conn modify uuid "$uuid" connection.id slave-eth10-to-bond0
+	nmcli conn modify uuid "$uuid" connection.interface-name eth10
+	nmcli conn up uuid "$uuid"
+}
+rescue_eth10_from_cmynode
+
 nmcli conn delete cmynode
 nmcli conn delete cmycluster
 isinitn='S'`cat /root/nodeconfigured`
@@ -420,8 +464,45 @@ echo nameserver 10.11.12.7 >  /root/gitrepo/resolv.conf
 echo starting etcd 
 docker run -itd --rm --name etcd --hostname etcd -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $etcd:2379:2379 -v /TopStor/:/TopStor -v /root/etcddata:/default.etcd --net intdns-net moataznegm/quickstor:etcd
 
-echo starting etcdclient 
-docker run -itd --rm --name etcdclient --hostname etcdclient -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf --net intdns-net -v /TopStor/:/TopStor -v /pace/:/pace moataznegm/quickstor:etcdclient 
+echo starting etcdclient
+docker run -itd --rm --name etcdclient --hostname etcdclient -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf --net intdns-net -v /TopStor/:/TopStor -v /pace/:/pace moataznegm/quickstor:etcdclient
+
+# Now that mynode/cmynode/clusterstub have all finished their
+# delete-and-recreate churn for this run and bond0 is in its final,
+# stable form, actually enslave eth10's rescued connection
+# (slave-eth10-to-bond0, see rescue_eth10_from_cmynode above) to it.
+# Doing this any earlier gets silently orphaned the next time something
+# recreates bond0's owning connection. Must run here, before the
+# isconf_prim=='nono' early exit right below — a cluster-joining
+# (non-primary) node would otherwise never reach the enslave step at
+# all, since it exits long before the end of this script.
+enslave_eth10_to_bond0() {
+	[ -d /sys/class/net/eth10 ] || return 0
+	local uuid
+	uuid=$(nmcli -t -f NAME,UUID conn show 2>/dev/null | awk -F: '$1=="slave-eth10-to-bond0"{print $2; exit}')
+	if [ -z "$uuid" ]; then
+		echo "[!] enslave_eth10_to_bond0: no slave-eth10-to-bond0 connection found; skipping." >&2
+		return 0
+	fi
+	if [ "$(nmcli -g connection.master conn show uuid "$uuid" 2>/dev/null)" = "bond0" ] \
+	   && [ "$(nmcli -g GENERAL.STATE device show eth10 2>/dev/null)" = "100 (connected)" ]; then
+		return 0
+	fi
+	echo "[*] Enslaving eth10 to bond0 (uuid=${uuid:0:8})" >&2
+	# master/slave-type (controller/port-type on newer nmcli) must be set
+	# together in one transaction, and ipv4/ipv6 must NOT be touched here
+	# at all — nmcli rejects "port connections cannot have IP
+	# configuration" if IP config is set (even disabled) alongside
+	# slave-type in the same transaction, and that failure is atomic:
+	# the whole modify silently no-ops, including the parts that did
+	# look fine on their own.
+	nmcli conn modify uuid "$uuid" \
+		connection.master bond0 \
+		connection.slave-type bond
+	nmcli conn up uuid "$uuid"
+}
+enslave_eth10_to_bond0
+
 if [[ $isconf_prim == 'nono' ]];
 then
 	exit
@@ -709,9 +790,10 @@ fi
 #nmcli con modify cmynode bond.options "mode=active-backup,miimon=100,fail_over_mac=1"
 #nmcli conn down cmynode && nmcli conn up cmynode
 docker rm -f promexport
-docker run -d -p $mynodeip:9100:9100 -v /proc:/proc -v /sys:/sys --name promexport prom/node-exporter
+docker run --rm -d -p $mynodeip:9100:9100 -v /proc:/proc -v /sys:/sys --name promexport prom/node-exporter
 docker rm -f promcadvisor
-docker run   --volume=/:/rootfs:ro   --volume=/var/run:/var/run:ro   --volume=/sys:/sys:ro   --volume=/var/lib/docker/:/var/lib/docker:ro   --volume=/dev/disk/:/dev/disk:ro   --publish=$mynodeip:9101:8080   --detach=true   --name=promcadvisor   --privileged   --device=/dev/kmsg   gcr.io/cadvisor/cadvisor
+docker run   --rm   --volume=/:/rootfs:ro   --volume=/var/run:/var/run:ro   --volume=/sys:/sys:ro   --volume=/var/lib/docker/:/var/lib/docker:ro   --volume=/dev/disk/:/dev/disk:ro   --publish=$mynodeip:9101:8080   --detach=true   --name=promcadvisor   --privileged   --device=/dev/kmsg   gcr.io/cadvisor/cadvisor
+
 echo 11111111111111111111
 exit
 /TopStor/registerports.sh $myclusterip

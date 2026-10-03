@@ -8,16 +8,17 @@
 #     `docker run` inside the zfs container without re-pulling from the
 #     internet on every restart.
 #   * The actual image LAYERS live on the host filesystem (under
-#     /root/topstor/volumes/zfs-docker-data/), NOT in the zfs image's
-#     overlay. /TopStor/cleannw.sh-style cleanup of the container does
-#     not blow away the image cache.
+#     /home/topstor/zfs-docker-data/ — moved there from under the repo
+#     because the root disk was nearly full; /home has far more room),
+#     NOT in the zfs image's overlay. /TopStor/cleannw.sh-style cleanup
+#     of the container does not blow away the image cache.
 #
 # Source of truth:
 #   /docker-images/*.tar        — tarballs bind-mounted read-only from
-#                                 /root/topstor/volumes/zfs-docker-images/
+#                                 /home/topstor/zfs-docker-images/
 #
 # Loaded into DinD's graph root, which itself is host-backed
-# (/docker-data <-> /root/topstor/volumes/zfs-docker-data/).
+# (/docker-data <-> /home/topstor/zfs-docker-data/).
 #
 # Idempotent: each load is gated by an existing-image check, so re-runs
 # are no-ops. Failed loads are logged but do not abort — the rest of
