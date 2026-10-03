@@ -224,6 +224,33 @@ targetcli saveconfig
 #nmcli conn delete mycluster 
 nmcli conn up mynode
 
+# Enslave eth10 to bond0. Call it only AFTER `nmcli conn up cmynode`/bond0 are
+# up: NM cannot (re)activate a bond that already has a slave ("device could not
+# be readied"), and every cmynode re-up recreates bond0 and releases eth10.
+# Idempotent: no-op if already enslaved.
+enslave_eth10_to_bond0() {
+	[ -d /sys/class/net/eth10 ] || { echo "[!] enslave_eth10_to_bond0: eth10 does not exist" >&2; return 1; }
+	[ -d /sys/class/net/bond0 ] || { echo "[!] enslave_eth10_to_bond0: bond0 does not exist" >&2; return 1; }
+	if grep -qw eth10 /sys/class/net/bond0/bonding/slaves 2>/dev/null; then
+		ip addr flush dev eth10 2>/dev/null
+		return 0
+	fi
+	echo "[*] Enslaving eth10 to bond0 (kernel)" >&2
+	# eth10 is kept out of NM's hands (entrypoint sets it unmanaged) because
+	# NM deletes NM-created software devices when their profile goes away.
+	nmcli device set eth10 managed no 2>/dev/null
+	ip addr flush dev eth10 2>/dev/null
+	ip link set eth10 down
+	ip link set eth10 master bond0
+	ip link set eth10 up
+	if grep -qw eth10 /sys/class/net/bond0/bonding/slaves 2>/dev/null; then
+		echo "[*] eth10 is now a slave of bond0" >&2
+	else
+		echo "[!] enslave_eth10_to_bond0 FAILED: eth10 is not a slave of bond0" >&2
+		return 1
+	fi
+}
+
 # ──────────────────────────────────────────────────────────────────────
 # eth10 (the image-baked kernel bond the entrypoint renamed from bond0)
 # ends up owned by whichever image-baked bond connection won the
@@ -423,6 +450,7 @@ else
 fi
 echo adding cmynode
 nmcli conn up cmynode
+enslave_eth10_to_bond0
 # Wait for node to be up
 ping -w 3 $mynodeip
 while [ $? -ne 0 ];
@@ -466,42 +494,6 @@ docker run -itd --rm --name etcd --hostname etcd -v /etc/localtime:/etc/localtim
 
 echo starting etcdclient
 docker run -itd --rm --name etcdclient --hostname etcdclient -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf --net intdns-net -v /TopStor/:/TopStor -v /pace/:/pace moataznegm/quickstor:etcdclient
-
-# Now that mynode/cmynode/clusterstub have all finished their
-# delete-and-recreate churn for this run and bond0 is in its final,
-# stable form, actually enslave eth10's rescued connection
-# (slave-eth10-to-bond0, see rescue_eth10_from_cmynode above) to it.
-# Doing this any earlier gets silently orphaned the next time something
-# recreates bond0's owning connection. Must run here, before the
-# isconf_prim=='nono' early exit right below — a cluster-joining
-# (non-primary) node would otherwise never reach the enslave step at
-# all, since it exits long before the end of this script.
-enslave_eth10_to_bond0() {
-	[ -d /sys/class/net/eth10 ] || return 0
-	local uuid
-	uuid=$(nmcli -t -f NAME,UUID conn show 2>/dev/null | awk -F: '$1=="slave-eth10-to-bond0"{print $2; exit}')
-	if [ -z "$uuid" ]; then
-		echo "[!] enslave_eth10_to_bond0: no slave-eth10-to-bond0 connection found; skipping." >&2
-		return 0
-	fi
-	if [ "$(nmcli -g connection.master conn show uuid "$uuid" 2>/dev/null)" = "bond0" ] \
-	   && [ "$(nmcli -g GENERAL.STATE device show eth10 2>/dev/null)" = "100 (connected)" ]; then
-		return 0
-	fi
-	echo "[*] Enslaving eth10 to bond0 (uuid=${uuid:0:8})" >&2
-	# master/slave-type (controller/port-type on newer nmcli) must be set
-	# together in one transaction, and ipv4/ipv6 must NOT be touched here
-	# at all — nmcli rejects "port connections cannot have IP
-	# configuration" if IP config is set (even disabled) alongside
-	# slave-type in the same transaction, and that failure is atomic:
-	# the whole modify silently no-ops, including the parts that did
-	# look fine on their own.
-	nmcli conn modify uuid "$uuid" \
-		connection.master bond0 \
-		connection.slave-type bond
-	nmcli conn up uuid "$uuid"
-}
-enslave_eth10_to_bond0
 
 if [[ $isconf_prim == 'nono' ]];
 then
@@ -786,6 +778,7 @@ mydns=`/TopStor/etcdget.py $myclusterip dnsname/$myhost`
 if [ -n "$mydns" ] && [ "$mydns" != "_1" ]; then
 	nmcli conn modify cmynode ipv4.dns $mydns
 	nmcli conn  up cmynode 
+	enslave_eth10_to_bond0
 fi
 #nmcli con modify cmynode bond.options "mode=active-backup,miimon=100,fail_over_mac=1"
 #nmcli conn down cmynode && nmcli conn up cmynode
@@ -793,6 +786,8 @@ docker rm -f promexport
 docker run --rm -d -p $mynodeip:9100:9100 -v /proc:/proc -v /sys:/sys --name promexport prom/node-exporter
 docker rm -f promcadvisor
 docker run   --rm   --volume=/:/rootfs:ro   --volume=/var/run:/var/run:ro   --volume=/sys:/sys:ro   --volume=/var/lib/docker/:/var/lib/docker:ro   --volume=/dev/disk/:/dev/disk:ro   --publish=$mynodeip:9101:8080   --detach=true   --name=promcadvisor   --privileged   --device=/dev/kmsg   gcr.io/cadvisor/cadvisor
+
+enslave_eth10_to_bond0
 
 echo 11111111111111111111
 exit
