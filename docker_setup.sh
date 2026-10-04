@@ -814,4 +814,4 @@ docker run   --rm   --volume=/:/rootfs:ro   --volume=/var/run:/var/run:ro   --vo
 enslave_eth10_to_bond0
 
 /TopStor/registerports.sh $myclusterip
-/pace/fapilooper.sh & disown
+setsid nohup /pace/fapilooper.sh >/dev/null 2>&1 </dev/null &
