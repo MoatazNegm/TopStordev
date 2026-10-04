@@ -15,7 +15,7 @@ stamp=$(date +%s%N)
 # Get the list of ports from listports.sh
 ports=$(/TopStor/listports.sh)
 
-if [ ${#ports[@]} -eq 0 ]; then
+if [ -z "$ports" ]; then
     echo "No ports found to register"
     exit 0
 fi
