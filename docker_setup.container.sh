@@ -782,12 +782,12 @@ then
 	# are what gets built.
 	reactcommit=`git -C /TopStor rev-parse HEAD 2>/dev/null`
 	reactmark=${reactcommit: -10}
-	if [ -n "$reactmark" ] && [ -e /TopStordata/$reactmark ] && [ -s /topstorweb/build_react/index.html ]; then
-		echo React UI already built for /TopStor commit ...$reactmark -- skipping build
+	if [ -n "uibuilt_$reactmark" ] && [ -e /TopStordata/uibuilt_$reactmark ] && [ -s /topstorweb/build_react/index.html ]; then
+		echo React UI already built for commit ...$reactmark -- skipping build
 	else
 		echo building React UI into /topstorweb/build_react
 		docker run --rm -v /topstorweb/src:/app/src -v /topstorweb/public:/app/public -v /topstorweb/index.html:/app/index.html -v /topstorweb/vite.config.js:/app/vite.config.js -v /topstorweb/tailwind.config.js:/app/tailwind.config.js -v /topstorweb/postcss.config.js:/app/postcss.config.js -v /topstorweb/build_react:/app/build_react quickstor-ui:latest npm run build \
-			&& [ -n "$reactmark" ] && touch /TopStordata/$reactmark
+			&& [ -n "$reactmark" ] && rm -rf /TopStordata/uibuilt* && touch /TopStordata/uibuilt_$reactmark
 	fi
 	# httpd.conf points SSLCertificateFile at topstorwebetc/TopStor.crt; without
 	# it httpd exits at start (and --rm removes it). Provide the repo's cert.
