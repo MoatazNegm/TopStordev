@@ -2393,8 +2393,8 @@ own. They are the places to guard if one script is ever to serve both flavours.
   `enslave_eth10_to_bond0` (NM port profile `slave-eth10-to-bond0`) after every `nmcli conn up`, the hang-prone
   `cleanlioluns.sh`, no `reboot` calls, `modprobe bnx2` / `hpsa` and `systemctl restart NetworkManager`
   commented out, the React build marker in `/TopStordata`, the `fapilooper` started with `setsid nohup`.
-- **Host side:** `manage.sh`, loop-device disks, `/home/topstor/zfs-docker-*`, the chrony link, the `DOCKER-USER`
-  and `8443` DNAT host rules, `rc.local` running `manage.sh`.
+- **Host side:** `manage.sh`, loop-device disks, `/home/topstor/zfs-docker-*`, the chrony link, the `-p 8443:443` UI
+  mapping, `rc.local` running `manage.sh`.
 - **Other scripts changed in the container line** (`QSD5.181-c47` against `QSD5.204`): `rebootme` and
   `HostManualconfig` write the etcd key `rebootme/<host>` instead of calling `/sbin/reboot` — inside a privileged
   container `/sbin/reboot` would reboot the **whole host machine**; the `rebootmepls.sh` watcher then runs
