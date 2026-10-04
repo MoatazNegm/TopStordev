@@ -1,4 +1,5 @@
 #!/bin/sh
+[ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
 eth1='enp0s8'
 eth2='enp0s8'
 templhttp='/TopStor/httpd_template.conf'
@@ -18,4 +19,4 @@ then
 else
 	_8080=`docker exec etcdclient /TopStor/etcdgetlocal.py mynodeip`
 fi
-docker run --rm --name httpd_local --hostname shttpd_local --net bridge0 -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $_8080:8080:8080 -v ${shttpdf}_local:/usr/local/apache2/conf/httpd.conf -v /root/topstorwebetc:/usr/local/apache2/topstorwebetc -v /topstorweb:/usr/local/apache2/htdocs/ -itd moataznegm/quickstor:git
+docker run --rm --name httpd_local --hostname shttpd_local --net ${DOCKER_NET:-bridge0} -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $_8080:8080:8080 -v ${shttpdf}_local:/usr/local/apache2/conf/httpd.conf -v /root/topstorwebetc:/usr/local/apache2/topstorwebetc -v /topstorweb:/usr/local/apache2/htdocs/ -itd moataznegm/quickstor:git

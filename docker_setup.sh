@@ -1,4 +1,13 @@
 #!/usr/bin/sh
+# --- FLAVOUR HAND-OVER (flavor.sh) ---------------------------------------------------
+# In the container flavour (/.dockerenv or eth10 present) run the container script, which
+# is the container version merged with this one. On a physical server nothing here fires
+# and everything below this block is the unchanged physical script.
+[ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
+if is_container 2>/dev/null && [ -f /TopStor/docker_setup.container.sh ]; then
+	exec "${BASH:-sh}" /TopStor/docker_setup.container.sh "$@"
+fi
+# --------------------------------------------------------------------------------------
 
 # clean up logical connections before proceeding
 #nmcli -t -f NAME conn show | grep -E '(node|cluster)' | while read -r conn; do

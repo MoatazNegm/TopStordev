@@ -1,4 +1,5 @@
 #!/usr/bin/sh
+[ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
 fnkillall () {
 process=(`ps -ef | grep $1 | grep -v color | grep -v grep | awk '{print $2}'`)
 for proc in "${process[@]}"; do
@@ -20,7 +21,7 @@ fi
 cujobs=(`echo diskreflooper zpooltoimportlooper iscsiwatchdog zfsping topstorrecvreply receivereplylooper checksyncs syncrequestlooper selectsparelooper volumechecklooper croncalllooper selectimportlooper retryvolumedeletelooper zfstelemetrylooper`)
 declare  -A cmdcjobs
 cmdcjobs['iscsiwatchdog']="/TopStor/iscsiwatchdog.sh" 
-#cmdcjobs['iscsiwatchdoglooper']="/TopStor/iscsiwatchdoglooper.sh" 
+is_container 2>/dev/null && cmdcjobs['iscsiwatchdoglooper']="/TopStor/iscsiwatchdoglooper.sh" 
 cmdcjobs['zfsping']="/pace/zfsping.py"
 cmdcjobs['topstorrecvreply']="echo"
 cmdcjobs['receivereplylooper']="/TopStor/receivereplylooper.sh"

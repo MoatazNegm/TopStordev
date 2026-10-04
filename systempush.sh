@@ -1,4 +1,10 @@
 #!/bin/sh
+# --- FLAVOUR HAND-OVER: in the container flavour run the c- variant of this script ---
+[ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
+if is_container 2>/dev/null && [ -f "/TopStor/c$(basename "$0")" ]; then
+	exec "${BASH:-sh}" "/TopStor/c$(basename "$0")" "$@"
+fi
+# ---
 # ---------------------------------------------------------------------------
 # systempush.sh <newbranch>
 #

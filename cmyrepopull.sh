@@ -1,39 +1,85 @@
 #!/usr/bin/sh
-# --- FLAVOUR HAND-OVER: in the container flavour run the c- variant of this script ---
-[ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
-if is_container 2>/dev/null && [ -f "/TopStor/c$(basename "$0")" ]; then
-	exec "${BASH:-sh}" "/TopStor/c$(basename "$0")" "$@"
+# /TopStor/cmyrepopull.sh
+#
+# Container-aware variant of myrepopull.sh. Kept separate so the
+# original physical-server flow is untouched.
+#
+# Container-only fix: the original's
+#     git branch -D tempb
+#     git checkout -b tempb
+#     git branch -D $1
+#     git checkout -b $1 leaderrepo/$1
+# is replaced by a single `git checkout -B $1 leaderrepo/$1`
+# (atomic create-or-move + switch), and the bare
+# `git fetch leaderrepo $1` is replaced by an explicit refspec so
+# the tracking ref updates reliably in this git version. Everything
+# else is byte-identical to myrepopull.sh (including
+# `git checkout -- *` to discard uncommitted changes, the
+# `git rm -rf __py*` cleanup, and the final `myrepopush.sh` push).
+#
+# Falls through to the original myrepopull.sh behaviour on a real
+# physical server (when /.dockerenv is absent).
+
+set +e
+
+if [ -f /.dockerenv ] || [ -f /run/.containerenv ]; then
+    ISCONTAINER=1
+else
+    ISCONTAINER=0
 fi
-# ---
-[ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
+
 fnupdate () {
 	git remote remove leaderrepo
 	# git:// protocol — matches git-daemon's --base-path=/srv/git in the
 	# software container. $3 is the leader IP (passed by the caller).
-	if is_container 2>/dev/null; then
-		git remote add leaderrepo git://$3/$2
-	else
-		git remote add leaderrepo http://$3/git/$2
-	fi
-	rm -rf pre_apply.sh	
+	git remote add leaderrepo git://$3/$2
+	rm -rf pre_apply.sh
 	echo '###########################################' $1
-	git fetch leaderrepo $1
-	if [ $? -ne 0 ];
-	then
-		echo something went wrong while updating $1 .... consult the devleloper
-		exit
+	if [ "$ISCONTAINER" = "1" ]; then
+		# Container: explicit refspec so the tracking ref
+		# actually updates in this git version, then a single
+		# `git checkout -B` replaces the original's tempb
+		# dance + `branch -D` + `checkout -b`.
+		git fetch leaderrepo refs/heads/$1:refs/remotes/leaderrepo/$1
+		if [ $? -ne 0 ];
+		then
+			echo something went wrong while updating $1 .... consult the devleloper
+			exit
+		fi
+		# Container-only fix: the original has no pre-checkout
+		# `git clean` at all, so any untracked file in the working
+		# tree would block `git checkout -B` with "would be
+		# overwritten by checkout" — same bug class as the one
+		# that hit cproxypush.sh. `clean -fd` (not just `-f`) so
+		# untracked directories also get pruned before checkout.
+		git clean -fd
+		git checkout -- *
+		git rm -rf __py*
+		rm -rf __py*
+		git checkout -B $1 leaderrepo/$1
+		git reset --hard
+		git checkout -- *
+		git rm -rf __py*
+		rm -rf __py*
+	else
+		git fetch leaderrepo $1
+		if [ $? -ne 0 ];
+		then
+			echo something went wrong while updating $1 .... consult the devleloper
+			exit
+		fi
+		git branch -D tempb
+		git checkout -- *
+		git rm -rf __py*
+		rm -rf __py*
+		git checkout -b tempb
+		git branch -D $1
+		git checkout -b $1 leaderrepo/$1
+		git reset --hard
+		git checkout -- *
+		git rm -rf __py*
+		rm -rf __py*
 	fi
-	git branch -D tempb
-	git checkout -- *
-	git rm -rf __py*
-	rm -rf __py*
-	git checkout -b tempb
-	git branch -D $1
-	git checkout -b $1 leaderrepo/$1
-	git reset --hard
-	git checkout -- *
-	git rm -rf __py*
-	rm -rf __py*
 	sync
 	sync
 	sync
@@ -53,7 +99,7 @@ if [ $branchc -le 3 ];
 then
 	echo no valid branch is supplied .... exiting
 	exit
-fi 
+fi
 echo $branch | grep samebranch
 if [ $? -eq 0 ];
 then
@@ -86,7 +132,7 @@ do
 	fi
 done
 echo running any needed scripts
-/TopStor/pre_apply.sh	
+/TopStor/pre_apply.sh
 leaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip`
 leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
 myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`

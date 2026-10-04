@@ -23,7 +23,8 @@ def sendhost(host, req, que, frmhst, port=5672):
 if __name__ == "__main__":
  import sys
  if len(sys.argv) < 2:
-    host='10.11.11.100'
+    import os
+    host='10.11.11.250' if (os.path.exists('/.dockerenv') or os.path.isdir('/sys/class/net/eth10')) else '10.11.11.100'
     req = {'req': 'Pumpthis', 'reply': ['/TopStor/VolumeCreateCIFS', '10.11.11.100', 'pdhcp1055322164', 'nf5', '1G', 'Everyone', '10.11.11.34', '24', 'active', 'admin', 'dhcp152953', 'admin']}
     que='recvreply'
     frmhst='dhcp152953'

@@ -1,3 +1,4 @@
+[ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
 myclusterf='/root/topstorwebetc/mycluster'
 mynodef='/root/topstorwebetc/mynode'
 mynodedev='enp0s8'
@@ -30,7 +31,7 @@ do
 	docker stop $doc
 done
 
-systemctl stop docker
+is_container 2>/dev/null || systemctl stop docker
 pkill rebootme 
 targetcli clearconfig confirm=True
 systemctl stop rabbitmq-server

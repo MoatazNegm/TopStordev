@@ -1,0 +1,24 @@
+# /TopStor/cmyrepopush.sh.toremove
+#
+# This file is a placeholder marking the previous, broken
+# /TopStor/cmyrepopush.sh as superseded. The old version had:
+#
+#   1. Wrong image: it tried to mount Apache httpd.conf + htdocs into
+#      topstor/abdopuppet:latest, which ships lighttpd, not Apache.
+#      The mounts were no-ops; nothing served the bare repos.
+#
+#   2. No `-it` discipline: the script was killed by `git clean -fd`
+#      (run by sibling cmyrepopull.sh) because it lived inside the
+#      /TopStor/ working tree as an untracked file.
+#
+#   3. Wrong IP resolution: it relied on
+#      `docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`
+#      which currently returns 10.11.11.14 (wetty) instead of the
+#      real software-container IP, so push was attempted to the
+#      wrong host and failed with `errno=No route to host`.
+#
+# The replacement lives at:
+#   - /TopStor/cmyrepopush.sh   (this container, copy of /root/cmyrepopush.sh)
+#   - /root/cmyrepopush.sh      (host bind-mount, source of truth)
+#
+# Safe to `git rm` this .toremove file at any time.
