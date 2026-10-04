@@ -2312,7 +2312,7 @@ for Rocky).
 - The host's own Docker (`/var/lib/docker`, 27 GB) also runs unrelated services
   (nginx-gateway, vllm-gateway, apirok, ...). **Never restart the host `dockerd`.**
 - Cluster containers are launched by `/root/topstor/manage.sh` (`start | stop |
-  restart | status | recreate | logs`) on bridge `topstor_gitnet`
+  restart | status | recreate | logs | hostfw`) on bridge `topstor_gitnet`
   `10.11.11.0/24` (host bridge `br-fc069f442a61`, gateway `10.11.11.1` = host):
 
   | Container | IP | Image | Notes |
@@ -2476,12 +2476,14 @@ docker push moataznegm/topstor-zfs:current        # existing docker login works
 - `10.11.11.0/24` is a Docker bridge internal to the host. The host reaches the
   node IPs directly (`https://10.11.11.250/` is the React UI on 443).
 - Outside machines need a route `10.11.11.0/24 via 192.168.8.62` **and** a host
-  allow rule, or a port mapping. Applied at runtime (**lost on host reboot or
-  firewall reload**): `iptables -I DOCKER-USER -i eno1 -o br-fc069f442a61 -d
+  allow rule, or a port mapping. These are applied by `manage.sh`
+  (`ensure_host_forwarding`, run on every `start` and on demand with
+  `./manage.sh hostfw`): `iptables -I DOCKER-USER -i eno1 -o <cluster bridge> -d
   10.11.11.0/24 -j ACCEPT`, nat `PREROUTING -i eno1 -p tcp --dport 8443 -j DNAT
-  --to-destination 10.11.11.250:443`, nat `OUTPUT -d 192.168.8.62 ...` (host-side
+  --to-destination 10.11.11.250:443`, nat `OUTPUT -d <host LAN IP> ...` (host-side
   test). UI: `https://192.168.8.62:8443/`. `firewalld` is running; the outside
-  leg was not testable from here.
+  leg was not testable from here. A firewall reload can drop the rules: run
+  `./manage.sh hostfw` again.
 - **Never change `eno1`, its addresses, routes or INPUT rules**: the SSH and
   Claude Code session ride on them. Ask before any host network change.
 - Joining the `10.11.11.0/24` of containers on other hosts needs an L2 overlay
@@ -2491,8 +2493,12 @@ docker push moataznegm/topstor-zfs:current        # existing docker login works
 
 - `/root/topstor` → `github.com/MoatazNegm/topstor-cluster`, branch `main`.
   Commit only real files (`scripts/`, `manage.sh`, docs); **skip the gitlinks**
-  `volumes/linux-env/{TopStor,pace,topstorweb}` and `.claude/`. Commit and push
-  **only when asked**.
+  `volumes/linux-env/{TopStor,pace,topstorweb}` and `.claude/`. **Standing order
+  (maintainer, 2026-10-04): whenever you change anything in this repo, commit and
+  push it (`git push origin main`) in the same turn, without asking.** After
+  editing `DEVELOPMENT.md`, also `\cp -f` it to
+  `volumes/linux-env/TopStor/C-DEVELOPMENT.md` (that nested repo is committed by
+  the maintainer, not by you).
 - Maintainer preferences: terse reports; prove fixes with evidence (nmcli
   output, curl codes) — never claim "fixed" from one run; do the loop above;
   don't edit unrelated code; images and data under `/home`.
@@ -2541,8 +2547,8 @@ Verified on 2026-10-04.
 > `/etc/rc.d/rc.local.bak-20261004`. **Edit only `/root/topstor/manage.sh`** (and
 > commit it); never recreate a second copy under `/root/TopStor`.
 >
-> Still open: the host firewall rules of §21.9 are not in `manage.sh`, so they are
-> lost on a host reboot.
+> The host firewall rules of §21.9 are part of `manage.sh` (`hostfw`), so
+> `rc.local` re-applies them at every host boot.
 
 ### 21.12 Configuration and tweaks inventory (what makes zfs run "as it is now")
 
@@ -2590,8 +2596,10 @@ image, removal of the old `echo 1111…; exit`).
   (`arp_ignore=0`).
 - **Outside the host** nothing is published by the zfs container (only `2222→22`;
   adding a `-p` needs a recreate and the services bind `10.11.11.250`, not
-  `eth0`). We use host rules instead (**runtime only — lost on host reboot or
-  firewall reload; not yet in `manage.sh`/`rc.local`**):
+  `eth0`). We use host rules instead, created idempotently by `manage.sh`
+  (`ensure_host_forwarding` / `./manage.sh hostfw`; it derives the bridge name
+  `br-<network id>`, skips safely if Docker is not ready, and `rc.local` runs it at
+  boot). The equivalent by hand:
 
   ```bash
   iptables -I DOCKER-USER -i eno1 -o br-fc069f442a61 -d 10.11.11.0/24 -j ACCEPT
