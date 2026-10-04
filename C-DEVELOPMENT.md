@@ -2200,6 +2200,7 @@ To be transparent about what's NOT in the recovery path:
 - **`/TopStordata/diskchange`** and other seed files in the ZFS
   container — these are recreated by `entrypoint-zfs.sh` on every
   boot, so they're fine.
+  (Exception: `/root/nodeconfigured` is seeded only when missing, so the value the app wrote survives — §21.2.)
 - **Any keys/secrets** that may have been added to the cluster after
   the original image builds — review your own docs.
 
@@ -2356,6 +2357,19 @@ for Rocky).
   mode). The maintainer runs it by hand; he will remove the flag when done.
 - Never share one `/docker-data` between two live dockerds. A second zfs
   instance needs its own `/home/topstor/<name>-docker-data`.
+- **`/root/nodeconfigured` survives a restart (since 2026-10-04).** `/root` is the
+  host bind mount `volumes/linux-env/root`, and `entrypoint-zfs.sh` seeds the file with
+  `no` **only when it is missing or empty**. A value written by the app
+  (`yes_fromCLUIP` from `HostManualconfigCLUIP` after a cluster-IP change, `no_fromCLUIP`,
+  `yes_fromsenddtarget`, `no_fromreset`, `<configured>_pls…` from `rebootmepls.sh`) therefore stays
+  across `docker restart zfs`, and `docker_setup.sh` takes the "already configured" path
+  (`isinitn` = `Syes…`). Before this, every start overwrote it with `no`, so a configured node
+  looked unconfigured after each restart. To test the first-boot path, set it yourself:
+  `docker exec zfs sh -c 'echo no > /root/nodeconfigured'` (or delete it) before the restart.
+  Which script sets what: UI → `Hostconfig.py` queues `sync/cluip/HostManualconfigCLUIP__<node>/request`
+  → `pace/checksyncs.py` runs `/TopStor/HostManualconfigCLUIP leader leaderip myhost myhostip` →
+  writes the file (`yes_…` unless `namespace/mgmtip` is still `10.11.11.250`), sets
+  `configured/<host>` in etcd and queues `rebootme … pls_fromCLUIP`.
 
 ### 21.3 The mandatory loop (edit → commit → restart → run → monitor)
 
@@ -2596,7 +2610,7 @@ Verified on 2026-10-04.
 `/home/topstor/zfs-docker-data→/docker-data`, and `/var/lib/docker` (ignored,
 unmounted by the entrypoint).
 
-**B. Boot sequence (`entrypoint-zfs.sh`)**, in order: seed files and `/workspace`
+**B. Boot sequence (`entrypoint-zfs.sh`)**, in order: seed files (`/root/nodeconfigured` only if missing, §21.2) and `/workspace`
 symlinks (incl. the `/usr/local/bin/zsh` → `/bin/bash` shim) → nested `dockerd` (`--storage-driver=vfs --data-root=/docker-data`) →
 rabbitmq → crond → sshd → dbus → `iscsid` via `nsenter --net=/host-ns/net` (+
 `iscsiadm` wrapper, guardian every 3 s, cron safety net) → NetworkManager → wait

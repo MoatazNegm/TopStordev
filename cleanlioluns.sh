@@ -20,6 +20,10 @@
 
 LIOVENDOR='LIO-ORG'
 
+# container flavour: another container owns the one iscsid of the shared host netns. Sessions, SCSI
+# devices and the LIO config (kernel-global) are then partly that node's: touch nothing.
+[ -f /TopStor/iscsidowner.sh ] && . /TopStor/iscsidowner.sh && iscsid_foreign && { echo "$0: iscsid is owned by another container - nothing to do here"; exit 0; }
+
 # 1. end every iSCSI session - healthy, stale or orphaned.
 #    A plain logout is tried first (30s timeout: a dead transport can block
 #    it). Sessions whose target is gone (TRANSPORT WAIT / FREE / REOPEN)
@@ -34,6 +38,19 @@ SYS=/sys/class/iscsi_session
 CONN=/sys/class/iscsi_connection
 WAIT=${CLEARSTALE_WAIT:-90}		# seconds to wait for iscsid to give up
 
+# iscsid is started/stopped the way the container does it (start-iscsid.sh,
+# in the host netns) - there is no systemd here. When a different container
+# (zfs2) owns the one iscsid of the shared host netns, this container has no
+# iscsid of its own: it can neither restart it nor make it adopt sessions.
+if [ -x /usr/local/sbin/start-iscsid.sh ]; then
+	start_iscsid()   { /usr/local/sbin/start-iscsid.sh >/dev/null 2>&1; }
+	restart_iscsid() { pkill -x iscsid; sleep 1; rm -f /var/run/iscsid.pid; start_iscsid; }
+else
+	start_iscsid()   { systemctl start iscsid >/dev/null 2>&1; }
+	restart_iscsid() { systemctl restart iscsid >/dev/null 2>&1; }
+fi
+own_iscsid()  { pgrep -x iscsid >/dev/null; }
+
 rd()          { cat "$1" 2>/dev/null; }
 sess_tgt()    { rd $SYS/session$1/targetname; }
 sess_portal() { echo "$(rd $CONN/connection$1:0/persistent_address):$(rd $CONN/connection$1:0/persistent_port),$(rd $SYS/session$1/tpgt)"; }
@@ -46,7 +63,7 @@ end_sessions() {
 	[ -n "$sids" ] || { echo "no iSCSI sessions"; return 0; }
 	for sid in $sids; do echo "session $sid: $(sess_info $sid)"; done
 
-	pgrep -x iscsid >/dev/null || systemctl start iscsid >/dev/null 2>&1
+	own_iscsid || start_iscsid
 
 	# plain logout
 	for sid in $sids; do
@@ -71,7 +88,7 @@ end_sessions() {
 		done
 
 		# iscsid reads the record when it adopts the session, i.e. at start-up
-		systemctl restart iscsid >/dev/null 2>&1
+		restart_iscsid
 
 		for ((i = 0; i < WAIT; i += 3)); do
 			n=0; for sid in $left; do gone $sid || n=1; done
