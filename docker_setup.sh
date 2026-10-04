@@ -5,6 +5,7 @@
 # and everything below this block is the unchanged physical script.
 [ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
 if is_container 2>/dev/null && [ -f /TopStor/docker_setup.container.sh ]; then
+	echo "[flavor] container detected -> running docker_setup.container.sh"
 	exec "${BASH:-sh}" /TopStor/docker_setup.container.sh "$@"
 fi
 # --------------------------------------------------------------------------------------
