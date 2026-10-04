@@ -622,7 +622,20 @@ then
 	sed -i "s/MYCLUSTER/$myclusterip/g" $shttpdf
 	echo building React UI into /topstorweb/build_react
 	mkdir -p /topstorweb/build_react
-	docker run --rm -v /topstorweb/src:/app/src -v /topstorweb/public:/app/public -v /topstorweb/index.html:/app/index.html -v /topstorweb/vite.config.js:/app/vite.config.js -v /topstorweb/tailwind.config.js:/app/tailwind.config.js -v /topstorweb/postcss.config.js:/app/postcss.config.js -v /topstorweb/build_react:/app/build_react quickstor-ui:latest npm run build
+	# Build the React UI only when /TopStor is at a commit not built yet: an empty
+	# marker file in /TopStordata is named after the last 10 chars of the commit.
+	# The repo's src is mounted over the image's baked-in one so pulled changes
+	# are what gets built.
+	reactcommit=`git -C /TopStor rev-parse HEAD 2>/dev/null`
+	reactmark=${reactcommit: -10}
+	if [ -n "uibuilt_$reactmark" ] && [ -e /TopStordata/uibuilt_$reactmark ] && [ -s /topstorweb/build_react/index.html ]; then
+		echo React UI already built for commit ...$reactmark -- skipping build
+	else
+		echo building React UI into /topstorweb/build_react
+		docker run --rm -v /topstorweb/src:/app/src -v /topstorweb/public:/app/public -v /topstorweb/index.html:/app/index.html -v /topstorweb/vite.config.js:/app/vite.config.js -v /topstorweb/tailwind.config.js:/app/tailwind.config.js -v /topstorweb/postcss.config.js:/app/postcss.config.js -v /topstorweb/build_react:/app/build_react quickstor-ui:latest npm run build \
+			&& [ -n "$reactmark" ] && rm -rf /TopStordata/uibuilt* && touch /TopStordata/uibuilt_$reactmark
+	fi
+
 	echo running httpd
 	docker run --rm --name httpd --hostname shttpd --net bridge0 -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $myclusterip:19999:19999 -p $myclusterip:81:81 -p 443:443 -v $shttpdf:/usr/local/apache2/conf/httpd.conf -v /root/topstorwebetc:/usr/local/apache2/topstorwebetc -v /topstorweb:/usr/local/apache2/htdocs/ -itd moataznegm/quickstor:git
 	docker run -itd --rm --name flask --hostname apisrv -v /etc/localtime:/etc/localtime:ro -v /pace/:/pace -v /pacedata/:/pacedata/ -v /root/gitrepo/resolv.conf:/etc/resolv.conf --net bridge0 -p $myclusterip:5001:5001 -v /TopStor/:/TopStor -v /TopStordata/:/TopStordata moataznegm/quickstor:flask3
