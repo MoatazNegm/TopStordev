@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 web='/var/www/html/des20/Data/CIFSstatus.log';
 logging='/var/www/html/des20/Data/currentinfo2.log'
 cd /TopStor

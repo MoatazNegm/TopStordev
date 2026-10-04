@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 origlog=$1
 backupdir=$2
 consolename=$3

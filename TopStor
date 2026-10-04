@@ -9,7 +9,7 @@ start_cmd="${name}_start"
 stop_cmd="${name}_stop"
 rcvar=TopStor_enable
 command="/TopStor/Topstor.sh"
-command_interpreter="/usr/local/bin/zsh"
+command_interpreter="/bin/bash"
 load_rc_config $name
 : ${TopStor_enable:=no}
 : ${TopStor_msg="TopStor started successfuly."}

@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 device=$1
 date=$2
 endlog=$3

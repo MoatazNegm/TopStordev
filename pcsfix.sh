@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 cd /TopStor
 echo $$ > /var/run/pcsfix.pid
 #rm /TopStor/txt/*

@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 webpartner='/var/www/html/des20/Data/Partnerslist.txt';
 resweb='/var/www/html/des20/Data/Partnerslist.txtupdated'
 partners='/TopStordata/partners.txt'

@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 cd /TopStor/
 COMMAND=$0
 RUNNING=`ps --no-headers -C${COMMAND} | wc -l`

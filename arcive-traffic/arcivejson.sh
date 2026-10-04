@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 backupdir=$1
 endlog=$2
 readlog=`cat $endlog`

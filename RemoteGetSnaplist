@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 cd /TopStor
 instr=`echo $@ | awk '{print $1}'`;
 lines=`zfs list -H -t snapshot -o name -S creation | grep -w "$instr" 2>/dev/null `;

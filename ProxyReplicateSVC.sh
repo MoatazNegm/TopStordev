@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 cd /TopStor
 so=`echo $@ | awk '{print $1}'`;
 dst=`echo $@ | awk '{print $2}'`;

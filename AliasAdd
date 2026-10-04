@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 export ETCDCTL_API=3
 webproxy='/var/www/html/des20/Data/Proxylist.txt';
 resweb='/var/www/html/des20/Data/Proxylist.txtupdated'

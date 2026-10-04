@@ -1,4 +1,4 @@
-#!/usr/local/bin/zsh
+#!/bin/bash
 cd /TopStor/;
 export ETCDCTL_API=3
 websnaps='/var/www/html/des20/Data/periodlist.txt';
@@ -22,7 +22,7 @@ echo $father2 $line
  t2=` echo $ts | awk -F. '{print $3}'`;
  t3=` echo $ts | awk -F. '{print $4}'`;
  t4=` echo $ts | awk -F. '{print $5}'`;
- subres=` /usr/local/bin/zsh jsonthis3.sh stamp $stamp period $period2 father $father pool $father2 t1 $t1 t2 $t2 t3 $t3 t4 $t4` ;
+ subres=` /bin/bash jsonthis3.sh stamp $stamp period $period2 father $father pool $father2 t1 $t1 t2 $t2 t3 $t3 t4 $t4` ;
  result=$result$subres,
 done
 result=` echo $result | rev | cut -c 2- | rev`];
