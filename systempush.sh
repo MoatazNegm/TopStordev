@@ -268,7 +268,8 @@ echo "  syncing the cluster"
 # The cluster sync only makes sense on a real node, so SPD_ROOT overrides skip it.
 if [ -z "$SPD_ROOT" ]; then
 	cd /TopStor 2>/dev/null
-	if docker ps 2>/dev/null | grep -q software; then
+	. /TopStor/myrepolib.sh
+	if software_ready "`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`"; then
 		myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
 		leaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip`
 		stamp=`date +%s`
@@ -276,6 +277,9 @@ if [ -z "$SPD_ROOT" ]; then
 		/TopStor/etcdput.py $leaderip sync/cversion/_${branch}__/request cversion_$stamp
 		/TopStor/etcdput.py $leaderip sync/cversion/_${branch}__/request/$myhost cversion_$stamp
 		/TopStor/myrepopush.sh $branch
+	else
+		echo "  the software container is not ready .... skipping the cluster sync"
+		rc=1
 	fi
 else
 	echo "  SPD_ROOT is set .... skipping the cluster sync"

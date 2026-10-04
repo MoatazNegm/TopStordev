@@ -2444,6 +2444,21 @@ Judge by `nmcli`, not by `/sys` or `ip link` alone — the maintainer looks at
   `/usr/local/bin/zsh` calls and `command_interpreter=` lines. The entrypoint still links
   `/usr/local/bin/zsh` → `/bin/bash` for any leftover legacy shebang. Commit those repos before
   the next `docker_setup.sh` run (it wipes uncommitted edits).
+- **`myrepo` sync (`myrepopush.sh`, called by `systempush.sh` and `systempull.sh`)**:
+  it used to `cd /root/gitrepo/git/<repo>.git; rm -rf *; git init --bare` when the remote was not
+  defined — if that directory did not exist the `cd` failed and **`rm -rf *` wiped the project's
+  own working tree**; and it never checked the `software` container. Now (new
+  `TopStor/myrepolib.sh`, sourced by the scripts): `software_ready <node ip>` requires the
+  `software` container to be running **and** `http://<node ip>/` to answer (waits up to 30 s) —
+  otherwise `myrepopush.sh` exits 1 before touching anything and the cluster-sync sections of
+  `systempush.sh`/`systempull.sh` print "skipping the cluster sync" and finish with errors;
+  `ensure_bare_repo <name.git>` creates a missing bare repo under `/root/gitrepo/git` (owner
+  `33:33`), leaves a valid one untouched, and moves a broken directory aside as
+  `<repo>.broken-<ts>` instead of deleting it. The per-project step also checks
+  `git ls-remote myrepo` before pushing. Helper logic was tested in isolation; the scripts
+  were **not** run end to end (they push a branch, and the git-daemon variant of `software`
+  has no web server on port 80 — only the `QSD5.204` `docker_setup.sh` variant serves
+  `http://<node ip>/git/`). `myrepopull.sh` is unchanged.
 
 ### 21.7 Committing the containers (images)
 

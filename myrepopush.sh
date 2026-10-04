@@ -22,6 +22,7 @@ fnupdate () {
 }
 
 cd /TopStor/
+. /TopStor/myrepolib.sh
 branch=`echo $@ | awk '{print $1}'`
 cjobs=(`echo TopStor_TopStordev pace_HC topstorweb_TopStorweb`)
 branchc=`echo $branch | wc -c`
@@ -36,6 +37,10 @@ chown 33:33 /root/gitrepo/git/*  -R
 chown 33:33 /root/gitrepo/git/  -R
 myhostip=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`
 echo myhostip=$myhostip
+if ! software_ready "$myhostip"; then
+	echo "the software container is not ready .... not touching the cluster repos, exiting"
+	exit 1
+fi
 while [ $flag -ne 0 ];
 do
 	rjobs=(`echo "${cjobs[@]}"`)
@@ -46,20 +51,19 @@ do
 		job=`echo $jobinfo | awk -F'_' '{print $1}'`
 		gitrepo=`echo $jobinfo | awk -F'_' '{print $2}'`'.git'
 		cd /$job
-	        repoloc=${myhostip}'/git/'$gitrepo
-		git remote -v | grep $repoloc 
-		if [ $? -ne 0 ];
-		then
-			cd /$job
-			git remote remove myrepo
+		if ! ensure_bare_repo $gitrepo; then
+			echo could not create the git repo $gitrepo .... exiting
+			exit 1
+		fi
+		repoloc=${myhostip}'/git/'$gitrepo
+		if ! git remote -v | grep -q $repoloc; then
+			git remote remove myrepo 2>/dev/null
 			echo git remote add myrepo http://${myhostip}/git/$gitrepo
 			git remote add myrepo http://${myhostip}/git/$gitrepo
-			cd /root/gitrepo/git/$gitrepo
-			rm -rf *
-			git init --bare
-			cd ..
-			echo chown 33:33 /root/gitrepo/git/$gitrepo -R
-			chown 33:33 /root/gitrepo/git/$gitrepo -R
+		fi
+		if ! git ls-remote myrepo >/dev/null 2>&1; then
+			echo the repo $gitrepo is not served at http://${myhostip}/git/$gitrepo .... exiting
+			exit 1
 		fi
  		echo $job
 		cd /$job
