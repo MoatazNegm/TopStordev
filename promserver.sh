@@ -40,4 +40,4 @@ docker rm -f promgraf
 	waitgrafana
 	docker restart promgraf
 	waitgrafana
-	docker exec -it promgraf grafana cli admin reset-admin-password $plhash
+	docker exec promgraf grafana cli admin reset-admin-password $plhash
