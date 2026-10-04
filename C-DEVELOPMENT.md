@@ -2544,9 +2544,8 @@ docker push moataznegm/topstor-zfs:current        # existing docker login works
   on their own lines, or a `<!--C-->` / `<!--P-->` / `<!--M-->` flag at the very end of a line, belongs
   to one flavour (M = master only); unflagged text is common. Edit only the master and run the script;
   the maintainer commits the nested repo himself.
-- Planned, not implemented: one `docker_setup.sh` for both flavours, choosing the code path at run time
-  (container if `/.dockerenv` exists or `eth10` exists; physical otherwise) instead of keeping separate
-  `-cN` branches. The container-only differences to guard are listed in `P-DEVELOPMENT.md` §21.5.
+- One code base for both flavours is implemented (2026-10-04, branch `QSD5.204-c5`): `flavor.sh` decides at run
+  time and the scripts adapt — see §22 for what runs where.
 
 ### 21.11 Host prerequisites (so we never re-think what the host needs)
 
@@ -2664,3 +2663,52 @@ image, removal of the old `echo 1111…; exit`).
 - Joining containers on other hosts that reuse `10.11.11.0/24` needs an L2
   overlay (VXLAN into the bridge), not routing — not built.
 
+
+## 22. One code base, two flavours (run-time detection)
+
+Since 2026-10-04 a single branch — `QSD5.204-c5`, the physical `QSD5.204-c4` merged with the container line
+`QSD5.181-c47` — serves both flavours. `TopStor/flavor.sh` decides at run time, and a script that needs to behave
+differently sources it with `[ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh`:
+
+- **container** when `/.dockerenv` or `/run/.containerenv` exists, or the interface `eth10` exists (the zfs entrypoint
+  renames the image's `bond0` to `eth10`; a physical server has none);
+- **physical** otherwise. `TOPSTOR_FLAVOR=container|physical` in the environment overrides it (tests only).
+- It provides `is_container` and `$DOCKER_NET` (`intdns-net` in the container, `bridge0` on physical).
+- Fail-safe: callers use `is_container 2>/dev/null` and `${DOCKER_NET:-bridge0}`, so a missing `flavor.sh` means the
+  physical behaviour.
+
+How each part adapts:
+
+| Part | Physical server | Container |
+|---|---|---|
+| `docker_setup.sh` | the physical script, unchanged apart from a 10-line hand-over block at the top | prints `[flavor] container detected -> running docker_setup.container.sh` and execs it: the container version merged with the physical one (`cleannw.sh` first, the `eth10` port profile after every `nmcli conn up`, `reboot.sh` instead of `reboot`, network `intdns-net`, the abdopuppet `software` container, the React build marker, ...) |
+| `rebootme`, `HostManualconfig` | `/sbin/reboot` | write the etcd key `rebootme/<host>`; the `rebootmepls.sh` watcher runs `docker_setup.sh reboot`, which ends in `reboot.sh` — the host machine is never rebooted |
+| `resetdocker.sh` | `systemctl stop docker` | Docker is left running |
+| `refreshdisown.sh` | the iscsiwatchdog looper is not started | it is started |
+| `myrepopull.sh` | `http://<leader>/git/<repo>.git` | `git://<leader>/<repo>` |
+| `systempush.sh`, `systempull.sh`, `systemmerge.sh`, `myrepopush.sh` | the physical flow (`myrepopush.sh` with `myrepolib.sh`) | hand over to the `c` variant (`csystempush.sh`, ...) |
+| docker network | `bridge0` | `intdns-net`, through `$DOCKER_NET` in `docker_primary.sh`, `bybyleader.sh`, `getdiscovery.sh`, `httpdflask.sh` |
+| `sendhost.py` demo default host | `10.11.11.100` | `10.11.11.250` |
+
+Fixes that apply to both flavours: `promserver.sh` (grafana TLS certs, wait for health, `grafana cli`), the empty-list check
+in `registerports.sh`, the `#!/usr/bin/python3` shebang of `putEthernetPorts.py`, a `.gitignore` for the UI build output, and
+the old `.bak` backup files are gone. The container-only files (`reboot.sh`, `cleannw.sh`, `cleanlioluns.sh`,
+`docker-preload.sh`, `rabbitnodefix.sh`, `checksync`, `abdopuppet-entrypoint.sh`, the `c*` scripts) are inert on a physical
+server unless something calls them.
+
+**What was verified.** `scripts/flavor-test.sh` runs every guard in both flavours with `reboot`, `systemctl`, `git` and
+`etcdput` stubbed (33 checks: detection, the reboot guard, the docker stop, the looper, the leader URL, the five hand-overs,
+the `docker_setup.sh` hand-over, and that the physical `docker_setup.sh` is the original plus the hand-over block with no line
+removed). The container path was run for real: restart zfs, `docker_setup.sh` through the hand-over, `nmcli` shows
+`cmynode` on `bond0` and `slave-eth10-to-bond0` on `eth10`, grafana (admin login included), prometheus, `httpd` and flask
+answer, the `fapilooper` runs. **Not verified: any run on physical hardware.**
+
+**Limits and maintenance.**
+
+- `docker_setup.sh` and `docker_setup.container.sh` are two files. The container side re-indented and reordered the script
+  (about 70 hunks), so inline guards would have put the physical path at risk. A change to the physical `docker_setup.sh`
+  must therefore be merged into the container script as well (the merge base is `QSD5.181-c47`).
+- `proxy*`, `devproxy*` and `devpullsomeupdate.sh` have no hand-over: both variants exist, choose by name (the proxy is itself
+  a container, so a hand-over would have changed its flow).
+- Detection is deliberately simple. A physical server that happens to have an interface named `eth10`, or that runs inside
+  a container, would be treated as the container flavour; set `TOPSTOR_FLAVOR=physical` there.
