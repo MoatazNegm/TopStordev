@@ -21,15 +21,24 @@ software_ready() {
 		echo "  the software container is not running (docker_setup.sh starts it)" >&2
 		return 1
 	fi
+	# Only a container that has just started is worth waiting for. One that has
+	# been up for a while and still refuses connections is not going to answer.
+	_started=`docker inspect -f '{{.State.StartedAt}}' software 2>/dev/null`
+	_up=$(( `date +%s` - `date -d "$_started" +%s 2>/dev/null || echo 0` ))
+	_tries=8
+	[ "$_up" -gt 120 ] && _tries=1
 	_i=0
-	while [ $_i -lt 15 ]; do
+	while [ $_i -lt $_tries ]; do
 		_code=`curl -s -o /dev/null -m 3 -w '%{http_code}' "http://${_ip}/" 2>/dev/null`
 		case $_code in
 		''|000) ;;
 		*) return 0 ;;
 		esac
 		_i=$((_i + 1))
-		sleep 2
+		if [ $_i -lt $_tries ]; then
+			echo "  waiting for the software container to answer on http://${_ip}/ ($_i/$_tries) ..." >&2
+			sleep 2
+		fi
 	done
 	echo "  the software container is running but http://${_ip}/ does not answer" >&2
 	return 1
