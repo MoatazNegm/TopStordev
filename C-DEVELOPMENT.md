@@ -2379,7 +2379,8 @@ for Rocky).
    `/root/topstor/volumes/linux-env/<repo>/...`. Edit only what the problem needs;
    never unrelated parts of `docker_setup.sh`.
 2. **Commit all three app repos**: `docker exec zfs1 /TopStor/systempush.sh <BRANCH>`.
-   `systempush.sh` (the same script in both flavours): `git add
+   In the container `systempush.sh` hands over to **`csystempush.sh`** (and `systempull.sh` to
+   **`csystempull.sh`**) — these are the ones that run here, see §23.1. They do: `git add
    --all`, `git commit -am fixing --allow-empty` (a new commit every time, so
    HEAD always moves), `git checkout -B <BRANCH>`, push to the internal
    `myrepo` (the `software` container) and abdopuppet. Not GitHub.
@@ -2702,7 +2703,7 @@ How each part adapts:
 | `resetdocker.sh` | `systemctl stop docker` | Docker is left running |
 | `refreshdisown.sh` | the iscsiwatchdog looper is not started | it is started |
 | `myrepopull.sh` | `http://<leader>/git/<repo>.git` | `git://<leader>/<repo>` |
-| `systempush.sh`, `systempull.sh`, `systemmerge.sh`, `myrepopush.sh` | the physical flow (`myrepopush.sh` with `myrepolib.sh`) | hand over to the `c` variant when one exists (`csystemmerge.sh`, ...; `csystempush.sh` and `csystempull.sh` were removed, the plain scripts serve both flavours) |
+| `systempush.sh`, `systempull.sh`, `systemmerge.sh`, `myrepopush.sh` | the physical flow (`myrepopush.sh` with `myrepolib.sh`) | hand over to the `c` variant (`csystempush.sh`, `csystempull.sh`, `csystemmerge.sh`, `cmyrepopush.sh`, `cmyrepopull.sh`) |
 | docker network | `bridge0` | `intdns-net`, through `$DOCKER_NET` in `docker_primary.sh`, `bybyleader.sh`, `getdiscovery.sh`, `httpdflask.sh` |
 | `sendhost.py` demo default host | `10.11.11.100` | `10.11.11.250` |
 
@@ -2795,7 +2796,17 @@ wait for `etcdget.py 10.11.11.253 possible --prefix`, then the join call above.
   `10.11.11.200` through `hosts/config`, then zfs2 reset and joined: join with alias + new IP, seven API cases, 6 minutes
   stable, evacuation (the leader drops the node from `ActivePartners` and `ready/` within seconds), join with alias only.
   Two cycles; the second needed no change (42 checks, 0 failures).
-- In the container flavour `myrepolib.sh` `software_ready` probes `http://<ip>/`, but git is served on 9418, so
-  `systempush.sh` / `systempull.sh` print "the software container is not ready" and skip the cluster step; push to the
-  node's software repo with `myrepopush.sh <BRANCH>`.
+- **Use `csystempush.sh` / `csystempull.sh` in the container** (2026-10-05; calling `systempush.sh` / `systempull.sh`
+  is the same thing, they hand over). The `software` container differs between the flavours: on a physical node it is an
+  httpd on port 80 (`http://<ip>/git/<repo>.git`), here it is a git daemon on port 9418 (`git://<ip>/<repo>.git`,
+  `abdopuppet-entrypoint.sh`). `myrepolib.sh` `software_ready` probes `http://<ip>/`, which never answers here, so the
+  plain scripts printed "the software container is not ready", skipped the cluster step (the push to the node's software
+  repo and the `sync/cversion` request) and finished with errors. The `c` copies are identical except for
+  `csoftware_ready`, which checks `git ls-remote git://<ip>/TopStordev.git`. With it a `systempush.sh` on zfs1 pushes to
+  the software repo and the other nodes pull by themselves through `sync/cversion`; `joinpull.sh` goes through
+  `csystempull.sh` too (`SPD_REMOTE=leaderrepo SPD_SYNC=0`).
+- Making `software` the same as on physical was tried (2026-10-05): the `quickstor:git` httpd starts and answers
+  `http://<ip>/`, but the `/root/gitrepo/httpd.conf` in this environment is a static file server (no CGI, no DAV, the repos
+  have no `info/refs`), so git can neither fetch nor push through it. It needs the `httpd.conf` of a working physical node
+  (the image does contain `git-http-backend`).
 
