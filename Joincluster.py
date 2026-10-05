@@ -27,7 +27,12 @@ def do(data):
  initqueue(leaderip, myhost)
  queuethis('AddHost','running',user)
  logmsg.sendlog('AddHostst01','info',user,name)
- put(discip, 'tojoin/'+name,leaderip)
+ cluip = (get(leaderip, 'namespace/mgmtip') or [leaderip])[0]
+ if '.' not in str(cluip):
+  cluip = leaderip
+ if '/' not in str(cluip):
+  cluip = str(cluip)+'/24'
+ put(discip, 'tojoin/'+name,cluip)
  put(leaderip, 'allowedPartners',name)
  nameip = '_1'
  counter = 1 

@@ -9,8 +9,11 @@ import logmsg
 
 
 def setall(*bargs):
- with open('/pacedata/perfmon','r') as f:
-  perfmon = f.readline()
+ try:
+  with open('/pacedata/perfmon','r') as f:
+   perfmon = f.readline()
+ except FileNotFoundError:
+  perfmon = '0'
  if '1' in perfmon:
   queuethis('Evacuate','running','system')
  myhost = bargs[1] 
