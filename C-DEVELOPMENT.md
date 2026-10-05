@@ -2330,9 +2330,11 @@ for Rocky).
   | Container | IP | Image | Notes |
   |---|---|---|---|
   | abdopuppet | `10.11.11.252` | `topstor/abdopuppet:latest` | git backplane |
-  | zfs | `10.11.11.101` | `moataznegm/topstor-zfs:current` | `-p 2222:22`, privileged, runs a nested dockerd |
+  | zfs1 | `10.11.11.101` | `moataznegm/topstor-zfs:current` | `-p 2222:22`, privileged, runs a nested dockerd |
   | proxy | `10.11.11.4` | `topstor/proxy:fixed` | `-p 2223:22 -p 8080:80`, has `ping` baked in |
 
+- **The storage container is named `zfs1` since 2026-10-05** (`manage.sh`: `--name zfs1 --hostname zfs1`; it was `zfs`).
+  Older text that says "the zfs container" means `zfs1`. Its state paths (`/home/topstor/zfs-docker-data`, ...) kept their names.
 - `manage.sh start` **recreates abdopuppet and proxy unconditionally** (it only
   tries `docker start zfs` first). To (re)create only zfs:
   `source <(sed -n '1,254p' /root/topstor/manage.sh); ensure_network; ensure_loop_disks; run_zfs`
@@ -2362,10 +2364,10 @@ for Rocky).
   `no` **only when it is missing or empty**. A value written by the app
   (`yes_fromCLUIP` from `HostManualconfigCLUIP` after a cluster-IP change, `no_fromCLUIP`,
   `yes_fromsenddtarget`, `no_fromreset`, `<configured>_pls…` from `rebootmepls.sh`) therefore stays
-  across `docker restart zfs`, and `docker_setup.sh` takes the "already configured" path
+  across `docker restart zfs1`, and `docker_setup.sh` takes the "already configured" path
   (`isinitn` = `Syes…`). Before this, every start overwrote it with `no`, so a configured node
   looked unconfigured after each restart. To test the first-boot path, set it yourself:
-  `docker exec zfs sh -c 'echo no > /root/nodeconfigured'` (or delete it) before the restart.
+  `docker exec zfs1 sh -c 'echo no > /root/nodeconfigured'` (or delete it) before the restart.
   Which script sets what: UI → `Hostconfig.py` queues `sync/cluip/HostManualconfigCLUIP__<node>/request`
   → `pace/checksyncs.py` runs `/TopStor/HostManualconfigCLUIP leader leaderip myhost myhostip` →
   writes the file (`yes_…` unless `namespace/mgmtip` is still `10.11.11.250`), sets
@@ -2376,18 +2378,18 @@ for Rocky).
 1. Find what is wrong, edit **on the host path**
    `/root/topstor/volumes/linux-env/<repo>/...`. Edit only what the problem needs;
    never unrelated parts of `docker_setup.sh`.
-2. **Commit all three app repos**: `docker exec zfs /TopStor/systempush.sh <BRANCH>`.
+2. **Commit all three app repos**: `docker exec zfs1 /TopStor/systempush.sh <BRANCH>`.
    `systempush.sh` (the same script in both flavours): `git add
    --all`, `git commit -am fixing --allow-empty` (a new commit every time, so
    HEAD always moves), `git checkout -B <BRANCH>`, push to the internal
    `myrepo` (the `software` container) and abdopuppet. Not GitHub.
    Current dev branch: `QSD5.181-cautomode`, **given by the maintainer on
    2026-10-03 — confirm it with him each session (§0 still applies).**
-   Verify: `docker exec zfs sh -c 'cd /TopStor && git log -1 --format=%h; git status --short'`.
-3. **On the host:** `docker restart zfs`. Never run `docker_setup.sh` again
+   Verify: `docker exec zfs1 sh -c 'cd /TopStor && git log -1 --format=%h; git status --short'`.
+3. **On the host:** `docker restart zfs1`. Never run `docker_setup.sh` again
    without a restart first; it needs the boot state.
 4. In zfs run `docker_setup.sh` **without a TTY**:
-   `docker exec zfs bash /TopStor/docker_setup.sh > /path/log 2>&1 &`
+   `docker exec zfs1 bash /TopStor/docker_setup.sh > /path/log 2>&1 &`
    (`docker exec -t/-it` makes background loopers such as `fapilooper.sh` die
    when the exec session ends).
 5. Monitor until it finishes and for ~6 more minutes (see §21.4), then loop.
@@ -2406,7 +2408,7 @@ Known unfixed issue: `/TopStor/cleanlioluns.sh` hangs during the run
 Judge by `nmcli`, not by `/sys` or `ip link` alone — the maintainer looks at
 `nmcli conn show`.
 
-- After `docker restart zfs`, before `docker_setup.sh`: `bond0` does not exist,
+- After `docker restart zfs1`, before `docker_setup.sh`: `bond0` does not exist,
   `eth10` exists with **no IP**, no active NM connection.
 - After `docker_setup.sh`: `nmcli conn show` has `cmynode → bond0` and
   `slave-eth10-to-bond0 → eth10`; `nmcli dev status` shows both `connected`;
@@ -2484,7 +2486,7 @@ entrypoint) is **not** captured by `docker commit`.
 ```bash
 # zfs
 docker tag moataznegm/topstor-zfs:current moataznegm/topstor-zfs:pre-$(date +%Y%m%d-%H%M)   # rollback
-docker exec zfs dnf clean all
+docker exec zfs1 dnf clean all
 docker commit zfs moataznegm/topstor-zfs:current
 docker push moataznegm/topstor-zfs:current        # existing docker login works
 ```
@@ -2659,7 +2661,7 @@ image, removal of the old `echo 1111…; exit`).
 
 ### 21.13 Second storage node `zfs2` (added 2026-10-04)
 
-`manage.sh` starts a second node, `zfs2`, beside `zfs` (`run_zfs2`, `ensure_loop_disks2`; included in
+`manage.sh` starts a second node, `zfs2`, beside `zfs1` (`run_zfs2`; included in
 `start | stop | status | logs`). Same image and in-container paths, everything on `/home`:
 
 | In zfs2 | Host path | Notes |
@@ -2668,7 +2670,7 @@ image, removal of the old `echo 1111…; exit`).
 | `/docker-data` | `/home/topstor/zfs2-docker-data` | `cp --reflink` clone of the idle image-only graph `zfs-nettest-docker-data`; `docker-preload.sh` fills the rest from the shared tarballs — nothing is pulled from the internet |
 | `/docker-images` | `/home/topstor/zfs-docker-images` (ro) | **shared** with zfs |
 | `/tmp/docker_setup_disabled` | `/home/topstor/zfs2/tmp/docker_setup_disabled` | dev-mode flag, `docker_setup.sh` does not auto-run |
-| loop disks | `/home/topstor/disks/zfs2-disk{1,2,3}.img` → host and container `/dev/loop{4,5,6}` | other names than zfs's `loop1-3`, so the LIO/lsscsi names do not collide |
+| loop disks | the same host `/dev/loop{1,2,3}` as zfs1 (since 2026-10-05) | shared on purpose; locking / clustering is the application's job. `zfs2-disk*.img` and `loop4-6` are no longer used |
 
 Not bound: `/var/lib/docker` (host root disk). IP `10.11.11.102`, ssh `-p 2224`, UI `-p 8444:443`.
 Run it like zfs: edit the host path under `/home/topstor/zfs2/linux-env/<repo>/`,
@@ -2726,3 +2728,57 @@ answer, the `fapilooper` runs. **Not verified: any run on physical hardware.**
   a container, so a hand-over would have changed its flow).
 - Detection is deliberately simple. A physical server that happens to have an interface named `eth10`, or that runs inside
   a container, would be treated as the container flavour; set `TOPSTOR_FLAVOR=physical` there.
+
+## 23. Joining a node to the cluster (one call, `tojoin` / `ackjoin`) — since 2026-10-05
+
+Both flavours. The UI makes **one** call; alias and node IP typed in the discovery form travel with it. There is no
+separate `hosts/config` call and no waiting for the node to change its IP first.
+
+```
+POST /api/v1/hosts/joincluster?name=<node>[&alias=<alias>][&ipaddr=<ip>&ipaddrsubnet=<n>]&token=…
+```
+
+| Step | Where | What happens |
+|---|---|---|
+| 1 | leader, `fapi.py` `hostjoincluster` | validates `ipaddr` (`is_valid_ip`, `is_unique_ip`), `ipaddrsubnet` (1-32) and `alias` (no `|` or `=`), then `Joincluster.do(data)` |
+| 2 | leader, `Joincluster.py` | publishes **one key** on the discovery etcd (`10.11.11.253`): `tojoin/<node>` = `ip=<ip/prefix>|cip=<cluster ip/prefix>|alias=<alias>|sw=<leader node ip>|br=<branch>|ts=<epoch>` (`ip`, `alias` only when supplied; `cip` is `namespace/mgmtip`). Re-puts it while unread, waits up to 30 s for `ackjoin/<node>` = `ts` |
+| 3 | node, `pace/senddiscovery.sh` | reads the line, writes `/root/newipaddr`, `/root/newcaddr`, `/root/newalias`, sets `nodeconfigured=yes_fromsenddtarget`, puts `ackjoin/<me>` = `ts`, deletes `tojoin/<me>` and `possible/<me>`, pulls the leader's branch (`joinpull.sh` → `systempull.sh` with `SPD_REMOTE=leaderrepo SPD_SYNC=0`), then restarts through `docker_setup.sh reboot` **detached** (`setsid nohup`, because `resetdocker.sh` starts with `pkill send`) |
+| 4 | leader, after the ack | writes `allowedPartners`, `ActivePartners/<node>` (the new IP when one was given), `ipaddr/<node>` and the syncs |
+| 5 | node, `docker_setup.sh` / `docker_setup.container.sh` | applies `newipaddr` → `mynode`, `newcaddr` → `mycluster`, `newalias` → `alias/<me>` on the leader (+ sync), deletes the three files |
+
+`joinstatus` in the reply: `acknowledged`, `already acknowledged` (an `ackjoin` exists: the node is on its way), `pending`
+(`tojoin` not read yet), `not acknowledged` (no ack in 30 s; `tojoin` removed, no leader keys written), `node not announcing`,
+`invalid ip` / `invalid subnet` / `invalid alias`.
+
+Rules that keep it race-free:
+
+- The node deletes its own `ackjoin` every time it announces `possible/<me>`: an announcing node is alive for joining, so a
+  left-over acknowledge can never block a new join.
+- The discovery etcd database is **kept** between scans (`/TopStordata/discovery`, `getdiscovery.sh`); it used to be wiped at
+  every scan, which could erase `tojoin` / `ackjoin` in the middle of a join. `possible/*` is still deleted and `tostop` is
+  reset (with a retry, the kept value is `yes`) at each scan start.
+- Nodes on software older than this cannot parse the line; bring them to this version before joining them.
+- `senddiscovery.sh` logs to `/root/senddiscovery.log`.
+
+Test from the host (API on the leader's cluster IP): `…/login?user=…&pass=…` → token, `POST …/hosts/discover?name=nothing`,
+wait for `etcdget.py 10.11.11.253 possible --prefix`, then the join call above.
+
+### 23.1 Testing a join on this dev host (zfs1 + zfs2)
+
+- **Commit before running `docker_setup.sh` on zfs2.** An unjoined node believes it is primary and runs `cmyrepopush.sh`,
+  which does `git reset --hard`: files copied into `/home/topstor/zfs2/linux-env` uncommitted are wiped. Write on the host
+  path, `docker exec zfs1 /TopStor/systempush.sh <BRANCH>`, `myrepopush.sh <BRANCH>`, `getcversion.sh`, then
+  `docker exec zfs2 /TopStor/systempull.sh <BRANCH>`.
+- **Wait for the image preload after every restart.** The entrypoint runs `docker-preload.sh` (about a minute). Starting
+  `docker_setup.sh` before `docker logs --since <StartedAt> zfs2` shows `images visible in DinD after preload` makes
+  `docker run … etcd` fail and the setup loops forever on `waiting etcd to settle`.
+- **First boot after `reset` / evacuate is two passes:** pass 1 sets a new hostname and reboots the container, pass 2 is the
+  real setup. `docker_setup.container.sh` now restores `connection.autoconnect yes` on `cmynode` / `clusterstub` before each
+  early reboot (`restore_bond_autoconnect`); without it the next start has no `bond0`, so no `eth10`.
+- Run `/TopStor/resetdocker.sh` in the container before a `docker restart`; a bare restart can hang.
+- LIO is one kernel table for both containers: `Cannot configure StorageObject … already in use` in zfs2's setup log means
+  backstores from an earlier hostname are still claimed.
+- In the container flavour `myrepolib.sh` `software_ready` probes `http://<ip>/`, but git is served on 9418, so
+  `systempush.sh` / `systempull.sh` print "the software container is not ready" and skip the cluster step; push to the
+  node's software repo with `myrepopush.sh <BRANCH>`.
+

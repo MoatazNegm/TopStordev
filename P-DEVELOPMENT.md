@@ -2479,3 +2479,39 @@ answer, the `fapilooper` runs. **Not verified: any run on physical hardware.**
   a container, so a hand-over would have changed its flow).
 - Detection is deliberately simple. A physical server that happens to have an interface named `eth10`, or that runs inside
   a container, would be treated as the container flavour; set `TOPSTOR_FLAVOR=physical` there.
+
+## 23. Joining a node to the cluster (one call, `tojoin` / `ackjoin`) — since 2026-10-05
+
+Both flavours. The UI makes **one** call; alias and node IP typed in the discovery form travel with it. There is no
+separate `hosts/config` call and no waiting for the node to change its IP first.
+
+```
+POST /api/v1/hosts/joincluster?name=<node>[&alias=<alias>][&ipaddr=<ip>&ipaddrsubnet=<n>]&token=…
+```
+
+| Step | Where | What happens |
+|---|---|---|
+| 1 | leader, `fapi.py` `hostjoincluster` | validates `ipaddr` (`is_valid_ip`, `is_unique_ip`), `ipaddrsubnet` (1-32) and `alias` (no `|` or `=`), then `Joincluster.do(data)` |
+| 2 | leader, `Joincluster.py` | publishes **one key** on the discovery etcd (`10.11.11.253`): `tojoin/<node>` = `ip=<ip/prefix>|cip=<cluster ip/prefix>|alias=<alias>|sw=<leader node ip>|br=<branch>|ts=<epoch>` (`ip`, `alias` only when supplied; `cip` is `namespace/mgmtip`). Re-puts it while unread, waits up to 30 s for `ackjoin/<node>` = `ts` |
+| 3 | node, `pace/senddiscovery.sh` | reads the line, writes `/root/newipaddr`, `/root/newcaddr`, `/root/newalias`, sets `nodeconfigured=yes_fromsenddtarget`, puts `ackjoin/<me>` = `ts`, deletes `tojoin/<me>` and `possible/<me>`, pulls the leader's branch (`joinpull.sh` → `systempull.sh` with `SPD_REMOTE=leaderrepo SPD_SYNC=0`), then restarts through `docker_setup.sh reboot` **detached** (`setsid nohup`, because `resetdocker.sh` starts with `pkill send`) |
+| 4 | leader, after the ack | writes `allowedPartners`, `ActivePartners/<node>` (the new IP when one was given), `ipaddr/<node>` and the syncs |
+| 5 | node, `docker_setup.sh` / `docker_setup.container.sh` | applies `newipaddr` → `mynode`, `newcaddr` → `mycluster`, `newalias` → `alias/<me>` on the leader (+ sync), deletes the three files |
+
+`joinstatus` in the reply: `acknowledged`, `already acknowledged` (an `ackjoin` exists: the node is on its way), `pending`
+(`tojoin` not read yet), `not acknowledged` (no ack in 30 s; `tojoin` removed, no leader keys written), `node not announcing`,
+`invalid ip` / `invalid subnet` / `invalid alias`.
+
+Rules that keep it race-free:
+
+- The node deletes its own `ackjoin` every time it announces `possible/<me>`: an announcing node is alive for joining, so a
+  left-over acknowledge can never block a new join.
+- The discovery etcd database is **kept** between scans (`/TopStordata/discovery`, `getdiscovery.sh`); it used to be wiped at
+  every scan, which could erase `tojoin` / `ackjoin` in the middle of a join. `possible/*` is still deleted and `tostop` is
+  reset (with a retry, the kept value is `yes`) at each scan start.
+- Nodes on software older than this cannot parse the line; bring them to this version before joining them.
+- `senddiscovery.sh` logs to `/root/senddiscovery.log`.
+
+Test from the host (API on the leader's cluster IP): `…/login?user=…&pass=…` → token, `POST …/hosts/discover?name=nothing`,
+wait for `etcdget.py 10.11.11.253 possible --prefix`, then the join call above.
+
+
