@@ -642,11 +642,11 @@ do
 	then
 		echo syncrequests only
 		echo row 262 checksync init >> /root/checksync
-		/pace/checksyncs.py syncrequest $myclusterip $myhost $myip >/dev/null & disown
+		/pace/checksyncs.py syncrequest $myclusterip $myhost $myip >/dev/null 2>&1 & disown
 	else
 		echo have to syncall
 		echo row 266 checksync init >> /root/checksync
-		/pace/checksyncs.py syncall $myclusterip $myhost $myip >/dev/null & disown
+		/pace/checksyncs.py syncall $myclusterip $myhost $myip >/dev/null 2>&1 & disown
 	fi
 	checkcluster=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip`
 	echo $checkcluster >> /root/dockerlogs.txt
@@ -678,7 +678,7 @@ then
 	echo adding all sync inits as I am primary
 	echo docker exec etcdclient /pace/checksyncs.py syncinit $etcd
 	echo row 293 checksync init >> /root/checksync
-	/pace/checksyncs.py syncinit $etcd $myhost >/dev/null & disown 
+	/pace/checksyncs.py syncinit $etcd $myhost >/dev/null 2>&1 & disown 
 fi
 /TopStor/etcdput.py $etcd ready/$myhost $mynodeip 
 
@@ -690,7 +690,7 @@ docker rm -f httpd 2>/dev/null
 docker rm -f flask 2>/dev/null
 docker rm -f react-dev-ui 2>/dev/null
 rm -rf $httpdf
-/TopStor/ioperf.py $etcd $myhost >/dev/null & disown
+/TopStor/ioperf.py $etcd $myhost >/dev/null 2>&1 & disown
 echo /TopStor/ioperf.py $etcd $myhost 
 echo docker exec etcdclient /TopStor/etcdput.py $myclusterip ready/$myhost $mynodeip 
 /TopStor/etcdput.py $myclusterip ready/$myhost $mynodeip 
@@ -751,20 +751,20 @@ fi
 echo I a hhhhhhhhhhhhhhhhhhhhhhhhere
 #if [ $isprimary -ne 0 ];
 #then
-/pace/checksyncs.py syncrequest $myclusterip $myhost >/dev/null & disown 
+/pace/checksyncs.py syncrequest $myclusterip $myhost >/dev/null 2>&1 & disown 
 #/TopStor/etcddel.py $myclusterip sync/diskref --prefix
 #/TopStor/etcdput.py $myclusterip sync/diskref/add_add_add______/request diskref_$stamp
 #fi
 /TopStor/etcdput.py $etcd refreshdisown/$myhost yes 
 echo /TopStor/etcdput.py $etcd refreshdisown/$myhost yes 
 
-/TopStor/refreshdisown.sh > /dev/null & disown 
+/TopStor/refreshdisown.sh >/dev/null 2>&1 & disown 
 
 #/pace/diskref.sh $leader $leaderip $myhost $myhostip & disown
-/pace/rebootmeplslooper.sh $myclusterip $myhost >/dev/null & disown 
+/pace/rebootmeplslooper.sh $myclusterip $myhost >/dev/null 2>&1 & disown 
 #/TopStor/receivereplylooper.sh & disown
 #/TopStor/iscsiwatchdoglooper.sh $mynodeip $myhost & disown 
-/pace/heartbeatlooper.sh >/dev/null & disown 
+/pace/heartbeatlooper.sh >/dev/null 2>&1 & disown 
 #/pace/updateconfiglooper.sh $myclusterip $myhost & disown
 stamp=`date +%s%N`
 /TopStor/etcddel.py $myclusterip rebootwait/$myhost
@@ -783,7 +783,7 @@ rm -rf /promgraf/grafana.db
 mkdir /promgraf
 cp -p /TopStor/grafana.db /promgraf/
 echo /TopStor/getcversion.sh $myclusterip $leader $myhost >/dev/null & disown
-/TopStor/getcversion.sh $myclusterip $leader $myhost >/dev/null & disown
+/TopStor/getcversion.sh $myclusterip $leader $myhost >/dev/null 2>&1 & disown
 if [ $isprimary -ne 0 ];
 then
 	echo I am hhhhhhhhhhhhhhhhhhhhhhinnhgjjjjhhhhhhhhhhhhhere
