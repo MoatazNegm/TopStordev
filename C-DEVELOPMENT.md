@@ -2794,17 +2794,32 @@ wait for `etcdget.py 10.11.11.253 possible --prefix`, then the join call above.
 - **From-scratch acceptance (2026-10-05):** both containers removed and recreated from the image with `manage.sh`
   (`run_zfs` → `zfs1`, `run_zfs2`), `systempull.sh`, `docker_setup.sh reset`, node IP `10.11.11.201` + cluster
   `10.11.11.200` through `hosts/config`, then zfs2 reset and joined: join with alias + new IP, seven API cases, 6 minutes
-  stable, evacuation (the leader drops the node from `ActivePartners` and `ready/` within seconds), join with alias only.
-  Two cycles; the second needed no change (42 checks, 0 failures).
+  stable, evacuation (the leader drops the node from `ActivePartners` and `ready/` within seconds), join with alias only,
+  then `systempush.sh` on zfs1 + `systempull.sh` on zfs2 by hand (no error, same commits, no pull loop). Three full
+  cycles; the last one, after `csystempush.sh` / `csystempull.sh` came back and the `cversion` sync was removed, needed no
+  change and no workaround (60 checks, 0 failures).
 - **Use `csystempush.sh` / `csystempull.sh` in the container** (2026-10-05; calling `systempush.sh` / `systempull.sh`
   is the same thing, they hand over). The `software` container differs between the flavours: on a physical node it is an
   httpd on port 80 (`http://<ip>/git/<repo>.git`), here it is a git daemon on port 9418 (`git://<ip>/<repo>.git`,
   `abdopuppet-entrypoint.sh`). `myrepolib.sh` `software_ready` probes `http://<ip>/`, which never answers here, so the
   plain scripts printed "the software container is not ready", skipped the cluster step (the push to the node's software
   repo and the `sync/cversion` request) and finished with errors. The `c` copies are identical except for
-  `csoftware_ready`, which checks `git ls-remote git://<ip>/TopStordev.git`. With it a `systempush.sh` on zfs1 pushes to
-  the software repo and the other nodes pull by themselves through `sync/cversion`; `joinpull.sh` goes through
-  `csystempull.sh` too (`SPD_REMOTE=leaderrepo SPD_SYNC=0`).
+  `csoftware_ready`, which checks `git ls-remote git://<ip>/TopStordev.git`, and for one more thing in `csystempull.sh`:
+  it posts **no** `sync/cversion` request (see the next point). With it a `systempush.sh` on zfs1 pushes to its software
+  repo; **the other nodes do not pull by themselves** — run `systempull.sh <BRANCH>` on each (zfs2). `joinpull.sh` goes
+  through `csystempull.sh` too (`SPD_REMOTE=leaderrepo SPD_SYNC=0`).
+- **No `cversion` sync in `pace/checksyncs.py` any more** (2026-10-05, both flavours): the entries in `syncanitem`,
+  `wholeetcd` and `noinit`, the two `sync/cversion` handlers (they ran `myrepopull.sh` / `systempull.sh`), the version
+  comparison in `insync()` and the `getcversion.sh` call after the request loop are gone. Why: once the cluster step
+  worked in the container, a `sync/cversion` request made a node run `systempull.sh`, whose end posted a new request, so
+  the nodes re-triggered each other for ever and every round force-checked-out the working trees (a reset every ~20 s,
+  which also discards uncommitted edits on the host path). The `cversion/<host>` **keys** stay: `getcversion.sh` (run by
+  `docker_setup.sh`) and `csystempull.sh` write them, `Joincluster.py` reads the leader's to tell a joining node which
+  branch to pull. Scripts that still post `sync/cversion/...` (`systempush.sh`, `myrepopull.sh`, `getcversion.sh`) are
+  harmless: nothing handles the request and `insync()` ignores it. `replichecksyncs.py` still has its own copy.
+- **A joining node ends on the primary's exact branch and commit** in all three repos: `senddiscovery.sh` →
+  `joinpull.sh` pulls from the primary's software repo (`leaderrepo` = `git://<primary node ip>/<repo>.git`), which the
+  primary fills at every `docker_setup.sh` (`cmyrepopush.sh`) and at every `systempush.sh`.
 - Making `software` the same as on physical was tried (2026-10-05): the `quickstor:git` httpd starts and answers
   `http://<ip>/`, but the `/root/gitrepo/httpd.conf` in this environment is a static file server (no CGI, no DAV, the repos
   have no `info/refs`), so git can neither fetch nor push through it. It needs the `httpd.conf` of a working physical node
