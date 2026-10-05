@@ -41,7 +41,14 @@ sed -i 's/SLEEP//g' /TopStordata/discovery.sh
 sed -i "s/ETCDIP/$newip/g" /TopStordata/discovery.sh
 docker run  -itd --rm --name discovery --hostname discovery -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $etcd:2379:2379 -v /TopStor/:/TopStor -v /TopStordata/discovery:/default.etcd -v /TopStordata/discovery.sh:/runme.sh --net ${DOCKER_NET:-bridge0} moataznegm/quickstor:etcd
 counter=0
-./etcdput.py $etcd tostop no 
+# the discovery database is kept between scans, so tostop still says yes from the last one: reset it
+# and make sure etcd (just started) took it, or the loop below would stop at once
+for tries in `seq 1 30`
+do
+	./etcdput.py $etcd tostop no >/dev/null
+	[ "`/TopStor/etcdget.py $etcd tostop`" = "no" ] && break
+	sleep 1
+done
 /TopStor/etcddel.py $etcd possible --prefix
 /TopStor/etcddel.py $leaderip  possible --prefix
 while true
