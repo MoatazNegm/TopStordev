@@ -31,12 +31,17 @@ fi
 #   SPD_CLEAN=1         also delete untracked files, not just tracked changes
 #   SPD_PROJECTS        space separated project directory names
 #   SPD_ROOT            prefix to put in front of every path (default none)
+#   SPD_REMOTE=<name>   git remote to pull from (default origin)
+#   SPD_SYNC=0          skip the cluster sync and pre/post_apply (a node that is not in
+#                       the cluster yet, e.g. joinpull.sh)
 # ---------------------------------------------------------------------------
 
 SPD_BASE=${SPD_BASE:-QSD5.179}
 SPD_CLEAN=${SPD_CLEAN:-0}
 SPD_PROJECTS=${SPD_PROJECTS:-'TopStor pace topstorweb'}
 SPD_ROOT=${SPD_ROOT:-}
+SPD_REMOTE=${SPD_REMOTE:-origin}
+SPD_SYNC=${SPD_SYNC:-1}
 PROJECTS=$SPD_PROJECTS
 
 fnupdate() {
@@ -62,22 +67,22 @@ fnupdate() {
 		echo "  the history below it is not re-downloaded"
 	fi
 
-	echo "  fetching origin/$branch"
-	if ! git fetch --no-tags --prune origin \
-			"+refs/heads/$branch:refs/remotes/origin/$branch"; then
-		echo "  ERROR: could not fetch $branch from origin"
+	echo "  fetching $SPD_REMOTE/$branch"
+	if ! git fetch --no-tags --prune "$SPD_REMOTE" \
+			"+refs/heads/$branch:refs/remotes/$SPD_REMOTE/$branch"; then
+		echo "  ERROR: could not fetch $branch from $SPD_REMOTE"
 		return 1
 	fi
 
-	if ! git rev-parse --verify --quiet "refs/remotes/origin/$branch" >/dev/null; then
-		echo "  ERROR: origin/$branch does not exist -- wrong branch name?"
+	if ! git rev-parse --verify --quiet "refs/remotes/$SPD_REMOTE/$branch" >/dev/null; then
+		echo "  ERROR: $SPD_REMOTE/$branch does not exist -- wrong branch name?"
 		return 1
 	fi
 
 	# ---- 2. warn before the shallow boundary can bite --------------------
 	if [ -n "$shallow" ]; then
 		if git rev-parse --verify --quiet "refs/heads/$SPD_BASE" >/dev/null &&
-		   git merge-base --is-ancestor "$SPD_BASE" "refs/remotes/origin/$branch" 2>/dev/null
+		   git merge-base --is-ancestor "$SPD_BASE" "refs/remotes/$SPD_REMOTE/$branch" 2>/dev/null
 		then
 			echo "  $branch descends from $SPD_BASE -- merge-base stays correct"
 		else
@@ -92,7 +97,7 @@ fnupdate() {
 	# -B resets the branch to the given ref and checks it out.
 	# -f throws local modifications away instead of refusing to switch.
 	# There is deliberately no merge and no rebase anywhere in here.
-	if ! git checkout -f -B "$branch" "refs/remotes/origin/$branch"; then
+	if ! git checkout -f -B "$branch" "refs/remotes/$SPD_REMOTE/$branch"; then
 		echo "  ERROR: could not check out $branch"
 		return 1
 	fi
@@ -111,11 +116,11 @@ fnupdate() {
 	# name of the branch the caller wants every project to end up on, and sh
 	# has no local variables, so reusing it here would clobber that.
 	got=`git rev-parse HEAD`
-	remote_sha=`git rev-parse refs/remotes/origin/$branch`
+	remote_sha=`git rev-parse refs/remotes/$SPD_REMOTE/$branch`
 	if [ "$got" = "$remote_sha" ]; then
-		echo "  $branch is now $got -- identical to origin/$branch"
+		echo "  $branch is now $got -- identical to $SPD_REMOTE/$branch"
 	else
-		echo "  *** ERROR: HEAD is $got but origin/$branch is $want"
+		echo "  *** ERROR: HEAD is $got but $SPD_REMOTE/$branch is $remote_sha"
 		return 1
 	fi
 
@@ -145,7 +150,7 @@ fi
 # the branch every project is expected to be sitting on when this finishes
 want=$branch
 
-echo "systempull: taking $branch from origin, as it is -- no merge, local changes discarded"
+echo "systempull: taking $branch from $SPD_REMOTE, as it is -- no merge, local changes discarded"
 
 rc=0
 for job in $PROJECTS; do
@@ -164,8 +169,8 @@ echo
 echo '###########################################'
 echo "  syncing the cluster"
 # The cluster sync only makes sense on a real node, so SPD_ROOT overrides skip it.
-if [ -n "$SPD_ROOT" ]; then
-	echo "  SPD_ROOT is set .... skipping the cluster sync"
+if [ -n "$SPD_ROOT" ] || [ "$SPD_SYNC" = "0" ]; then
+	echo "  SPD_ROOT/SPD_SYNC is set .... skipping the cluster sync"
 elif ( . /TopStor/myrepolib.sh; software_ready "`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`" ); then
 	echo "  running any needed scripts"
 	leaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip`
@@ -192,7 +197,7 @@ else
 	rc=1
 fi
 
-if [ -z "$SPD_ROOT" ] && docker ps >/dev/null 2>&1; then
+if [ -z "$SPD_ROOT" ] && [ "$SPD_SYNC" != "0" ] && docker ps >/dev/null 2>&1; then
 	if [ -e /TopStor/pre_apply.sh ]; then
 		/TopStor/pre_apply.sh
 	else

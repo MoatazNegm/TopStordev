@@ -11,7 +11,7 @@
 # create-or-move + switch), and `git branch -D` is made non-fatal
 # (it can fail when $1_$currentbranch IS the current branch).
 # The merge + diff + the systempull.sh call at the bottom are
-# byte-identical to systemmerge.sh (we just call /TopStor/csystempull.sh
+# byte-identical to systemmerge.sh (we just call /TopStor/systempull.sh
 # directly instead of copying systempull.sh to /root).
 #
 # Falls through to the original systemmerge.sh behaviour on a real
@@ -72,8 +72,8 @@ if [ "$ISCONTAINER" = "1" ]; then
 		branch=`git branch | grep '*' | awk '{print $2}'`
 	fi
 
-	/TopStor/csystempull.sh $branch
-	/TopStor/csystempull.sh $currentbranch
+	/TopStor/systempull.sh $branch
+	/TopStor/systempull.sh $currentbranch
 else
 	rm -rf /root/systempull.sh
 	cp /TopStor/systempull.sh /root/

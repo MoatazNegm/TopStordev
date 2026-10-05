@@ -49,7 +49,7 @@
 The full policy, with examples and a pre-flight checklist, is in **§10**.
 
 **Exception that is not a loophole:** when the maintainer *explicitly types* the
-script and branch in his prompt (e.g. `csystempush.sh QSD5.181-cautomode`), running
+script and branch in his prompt (e.g. `systempush.sh QSD5.181-cautomode`), running
 exactly that is allowed — that is the "branch the user typed" case in item 1.
 The branch is still never yours to choose; see §21.3 for the dev loop.
 
@@ -2376,8 +2376,8 @@ for Rocky).
 1. Find what is wrong, edit **on the host path**
    `/root/topstor/volumes/linux-env/<repo>/...`. Edit only what the problem needs;
    never unrelated parts of `docker_setup.sh`.
-2. **Commit all three app repos**: `docker exec zfs /TopStor/csystempush.sh <BRANCH>`.
-   `csystempush.sh` is the container-aware variant of `systempush.sh`: `git add
+2. **Commit all three app repos**: `docker exec zfs /TopStor/systempush.sh <BRANCH>`.
+   `systempush.sh` (the same script in both flavours): `git add
    --all`, `git commit -am fixing --allow-empty` (a new commit every time, so
    HEAD always moves), `git checkout -B <BRANCH>`, push to the internal
    `myrepo` (the `software` container) and abdopuppet. Not GitHub.
@@ -2672,7 +2672,7 @@ image, removal of the old `echo 1111…; exit`).
 
 Not bound: `/var/lib/docker` (host root disk). IP `10.11.11.102`, ssh `-p 2224`, UI `-p 8444:443`.
 Run it like zfs: edit the host path under `/home/topstor/zfs2/linux-env/<repo>/`,
-`docker exec zfs2 /TopStor/csystempush.sh <BRANCH>`, `docker restart zfs2`, then `docker_setup.sh` without a TTY.
+`docker exec zfs2 /TopStor/systempush.sh <BRANCH>`, `docker restart zfs2`, then `docker_setup.sh` without a TTY.
 **Limit:** `iscsid` is one per host netns (§ iSCSI host-netns fix). With zfs's iscsid running, zfs2's entrypoint
 refuses to start its own (`another iscsid already owns @ISCSIADM_ABSTRACT_NAMESPACE`), so zfs2 has no working
 iSCSI initiator until that is designed. `docker_setup.sh` on zfs2 would join the cluster (`10.11.11.250` answers).
@@ -2700,7 +2700,7 @@ How each part adapts:
 | `resetdocker.sh` | `systemctl stop docker` | Docker is left running |
 | `refreshdisown.sh` | the iscsiwatchdog looper is not started | it is started |
 | `myrepopull.sh` | `http://<leader>/git/<repo>.git` | `git://<leader>/<repo>` |
-| `systempush.sh`, `systempull.sh`, `systemmerge.sh`, `myrepopush.sh` | the physical flow (`myrepopush.sh` with `myrepolib.sh`) | hand over to the `c` variant (`csystempush.sh`, ...) |
+| `systempush.sh`, `systempull.sh`, `systemmerge.sh`, `myrepopush.sh` | the physical flow (`myrepopush.sh` with `myrepolib.sh`) | hand over to the `c` variant when one exists (`csystemmerge.sh`, ...; `csystempush.sh` and `csystempull.sh` were removed, the plain scripts serve both flavours) |
 | docker network | `bridge0` | `intdns-net`, through `$DOCKER_NET` in `docker_primary.sh`, `bybyleader.sh`, `getdiscovery.sh`, `httpdflask.sh` |
 | `sendhost.py` demo default host | `10.11.11.100` | `10.11.11.250` |
 

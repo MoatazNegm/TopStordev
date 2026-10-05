@@ -2405,7 +2405,7 @@ own. They are the places to guard if one script is ever to serve both flavours.
   `putEthernetPorts.py` uses `#!/usr/bin/python3`.
 - **Container-only files:** `reboot.sh`, `cleannw.sh`, `cleanlioluns.sh`, `docker-preload.sh`, `rabbitnodefix.sh`,
   `checksync`, `abdopuppet-entrypoint.sh`, `tmpCreatePoolCMD`, and the `c*` variants of the push / pull / update
-  scripts (`csystempush.sh`, `csystempull.sh`, `csystemmerge.sh`, `cmyrepopush.sh`, `cmyrepopull.sh`,
+  scripts (`csystemmerge.sh`, `cmyrepopush.sh`, `cmyrepopull.sh`,
   `cproxypush.sh`, `cproxyupdate.sh`, `cdevproxypush.sh`, `cdevproxyupdate.sh`, `cdevpullsomeupdate.sh`).
 - **Physical-only (newer app code, not in the container line):** `post_apply.sh`, `fixcachelocality.py`,
   `check_evac_state2.py`, `delete_stale_possible.py` and larger `fapi.py` / `DGsetPool`. `c47` and `QSD5.204`
@@ -2453,7 +2453,7 @@ How each part adapts:
 | `resetdocker.sh` | `systemctl stop docker` | Docker is left running |
 | `refreshdisown.sh` | the iscsiwatchdog looper is not started | it is started |
 | `myrepopull.sh` | `http://<leader>/git/<repo>.git` | `git://<leader>/<repo>` |
-| `systempush.sh`, `systempull.sh`, `systemmerge.sh`, `myrepopush.sh` | the physical flow (`myrepopush.sh` with `myrepolib.sh`) | hand over to the `c` variant (`csystempush.sh`, ...) |
+| `systempush.sh`, `systempull.sh`, `systemmerge.sh`, `myrepopush.sh` | the physical flow (`myrepopush.sh` with `myrepolib.sh`) | hand over to the `c` variant when one exists (`csystemmerge.sh`, ...; `csystempush.sh` and `csystempull.sh` were removed, the plain scripts serve both flavours) |
 | docker network | `bridge0` | `intdns-net`, through `$DOCKER_NET` in `docker_primary.sh`, `bybyleader.sh`, `getdiscovery.sh`, `httpdflask.sh` |
 | `sendhost.py` demo default host | `10.11.11.100` | `10.11.11.250` |
 

@@ -32,6 +32,13 @@ def do(data):
   cluip = leaderip
  if '/' not in str(cluip):
   cluip = str(cluip)+'/24'
+ # tell the joining node which software to pull before it restarts: the primary's
+ # node address (its software git-daemon) and branch; these must be put BEFORE tojoin/
+ leadernodeip = (get(leaderip, 'ready/'+leader) or [''])[0]
+ cversion = (get(leaderip, 'cversion/'+leader) or [''])[0]
+ if '.' in str(leadernodeip) and '-' in str(cversion):
+  put(discip, 'tojoinsw/'+name, leadernodeip)
+  put(discip, 'tojoinbr/'+name, str(cversion).rsplit('-',1)[0])
  put(discip, 'tojoin/'+name,cluip)
  put(leaderip, 'allowedPartners',name)
  nameip = '_1'
