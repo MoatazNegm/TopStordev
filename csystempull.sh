@@ -206,11 +206,11 @@ elif csoftware_ready "`docker exec etcdclient /TopStor/etcdgetlocal.py clusterno
 	leaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip`
 	leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
 	myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
-	stamp=`date +%s`
-	/TopStor/etcddel.py $leaderip sync/cversion --prefix
-	/TopStor/etcdput.py $leaderip sync/cversion/_${branch}__/request cversion_$stamp
-	/TopStor/etcdput.py $leaderip sync/cversion/_${branch}__/request/$myhost cversion_$stamp
-	/TopStor/getcversion.sh $leaderip $leader $myhost
+	# Container variant: NO new sync/cversion request here (and no getcversion.sh, which posts one too).
+	# pace/checksyncs.py answers a sync/cversion request by running systempull.sh; if the pull posted a
+	# request itself, the nodes would re-trigger each other for ever and every round force-checks-out the
+	# working trees (seen on 2026-10-05, a reset every ~20 s). A systempush.sh posts the one request that
+	# makes the other nodes pull; a pull only records this node's own version.
 	cd /TopStor || exit 1
 	commit=`git show --abbrev-commit | grep commit | head -1 | awk '{print $2}'`
 	echo /TopStor/etcdput.py $leaderip cversion/$myhost $branch-$commit
