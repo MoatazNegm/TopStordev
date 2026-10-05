@@ -1484,6 +1484,22 @@ def hostjoincluster(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
  data['user'] = data['response']
+ # optional changes made together with the join: they travel to the node in tojoin/<name>
+ if data.get('ipaddr'):
+  isvu = int(is_valid_ip(data['ipaddr']))+int(is_unique_ip(data['ipaddr']))
+  if isvu != 0:
+   if isvu < 100:
+    logmsg.sendlog('IPaddrfa','error','system',data['user'])
+   else:
+    logmsg.sendlog('IPadduqfa','error','system',data['user'])
+   data['joinstatus'] = 'invalid ip'
+   return data
+  if data.get('ipaddrsubnet') and not (str(data['ipaddrsubnet']).isdigit() and 1 <= int(data['ipaddrsubnet']) <= 32):
+   data['joinstatus'] = 'invalid subnet'
+   return data
+ if data.get('alias') and ('|' in data['alias'] or '=' in data['alias']):
+  data['joinstatus'] = 'invalid alias'
+  return data
  discover()
  data['leaderip'] = leaderip
  data ['myhost'] = myhost

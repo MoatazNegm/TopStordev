@@ -477,6 +477,8 @@ then
 fi
 echo starting docker containers
 #systemctl start docker
+newalias=`cat /root/newalias 2>/dev/null`
+rm -rf /root/newalias
 rm -rf /root/newipaddr
 rm -rf /root/newcaddr
 hostname $hostname
@@ -592,6 +594,7 @@ do
 	fi
 	echo initializaing volume pool leader clsuternode data
 	myalias=`docker exec etcdclient /pace/etcdgetlocal.py $aliast/$myhost`
+	if [ -n "$newalias" ]; then myalias=$newalias; fi
 	leader=`/pace/etcdget.py $myclusterip leader`
 	docker exec etcdclient /pace/etcdputlocal.py leader $leader 
 	docker exec etcdclient /pace/etcdputlocal.py leaderip $myclusterip

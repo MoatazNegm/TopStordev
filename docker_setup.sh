@@ -343,6 +343,8 @@ systemctl start iscsid
 fi
 echo starting docker
 systemctl start docker
+newalias=`cat /root/newalias 2>/dev/null`
+rm -rf /root/newalias
 rm -rf /root/newipaddr
 rm -rf /root/newcaddr
 docker run --rm --name software  --hostname software  -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $myhostip:80:80 -v /root/gitrepo/httpd.conf:/usr/local/apache2/conf/httpd.conf -v /root/gitrepo:/usr/local/apache2/htdocs/ -itd moataznegm/quickstor:git
@@ -454,6 +456,7 @@ docker run -itd --rm --privileged \
 	       fi
 	       echo initializaing volume pool leader clsuternode data
 	       myalias=`docker exec etcdclient /pace/etcdgetlocal.py $aliast/$myhost`
+	       if [ -n "$newalias" ]; then myalias=$newalias; fi
 	       leader=`/pace/etcdget.py $myclusterip leader`
 	       docker exec etcdclient /pace/etcdputlocal.py leader $leader 
 	       docker exec etcdclient /pace/etcdputlocal.py leaderip $myclusterip
