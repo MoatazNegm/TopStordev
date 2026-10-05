@@ -143,6 +143,15 @@ fi
 /usr/bin/targetcli clearconfig confirm=True	
 targetcli saveconfig
 /TopStor/cleanlioluns.sh
+# The entrypoint needs the image-baked bond profiles to autoconnect at the next boot: NM creates bond0
+# from them and the entrypoint renames it to eth10. cleannw.sh turns autoconnect off during a run and a
+# normal run re-adds cmynode with it on, but the early container reboots below leave it off, so the
+# next start had no eth10 (and the next docker_setup.sh hung waiting for etcd).
+restore_bond_autoconnect() {
+	for c in cmynode clusterstub; do
+		nmcli conn modify "$c" connection.autoconnect yes 2>/dev/null || true
+	done
+}
 mkdir -p /dev/disk/by-id/
 echo ${myhost}$cmdline | egrep 'init|local'
 if [ $? -eq 0 ];
@@ -162,12 +171,14 @@ then
 	# path where the reboot is skipped).
 	systemctl restart iscsid 2>/dev/null || /usr/local/sbin/start-iscsid.sh
 	/TopStor/resetdocker.sh
+	restore_bond_autoconnect
 	/TopStor/reboot.sh
 fi
 cat /root/hostname | grep frstreboot
 if [ $? -eq 0 ];
 then
 	echo $myhost > /root/hostname
+	restore_bond_autoconnect
 	/TopStor/reboot.sh
 fi
 echo l$cmdline | grep restart
@@ -219,6 +230,7 @@ then
 	echo $cmdline | egrep 'reboot|reset'
 	if [ $? -eq 0 ];
 	then
+		restore_bond_autoconnect
 		/TopStor/reboot.sh
 	fi
 	echo $cmdline | grep 'stop'
