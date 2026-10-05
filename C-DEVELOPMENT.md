@@ -2778,6 +2778,23 @@ wait for `etcdget.py 10.11.11.253 possible --prefix`, then the join call above.
 - Run `/TopStor/resetdocker.sh` in the container before a `docker restart`; a bare restart can hang.
 - LIO is one kernel table for both containers: `Cannot configure StorageObject … already in use` in zfs2's setup log means
   backstores from an earlier hostname are still claimed.
+- **Background loops need their stderr redirected** (`docker_setup.container.sh`, 2026-10-05). The loops it starts
+  (`rebootmeplslooper.sh`, `heartbeatlooper.sh`, `refreshdisown.sh` → `iscsiwatchdog.sh`, `checksyncs.py`, `ioperf.py`,
+  `getcversion.sh`) now run with `>/dev/null 2>&1`. With only stdout redirected their stderr was the pipe of the
+  `docker exec` session that ran the setup; once that session ended every write to it (each nested `docker exec` prints a
+  locale warning) broke, and `rebootmepls.sh` silently ignored `rebootme/<host> = pls…` — a node did not restart after an
+  evacuation or a cluster-IP change. Check: `readlink /proc/$(pgrep -f rebootmeplslooper | head -1)/fd/2` → `/dev/null`.
+- **The image needs `nmap`** (added to `moataznegm/topstor-zfs:current` on 2026-10-05, rollback tag
+  `pre-nmap-20261005-2046`). `pace/heartbeat.py` probes the other nodes with it; without it the script died on every run
+  (`UnboundLocalError: res`), so the leader never marked a node lost, `ready/<host>` stayed, and an evacuation never
+  finished (`checksyncs.py` runs the `evacuatehost` cleanup only once the node is out of `ready/`). The package was added in a
+  throw-away container (`docker run --entrypoint /bin/bash … dnf install -y nmap`), committed, and the image's
+  `ENTRYPOINT` reset to none with a two-line `docker build` (`docker commit --change 'ENTRYPOINT []'` leaves `/bin/bash`).
+- **From-scratch acceptance (2026-10-05):** both containers removed and recreated from the image with `manage.sh`
+  (`run_zfs` → `zfs1`, `run_zfs2`), `systempull.sh`, `docker_setup.sh reset`, node IP `10.11.11.201` + cluster
+  `10.11.11.200` through `hosts/config`, then zfs2 reset and joined: join with alias + new IP, seven API cases, 6 minutes
+  stable, evacuation (the leader drops the node from `ActivePartners` and `ready/` within seconds), join with alias only.
+  Two cycles; the second needed no change (42 checks, 0 failures).
 - In the container flavour `myrepolib.sh` `software_ready` probes `http://<ip>/`, but git is served on 9418, so
   `systempush.sh` / `systempull.sh` print "the software container is not ready" and skip the cluster step; push to the
   node's software repo with `myrepopush.sh <BRANCH>`.
