@@ -2504,10 +2504,14 @@ docker push moataznegm/topstor-zfs:current        # existing docker login works
 - Mount `volumes/linux-env-proxy:/workspace`; entrypoint
   `scripts/entrypoint-proxy.sh`; internet works via the host MASQUERADE rule.
 - Repos `/TopStor`, `/pace`, `/topstorweb` have remotes `origin =
-  git://10.11.11.252/{TopStordev,HC,TopStorWeb}.git` and `github =
+  git://10.11.11.252/{TopStordev,HC,TopStorweb}.git` and `github =
   https://github.com/MoatazNegm/{TopStordev,HC,TopStorWeb}.git`.
   `proxypush.sh <branch>` pulls from origin (252) and pushes to GitHub;
   `proxyupdate.sh <branch>` goes GitHub → 252. Both hard-reset the repos.
+  **Repo renamed (2026-10-06):** on abdopuppet the bare repo is now `TopStorweb.git`; `TopStorWeb.git` is a
+  symlink to it so old `origin` URLs (zfs1, zfs2) keep working until they are migrated. `PROJECTS` in
+  `proxypush.sh` / `proxyupdate.sh` use `TopStorweb`. Still `TopStorWeb`: `cmyrepopush.sh`, `joinpull.sh`, the
+  `myrepo` remote (software container, inside zfs1) and the nested repos' `origin` remote.
 - GitHub auth: `/root/.git-credentials` + `git config --global credential.helper
   store` inside the proxy (lives in the container layer, lost on recreate unless
   the image is committed). The valid token is also in host `/root/.git-credentials`.

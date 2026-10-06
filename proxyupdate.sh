@@ -44,7 +44,7 @@
 #   PROXY_WORKROOT    where the scratch repositories are made
 # ---------------------------------------------------------------------------
 
-PROJECTS=${PROXY_PROJECTS:-"TopStordev HC TopStorWeb"}
+PROJECTS=${PROXY_PROJECTS:-"TopStordev HC TopStorweb"}
 ABDOPUPET=${PROXY_ABDOPUPET:-10.11.11.252}
 GITHUB_USER=${PROXY_GITHUB:-MoatazNegm}
 DRYRUN=${PROXY_DRYRUN:-0}
