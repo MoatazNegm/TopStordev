@@ -3012,3 +3012,25 @@ tested: it still has `configured = yes` and the cluster ip in its profiles. Afte
 `deepen_for_push` stopped when *one* of them was known to the destination, the push was still refused and the relay ended "PUSH FAILED". It now needs **all**
 of them to be ref tips of the destination, and once at least one is (the main line arrived) it tries the push after every one-commit deepen, because the other
 lines may end on commits the destination has that are not branch tips. `QSD5.220` then went to abdopuppet in ~10 s per repo (7–8 extra commits).
+
+### 25.1 How long the take over takes, and why — measured 2026-10-06, branch `QSD5.222`
+
+Measured with a 1 s sampler from the host (cluster ip ping, port 2379, UI, API) and the API looper's log, leader removed with `docker kill` / `docker stop`.
+
+| Phase | `QSD5.221` | Cause |
+|---|---|---|
+| leader declared lost | 0 → ~9 s | `heartbeat.py`: two probe rounds (nmap ~1.5 s, `ping -w 1`, 1 s pause) — by design, protects against a false fail over |
+| cluster ip answers | +10.4 s | includes **2 s wasted**: `hostlost()` asked the *dead* leader's etcd for `namespace/mgmtip` and waited for the timeout |
+| etcd on the cluster ip / UI 200 | +11.9 s / +17.1 s | `docker_primary.sh`: etcd, `promgraf`, `httpd`, `flask` started one after the other |
+| API 200 | **+53.5 s** | (a) `fapilooper.sh` slept **10 s** between attempts and had just missed the new `flask` container; (b) `fapi.py` then needed **~27 s** to start instead of ~1 s (measured on a settled leader), because `leaderlost.sh` ran `promserver.sh` in line right after `docker_primary.sh`: prometheus and grafana are recreated, and the nested dockerd of the container flavour uses the `vfs` storage driver (it copies whole image file systems) — heavy disk load exactly while the API starts cold |
+
+So the cluster itself (ip, etcd, UI) moved in 12–17 s; two thirds of the "50–60 s" was the API. Fixes in `QSD5.222` (all in `pace`, both flavours):
+- `fapilooper.sh`: retry every **2 s** instead of 10.
+- `leaderlost.sh`: `promserver.sh` runs **in the background, after the API answers** (60 s at most), with its output detached so `heartbeat.py`'s `check_output` returns.
+  The heartbeat therefore also finishes the take over (hostdown sync, clean up of the lost leader, `hostlost.sh`) at ~+22 s instead of ~+70 s.
+- `heartbeat.py`: `namespace/mgmtip` is read from the node's own etcd.
+
+Result, fresh-cluster cycle on `QSD5.222`: etcd on the cluster ip **+9 s**, UI **+20 s**, API **+29 s** (was 53–59 s); join 9/9 and fail over 19/19 checks passed, grafana and
+prometheus up, 12 identical samples over 6 minutes. What is left: ~8 s detection (the two probe rounds; shortening them trades safety against false fail overs),
+~11 s in `docker_primary.sh` (containers started one by one), ~7–9 s API cold start in a new container. On a physical node (no `vfs`) the container and API starts
+should be faster; not measured.
