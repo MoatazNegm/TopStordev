@@ -2820,6 +2820,15 @@ wait for `etcdget.py 10.11.11.253 possible --prefix`, then the join call above.
 - **A joining node ends on the primary's exact branch and commit** in all three repos: `senddiscovery.sh` →
   `joinpull.sh` pulls from the primary's software repo (`leaderrepo` = `git://<primary node ip>/<repo>.git`), which the
   primary fills at every `docker_setup.sh` (`cmyrepopush.sh`) and at every `systempush.sh`.
+- **QSD5.207 (2026-10-06):** `QSD5.204-c16` merged with the physical `QSD5.206` (only `TopStor` has that branch; `pace` and
+  `topstorweb` are c16 under the new name). QSD5.206 brings the relative-size cache choice: `fapi.py` `dgsupdatecache`
+  (no disk given -> the free disks of the pool owner's host that are strictly smaller than the rest) and the same rule in
+  `fixcachelocality.py`; the rest is a `.gitignore` we already had and a deleted `.bak`. No conflict, nothing of c16 changed.
+  To exercise it here, `manage.sh` now attaches one extra **2 GB cache disk**, `/dev/loop7` -> `/home/topstor/disks/disk-cache.img`
+  (`ensure_loop_disks`, `--device /dev/loop7` in `run_zfs` / `run_zfs2`; shared by both nodes like loop1-3; loops 4-6 are
+  held by old zfs2 images). Recreate the containers for it to appear. From-scratch cycle on QSD5.207: 60 checks, 0 failures.
+  Pushed to abdopuppet by `systempush.sh` and to GitHub by `proxypush.sh QSD5.207` in the proxy (the relay version; it never
+  touches the proxy's working trees). The cache call itself (`dgsupdatecache` with no disk) was **not** run: no pool existed.
 - Making `software` the same as on physical was tried (2026-10-05): the `quickstor:git` httpd starts and answers
   `http://<ip>/`, but the `/root/gitrepo/httpd.conf` in this environment is a static file server (no CGI, no DAV, the repos
   have no `info/refs`), so git can neither fetch nor push through it. It needs the `httpd.conf` of a working physical node
