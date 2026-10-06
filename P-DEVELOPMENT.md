@@ -2684,3 +2684,25 @@ Result, fresh-cluster cycle on `QSD5.222`: etcd on the cluster ip **+9 s**, UI *
 prometheus up, 12 identical samples over 6 minutes. What is left: ~8 s detection (the two probe rounds; shortening them trades safety against false fail overs),
 ~11 s in `docker_primary.sh` (containers started one by one), ~7–9 s API cold start in a new container. On a physical node (no `vfs`) the container and API starts
 should be faster; not measured.
+
+### 25.2 The old leader comes back, and failing back — tested 2026-10-06, branch `QSD5.223`
+
+**Design (already there, both flavours).** A configured node pings the cluster ip at boot (`docker_setup*.sh`, `isconf_prim`): if it answers, the node is **not**
+primary — it sets up as a cluster node (etcd on its node ip, no `flask` / cluster `httpd`), and the leader names it next leader (§25) because it is the node that
+just became ready. Only when nobody answers does a configured node make itself primary.
+
+**Bug found (shared `pace/checksyncs.py`).** In the request loops of `syncrequest` and `replisyncrequest` an unknown sync type did `return`, which dropped **every
+later request, on every pass**. `sync/cversion/...` requests are not handled there any more, so one old `cversion` request was enough: the node that came back
+(it has no done mark for requests posted while it was away; a freshly joined node gets them all marked by `syncall`) met it first in the sorted list and never
+applied anything again — its local `nextlead/er` stayed the old value and the leader never reached `isinsync = yes` (`sync/ActivePartners/Add_…`, `sync/log/…`
+pending for ever). **Fix:** `continue` instead of `return`. Seen live: with the fix the returned node caught up within one looper pass.
+
+**Proof: one round trip from two fresh nodes on `QSD5.223`, no change needed** (`cyclert.sh`): build → join (9/9) → `docker stop zfs1` → `zfs2` takes over in 27 s
+(19/19 checks, 6 min stable) → `docker start zfs1` → return (20/20) → `docker stop zfs2` → `zfs1` takes the cluster back in 41 s (19/19, 6 min stable) →
+`docker start zfs2` → return (20/20). Return checks: the returning node does **not** take the cluster ip, its etcd is on its node ip, no API container on it,
+leader key unchanged on both etcds, `ready/` + `ActivePartners/` list it, the leader names it next leader (`<host>/<ip>`) and its local etcd has the same value,
+same commit in the three repos, `nmcli` state, loopers running, the cluster API **and** UI answered 200 in every sample (49 of 49, one every ~2 s) while the node
+booted and set itself up (~98 s), and `isinsync = yes`. Take-over times seen on `QSD5.222`/`223`: 27, 29, 31, 41 s (the spread is the API cold start).
+
+**Still not covered:** physical hardware, more than two real nodes, pools / volumes / iSCSI (no data on the cluster), both nodes down at once and a network
+split between two live nodes (each would see the other as lost: the standby takes the cluster ip while the old leader still holds it).
