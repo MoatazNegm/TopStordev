@@ -28,7 +28,7 @@
 #   SPD_PROJECTS        space separated project directory names
 #   SPD_ROOT            prefix to put in front of every path (default none)
 #   SPD_REMOTE=<name>   git remote to pull from (default origin)
-#   SPD_SYNC=0          skip the cluster sync and pre/post_apply (a node that is not in
+#   SPD_SYNC=0          skip the cluster sync and the apply.d hooks (a node that is not in
 #                       the cluster yet, e.g. joinpull.sh)
 # ---------------------------------------------------------------------------
 
@@ -264,16 +264,17 @@ else
 fi
 
 if [ -z "$SPD_ROOT" ] && [ "$SPD_SYNC" != "0" ] && docker ps >/dev/null 2>&1; then
-	if [ -e /TopStor/pre_apply.sh ]; then
-		/TopStor/pre_apply.sh
-	else
-		echo "  pre_apply.sh is not present .... skipping"
-	fi
-	if [ -e /TopStor/post_apply.sh ]; then
-		/TopStor/post_apply.sh
-	else
-		echo "  post_apply.sh is not present .... skipping"
-	fi
+	# per-branch hooks: apply.d/<branch>/pre_apply.sh and post_apply.sh of the branch just pulled
+	# (stubs made by mkapplyhooks.sh).  A failing hook is reported, it does not stop the pull.
+	for hook in pre_apply post_apply; do
+		hf=${SPD_HOOKS_DIR:-/TopStor/apply.d}/$branch/$hook.sh
+		if [ -f "$hf" ]; then
+			echo "  running $hook for $branch"
+			sh "$hf" "$branch" || { echo "  *** $hook for $branch failed"; rc=1; }
+		else
+			echo "  no $hook hook for $branch .... skipping"
+		fi
+	done
 fi
 
 echo

@@ -155,6 +155,11 @@ fnupdate() {
 	fi
 
 	# ---- 1 and 2. stage everything, minus what must never be committed ---
+	# per-branch pre_apply / post_apply hook stubs (apply.d/<branch>/), TopStor only
+	if [ "$job" = "TopStor" ] && [ -f ./mkapplyhooks.sh ]; then
+		sh ./mkapplyhooks.sh "$branch" .
+	fi
+
 	git add --all
 
 	# __pycache__ turns up at any depth, so a bare '__py*' pathspec is not

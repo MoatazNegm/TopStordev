@@ -2376,10 +2376,9 @@ the `reboot` calls.
   `http://<node ip>/git/<repo>.git`, bare repos in `/root/gitrepo/git`) via `myrepopush.sh`. `myrepolib.sh`
   (`software_ready`, `ensure_bare_repo`) checks that container first and creates a missing repo; the old code
   could wipe the project's working tree when the repo directory was missing.
-- After a pull `post_apply.sh` rebuilds the React UI, but only if the `httpd` container runs and the
-  `quickstor-ui:latest` image is loaded (it names `pre_apply.sh` for that, which is not in this branch's
-  tree). It builds with the pulled `/topstorweb/{src,public,index.html,vite.config.js}` and logs to
-  `/TopStordata/reactbuild.log`.
+- Until `QSD5.211` a pull ran `post_apply.sh`, which rebuilt the React UI (`quickstor-ui:latest`, `/TopStordata/reactbuild.log`).
+  From `QSD5.212` that file is an empty stub and the pull runs the **per-branch hooks** `apply.d/<branch>/pre_apply.sh` and
+  `post_apply.sh` instead (§24.2); the UI build is no longer triggered by a pull.
 
 ### 21.5 Container-only tweaks — do **not** apply on a physical node
 
@@ -2547,3 +2546,19 @@ clone of the host repo is used for tests.
 **Tested (2026-10-06, scratch clones of the host repo, `SPD_ROOT`/`SPD_SYNC=0`).** From `QSD5.179-container2` to `QSD5.210`: (A) a node that had already lost
 `plugins/` + `dist/` — bridge via `QSD5.211`, afterwards 3 959 / 207 files back and `git status` clean; (B) a node that still had them — 4 002 / 221 files
 kept, `git status` clean; `HEAD` identical to `origin/QSD5.210` in both.
+
+### 24.2 Per-branch `pre_apply` / `post_apply` hooks — since `QSD5.212`
+
+- **Where:** in the TopStor repo, `apply.d/<branch>/pre_apply.sh` and `apply.d/<branch>/post_apply.sh`. They travel with the branch, so a pull of
+  `<branch>` runs exactly the hooks of that branch (and none of an older one).
+- **Who runs them:** `systempull.sh` and `csystempull.sh` (same code), at the very end of a pull on a real node (not with `SPD_ROOT`, not with
+  `SPD_SYNC=0`, docker reachable), after the cluster sync: `pre_apply` first, then `post_apply`, each as `sh apply.d/<branch>/<hook>.sh <branch>`.
+  A missing hook is skipped with a line in the log; a hook that exits non-zero is reported and the pull ends "with errors" (it does not stop the pull).
+  `SPD_HOOKS_DIR` (default `/TopStor/apply.d`) overrides the directory.
+- **Stubs:** `mkapplyhooks.sh <branch> [dir]` creates the two missing stubs (comment + `exit 0`, never touches an existing hook).
+  `systempush.sh` / `csystempush.sh` call it for the TopStor repo before they stage, so **every pushed branch gets its stubs** and the maintainer only has
+  to fill them in. Stubs exist for `QSD5.212`; `QSD5.211` has none (it predates the feature).
+- **Removed:** the top-level `post_apply.sh` (React build) is now an empty stub that nothing calls. `pre_apply.sh` at the top level was never in the
+  tree; `myrepopull.sh`, `cmyrepopull.sh` and `indevicepull.sh` still call `/TopStor/pre_apply.sh` themselves (unchanged).
+- **`QSD5.212`** = `QSD5.211` + this feature, pushed with the **normal** exclude list, so `dist/`, `plugins/` … are untracked again there (the pull keeps them on
+  disk, §24). It is the branch to give the team: `systempull.sh QSD5.212` twice from the old line.
