@@ -2515,3 +2515,35 @@ Test from the host (API on the leader's cluster IP): `…/login?user=…&pass=�
 wait for `etcdget.py 10.11.11.253 possible --prefix`, then the join call above.
 
 
+
+## 24. topstorweb ignored directories (`dist/`, `plugins/`, …) across pulls — since 2026-10-06
+
+**Problem.** Up to `QSD5.179-container2` / `QSD5.181` the repo `topstorweb` **tracks** `dist/`, `plugins/`, `dashboarddev3/`, `public/`,
+`assets/`, `ar/`, `js/`, `css/`, `img/`, `fonts/`, `netdata/`, `Data/` (≈ 7 800 files). From `QSD5.204` / `QSD5.207` on they are untracked and in
+`.gitignore` (`systempush.sh` strips them: `SPD_EXCLUDE_TOPSTORWEB`). `systempull.sh` does `git checkout -f -B <branch> origin/<branch>`, so a
+pull from the old line to the new one deleted the folders on the node as "removed files" (`/topstorweb/plugins` and `dist` vanished).
+
+**Fix (both flavours: `systempull.sh` and its container hand-over `csystempull.sh`, same code in both).**
+1. *Keep ignored files.* Before the checkout the script remembers the old `HEAD`; afterwards it lists the files the old branch tracked, the new
+   one dropped and the new `.gitignore` ignores (`git diff --diff-filter=D old HEAD | git check-ignore --no-index --stdin`) and puts them back
+   from the old commit (`git archive | tar -x`, one `tar` per `xargs` chunk — a single `tar` stops after the first archive). They come back
+   **untracked**: the commit number is untouched, `git status` stays clean. Only the committed content comes back, local edits to those files are lost.
+2. *Bridge.* The first pull from a node whose pull script is still the old one loses the folders. The next pull heals it: for the project
+   `topstorweb`, when the target branch does not track `plugins/` **and** `/topstorweb/plugins` is missing, the script first checks out the bridge branch
+   **`QSD5.211`** (detached; it has all the ignored directories force-added and the fixed scripts) and then continues to the requested branch, with
+   step 1 keeping the folders. `SPD_BRIDGE` (default `QSD5.211`), `SPD_BRIDGE_PROJECT` (`topstorweb`), `SPD_BRIDGE_MARK` (`plugins`) override it.
+   A pull to a branch that tracks `plugins/` (the old line, `QSD5.211`) never bridges.
+3. *Procedure for a colleague on the old line:* `systempull.sh <QSD5.211 or newer>` **twice** — the first run (old script) may delete the folders but
+   brings in the new script, the second run restores them. From then on a single pull is enough. Never use `git clean -x`.
+
+**`QSD5.211`** = `QSD5.210` + the fixed pull scripts + the ignored directories force-added (`git add -f`, then
+`SPD_EXCLUDE_TOPSTORWEB='node_modules/ build_react/ build_react.bak/ .vite/ *.zip *.tar *.tar.gz *.map' systempush.sh QSD5.211`, so the push does not untrack
+them again). The next branch (`QSD5.212`) is pushed with the normal exclude list (`git rm --cached` of the folders); nodes that pull it from `QSD5.211` keep them on disk.
+
+**Pitfall.** `systempush.sh <new>` commits on the *current* branch before it creates `<new>`, so the local ref of the previous branch moves to the
+new commit (`QSD5.210` showed the `QSD5.211` hash in the host repos until `git branch -f QSD5.210 myrepo/QSD5.210`). Check that after a push if a
+clone of the host repo is used for tests.
+
+**Tested (2026-10-06, scratch clones of the host repo, `SPD_ROOT`/`SPD_SYNC=0`).** From `QSD5.179-container2` to `QSD5.210`: (A) a node that had already lost
+`plugins/` + `dist/` — bridge via `QSD5.211`, afterwards 3 959 / 207 files back and `git status` clean; (B) a node that still had them — 4 002 / 221 files
+kept, `git status` clean; `HEAD` identical to `origin/QSD5.210` in both.

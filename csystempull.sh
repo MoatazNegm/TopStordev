@@ -162,7 +162,9 @@ fnupdate() {
 			git check-ignore --no-index --stdin 2>/dev/null`
 		if [ -n "$keep" ]; then
 			echo "  keeping `echo "$keep" | wc -l` ignored file(s) the old branch tracked (dist/, plugins/ ...)"
-			echo "$keep" | tr '\n' '\0' | xargs -0 git archive "$oldhead" -- | tar -x
+			# xargs splits a long list into several runs, so each run gets its own tar
+			echo "$keep" | tr '\n' '\0' |
+				xargs -0 sh -c 'git archive "$0" -- "$@" | tar -x' "$oldhead"
 		fi
 	fi
 	git reset --hard --quiet
