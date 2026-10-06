@@ -121,6 +121,8 @@ options:
   --plan-file P   use P for this pair, instead of the automatic name
   --branch NAME   the merged branch to create (default <from>_<into>)
   --fetch         run "git fetch --prune" first.  Off by default.
+                  (A branch that is neither local nor already tracked is looked
+                  up on origin and fetched by itself, with or without --fetch.)
   --summary       summaries only, no file browser
   --pager X       builtin (default) | none | less
   --width N       viewer width (default 170, or $SYSTEMDIFF_WIDTH)
@@ -1314,9 +1316,23 @@ branch_clash() {
 # ===========================================================================
 ref_exists() { git rev-parse --verify --quiet "$1^{commit}" >/dev/null 2>&1; }
 
+# fetch_from_origin <branch>: the branch is not here, so ask origin (abdopuppet).
+# Only that one branch is fetched, into refs/remotes/origin/<branch>: no local
+# branch, HEAD, index or file is touched, so the "nothing is checked out while
+# you preview" promise holds.  Returns 0 when origin has it and it is now here.
+fetch_from_origin() {
+	ff_to=""; command -v timeout >/dev/null 2>&1 && ff_to="timeout 30"
+	[ -n "`$ff_to git ls-remote --heads origin "refs/heads/$1" 2>/dev/null`" ] || return 1
+	$ff_to git fetch --quiet origin "+refs/heads/$1:refs/remotes/origin/$1" >/dev/null 2>&1 || return 1
+	ref_exists "refs/remotes/origin/$1"
+}
+
 resolve_ref() {
 	if ref_exists "refs/heads/$1";            then printf '%s\n' "$1"
 	elif ref_exists "refs/remotes/origin/$1"; then printf '%s\n' "origin/$1"
+	elif fetch_from_origin "$1"; then
+		printf '  %s: branch %s not local, fetched from origin\n' "${PWD##*/}" "$1" >&2
+		printf '%s\n' "origin/$1"
 	fi
 	return 0
 }
@@ -1357,8 +1373,8 @@ preview_repo() {
 	pr_intoref=`resolve_ref "$P_INTO"`
 	if [ -z "$pr_fromref" ] || [ -z "$pr_intoref" ]; then
 		printf '\n'; rule; printf ' %s\n' "$pr_path"; rule
-		[ -z "$pr_fromref" ] && say "  branch '$P_FROM' does not exist here"
-		[ -z "$pr_intoref" ] && say "  branch '$P_INTO' does not exist here"
+		[ -z "$pr_fromref" ] && say "  branch '$P_FROM' does not exist here or on origin"
+		[ -z "$pr_intoref" ] && say "  branch '$P_INTO' does not exist here or on origin"
 		return 0
 	fi
 

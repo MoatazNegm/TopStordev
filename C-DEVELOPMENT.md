@@ -2352,7 +2352,7 @@ for Rocky).
 | `/docker-data` (nested dockerd graph root, vfs, ~25 GB) | `/home/topstor/zfs-docker-data` | yes |
 | `/docker-images` (ro tarballs, loaded by `docker-preload.sh` at boot) | `/home/topstor/zfs-docker-images` | yes, shared by all instances |
 | loop disks | `/home/topstor/disks/disk{1,2,3}.img` | yes |
-| `/tmp/docker_setup_disabled` | `volumes/zfs-tmp/docker_setup_disabled` | flag file |
+| `/tmp/docker_setup_disabled` | — (no bind mount since 2026-10-06) | optional dev flag: `touch` it in the container before a restart and `docker_setup.sh` does not auto-run |
 | everything else (NM profiles, `/promgraf`, `/usr/local`, dnf packages...) | container writable layer | **only if the image is committed (§21.7)** |
 
 - While the flag file exists, **`docker_setup.sh` does not run at boot** (dev
@@ -2508,10 +2508,12 @@ docker push moataznegm/topstor-zfs:current        # existing docker login works
   https://github.com/MoatazNegm/{TopStordev,HC,TopStorWeb}.git`.
   `proxypush.sh <branch>` pulls from origin (252) and pushes to GitHub;
   `proxyupdate.sh <branch>` goes GitHub → 252. Both hard-reset the repos.
-  **Repo renamed (2026-10-06):** on abdopuppet the bare repo is now `TopStorweb.git`; `TopStorWeb.git` is a
-  symlink to it so old `origin` URLs (zfs1, zfs2) keep working until they are migrated. `PROJECTS` in
-  `proxypush.sh` / `proxyupdate.sh` use `TopStorweb`. Still `TopStorWeb`: `cmyrepopush.sh`, `joinpull.sh`, the
-  `myrepo` remote (software container, inside zfs1) and the nested repos' `origin` remote.
+  **Repo renamed (2026-10-06):** on abdopuppet the bare repo is `TopStorweb.git` (small w); `TopStorWeb.git` is a
+  symlink to it so old `origin` URLs (zfs1, zfs2) keep working until they are migrated. Branch **QSD5.208**
+  (from `QSD5.207-autorun-test`; TopStor `e87286a5`, pace `223ea7b`, topstorweb `cebb8ca2`) makes every script use
+  the new name (`proxypush.sh`, `proxyupdate.sh`, `cmyrepopush.sh`, `joinpull.sh`); it was committed from side
+  clones, pushed to abdopuppet and relayed to GitHub with `proxypush.sh QSD5.208`. The nested repos' `origin` /
+  `myrepo` remotes on zfs1/zfs2 still say `TopStorWeb.git` until they switch to QSD5.208.
 - GitHub auth: `/root/.git-credentials` + `git config --global credential.helper
   store` inside the proxy (lives in the container layer, lost on recreate unless
   the image is committed). The valid token is also in host `/root/.git-credentials`.
@@ -2674,7 +2676,7 @@ image, removal of the old `echo 1111…; exit`).
 | `/workspace` (`/TopStor`, `/pace`, `/topstorweb`) | `/home/topstor/zfs2/linux-env/` | copies of the zfs trees (branch `QSD5.204-c11` at copy time); also `root` (without `etcddata`, `.targetcli`, `gitrepo`), empty `TopStordata`, `etc-networkmanager-conf.d` |
 | `/docker-data` | `/home/topstor/zfs2-docker-data` | `cp --reflink` clone of the idle image-only graph `zfs-nettest-docker-data`; `docker-preload.sh` fills the rest from the shared tarballs — nothing is pulled from the internet |
 | `/docker-images` | `/home/topstor/zfs-docker-images` (ro) | **shared** with zfs |
-| `/tmp/docker_setup_disabled` | `/home/topstor/zfs2/tmp/docker_setup_disabled` | dev-mode flag, `docker_setup.sh` does not auto-run |
+| `/tmp/docker_setup_disabled` | — (no bind mount since 2026-10-06) | optional dev flag, see §21.2 |
 | loop disks | the same host `/dev/loop{1,2,3}` as zfs1 (since 2026-10-05) | shared on purpose; locking / clustering is the application's job. `zfs2-disk*.img` and `loop4-6` are no longer used |
 
 Not bound: `/var/lib/docker` (host root disk). IP `10.11.11.102`, ssh `-p 2224`, UI `-p 8444:443`.
@@ -2837,4 +2839,28 @@ wait for `etcdget.py 10.11.11.253 possible --prefix`, then the join call above.
   `http://<ip>/`, but the `/root/gitrepo/httpd.conf` in this environment is a static file server (no CGI, no DAV, the repos
   have no `info/refs`), so git can neither fetch nor push through it. It needs the `httpd.conf` of a working physical node
   (the image does contain `git-http-backend`).
+- **`docker_setup.sh` runs by itself at container start (2026-10-06).** The flag-file bind mounts
+  (`volumes/zfs-tmp/docker_setup_disabled`, `zfs2/tmp/...`) are gone from `manage.sh`, and `entrypoint-zfs.sh` now runs the
+  image preload **first** and starts `docker_setup.sh` (background, `nohup`, log `/var/log/docker_setup.log`) after it:
+  before, the setup was launched ahead of the preload and `docker run etcd` could fail on images still being loaded.
+  The image `moataznegm/topstor-zfs:current` (sha256:74ceb93b2018…, previous `:pre-autorun-20261006`) is a thin layer: it
+  carries the new entrypoint and **no** `/tmp/docker_setup_disabled` and no stale setup log. Pitfall found: a flag file left
+  inside a committed image silently disables the auto-run (the old bind mount used to hide it). It was not a live-container
+  commit: `docker diff` showed only runtime state, no package or file worth keeping.
+  **Fresh cluster, hands off:** write `no_fromreset` to the host `root/nodeconfigured` of each node
+  (`volumes/linux-env/root`, `/home/topstor/zfs2/linux-env/root`), recreate with `run_zfs` / `run_zfs2`; the first automatic run
+  takes the reset path by itself (several container restarts, ~5 min), ends as a primary (zfs1) or unjoined (zfs2). Do not
+  run `docker_setup.sh` by hand any more. Acceptance (three cycles; the first two found the image flag and two bugs in the
+  test watcher, the third needed no change): zfs1 + zfs2 from scratch, node ip `10.11.11.201` / cluster `10.11.11.200`
+  through the API, join with alias + ip, 7 API cases, 6 min stable, evacuation, join with alias only, `systempush.sh` /
+  `systempull.sh` by hand, no pull loop: all checks passed. `systempush.sh <branch>` also commits the host trees' pending
+  edits onto the current branch before branching; run it only when that is wanted.
+- **QSD5.209 (2026-10-06):** `QSD5.208` (abdopuppet repo name `TopStorweb` in `cmyrepopush.sh` / `joinpull.sh`) merged into `QSD5.207`
+  (no collisions: `git merge-tree` gives the same tree as the merge commit; only those two TopStor files differ, pace and topstorweb
+  unchanged). The container's `systemmerge.sh` hand-over (`csystemmerge.sh`) is the old unchecked script and has no `--dry-run`
+  (it would take it as a branch name and run `systempull.sh` with it): for a merge use `systempregetdiff.sh <from> <into>` (preview, `--apply`),
+  or `TOPSTOR_FLAVOR=physical systemmerge.sh [--dry-run] <branch>`. `systempregetdiff.sh` looks a branch up on origin (abdopuppet)
+  when it is neither local nor tracked and fetches just that branch into `refs/remotes/origin/` (2026-10-06); `systemmerge.sh` still
+  sees **local** branches only, so there `git fetch origin <branch>:<branch>` in the three repos first. Then `systempush.sh QSD5.209` on zfs1 (abdopuppet) and
+  `proxypush.sh QSD5.209` in the proxy (GitHub; run `PROXY_DRYRUN=1` first): TopStor `3b0e9f21`, pace `98f88a4`, topstorweb `7d20b1c3`.
 
