@@ -2608,3 +2608,57 @@ kept, `git status` clean; `HEAD` identical to `origin/QSD5.210` in both.
   `TopStorweb` then `TopStorWeb` (an abdopuppet not migrated by the 2026-10-06 rename only has the old spelling); (6) a banner shows the abdopuppet address and the forms in use.
   `PROXY_ABDOPUPET=<ip>` and `PROXY_ABD_FORMS="git://%h/%r.git ssh://root@%h:5022/srv/git/%r.git"` (`%h` host, `%r` repo) adapt a proxy on another network. Tested: reachable case (both scripts), refused
   connection case; not tested against a differently configured abdopuppet.
+
+## 25. Leader failover (stop the leader, the next leader takes the cluster) — fixed and proven on 2026-10-06, branch `QSD5.221`
+
+**How it works (both flavours, same `pace` code).** `heartbeatlooper.sh` → `heartbeat.py` runs on every node. A node probes port 2379 of the nodes in
+`ready/` (nmap, then ping). When the **leader** is lost, each survivor reads `nextlead/er` from its **own local etcd**; the node named there runs
+`/pace/leaderlost.sh` → `/TopStor/docker_primary.sh` (adds the cluster ip to `cmynode`, restarts etcd on the cluster ip, starts `promgraf`, `httpd`, `flask`)
+→ `promserver.sh`, and posts `sync/leader/Add_<host>_<ip>` + `sync/hostdown/<lost>_`. The other survivors only set their local `leader` key and wait for the cluster ip.
+
+**`nextlead/er` — who writes it, and its format.** Value: **`<host>/<ip>`** (what `checkleader.py`, `addknown.py`, `addactive.py`, `remknown.py` always expected).
+**Only the leader writes it**, in `heartbeat.py` `leadernextlead()` (runs in the leader's heartbeat loop, so it is also the new leader's job after a take over):
+- a node that has **just become ready** (a new `ready/<host>` on the leader's etcd) becomes the next leader;
+- if the current value is not a ready node any more (lost, evacuated, `None`, the leader itself after a take over) another ready node is chosen;
+- otherwise nothing is written. On the leader's first pass after a (re)start an existing valid value is kept (the nodes are not "new").
+Every change is `put nextlead/er <host>/<ip>`, `del sync/nextlead/Add_er --prefix`, and the usual **two sync lines**
+`sync/nextlead/Add_er_<host>::<ip>/request  nextlead_<stamp>` and `…/request/<leader>  nextlead_<stamp>`; each node's `syncrequestlooper.sh` →
+`checksyncs.py syncrequest` then copies the `nextlead` prefix into its local etcd and adds its own done mark. This is what makes it right for more than two nodes:
+all nodes get the same next leader, from one writer. `docker_setup.sh` / `docker_setup.container.sh` **no longer** write `nextlead/er` when a node starts
+(the four lines are gone in both), `heartbeat.py` no longer announces itself, and `Evacuate.py` reads / writes the `<host>/<ip>` form with the two sync lines.
+
+**Bugs found by the fresh-cluster loop (all in shared code, so both flavours had them).**
+1. **A sync request lost during a node's first sync** (`checksyncs.py syncall`). A node's first setup after a join runs `syncall` in the background: it copied
+   every key type from the leader ("initial" syncs) and only **afterwards** read the pending requests and marked all of them done for itself without applying
+   them. A request posted in between was lost for that node for ever. The `nextlead` request of the same setup fell into that window: the node kept
+   `nextlead/er = None` (etcd history: created once, never modified), so when the leader was stopped it wrote `leader = None`, never ran `leaderlost.sh`, and
+   spun on `nmap <cluster ip>`. **Fix:** the pending list is taken **before** the initial syncs; only those are marked, later ones stay pending for the looper.
+2. **Version compare cut the branch name at the first dash** (`docker_setup*.sh`: `awk -F'-' '{print $1}'` on `cversion/<host>` = `<branch>-<commit>`).
+   `QSD5.220-fo-a40d0cda` became `QSD5.220`, a just-joined node (no `cversion` of its own yet) then ran `cmyrepopull.sh QSD5.220` and ended on a stale branch
+   of the leader's software repo — after the join had pulled the right one. Branch names with dashes are normal here (`QSD5.204-c15-jointest`). **Fix:**
+   `sed 's/-[^-]*$//'` (drop only the commit), the same rule `Joincluster.py` uses.
+3. **Loops without an end.** `heartbeat.py` waited for the new leader in a `while` without pause or limit (100 % of a core, for ever, when nobody takes over);
+   `docker_primary.sh` waited for etcd in a loop without limit, which would hang the heartbeat. **Fix:** 5 minutes, then back to the main loop (and a line in
+   `/root/heartproblem`); 180 s, then the take over goes on (line in `/root/heartproblem`).
+4. `heartbeat.py` wrote `leader = None` into the local etcd when there was no next leader; now the local leader key is left alone in that case.
+
+**Proof (container flavour; `zfs1` + `zfs2` recreated from the image for every cycle, `docker_setup.sh` never run by hand).** Cycle = fresh `zfs1` primary
+(node ip `10.11.11.201`, cluster ip `10.11.11.200`) → fresh `zfs2` → join through the API (alias + ip `10.11.11.77`) → `docker stop zfs1` one second after the join
+finished → checks. Cycle 1 (`QSD5.220` as pulled): no take over (bug 1). Cycle 2 (bug 1 fixed): OK. Cycle 3 (leader-driven `nextlead`): the design worked
+(`zfs2` local `nextlead/er = <host>/10.11.11.77` at once, two sync lines + both done marks on the leader) but bug 2 showed. Cycle 4: **no change needed** — take
+over visible after 59 s, 19 checks passed, 0 failed: cluster ip on `zfs2` `bond0`, etcd on `10.11.11.200:2379`, `leader` key = `zfs2`'s host, old leader gone from
+`ready/`, API login, UI 200, grafana `:4000/login` 200, prometheus `:9090/-/ready` 200, `fapilooper` / `zfsping` / `iscsiwatchdog` / `syncrequestlooper` /
+`heartbeatlooper` running, `nmcli` `cmynode → bond0`, `slave-eth10-to-bond0 → eth10`, `eth10` without ip, and 12 identical samples over 6 minutes. The selection
+logic for more than two nodes is covered by a unit test with a fake etcd (new nodes, lost next leader, take over, legacy value, no needless writes): 10 cases pass.
+
+**Not covered.** The physical flavour was not run (no hardware here): the changes are in shared `pace` code, the same lines in both `docker_setup` scripts and the
+shared `docker_primary.sh`; syntax checked, `scripts/flavor-test.sh` passes. More than two real nodes were not run (two containers). No pool / volume was on the
+cluster, so data fail over (pool import on the new leader, iSCSI) is not tested; `zfs2` has no own `iscsid` (§21.13). The **return of the old leader** was not
+tested: it still has `configured = yes` and the cluster ip in its profiles. After a take over the pending `sync/log/...` requests wait for the lost member
+(it is still in `ActivePartners`), so `isinsync` stays `no` until it returns or is evacuated — expected. Test scripts: session scratchpad `fo/`
+(`phaseA.sh`, `phaseB.sh`, `join.sh`, `failover.sh`, `cycle.sh`).
+
+**Relay scripts (`proxyupdate.sh`, `proxypush.sh`), found while bringing `QSD5.220` in.** A branch with merge commits has **several** shallow-boundary commits;
+`deepen_for_push` stopped when *one* of them was known to the destination, the push was still refused and the relay ended "PUSH FAILED". It now needs **all**
+of them to be ref tips of the destination, and once at least one is (the main line arrived) it tries the push after every one-commit deepen, because the other
+lines may end on commits the destination has that are not branch tips. `QSD5.220` then went to abdopuppet in ~10 s per repo (7–8 extra commits).

@@ -127,12 +127,15 @@ if [ -w /etc/resolv.conf ]; then
 fi
 
 # deepen_for_push <source remote> <destination url> <ref> <scratch dir>
-# A shallow push is refused ("shallow update not allowed") unless the commit at the shallow boundary is
-# already known to the destination.  Deepening by 200 commits in one go downloads hundreds of MB (TopStor:
-# ~800 MB-1.3 GB, every commit rewrites big files).  So: deepen ONE commit at a time and stop as soon as the
-# boundary commit is one the destination already has (a tip of any of its refs).  Only if none is found in
-# PROXY_MAXDEEP commits (default 60: the destination has no history of this branch at all) fall back to the
-# big deepen, with a loud warning.
+# A shallow push is refused ("shallow update not allowed") unless EVERY commit at the shallow boundary is
+# already in the destination.  A branch with merge commits has several boundary commits (one per line of
+# history), so one known boundary is not enough.  Deepening by 200 commits in one go downloads hundreds of MB
+# (TopStor: ~800 MB-1.3 GB), so: deepen ONE commit at a time and
+#   - stop when all boundary commits are tips of the destination's refs (the push is then certain), or
+#   - once at least one of them is (the main line has arrived), try the push after every step: the other
+#     lines may end on commits the destination has but that are not branch tips, and only a push can tell.
+# Only if nothing is accepted within PROXY_MAXDEEP commits (default 60) fall back to the big deepen, loudly.
+# Returns 0 when the history is deep enough (the caller's push then succeeds, or is already done).
 deepen_for_push() {
 	_src=$1; _dst=$2; _ref=$3; _sc=$4
 	_gd=`git rev-parse --git-dir`
@@ -141,13 +144,21 @@ deepen_for_push() {
 	echo "    it has $(echo "$_tips" | grep -c .) refs"
 	_n=0
 	while :; do
-		_found=
+		_known=0; _unknown=0
 		for _r in `cat "$_gd/shallow" 2>/dev/null`; do
-			if echo "$_tips" | grep -qx "$_r"; then _found=$_r; break; fi
+			if echo "$_tips" | grep -qx "$_r"; then _known=`expr $_known + 1`; else _unknown=`expr $_unknown + 1`; fi
 		done
-		if [ -n "$_found" ]; then
-			echo "    the destination already has `echo $_found | cut -c1-8` -- history is deep enough after $_n extra commit(s), small push"
+		if [ "$_unknown" -eq 0 ]; then
+			echo "    all $_known boundary commit(s) are known to the destination after $_n extra commit(s) -- small push"
 			return 0
+		fi
+		if [ "$_known" -gt 0 ]; then
+			echo "    $_known boundary commit(s) known, $_unknown other(s) not a branch tip there -- trying the push"
+			if timeout 600 git push "$_dst" "$_ref" > "$_sc/trypush" 2>&1; then
+				echo "    accepted after $_n extra commit(s)"
+				return 0
+			fi
+			grep -q "shallow update not allowed" "$_sc/trypush" || { echo "    push failed for another reason:"; tail -3 "$_sc/trypush" | sed 's/^/       /'; return 1; }
 		fi
 		[ "$_n" -ge "${PROXY_MAXDEEP:-60}" ] && break
 		_n=`expr $_n + 1`
@@ -155,9 +166,9 @@ deepen_for_push() {
 			echo "    deepening by one commit failed:"; tail -3 "$_sc/deepen" | sed 's/^/       /'
 			return 1
 		fi
-		echo "    deepened by one commit ($_n) -- boundary is now `cat "$_gd/shallow" | head -1 | cut -c1-8`, not known to the destination yet"
+		echo "    deepened by one commit ($_n) -- `wc -l < "$_gd/shallow" 2>/dev/null || echo 0` boundary commit(s) now"
 	done
-	echo "    *** none of the last $_n commits is known to the destination (it has no history of this branch)."
+	echo "    *** not accepted within $_n extra commits (the destination has no usable history of this branch)."
 	echo "    *** falling back to a deepen of ${PROXY_FALLBACK_DEEPEN:-200} commits: this can be a LARGE download (up to ~1.3 GB for TopStor)"
 	runv "deepening by ${PROXY_FALLBACK_DEEPEN:-200} commits" 900 "$_sc/deepen" git fetch --progress --no-tags --deepen "${PROXY_FALLBACK_DEEPEN:-200}" "$_src" "$_ref"
 }
