@@ -2,8 +2,8 @@
 # uservalid.py -- the rules a NEW user must meet.  One place for all callers:
 #   fapi.py            from uservalid import check_new_user          (the API answers at once)
 #   UnixAddUser        /TopStor/uservalid.py <name> <password>       (also covers the bulk upload, which calls the script)
-# check_new_user() returns '' when the pair is acceptable, otherwise the reason as text.
-# The command line prints the reason and exits 1 when the user must not be created.
+# check_new_user() returns '' when the pair is acceptable, otherwise the reason as text;
+# check_new_user_coded() also gives the log message code.  The command line prints "<code>|<reason>" and exits 1.
 # Sync copies of an existing user (UnixAddUser ... pullsync) are NOT checked: they repeat what the leader accepted.
 import re, sys
 
@@ -17,6 +17,9 @@ RESERVED = {
  'dbus','polkitd','sshd','chrony','tss','rpc','rpcuser','nfsnobody','postfix','apache','nginx','named','tcpdump',
  'docker','etcd','grafana','prometheus','systemd','wheel','users','nogroup','guest','samba','smb',
 }
+
+# log message codes (msgsglobal.txt), so the rejection reaches the system log through logmsg
+CODE_NAME, CODE_RESERVED, CODE_PASSWORD, CODE_EXISTS = 'Unlin1027nm', 'Unlin1027rs', 'Unlin1027pw', 'Unlin1021uu'
 
 def check_username(name):
     name = '' if name is None else str(name)
@@ -52,11 +55,27 @@ def check_password(password):
 def check_new_user(name, password):
     return check_username(name) or check_password(password)
 
+def check_new_user_coded(name, password):
+    # ('', '') when acceptable, otherwise (log message code, reason)
+    reason = check_username(name)
+    if reason:
+        return (CODE_RESERVED if 'reserved' in reason else CODE_NAME), reason
+    reason = check_password(password)
+    if reason:
+        return CODE_PASSWORD, reason
+    return '', ''
+
+def logname(name):
+    # the name as it may go into a log message: one word, harmless characters only
+    name = re.sub(r'[^A-Za-z0-9.-]', '.', '' if name is None else str(name))[:32]
+    return name or 'noname'
+
 if __name__ == '__main__':
+    # prints "<code>|<reason>" and exits 1 when the user must not be created
     name = sys.argv[1] if len(sys.argv) > 1 else ''
     password = sys.argv[2] if len(sys.argv) > 2 else ''
-    reason = check_new_user(name, password)
+    code, reason = check_new_user_coded(name, password)
     if reason:
-        print(reason)
+        print(code+'|'+reason)
         sys.exit(1)
     sys.exit(0)

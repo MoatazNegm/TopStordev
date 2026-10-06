@@ -8,7 +8,7 @@ import re, ipaddress, traceback
 import Hostsconfig
 from Hostconfig import config
 from allphysicalinfo import getall, initallphy
-from uservalid import check_new_user
+from uservalid import check_new_user_coded, logname
 from UnixChkUser import setlogin
 import sqlite3
 from etcdget2 import etcdgetjson
@@ -1802,14 +1802,18 @@ def UnixAddUser(data):
    return data
  # the values as they were sent: login_required removes every blank from the parameters, so a name or a password
  # with a blank would otherwise be accepted as a different one (and the user could not log in with what was typed)
- reason = check_new_user(request.args.get('name', data.get('name')), request.args.get('Password', data.get('Password')))
+ rawname = request.args.get('name', data.get('name'))
+ code, reason = check_new_user_coded(rawname, request.args.get('Password', data.get('Password')))
  if reason:
-  logmsg.sendlog('Unlin1020','error',loggedusers[data['token']]['user'],str(data.get('name'))[:32].replace(' ','.') or 'noname')
+  # every rejection is reported through logmsg, with a message that says what was wrong
+  logmsg.sendlog(code,'error',loggedusers[data['token']]['user'],logname(rawname))
   data['adduser'] = 'rejected: '+reason
+  data['response'] = 'rejected'
   return data
  if str(get('usersinfo/'+data['name'])[0]) not in ('_1', '-1', '', 'None'):
-  logmsg.sendlog('Unlin1021uu','warning',loggedusers[data['token']]['user'],data['name'])
+  logmsg.sendlog('Unlin1021uu','error',loggedusers[data['token']]['user'],data['name'])
   data['adduser'] = 'rejected: a user with this name already exists'
+  data['response'] = 'rejected'
   return data
  pool = data['Volpool']
  if 'NoHome' in data['Volpool'] or '-' in data['Volpool']:

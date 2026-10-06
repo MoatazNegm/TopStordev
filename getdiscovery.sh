@@ -6,12 +6,19 @@ etcd='10.11.11.253'
 /TopStor/etcddel.py $etcd possible --prefix
 leaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip`
 /TopStor/etcddel.py $leaderip possible --prefix
-for pid in $(pidof -x getdiscovery.sh); do
-    if [ $pid != $$ ]; then
-        echo "[$(date)] : discovery.sh : Process is already running with PID $pid"
-        exit 1
-    fi
-done
+# The scan below runs until it is told to stop (or 600 rounds).  It is started through the node's command queue
+# (topstorrecvreply.py runs one command at a time), so in the foreground it held every later command -- adding a
+# user, for one -- until the scan ended.  The script therefore starts itself again detached and returns at once.
+if [ -z "$GETDISCOVERY_BG" ]; then
+	for pid in $(pidof -x getdiscovery.sh); do
+	    if [ $pid != $$ ]; then
+	        echo "[$(date)] : discovery.sh : Process is already running with PID $pid"
+	        exit 1
+	    fi
+	done
+	GETDISCOVERY_BG=1 setsid nohup /TopStor/getdiscovery.sh "$@" >/dev/null 2>&1 </dev/null &
+	exit 0
+fi
 cd /TopStor
 # the discovery etcd database is kept between scans (tojoin / ackjoin must survive a new scan);
 # stale possible/ keys are deleted explicitly above and tostop is reset below

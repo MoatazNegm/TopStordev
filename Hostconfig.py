@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import socket, subprocess,sys, datetime
+from uservalid import check_password
 from time import sleep
 from logqueue import queuethis, initqueue
 from etcdgetpy import etcdget as get
@@ -74,7 +75,7 @@ def config(leader, leaderip, myhost, *bargs):
 
 ############ changing user password ###############
  if 'password' in arglist:
-  if len(arglist['password']) < 3:
+  if check_password(arglist['password']):      # empty, shorter than 3, blanks, quotes ... (uservalid.py)
    logmsg.sendlog('Unlinfa12','error',arglist['user'],arglist['username'])
   else:
    print('changing password')

@@ -33,7 +33,7 @@ then
 	if [ $? -ne 0 ]
 	then
 		echo UnixAddUser: user "$username" rejected: $why
-		docker exec etcdclient /TopStor/logmsg.py Unlin1020 error $userreq `echo "$username" | cut -c1-32 | tr -c 'A-Za-z0-9.\n-' '.'`
+		docker exec etcdclient /TopStor/logmsg.py `echo "$why" | cut -d'|' -f1` error $userreq `echo "$username" | cut -c1-32 | tr -c 'A-Za-z0-9.\n-' '.'`
 		exit 1
 	fi
 	sysline=`getent passwd "$username"`
@@ -43,7 +43,7 @@ then
 		if [ $? -ne 0 ]
 		then
 			echo UnixAddUser: user "$username" rejected: it is a system account on this node
-			docker exec etcdclient /TopStor/logmsg.py Unlin1020 error $userreq $username
+			docker exec etcdclient /TopStor/logmsg.py Unlin1027rs error $userreq $username
 			exit 1
 		fi
 	fi
