@@ -160,6 +160,42 @@ if [ -w /etc/resolv.conf ]; then
 	echo 'nameserver 8.8.8.8' > /etc/resolv.conf 2>/dev/null
 fi
 
+# deepen_for_push <source remote> <destination url> <ref> <scratch dir>
+# A shallow push is refused ("shallow update not allowed") unless the commit at the shallow boundary is
+# already known to the destination.  Deepening by 200 commits in one go downloads hundreds of MB (TopStor:
+# ~800 MB-1.3 GB, every commit rewrites big files).  So: deepen ONE commit at a time and stop as soon as the
+# boundary commit is one the destination already has (a tip of any of its refs).  Only if none is found in
+# PROXY_MAXDEEP commits (default 60: the destination has no history of this branch at all) fall back to the
+# big deepen, with a loud warning.
+deepen_for_push() {
+	_src=$1; _dst=$2; _ref=$3; _sc=$4
+	_gd=`git rev-parse --git-dir`
+	echo "  [`date +%H:%M:%S`] asking $_dst which commits it already has ..."
+	_tips=`timeout 120 git ls-remote "$_dst" 2>/dev/null | awk '{print $1}'`
+	echo "    it has $(echo "$_tips" | grep -c .) refs"
+	_n=0
+	while :; do
+		_found=
+		for _r in `cat "$_gd/shallow" 2>/dev/null`; do
+			if echo "$_tips" | grep -qx "$_r"; then _found=$_r; break; fi
+		done
+		if [ -n "$_found" ]; then
+			echo "    the destination already has `echo $_found | cut -c1-8` -- history is deep enough after $_n extra commit(s), small push"
+			return 0
+		fi
+		[ "$_n" -ge "${PROXY_MAXDEEP:-60}" ] && break
+		_n=`expr $_n + 1`
+		if ! timeout 300 git fetch -q --no-tags --deepen 1 "$_src" "$_ref" > "$_sc/deepen" 2>&1; then
+			echo "    deepening by one commit failed:"; tail -3 "$_sc/deepen" | sed 's/^/       /'
+			return 1
+		fi
+		echo "    deepened by one commit ($_n) -- boundary is now `cat "$_gd/shallow" | head -1 | cut -c1-8`, not known to the destination yet"
+	done
+	echo "    *** none of the last $_n commits is known to the destination (it has no history of this branch)."
+	echo "    *** falling back to a deepen of ${PROXY_FALLBACK_DEEPEN:-200} commits: this can be a LARGE download (up to ~1.3 GB for TopStor)"
+	runv "deepening by ${PROXY_FALLBACK_DEEPEN:-200} commits" 900 "$_sc/deepen" git fetch --progress --no-tags --deepen "${PROXY_FALLBACK_DEEPEN:-200}" "$_src" "$_ref"
+}
+
 ok=0
 skipped=0
 missing=0
@@ -279,8 +315,8 @@ for project in $PROJECTS; do
 		echo "  PUSHED $branch to $ABDOPUPET in ${pushsecs}s"
 		pushed=1
 	elif { sed 's/^/     /' "$scratch/push" | tail -4
-	       echo "  push refused -- deepening the history and trying once more"
-	       runv "deepening the history from github" 900 "$scratch/deepen" git fetch --progress --no-tags --deepen 200 github "$ref"; } &&
+	       echo "  push refused (shallow) -- deepening only as far as $ABDOPUPET needs"
+	       deepen_for_push github "$to_url" "$ref" "$scratch"; } &&
 	     runv "pushing $branch to $ABDOPUPET (second attempt)" 600 "$scratch/push2" git push --progress abdopuppet "$ref"; then
 		# ---- 4. a shallow pack is refused when the far side lacks history ----
 		pushsecs=`expr \`date +%s\` - $pushstart`

@@ -2938,3 +2938,12 @@ kept, `git status` clean; `HEAD` identical to `origin/QSD5.210` in both.
   re-checked on every run. Now, after the relay, it runs `git -C /topstorweb fetch git://<abdopuppet>/TopStorweb.git +refs/heads/QSD5.211:refs/heads/QSD5.211` (a branch that is
   not checked out: no checkout, no reset) and prints `QSD5.211 is now a branch of /topstorweb: <sha>`; the requested branch is relayed next, and the next run finds the
   branch listed. Tested in the proxy against a clone of `/topstorweb` (`PROXY_BRIDGE_DIR`): not listed → relayed + pulled → listed; second run no bridge.
+- **`QSD5.216` — the relay no longer downloads ~1 GB (`proxyupdate.sh` and `proxypush.sh`).** Reported 2026-10-06: relaying `QSD5.215` on a second proxy downloaded 1.28 GB "in
+  the TopStor". Cause, measured: the first fetch *is* shallow (`--depth 1`: 4.1 MB for TopStor), but a shallow push is **always** refused (`shallow update not allowed`) unless the
+  shallow-boundary commit is already known to the destination (`receive.shallowUpdate` is off; on an empty destination the same), and the old retry was `--deepen 200`, which
+  fetched 545 commits = **787 MB** locally (every commit rewrites big files such as `grafana.db`, `docker_setup.sh`; ~1.3 GB from GitHub). GitHub accepted our `QSD5.214/215` pushes at
+  once because it already had the parent; an abdopuppet without the parent branch refuses. Now `deepen_for_push` asks the destination for its ref tips (`git ls-remote`), deepens
+  **one commit at a time** and stops as soon as the boundary commit is one the destination has (test: destination with history up to `QSD5.213` → 2 extra commits, scratch repo 4.4 MB,
+  push accepted, versus 787 MB). Only if none of `PROXY_MAXDEEP` (60) commits is known (a destination with no history of the branch) it falls back to `--deepen
+  ${PROXY_FALLBACK_DEEPEN:-200}` and says so loudly. To get the script onto a proxy that runs an older copy: `git -C /TopStor fetch --depth 1 github QSD5.216 && git -C /TopStor show FETCH_HEAD:proxyupdate.sh > /root/proxyupdate.sh`
+  (4 MB).
