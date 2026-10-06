@@ -33,7 +33,7 @@ def do(leaderip,myhost, *args):
  logmsg.sendlog('Evacuaest01','info',args[-1],args[-2])
  leader = get(leaderip, 'leader')[0]
  evacip = get(leaderip, 'ActivePartners/'+args[-2])[0]
- nextleader = get(leaderip,'nextlead/er')[0] 
+ nextleader = str(get(leaderip,'nextlead/er')[0]).split('/')[0]    # '<host>/<ip>': the host
  if leader == myhost and leader==args[-2]:
    nextleaderip = [ host[1] for host in readies if nextleader in host[0] ][0]
    put(nextleaderip, 'bybyleader', myhost+'/'+args[-1])
@@ -48,9 +48,9 @@ def do(leaderip,myhost, *args):
      for ready in readies:
         if nextleader not in str(ready) and leader not in str(ready):
             nextleader = ready[0].split('/')[1]
-            put(leaderip, 'nextlead/er',nextleader)
-            put(leaderip, 'sync/nextlead/Add_er_'+nextleader+'/request','nextlead_'+str(stamp))
-            #put(leaderip, 'sync/nextlead/Add_er_'+nextleader+'/request/'+myhost,'nextlead_'+str(stamp))
+            put(leaderip, 'nextlead/er',nextleader+'/'+ready[1])
+            put(leaderip, 'sync/nextlead/Add_er_'+nextleader+'::'+ready[1]+'/request','nextlead_'+str(stamp))
+            put(leaderip, 'sync/nextlead/Add_er_'+nextleader+'::'+ready[1]+'/request/'+myhost,'nextlead_'+str(stamp))
             break
 
     put(leaderip,'configured/'+args[-2],'reset')

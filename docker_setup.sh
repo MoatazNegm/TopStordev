@@ -564,10 +564,8 @@ docker run -itd --rm --privileged \
 	       /pace/etcddel.py $myclusterip list --prefix
 	       else
 	       /TopStor/etcddel.py $etcd rebootme $myhost
-	       /TopStor/etcdput.py $myclusterip nextlead/er $myhost
-	       /TopStor/etcddel.py $myclusterip sync/nextlead/Add_er_ --prefix
-	       /TopStor/etcdput.py $myclusterip sync/nextlead/Add_er_${myhost}/request nextlead_$stamp
-	       /TopStor/etcdput.py $myclusterip sync/nextlead/Add_er_${myhost}/request/$leader nextlead_$stamp
+	       # nextlead/er is not set here any more: the leader names the next leader when it sees this node ready
+	       # (pace/heartbeat.py leadernextlead) and posts the sync, so every node gets the same '<host>/<ip>'.
 	       fi
 #/TopStor/etcddel.py $myclusterip sync/diskref --prefix
 #/TopStor/etcdput.py $myclusterip sync/diskref/add_add_add______/request diskref_$stamp
