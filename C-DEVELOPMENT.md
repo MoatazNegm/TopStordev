@@ -2932,3 +2932,9 @@ kept, `git status` clean; `HEAD` identical to `origin/QSD5.210` in both.
   last progress line>`, then `done in Ns` / `TIMED OUT` / `exit N`; a refused push says so before it deepens and retries; `GIT_TERMINAL_PROMPT=0` so git fails with
   its message instead of waiting for credentials nobody can type. Behaviour and exit codes are unchanged. Tested: heartbeat and timeout in isolation, a dry run
   against the real remotes; a real push was not run for the test.
+- **`QSD5.215` — `proxyupdate.sh` also pulls the bridge into `/topstorweb`.** Found on 2026-10-06: the maintainer runs `cd /TopStor; ./proxyupdate.sh <branch>` in the proxy,
+  and that file there was still the **old copy** (the relay never updates the proxy's own scripts, so a fixed `proxyupdate.sh` only counts once it is copied to the proxy's
+  `/TopStor/proxyupdate.sh`). Even the `QSD5.213`/`QSD5.214` version only relayed `QSD5.211` github → abdopuppet and left `git branch` in `/topstorweb` without it, so it
+  re-checked on every run. Now, after the relay, it runs `git -C /topstorweb fetch git://<abdopuppet>/TopStorweb.git +refs/heads/QSD5.211:refs/heads/QSD5.211` (a branch that is
+  not checked out: no checkout, no reset) and prints `QSD5.211 is now a branch of /topstorweb: <sha>`; the requested branch is relayed next, and the next run finds the
+  branch listed. Tested in the proxy against a clone of `/topstorweb` (`PROXY_BRIDGE_DIR`): not listed → relayed + pulled → listed; second run no bridge.

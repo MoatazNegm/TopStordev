@@ -69,6 +69,16 @@ if [ "$branch" != "$BRIDGE" ] && [ -z "$PROXY_NO_BRIDGE" ] && [ -d "$BRIDGE_DIR/
    [ -z "`git -C "$BRIDGE_DIR" branch --list "$BRIDGE" 2>/dev/null`" ]; then
 	echo "  $BRIDGE is not a branch of $BRIDGE_DIR -- relaying it first, then $branch"
 	PROXY_NO_BRIDGE=1 PROXY_PROJECTS=TopStorweb sh "$0" "$BRIDGE"
+	# ... and pull it into $BRIDGE_DIR as a local branch (a fetch into a branch that is not checked out:
+	# no checkout, no reset), so that `git branch` lists it from now on and the check is satisfied
+	echo "  pulling $BRIDGE into $BRIDGE_DIR from $ABDOPUPET ..."
+	if [ "$DRYRUN" = 1 ]; then
+		echo "  PROXY_DRYRUN=1 - not pulling it"
+	elif timeout 600 git -C "$BRIDGE_DIR" fetch --progress --no-tags "git://$ABDOPUPET/TopStorweb.git" "+refs/heads/$BRIDGE:refs/heads/$BRIDGE"; then
+		echo "  $BRIDGE is now a branch of $BRIDGE_DIR: `git -C "$BRIDGE_DIR" rev-parse --short "refs/heads/$BRIDGE"`"
+	else
+		echo "  *** could not pull $BRIDGE into $BRIDGE_DIR (is it checked out there?) -- continuing"
+	fi
 fi
 
 # ---- verbosity helpers: nothing here may stay silent for more than ~10 seconds ----
