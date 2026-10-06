@@ -319,7 +319,7 @@ if [ -z "$SPD_ROOT" ]; then
 		/TopStor/myrepopush.sh $branch
 	else
 		echo "  the software container is not ready .... skipping the cluster sync"
-		rc=1
+		rc=0
 	fi
 else
 	echo "  SPD_ROOT is set .... skipping the cluster sync"
