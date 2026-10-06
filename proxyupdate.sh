@@ -60,6 +60,17 @@ if [ -z "$branch" ]; then
 	exit 1
 fi
 
+# bridge: topstorweb must have QSD5.211 as a branch (`git branch`, not a look at any remote), because
+# systempull.sh pulls it first on a node that does not have it.  If it is not listed, relay it from
+# github to abdopuppet first (topstorweb only), then go on with the requested branch.
+BRIDGE=${PROXY_BRIDGE:-QSD5.211}
+BRIDGE_DIR=${PROXY_BRIDGE_DIR:-/topstorweb}
+if [ "$branch" != "$BRIDGE" ] && [ -z "$PROXY_NO_BRIDGE" ] && [ -d "$BRIDGE_DIR/.git" ] &&
+   [ -z "`git -C "$BRIDGE_DIR" branch --list "$BRIDGE" 2>/dev/null`" ]; then
+	echo "  $BRIDGE is not a branch of $BRIDGE_DIR -- relaying it first, then $branch"
+	PROXY_NO_BRIDGE=1 PROXY_PROJECTS=TopStorweb sh "$0" "$BRIDGE"
+fi
+
 # abdopuppet answers on two url forms depending on which repository copy asks
 pick_abdopuppet() {
 	ABD_URL=

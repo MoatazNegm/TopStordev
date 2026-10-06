@@ -107,7 +107,7 @@ fnupdate() {
 	# Only the bridge project (topstorweb).  The local branch, once made, is the marker
 	# that this node went through the bridge; the requested branch is pulled next.
 	if [ "`basename "$dir"`" = "$SPD_BRIDGE_PROJECT" ] && [ "$branch" != "$SPD_BRIDGE" ] &&
-	   ! git rev-parse --verify --quiet "refs/heads/$SPD_BRIDGE" >/dev/null; then
+	   [ -z "`git branch --list "$SPD_BRIDGE"`" ]; then
 		echo "  $SPD_BRIDGE is not a branch of this project -- pulling it first, then $branch"
 		if git fetch --no-tags "$SPD_REMOTE" "+refs/heads/$SPD_BRIDGE:refs/remotes/$SPD_REMOTE/$SPD_BRIDGE" &&
 		   git checkout -f -B "$SPD_BRIDGE" "refs/remotes/$SPD_REMOTE/$SPD_BRIDGE" >/dev/null 2>&1; then

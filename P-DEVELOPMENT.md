@@ -2530,7 +2530,7 @@ pull from the old line to the new one deleted the folders on the node as "remove
 2. *Bridge (rule since `QSD5.213`).* In the project `topstorweb`, **`QSD5.211` must be one of the local branches**. If it is not (and the requested
    branch is not `QSD5.211` itself), the script first fetches and checks out `QSD5.211` (all ignored directories force-added, so they come back
    from git) and then pulls the requested branch, with step 1 keeping the folders. The local branch `QSD5.211` is the marker: once it exists the
-   node never bridges again. It does not look at `plugins/` or at version numbers; if the fetch fails the pull goes on with a warning.
+   node never bridges again. The test is literally `git branch --list QSD5.211` in `/topstorweb` — not a look at `origin` or any remote. It does not look at `plugins/` or at version numbers; if the fetch fails the pull goes on with a warning.
    `SPD_BRIDGE` (default `QSD5.211`) and `SPD_BRIDGE_PROJECT` (default `topstorweb`) override it. (`QSD5.211`/`QSD5.212` used a weaker test:
    target does not track `plugins/` and `plugins/` missing or empty.)
 3. *Procedure for a colleague on the old line:* `systempull.sh <QSD5.211 or newer>` **twice** — the first run (old script) may delete the folders but
@@ -2572,3 +2572,8 @@ kept, `git status` clean; `HEAD` identical to `origin/QSD5.210` in both.
 - **Not covered:** `myrepopull.sh` / `cmyrepopull.sh` (pull from the leader's repo; `docker_setup.container.sh` calls `cmyrepopull.sh` for a node that
   joins) and `devsystempull.sh` also `reset --hard` to another branch and would delete the folders the same way. Only `systempull.sh` / `csystempull.sh`
   have the keep-ignored step and the bridge. Run `systempull.sh` once more on such a node.
+- **`proxyupdate.sh` (github → abdopuppet)** has the same rule since `QSD5.213`: before the requested branch it runs `git -C /topstorweb branch --list QSD5.211`
+  (`PROXY_BRIDGE`, `PROXY_BRIDGE_DIR` override) and, if the branch is not listed, relays `QSD5.211` of `TopStorweb` first (`PROXY_PROJECTS=TopStorweb`,
+  same script, no recursion), so abdopuppet has the bridge whenever a branch is relayed. The relay never touches `/topstorweb`, so the listing only
+  changes when somebody pulls `QSD5.211` there; until then each run re-checks it and finds "already the same commit" (cheap). `proxypush.sh` and the proxy's
+  kept copy `/root/proxyupdate.sh` are unchanged: copy the new `proxyupdate.sh` there when the maintainer wants it live.
