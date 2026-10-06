@@ -3,8 +3,12 @@
 # just got imported here has a cache (L2ARC) vdev that lives on a different
 # host than the one now owning the pool, that disk is no longer local -
 # reachable only over the network - so it's worse than useless as a read
-# cache. Swap it for a spare cache disk that actually lives on this host,
-# if one is available.
+# cache. Swap it for a free disk on this host that sits at the smallest
+# size tier - strictly smaller than the rest of this host's free disks -
+# if one is available. Same relative-size rule the manual "Update Cache"
+# button uses (see fapi.py's dgsupdatecache); if every free disk on the
+# host is the same size, nothing is "smaller than the rest" and there's
+# no candidate.
 import sys
 import subprocess
 
@@ -50,15 +54,26 @@ def main():
 
     print(f"fixcachelocality: pool {pool}'s cache disk(s) {remote_cache_disks} are not local to {myhost}, relocating")
 
+    free_disk_ids = info['raids'].get('free', {}).get('disks', [])
+    local_sizes = {}
+    for did in free_disk_ids:
+        disk_info = info['disks'].get(did, {})
+        if disk_info.get('host') != myhost:
+            continue
+        if did in cache_disks:
+            continue
+        try:
+            local_sizes[did] = float(disk_info.get('size', 0))
+        except (TypeError, ValueError):
+            continue
+
     local_spare = None
-    for raid_data in info['raids'].values():
-        if raid_data.get('status') == 'cache':
-            for d in raid_data.get('disks', []):
-                if info['disks'].get(d, {}).get('host') == myhost and d not in cache_disks:
-                    local_spare = d
-                    break
-        if local_spare:
-            break
+    if local_sizes:
+        smallest = min(local_sizes.values())
+        largest = max(local_sizes.values())
+        if smallest < largest:
+            candidates = [d for d, s in local_sizes.items() if s == smallest]
+            local_spare = min(candidates, key=lambda d: local_sizes[d])
 
     for d in remote_cache_disks:
         resolved = resolve_by_id(d)
@@ -71,10 +86,10 @@ def main():
     if local_spare:
         resolved = resolve_by_id(local_spare)
         if resolved:
-            print(f"fixcachelocality: adding local spare {resolved} as new cache for {pool}")
+            print(f"fixcachelocality: adding local disk {resolved} as new cache for {pool}")
             subprocess.run(['/sbin/zpool', 'add', '-f', pool, 'cache', resolved])
     else:
-        print(f"fixcachelocality: no local spare cache disk available on {myhost}, pool {pool} now has no cache")
+        print(f"fixcachelocality: no disk on {myhost} is smaller than the rest, pool {pool} now has no cache")
 
 
 if __name__ == '__main__':
