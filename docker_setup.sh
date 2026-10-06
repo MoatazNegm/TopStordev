@@ -572,8 +572,8 @@ docker run -itd --rm --privileged \
 #/pace/diskref.sh $leader $myclusterip $myhost $mynodeip >/dev/null & disown 
 if [ $isprimary -ne 1 ];
 then
- leaderversion=`/TopStor/etcdget.py $myclusterip cversion/$leader | awk -F'-' '{print $1}'`
- myversion=`/TopStor/etcdget.py $myclusterip cversion/$myhost | awk -F'-' '{print $1}'`
+ leaderversion=`/TopStor/etcdget.py $myclusterip cversion/$leader | sed 's/-[^-]*$//'`   # '<branch>-<commit>': drop the commit only, branch names have dashes
+ myversion=`/TopStor/etcdget.py $myclusterip cversion/$myhost | sed 's/-[^-]*$//'`
  echo c$leaderversion | grep c$myversion 
  if [ $? -ne 0 ];
  then

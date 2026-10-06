@@ -37,6 +37,7 @@ sed -i 's/SLEEP//g' /TopStordata/etcd.sh
 sed -i "s/ETCDIP/$newip/g" /TopStordata/etcd.sh
 docker run -itd --rm --name etcd --hostname etcd -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $myclusterip:2379:2379 -v /TopStor/:/TopStor -v /root/etcddata:/default.etcd  -v /TopStordata/etcd.sh:/runme.sh --net ${DOCKER_NET:-bridge0} moataznegm/quickstor:etcd
 started=0
+waited=0
 while [ $started -eq 0 ];
 do
 		echo waiting etcd to settle 
@@ -46,6 +47,14 @@ do
 			started=1
 	 	else
 		 	sleep 1
+			waited=$((waited+1))
+			# never wait for ever: the take over must go on (or fail visibly) instead of hanging the heartbeat
+			if [ $waited -ge 180 ];
+			then
+				echo etcd did not settle in 180 seconds .... going on
+				echo `date` docker_primary.sh: etcd did not settle in 180s >> /root/heartproblem
+				break
+			fi
 	 	fi
 done
 
