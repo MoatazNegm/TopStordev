@@ -258,7 +258,7 @@ elif csoftware_ready "`docker exec etcdclient /TopStor/etcdgetlocal.py clusterno
 	/TopStor/myrepopush.sh $branch
 else
 	echo "  the software container is not ready .... skipping the cluster sync"
-	rc=1
+	rc=0
 fi
 
 if [ -z "$SPD_ROOT" ] && [ "$SPD_SYNC" != "0" ] && docker ps >/dev/null 2>&1; then
