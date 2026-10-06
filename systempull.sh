@@ -105,9 +105,9 @@ fnupdate() {
 	# There is deliberately no merge and no rebase anywhere in here.
 	# ---- 2b. bridge: bring back the ignored directories a node has lost ----
 	# Only when: this is the bridge project, the target does not track the marker
-	# directory itself, the directory is missing here, and the bridge branch exists.
+	# directory itself, the directory is missing or empty here, and the bridge branch exists.
 	if [ "`basename "$dir"`" = "$SPD_BRIDGE_PROJECT" ] && [ "$branch" != "$SPD_BRIDGE" ] &&
-	   [ ! -d "$SPD_BRIDGE_MARK" ] &&
+	   [ -z "`ls -A "$SPD_BRIDGE_MARK" 2>/dev/null`" ] &&
 	   [ -z "`git ls-tree --name-only "refs/remotes/$SPD_REMOTE/$branch" "$SPD_BRIDGE_MARK" 2>/dev/null`" ]; then
 		echo "  $SPD_BRIDGE_MARK/ is missing here -- going through $SPD_BRIDGE first to bring it back"
 		if git fetch --no-tags "$SPD_REMOTE" "+refs/heads/$SPD_BRIDGE:refs/remotes/$SPD_REMOTE/$SPD_BRIDGE" &&

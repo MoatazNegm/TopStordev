@@ -2878,7 +2878,7 @@ pull from the old line to the new one deleted the folders on the node as "remove
    from the old commit (`git archive | tar -x`, one `tar` per `xargs` chunk — a single `tar` stops after the first archive). They come back
    **untracked**: the commit number is untouched, `git status` stays clean. Only the committed content comes back, local edits to those files are lost.
 2. *Bridge.* The first pull from a node whose pull script is still the old one loses the folders. The next pull heals it: for the project
-   `topstorweb`, when the target branch does not track `plugins/` **and** `/topstorweb/plugins` is missing, the script first checks out the bridge branch
+   `topstorweb`, when the target branch does not track `plugins/` **and** `/topstorweb/plugins` is missing or empty, the script first checks out the bridge branch
    **`QSD5.211`** (detached; it has all the ignored directories force-added and the fixed scripts) and then continues to the requested branch, with
    step 1 keeping the folders. `SPD_BRIDGE` (default `QSD5.211`), `SPD_BRIDGE_PROJECT` (`topstorweb`), `SPD_BRIDGE_MARK` (`plugins`) override it.
    A pull to a branch that tracks `plugins/` (the old line, `QSD5.211`) never bridges.
@@ -2912,3 +2912,12 @@ kept, `git status` clean; `HEAD` identical to `origin/QSD5.210` in both.
   tree; `myrepopull.sh`, `cmyrepopull.sh` and `indevicepull.sh` still call `/TopStor/pre_apply.sh` themselves (unchanged).
 - **`QSD5.212`** = `QSD5.211` + this feature, pushed with the **normal** exclude list, so `dist/`, `plugins/` … are untracked again there (the pull keeps them on
   disk, §24). It is the branch to give the team: `systempull.sh QSD5.212` twice from the old line.
+
+### 24.3 What the team is told, and what is not covered
+
+- On any version older than `QSD5.211` (old line, or `QSD5.204`–`QSD5.210`): run `systempull.sh <wanted branch>` **twice**. That holds for any wanted
+  branch: the bridge looks at the target (does it track `plugins/`?) and at the node (is `plugins/` missing or empty?), not at version numbers. On
+  `QSD5.211` or newer one pull is enough.
+- **Not covered:** `myrepopull.sh` / `cmyrepopull.sh` (pull from the leader's repo; `docker_setup.container.sh` calls `cmyrepopull.sh` for a node that
+  joins) and `devsystempull.sh` also `reset --hard` to another branch and would delete the folders the same way. Only `systempull.sh` / `csystempull.sh`
+  have the keep-ignored step and the bridge. Run `systempull.sh` once more on such a node.
