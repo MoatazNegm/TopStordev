@@ -3056,3 +3056,52 @@ booted and set itself up (~98 s), and `isinsync = yes`. Take-over times seen on 
 
 **Still not covered:** physical hardware, more than two real nodes, pools / volumes / iSCSI (no data on the cluster), both nodes down at once and a network
 split between two live nodes (each would see the other as lost: the standby takes the cluster ip while the old leader still holds it).
+
+## 26. Users across a fail over, and the new-user guards — 2026-10-07, branch `QSD5.224`
+
+### 26.1 How a user is created and reaches the other nodes
+UI / API `POST /api/v1/users/UnixAddUser` (`name`, `Volpool=NoHome` for a user without a home, `groups`, `Password`, `Volsize`, `HomeAddress`, `HomeSubnet`)
+→ `fapi.py postchange()` puts `['/TopStor/UnixAddUser', …]` on the node's command queue (RabbitMQ queue `recvreply`, `sendhost.py`) → `topstorrecvreply.py`
+(**one consumer, one command at a time**) → `actionreply.py` `Pumpthis` runs the script: `useradd` on the node, `intsmb`, etcd `usersinfo/<name>` and
+`usershash/<name>`, and the sync requests `sync/user/…` + `sync/UsrChange/…`. Every other node applies them in `checksyncs.py` (`oneusersync`), with the **same uid**;
+a node that joins later gets all users in its first sync (`usersyncall`). A user logs in through `/api/v1/login` against `usershash`.
+
+### 26.2 Bug: one long command blocked every later one (shared code, both flavours)
+`/TopStor/getdiscovery.sh` (started by `hosts/discover`) scans until it is told to stop, or 600 rounds. It ran **in the foreground of the command queue**, so
+everything queued after it waited: with a scan running, 5 users were *accepted* by the API and not created for more than 3 minutes on any node (`rabbitmqctl
+list_queues`: `recvreply 33`, no consumer connection; process tree: `topstorrecvreply.py → getdiscovery.sh → syncpossibles.py`). **Fix:** the script checks for a
+running scan as before, then starts itself again detached (`GETDISCOVERY_BG=1 setsid nohup …`) and returns at once. With the scan still running, 5 users were on
+both nodes after 20 s.
+
+### 26.3 Guards for a new user — backend and frontend, same rules
+| Rule | Why |
+|---|---|
+| name 3–32 characters, letters / digits / `-`, starting with a letter | `_` breaks the sync (the request key is split on `_`, other nodes would create the wrong user); blanks and `. / :` break the scripts and the etcd keys |
+| name is not a system account (`root`, `bin`, `admin`, `nobody`, `grafana`, … and, on the node, any account that is not a TopStor user) | `UnixAddUser` runs `userdel -f <name>` before it creates the user |
+| no second user with exactly the same name | |
+| password not empty, 3–128 characters, no blanks, quotes, back slashes, `* ? [ ]` | the scripts use it unquoted; `login_required` **removes blanks from every parameter**, so `pass word1` used to be stored as `password1` and the user could not log in with what was typed |
+
+- **Backend:** `TopStor/uservalid.py` is the one place for the rules (`check_new_user`, `check_new_user_coded`, `check_password`; command line prints `<code>|<reason>`).
+  `fapi.py` `UnixAddUser` checks the values **as sent** (`request.args`), answers `"adduser": "accepted"` or `"adduser": "rejected: <why>"` (+ `"response": "rejected"`)
+  and **reports every rejection through `logmsg`**: `Unlin1027nm` (name not valid), `Unlin1027rs` (reserved), `Unlin1027pw` (password), `Unlin1021uu` (already exists) —
+  texts added to both `msgsglobal.txt`. The script `UnixAddUser` applies the same rules for every caller that creates a *new* user (so the bulk upload,
+  `UsersMassAddition.py`, is covered) and refuses a name that is a system account on the node; sync copies (`pullsync`) are not checked. `Hostconfig.py` uses
+  `check_password` for a password change.
+- **Frontend:** `src/utils/userRules.js` (`validateUserName`, `validatePassword`) mirrors the backend. `AddUserForm.jsx` shows the reason under the field as soon as it
+  has content, checks the name against the loaded user list, keeps *Add System User* disabled and **never submits** while a rule is broken. If the backend still
+  refuses, `QUsers.jsx` shows `User <name> was not created: <why>`.
+
+### 26.4 Proof — one cycle from two fresh nodes with no change needed (`cycleu.sh`, 153 checks, 0 failed)
+1. fresh `zfs1` primary; **5 users without a home** through the API → on `zfs1` after 10 s (`/NoHome/<name>`, `nologin`), listed, log in.
+2. guards: 11 cases rejected with the right reason (2-char name, empty name, empty / 2-char / blank password, same name again, `_`, blank, leading digit, `root`,
+   40 characters); none became a unix user, `root` untouched, the duplicate attempt left the first user alone; each rejection is in `/TopStordata/TopStorglobal.log`
+   with its code; the built UI carries the messages (`uibundlecheck.sh`).
+3. fresh `zfs2` joins. **5 s** after it was ready: the 5 users are on `zfs2` (unix user + `usersinfo` + `usershash` in its local etcd), same uid, `isinsync = yes` (limit 300 s).
+4. **5 more users with random names** → on both nodes, in sync, same uid after **20 s** (limit 300 s).
+5. `docker kill zfs1` → `zfs2` takes over in 32 s (19/19, 6 min stable); **all 10 users**: complete on `zfs2`, uid unchanged, listed by the API, every one logs in, a wrong
+   password is refused.
+6. `zfs1` back (20/20, API + UI 200 in every sample) → all 10 users complete on both nodes.
+7. `docker kill zfs2` → `zfs1` takes over in 34 s (19/19, 6 min stable) → all 10 users intact; `zfs2` back (20/20) → all 10 on both.
+
+**Not covered:** physical hardware; users **with** a home (needs a pool and a volume); groups; user deletion and password change across a fail over; the bulk upload
+file itself; more than two real nodes. The API answer still echoes the request (including `Password`), as before.
