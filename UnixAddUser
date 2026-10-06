@@ -24,6 +24,30 @@ then
 else
 	userreq=`echo $@  | awk '{print $10}'`;
 fi
+# Guards for a NEW user (not for the sync copy another node makes of an accepted user): the rules of
+# uservalid.py, and never a name that is a system account here -- "userdel -f" below would delete it.
+echo $pullsync | grep -q pull
+if [ $? -ne 0 ]
+then
+	why=`/TopStor/uservalid.py "$username" "$userpass"`
+	if [ $? -ne 0 ]
+	then
+		echo UnixAddUser: user "$username" rejected: $why
+		docker exec etcdclient /TopStor/logmsg.py Unlin1020 error $userreq `echo "$username" | cut -c1-32 | tr -c 'A-Za-z0-9.\n-' '.'`
+		exit 1
+	fi
+	sysline=`getent passwd "$username"`
+	if [ -n "$sysline" ]
+	then
+		echo "$sysline" | awk -F':' '{print $5}' | grep -q '^TopStor'
+		if [ $? -ne 0 ]
+		then
+			echo UnixAddUser: user "$username" rejected: it is a system account on this node
+			docker exec etcdclient /TopStor/logmsg.py Unlin1020 error $userreq $username
+			exit 1
+		fi
+	fi
+fi
 privilege="Box_Users";
 contrun=`./privthis.sh $privilege $userreq`;
 echo contrun $contrun, $userreq

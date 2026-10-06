@@ -8,6 +8,7 @@ import re, ipaddress, traceback
 import Hostsconfig
 from Hostconfig import config
 from allphysicalinfo import getall, initallphy
+from uservalid import check_new_user
 from UnixChkUser import setlogin
 import sqlite3
 from etcdget2 import etcdgetjson
@@ -1793,6 +1794,21 @@ def UnixAddUser(data):
  global allgroups, leaderip
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
+ # Guards (uservalid.py): name of 3-32 letters/digits/-, not a system account, a real password, and no second
+ # user with exactly the same name.  The answer says what happened in 'adduser': 'accepted' or 'rejected: <why>'.
+ for field in ('name', 'Password', 'Volpool'):
+  if field not in data:
+   data['adduser'] = 'rejected: the field '+field+' is missing'
+   return data
+ reason = check_new_user(data.get('name'), data.get('Password'))
+ if reason:
+  logmsg.sendlog('Unlin1020','error',loggedusers[data['token']]['user'],str(data.get('name'))[:32].replace(' ','.') or 'noname')
+  data['adduser'] = 'rejected: '+reason
+  return data
+ if str(get('usersinfo/'+data['name'])[0]) not in ('_1', '-1', '', 'None'):
+  logmsg.sendlog('Unlin1021uu','warning',loggedusers[data['token']]['user'],data['name'])
+  data['adduser'] = 'rejected: a user with this name already exists'
+  return data
  pool = data['Volpool']
  if 'NoHome' in data['Volpool'] or '-' in data['Volpool']:
   pool = 'NoHome'
@@ -1812,9 +1828,10 @@ def UnixAddUser(data):
 
  if int(is_unique_name(data['name']))==1000:
     logmsg.sendlog('IPnamuqfa','error','system',loggedusers[data['token']]['user'])
+    data['adduser'] = 'rejected: the name is already used by a user, a group or a volume'
     return data
     
- grps = data.get('groups')
+ grps = data.get('groups') or ''
  groupstr = ''
  allgroups = getgroups()
  if len(grps) < 1:
@@ -1829,6 +1846,7 @@ def UnixAddUser(data):
  print(cmndstring)
  print('*************************************************************************')
  postchange(cmndstring)
+ data['adduser'] = 'accepted'
  return data 
 
 @app.route('/api/v1/volumes/grouplist', methods=['GET'])
