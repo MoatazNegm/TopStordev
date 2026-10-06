@@ -1800,7 +1800,9 @@ def UnixAddUser(data):
   if field not in data:
    data['adduser'] = 'rejected: the field '+field+' is missing'
    return data
- reason = check_new_user(data.get('name'), data.get('Password'))
+ # the values as they were sent: login_required removes every blank from the parameters, so a name or a password
+ # with a blank would otherwise be accepted as a different one (and the user could not log in with what was typed)
+ reason = check_new_user(request.args.get('name', data.get('name')), request.args.get('Password', data.get('Password')))
  if reason:
   logmsg.sendlog('Unlin1020','error',loggedusers[data['token']]['user'],str(data.get('name'))[:32].replace(' ','.') or 'noname')
   data['adduser'] = 'rejected: '+reason
