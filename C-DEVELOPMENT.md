@@ -2947,3 +2947,14 @@ kept, `git status` clean; `HEAD` identical to `origin/QSD5.210` in both.
   push accepted, versus 787 MB). Only if none of `PROXY_MAXDEEP` (60) commits is known (a destination with no history of the branch) it falls back to `--deepen
   ${PROXY_FALLBACK_DEEPEN:-200}` and says so loudly. To get the script onto a proxy that runs an older copy: `git -C /TopStor fetch --depth 1 github QSD5.216 && git -C /TopStor show FETCH_HEAD:proxyupdate.sh > /root/proxyupdate.sh`
   (4 MB).
+- **`QSD5.217` — how the proxy scripts talk to abdopuppet (`proxyupdate.sh`, `proxypush.sh`).** Protocols, measured on 2026-10-06: abdopuppet is a container with `git-daemon --enable=receive-pack
+  --base-path=/srv/git` on **9418** (`git://<ip>/<Repo>.git`, read **and** push; a real push + delete of a test ref from the proxy worked), lighttpd on 80 **without** a git backend
+  (`http://<ip>/git/<Repo>.git` → "not found") and sshd. The flavour difference seen in `csystempull/push` vs `systempull/push` is about the **software container** (container flavour
+  `git://<node ip>/<repo>` on 9418, `csoftware_ready`; physical flavour `http://<node ip>/git/<repo>` on 80, `software_ready`/`myrepolib.sh`), not about abdopuppet; the proxy scripts never use the
+  software container. Fixes: (1) `pick_abdopuppet` used to accept a URL form only if the **branch already existed** there — for a new branch (`QSD5.211`, `QSD5.216`) it matched nothing and
+  silently fell back to `git://`; it now probes each form for plain reachability (`git ls-remote --heads`, no branch filter), takes the first that answers, and reports branch present / absent;
+  (2) the bridge pull into `/topstorweb` used a hard-coded `git://` URL, now the picked one; (3) `proxypush.sh` reported an unreachable abdopuppet as "has no branch" — now "ABDOPUPPET NOT REACHABLE";
+  (4) when no form answers, each form's real git error is printed (connection refused, not found, timed out), nothing is pushed and the run ends "with errors"; (5) the repo name is tried as
+  `TopStorweb` then `TopStorWeb` (an abdopuppet not migrated by the 2026-10-06 rename only has the old spelling); (6) a banner shows the abdopuppet address and the forms in use.
+  `PROXY_ABDOPUPET=<ip>` and `PROXY_ABD_FORMS="git://%h/%r.git ssh://root@%h:5022/srv/git/%r.git"` (`%h` host, `%r` repo) adapt a proxy on another network. Tested: reachable case (both scripts), refused
+  connection case; not tested against a differently configured abdopuppet.

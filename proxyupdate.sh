@@ -60,26 +60,7 @@ if [ -z "$branch" ]; then
 	exit 1
 fi
 
-# bridge: topstorweb must have QSD5.211 as a branch (`git branch`, not a look at any remote), because
-# systempull.sh pulls it first on a node that does not have it.  If it is not listed, relay it from
-# github to abdopuppet first (topstorweb only), then go on with the requested branch.
-BRIDGE=${PROXY_BRIDGE:-QSD5.211}
-BRIDGE_DIR=${PROXY_BRIDGE_DIR:-/topstorweb}
-if [ "$branch" != "$BRIDGE" ] && [ -z "$PROXY_NO_BRIDGE" ] && [ -d "$BRIDGE_DIR/.git" ] &&
-   [ -z "`git -C "$BRIDGE_DIR" branch --list "$BRIDGE" 2>/dev/null`" ]; then
-	echo "  $BRIDGE is not a branch of $BRIDGE_DIR -- relaying it first, then $branch"
-	PROXY_NO_BRIDGE=1 PROXY_PROJECTS=TopStorweb sh "$0" "$BRIDGE"
-	# ... and pull it into $BRIDGE_DIR as a local branch (a fetch into a branch that is not checked out:
-	# no checkout, no reset), so that `git branch` lists it from now on and the check is satisfied
-	echo "  pulling $BRIDGE into $BRIDGE_DIR from $ABDOPUPET ..."
-	if [ "$DRYRUN" = 1 ]; then
-		echo "  PROXY_DRYRUN=1 - not pulling it"
-	elif timeout 600 git -C "$BRIDGE_DIR" fetch --progress --no-tags "git://$ABDOPUPET/TopStorweb.git" "+refs/heads/$BRIDGE:refs/heads/$BRIDGE"; then
-		echo "  $BRIDGE is now a branch of $BRIDGE_DIR: `git -C "$BRIDGE_DIR" rev-parse --short "refs/heads/$BRIDGE"`"
-	else
-		echo "  *** could not pull $BRIDGE into $BRIDGE_DIR (is it checked out there?) -- continuing"
-	fi
-fi
+echo "  proxyupdate: github user $GITHUB_USER -> abdopuppet $ABDOPUPET (url forms: ${PROXY_ABD_FORMS:-git://%h/%r.git http://%h/git/%r.git}), branch $branch"
 
 # ---- verbosity helpers: nothing here may stay silent for more than ~10 seconds ----
 # git must never wait for a username/password on a terminal that is not there: that looks exactly like a hang
@@ -140,21 +121,6 @@ runv() {
 	return $_rc
 }
 
-# abdopuppet answers on two url forms depending on which repository copy asks
-pick_abdopuppet() {
-	ABD_URL=
-	ABD_SHA=
-	for u in "git://$ABDOPUPET/$1.git" "http://$ABDOPUPET/git/$1.git"; do
-		sha=`lsremote "$u"`
-		if [ -n "$sha" ]; then
-			ABD_URL=$u
-			ABD_SHA=$sha
-			return 0
-		fi
-	done
-	return 1
-}
-
 # github needs a working resolver
 if [ -w /etc/resolv.conf ]; then
 	echo 'nameserver 8.8.8.8' > /etc/resolv.conf 2>/dev/null
@@ -195,6 +161,77 @@ deepen_for_push() {
 	echo "    *** falling back to a deepen of ${PROXY_FALLBACK_DEEPEN:-200} commits: this can be a LARGE download (up to ~1.3 GB for TopStor)"
 	runv "deepening by ${PROXY_FALLBACK_DEEPEN:-200} commits" 900 "$_sc/deepen" git fetch --progress --no-tags --deepen "${PROXY_FALLBACK_DEEPEN:-200}" "$_src" "$_ref"
 }
+
+# abdopuppet is a git-daemon (git://<ip>/<repo>.git, port 9418, receive-pack enabled -- the form it serves itself);
+# a physical node's software container serves the same repos over http (http://<ip>/git/<repo>.git).
+# %h = the host, %r = the repository.  PROXY_ABD_FORMS changes the list (e.g. to add an ssh:// form).
+ABD_FORMS=${PROXY_ABD_FORMS:-"git://%h/%r.git http://%h/git/%r.git"}
+
+# pick_abdopuppet <repo>: the first URL form that ANSWERS at all (the branch does not have to exist there yet).
+# Sets ABD_URL and ABD_SHA (the branch's commit there, empty when it is not there).  Returns 1 and says why when
+# no form answers -- that is a connectivity problem, not a missing branch.
+pick_abdopuppet() {
+	ABD_URL=
+	ABD_SHA=
+	# the web repo is TopStorweb.git since 2026-10-06 (TopStorWeb.git is a symlink to it); an abdopuppet that
+	# was not migrated only has the old spelling, so try both
+	case $1 in
+	TopStorweb) _names="TopStorweb TopStorWeb" ;;
+	TopStorWeb) _names="TopStorWeb TopStorweb" ;;
+	*)          _names=$1 ;;
+	esac
+	for _n in $_names; do
+	for _f in $ABD_FORMS; do
+		_u=`echo "$_f" | sed "s|%h|$ABDOPUPET|; s|%r|$_n|"`
+		_err=/tmp/proxy.pick.$$
+		_t0=`date +%s`
+		echo "  asking $_u (max 60s) ..." >&2
+		_all=`timeout 60 git ls-remote --heads "$_u" 2>"$_err"`
+		_rc=$?
+		_secs=`expr \`date +%s\` - $_t0`
+		if [ "$_rc" -eq 0 ]; then
+			ABD_URL=$_u
+			ABD_SHA=`echo "$_all" | awk -v b="refs/heads/$branch" '$2 == b { print $1 }'`
+			echo "    answered in ${_secs}s, `echo "$_all" | grep -c .` branches, $branch there: ${ABD_SHA:-no}" >&2
+			rm -f "$_err"
+			return 0
+		elif [ "$_rc" -eq 124 ]; then
+			echo "    TIMED OUT after 60s" >&2
+		else
+			echo "    no (exit $_rc): `head -2 "$_err" | tr '\n' ' '`" >&2
+		fi
+	done
+	done
+	rm -f "$_err"
+	echo "  *** $ABDOPUPET does not answer for repository $1 on any of: $ABD_FORMS" >&2
+	echo "      git:// needs tcp 9418 open to it, http:// needs port 80.  Check PROXY_ABDOPUPET (now $ABDOPUPET) or set PROXY_ABD_FORMS." >&2
+	return 1
+}
+
+# bridge: topstorweb must have QSD5.211 as a branch (`git branch`, not a look at any remote), because
+# systempull.sh pulls it first on a node that does not have it.  If it is not listed, relay it from
+# github to abdopuppet first (topstorweb only), then pull it from abdopuppet into the local repo.
+BRIDGE=${PROXY_BRIDGE:-QSD5.211}
+BRIDGE_DIR=${PROXY_BRIDGE_DIR:-/topstorweb}
+if [ "$branch" != "$BRIDGE" ] && [ -z "$PROXY_NO_BRIDGE" ] && [ -d "$BRIDGE_DIR/.git" ] &&
+   [ -z "`git -C "$BRIDGE_DIR" branch --list "$BRIDGE" 2>/dev/null`" ]; then
+	echo "  $BRIDGE is not a branch of $BRIDGE_DIR -- relaying it first, then $branch"
+	PROXY_NO_BRIDGE=1 PROXY_PROJECTS=TopStorweb sh "$0" "$BRIDGE"
+	# ... and pull it into $BRIDGE_DIR as a local branch (a fetch into a branch that is not checked out:
+	# no checkout, no reset) from whichever abdopuppet URL form answers, so that `git branch` lists it
+	echo "  pulling $BRIDGE into $BRIDGE_DIR from $ABDOPUPET ..."
+	_keep=$branch; branch=$BRIDGE
+	if [ "$DRYRUN" = 1 ]; then
+		echo "  PROXY_DRYRUN=1 - not pulling it"
+	elif ! pick_abdopuppet TopStorweb; then
+		echo "  *** abdopuppet is not reachable -- $BRIDGE not pulled into $BRIDGE_DIR"
+	elif timeout 600 git -C "$BRIDGE_DIR" fetch --progress --no-tags "$ABD_URL" "+refs/heads/$BRIDGE:refs/heads/$BRIDGE"; then
+		echo "  $BRIDGE is now a branch of $BRIDGE_DIR: `git -C "$BRIDGE_DIR" rev-parse --short "refs/heads/$BRIDGE"`"
+	else
+		echo "  *** could not pull $BRIDGE into $BRIDGE_DIR from $ABD_URL (is it checked out there?) -- continuing"
+	fi
+	branch=$_keep
+fi
 
 ok=0
 skipped=0
@@ -239,8 +276,10 @@ for project in $PROJECTS; do
 		to_url=$ABD_URL
 		dst_sha=$ABD_SHA
 	else
-		to_url="git://$ABDOPUPET/$project.git"
-		dst_sha=
+		echo "  *** cannot reach abdopuppet for $project -- nothing pushed"
+		note "$project" "$branch" "$src_sha" "ABDOPUPPET NOT REACHABLE"
+		failed=`expr $failed + 1`
+		continue
 	fi
 
 	echo "  from : $from_url"
