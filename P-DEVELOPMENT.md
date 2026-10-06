@@ -2577,3 +2577,8 @@ kept, `git status` clean; `HEAD` identical to `origin/QSD5.210` in both.
   same script, no recursion), so abdopuppet has the bridge whenever a branch is relayed. The relay never touches `/topstorweb`, so the listing only
   changes when somebody pulls `QSD5.211` there; until then each run re-checks it and finds "already the same commit" (cheap). `proxypush.sh` and the proxy's
   kept copy `/root/proxyupdate.sh` are unchanged: copy the new `proxyupdate.sh` there when the maintainer wants it live.
+- **`proxyupdate.sh` is verbose since `QSD5.214`** (a push of thousands of files used to look like a hang): every `ls-remote` prints what it asks, how long it took
+  and the error if it failed (max 60 s); fetch, deepen and push run through `runv`, which prints a start time and, every 10 s, `still running, Ns so far -- <git's
+  last progress line>`, then `done in Ns` / `TIMED OUT` / `exit N`; a refused push says so before it deepens and retries; `GIT_TERMINAL_PROMPT=0` so git fails with
+  its message instead of waiting for credentials nobody can type. Behaviour and exit codes are unchanged. Tested: heartbeat and timeout in isolation, a dry run
+  against the real remotes; a real push was not run for the test.

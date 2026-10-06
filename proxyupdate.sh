@@ -71,12 +71,71 @@ if [ "$branch" != "$BRIDGE" ] && [ -z "$PROXY_NO_BRIDGE" ] && [ -d "$BRIDGE_DIR/
 	PROXY_NO_BRIDGE=1 PROXY_PROJECTS=TopStorweb sh "$0" "$BRIDGE"
 fi
 
+# ---- verbosity helpers: nothing here may stay silent for more than ~10 seconds ----
+# git must never wait for a username/password on a terminal that is not there: that looks exactly like a hang
+GIT_TERMINAL_PROMPT=0
+export GIT_TERMINAL_PROMPT
+
+# lsremote <url>: sha of $branch at that url on stdout; what it is doing, how long it took and
+# why it failed go to stderr (so they show on the screen but do not end up in the sha)
+lsremote() {
+	_t0=`date +%s`
+	_err=/tmp/proxyupdate.lsr.$$
+	echo "  asking $1 for $branch (max 60s) ..." >&2
+	_out=`timeout 60 git ls-remote --heads "$1" "$branch" 2>"$_err"`
+	_rc=$?
+	_secs=`expr \`date +%s\` - $_t0`
+	if [ "$_rc" -eq 124 ]; then
+		echo "    TIMED OUT after 60s -- $1 is not answering (network? dns? credentials?)" >&2
+	elif [ "$_rc" -ne 0 ]; then
+		echo "    FAILED (exit $_rc) after ${_secs}s: `head -2 "$_err" | tr '\n' ' '`" >&2
+	elif [ -z "$_out" ]; then
+		echo "    answered in ${_secs}s: no such branch there" >&2
+	else
+		echo "    answered in ${_secs}s" >&2
+	fi
+	rm -f "$_err"
+	echo "$_out" | awk 'NR==1 { print $1 }'
+}
+
+# runv <label> <max seconds> <logfile> <command...>: run a long command, keep its output in the
+# logfile, and every 10 seconds say that it is still running, for how long and what git last said
+# (git's progress line: objects, MB, speed).  Returns the command's exit status (124 = timed out).
+runv() {
+	_label=$1; _max=$2; _log=$3
+	shift 3
+	_t0=`date +%s`
+	echo "  [`date +%H:%M:%S`] $_label (max ${_max}s) ..."
+	timeout "$_max" "$@" > "$_log" 2>&1 &
+	_pid=$!
+	_n=0
+	while kill -0 "$_pid" 2>/dev/null; do
+		sleep 1
+		_n=`expr $_n + 1`
+		if [ `expr $_n % 10` -eq 0 ]; then
+			_last=`tr '\r' '\n' < "$_log" 2>/dev/null | grep -v '^$' | tail -1 | cut -c1-110`
+			echo "    ... $_label: still running, ${_n}s so far ${_last:+-- $_last}"
+		fi
+	done
+	wait "$_pid"
+	_rc=$?
+	_secs=`expr \`date +%s\` - $_t0`
+	if [ "$_rc" -eq 124 ]; then
+		echo "    $_label: TIMED OUT after ${_max}s"
+	elif [ "$_rc" -eq 0 ]; then
+		echo "    $_label: done in ${_secs}s"
+	else
+		echo "    $_label: exit $_rc after ${_secs}s"
+	fi
+	return $_rc
+}
+
 # abdopuppet answers on two url forms depending on which repository copy asks
 pick_abdopuppet() {
 	ABD_URL=
 	ABD_SHA=
 	for u in "git://$ABDOPUPET/$1.git" "http://$ABDOPUPET/git/$1.git"; do
-		sha=`timeout 60 git ls-remote --heads "$u" "$branch" 2>/dev/null | awk 'NR==1 { print $1 }'`
+		sha=`lsremote "$u"`
 		if [ -n "$sha" ]; then
 			ABD_URL=$u
 			ABD_SHA=$sha
@@ -121,7 +180,8 @@ for project in $PROJECTS; do
 
 	# ---- 1. what is where, without moving any objects ----
 	from_url="https://github.com/$GITHUB_USER/$project.git"
-	src_sha=`timeout 60 git ls-remote --heads "$from_url" "$branch" 2>/dev/null | awk 'NR==1 { print $1 }'`
+	echo "  [`date +%H:%M:%S`] checking what is where"
+	src_sha=`lsremote "$from_url"`
 	if [ -z "$src_sha" ]; then
 		echo "  github has no branch '$branch' for $GITHUB_USER/$project - nothing to copy"
 		note "$project" "$branch" "-" "not on github"
@@ -175,10 +235,10 @@ for project in $PROJECTS; do
 
 	# ---- 2. shallow fetch of the one branch we need ----
 	ref="+refs/heads/$branch:refs/heads/$branch"
-	echo "  fetching $branch (shallow) ..."
-	if ! timeout 300 git fetch --no-tags --depth 1 github "$ref" > "$scratch/fetch" 2>&1; then
+	if ! runv "fetching $branch from github (shallow)" 300 "$scratch/fetch" git fetch --progress --no-tags --depth 1 github "$ref"; then
+		tail -3 "$scratch/fetch" | sed 's/^/     /'
 		echo "  shallow fetch failed - fetching the full history instead ..."
-		if ! timeout 900 git fetch --no-tags github "$ref" > "$scratch/fetch" 2>&1; then
+		if ! runv "fetching $branch from github (full history)" 900 "$scratch/fetch" git fetch --progress --no-tags github "$ref"; then
 			echo "  FAILED to fetch $branch from github"
 			tail -5 "$scratch/fetch" | sed 's/^/     /'
 			failed=`expr $failed + 1`
@@ -204,12 +264,14 @@ for project in $PROJECTS; do
 
 	pushstart=`date +%s`
 	pushed=0
-	if timeout 600 git push --progress abdopuppet "$ref" > "$scratch/push" 2>&1; then
+	if runv "pushing $branch to $ABDOPUPET" 600 "$scratch/push" git push --progress abdopuppet "$ref"; then
 		pushsecs=`expr \`date +%s\` - $pushstart`
 		echo "  PUSHED $branch to $ABDOPUPET in ${pushsecs}s"
 		pushed=1
-	elif timeout 900 git fetch --no-tags --deepen 200 github "$ref" > "$scratch/deepen" 2>&1 &&
-	     timeout 600 git push --progress abdopuppet "$ref" > "$scratch/push2" 2>&1; then
+	elif { sed 's/^/     /' "$scratch/push" | tail -4
+	       echo "  push refused -- deepening the history and trying once more"
+	       runv "deepening the history from github" 900 "$scratch/deepen" git fetch --progress --no-tags --deepen 200 github "$ref"; } &&
+	     runv "pushing $branch to $ABDOPUPET (second attempt)" 600 "$scratch/push2" git push --progress abdopuppet "$ref"; then
 		# ---- 4. a shallow pack is refused when the far side lacks history ----
 		pushsecs=`expr \`date +%s\` - $pushstart`
 		echo "  push refused, deepened the history, PUSHED on the second attempt in ${pushsecs}s"
@@ -224,7 +286,7 @@ for project in $PROJECTS; do
 
 	# ---- 5. prove abdopuppet really has exactly that commit now ----
 	cd /
-	now=`timeout 60 git ls-remote --heads "$to_url" "$branch" 2>/dev/null | awk 'NR==1 { print $1 }'`
+	now=`lsremote "$to_url"`
 	if [ "$now" = "$src_sha" ]; then
 		echo "  verified: $ABDOPUPET now has $now"
 		if [ "$pushed" -eq 1 ]; then
