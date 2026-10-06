@@ -2527,11 +2527,12 @@ pull from the old line to the new one deleted the folders on the node as "remove
    one dropped and the new `.gitignore` ignores (`git diff --diff-filter=D old HEAD | git check-ignore --no-index --stdin`) and puts them back
    from the old commit (`git archive | tar -x`, one `tar` per `xargs` chunk — a single `tar` stops after the first archive). They come back
    **untracked**: the commit number is untouched, `git status` stays clean. Only the committed content comes back, local edits to those files are lost.
-2. *Bridge.* The first pull from a node whose pull script is still the old one loses the folders. The next pull heals it: for the project
-   `topstorweb`, when the target branch does not track `plugins/` **and** `/topstorweb/plugins` is missing or empty, the script first checks out the bridge branch
-   **`QSD5.211`** (detached; it has all the ignored directories force-added and the fixed scripts) and then continues to the requested branch, with
-   step 1 keeping the folders. `SPD_BRIDGE` (default `QSD5.211`), `SPD_BRIDGE_PROJECT` (`topstorweb`), `SPD_BRIDGE_MARK` (`plugins`) override it.
-   A pull to a branch that tracks `plugins/` (the old line, `QSD5.211`) never bridges.
+2. *Bridge (rule since `QSD5.213`).* In the project `topstorweb`, **`QSD5.211` must be one of the local branches**. If it is not (and the requested
+   branch is not `QSD5.211` itself), the script first fetches and checks out `QSD5.211` (all ignored directories force-added, so they come back
+   from git) and then pulls the requested branch, with step 1 keeping the folders. The local branch `QSD5.211` is the marker: once it exists the
+   node never bridges again. It does not look at `plugins/` or at version numbers; if the fetch fails the pull goes on with a warning.
+   `SPD_BRIDGE` (default `QSD5.211`) and `SPD_BRIDGE_PROJECT` (default `topstorweb`) override it. (`QSD5.211`/`QSD5.212` used a weaker test:
+   target does not track `plugins/` and `plugins/` missing or empty.)
 3. *Procedure for a colleague on the old line:* `systempull.sh <QSD5.211 or newer>` **twice** — the first run (old script) may delete the folders but
    brings in the new script, the second run restores them. From then on a single pull is enough. Never use `git clean -x`.
 
@@ -2561,13 +2562,13 @@ kept, `git status` clean; `HEAD` identical to `origin/QSD5.210` in both.
 - **Removed:** the top-level `post_apply.sh` (React build) is now an empty stub that nothing calls. `pre_apply.sh` at the top level was never in the
   tree; `myrepopull.sh`, `cmyrepopull.sh` and `indevicepull.sh` still call `/TopStor/pre_apply.sh` themselves (unchanged).
 - **`QSD5.212`** = `QSD5.211` + this feature, pushed with the **normal** exclude list, so `dist/`, `plugins/` … are untracked again there (the pull keeps them on
-  disk, §24). It is the branch to give the team: `systempull.sh QSD5.212` twice from the old line.
+  disk, §24). `QSD5.213` supersedes it for the team.
 
 ### 24.3 What the team is told, and what is not covered
 
-- On any version older than `QSD5.211` (old line, or `QSD5.204`–`QSD5.210`): run `systempull.sh <wanted branch>` **twice**. That holds for any wanted
-  branch: the bridge looks at the target (does it track `plugins/`?) and at the node (is `plugins/` missing or empty?), not at version numbers. On
-  `QSD5.211` or newer one pull is enough.
+- On any version older than `QSD5.211` (old line, or `QSD5.204`–`QSD5.210`): run `systempull.sh <wanted branch>` **twice** (the first run is the old
+  script). That holds for any wanted branch; the bridge only asks whether the local branch `QSD5.211` exists. The branch to give the team is
+  **`QSD5.213`** (`QSD5.212` has the weaker bridge test).
 - **Not covered:** `myrepopull.sh` / `cmyrepopull.sh` (pull from the leader's repo; `docker_setup.container.sh` calls `cmyrepopull.sh` for a node that
   joins) and `devsystempull.sh` also `reset --hard` to another branch and would delete the folders the same way. Only `systempull.sh` / `csystempull.sh`
   have the keep-ignored step and the bridge. Run `systempull.sh` once more on such a node.

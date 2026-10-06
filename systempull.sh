@@ -44,10 +44,10 @@ SPD_REMOTE=${SPD_REMOTE:-origin}
 SPD_SYNC=${SPD_SYNC:-1}
 # One-off bridge for topstorweb: dist/, plugins/ ... are tracked up to this branch and
 # ignored (untracked) after it.  A node that went to a newer branch with an OLD pull
-# script has lost them; the next pull (this script) goes through the bridge first.
+# script has lost them.  So in topstorweb the bridge branch must be one of the local
+# branches; if it is not, it is pulled first and the requested branch after it.
 SPD_BRIDGE=${SPD_BRIDGE:-QSD5.211}
 SPD_BRIDGE_PROJECT=${SPD_BRIDGE_PROJECT:-topstorweb}
-SPD_BRIDGE_MARK=${SPD_BRIDGE_MARK:-plugins}
 PROJECTS=$SPD_PROJECTS
 
 fnupdate() {
@@ -103,19 +103,17 @@ fnupdate() {
 	# -B resets the branch to the given ref and checks it out.
 	# -f throws local modifications away instead of refusing to switch.
 	# There is deliberately no merge and no rebase anywhere in here.
-	# ---- 2b. bridge: bring back the ignored directories a node has lost ----
-	# Only when: this is the bridge project, the target does not track the marker
-	# directory itself, the directory is missing or empty here, and the bridge branch exists.
+	# ---- 2b. bridge: the bridge branch must be a branch of this project -----
+	# Only the bridge project (topstorweb).  The local branch, once made, is the marker
+	# that this node went through the bridge; the requested branch is pulled next.
 	if [ "`basename "$dir"`" = "$SPD_BRIDGE_PROJECT" ] && [ "$branch" != "$SPD_BRIDGE" ] &&
-	   [ -z "`ls -A "$SPD_BRIDGE_MARK" 2>/dev/null`" ] &&
-	   [ -z "`git ls-tree --name-only "refs/remotes/$SPD_REMOTE/$branch" "$SPD_BRIDGE_MARK" 2>/dev/null`" ]; then
-		echo "  $SPD_BRIDGE_MARK/ is missing here -- going through $SPD_BRIDGE first to bring it back"
+	   ! git rev-parse --verify --quiet "refs/heads/$SPD_BRIDGE" >/dev/null; then
+		echo "  $SPD_BRIDGE is not a branch of this project -- pulling it first, then $branch"
 		if git fetch --no-tags "$SPD_REMOTE" "+refs/heads/$SPD_BRIDGE:refs/remotes/$SPD_REMOTE/$SPD_BRIDGE" &&
-		   [ -n "`git ls-tree --name-only "refs/remotes/$SPD_REMOTE/$SPD_BRIDGE" "$SPD_BRIDGE_MARK" 2>/dev/null`" ] &&
-		   git checkout -f --detach "refs/remotes/$SPD_REMOTE/$SPD_BRIDGE" >/dev/null 2>&1; then
-			echo "  $SPD_BRIDGE checked out -- $SPD_BRIDGE_MARK/ and the other ignored directories are back"
+		   git checkout -f -B "$SPD_BRIDGE" "refs/remotes/$SPD_REMOTE/$SPD_BRIDGE" >/dev/null 2>&1; then
+			echo "  $SPD_BRIDGE pulled -- the ignored directories are back, now $branch"
 		else
-			echo "  WARNING: bridge $SPD_BRIDGE not usable -- continuing without it"
+			echo "  WARNING: could not pull $SPD_BRIDGE from $SPD_REMOTE -- continuing without it"
 		fi
 	fi
 
