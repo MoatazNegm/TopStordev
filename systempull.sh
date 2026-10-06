@@ -42,6 +42,12 @@ SPD_PROJECTS=${SPD_PROJECTS:-'TopStor pace topstorweb'}
 SPD_ROOT=${SPD_ROOT:-}
 SPD_REMOTE=${SPD_REMOTE:-origin}
 SPD_SYNC=${SPD_SYNC:-1}
+# One-off bridge for topstorweb: dist/, plugins/ ... are tracked up to this branch and
+# ignored (untracked) after it.  A node that went to a newer branch with an OLD pull
+# script has lost them; the next pull (this script) goes through the bridge first.
+SPD_BRIDGE=${SPD_BRIDGE:-QSD5.211}
+SPD_BRIDGE_PROJECT=${SPD_BRIDGE_PROJECT:-topstorweb}
+SPD_BRIDGE_MARK=${SPD_BRIDGE_MARK:-plugins}
 PROJECTS=$SPD_PROJECTS
 
 fnupdate() {
@@ -97,9 +103,37 @@ fnupdate() {
 	# -B resets the branch to the given ref and checks it out.
 	# -f throws local modifications away instead of refusing to switch.
 	# There is deliberately no merge and no rebase anywhere in here.
+	# ---- 2b. bridge: bring back the ignored directories a node has lost ----
+	# Only when: this is the bridge project, the target does not track the marker
+	# directory itself, the directory is missing here, and the bridge branch exists.
+	if [ "`basename "$dir"`" = "$SPD_BRIDGE_PROJECT" ] && [ "$branch" != "$SPD_BRIDGE" ] &&
+	   [ ! -d "$SPD_BRIDGE_MARK" ] &&
+	   [ -z "`git ls-tree --name-only "refs/remotes/$SPD_REMOTE/$branch" "$SPD_BRIDGE_MARK" 2>/dev/null`" ]; then
+		echo "  $SPD_BRIDGE_MARK/ is missing here -- going through $SPD_BRIDGE first to bring it back"
+		if git fetch --no-tags "$SPD_REMOTE" "+refs/heads/$SPD_BRIDGE:refs/remotes/$SPD_REMOTE/$SPD_BRIDGE" &&
+		   [ -n "`git ls-tree --name-only "refs/remotes/$SPD_REMOTE/$SPD_BRIDGE" "$SPD_BRIDGE_MARK" 2>/dev/null`" ] &&
+		   git checkout -f --detach "refs/remotes/$SPD_REMOTE/$SPD_BRIDGE" >/dev/null 2>&1; then
+			echo "  $SPD_BRIDGE checked out -- $SPD_BRIDGE_MARK/ and the other ignored directories are back"
+		else
+			echo "  WARNING: bridge $SPD_BRIDGE not usable -- continuing without it"
+		fi
+	fi
+
+	oldhead=`git rev-parse --verify --quiet HEAD`
 	if ! git checkout -f -B "$branch" "refs/remotes/$SPD_REMOTE/$branch"; then
 		echo "  ERROR: could not check out $branch"
 		return 1
+	fi
+	# A path the old branch tracked but the new one ignores (dist/, plugins/ ...)
+	# is deleted by the checkout as a "removed" file.  It must stay intact, so
+	# put the committed content of the old branch back; it stays untracked.
+	if [ -n "$oldhead" ] && [ "$oldhead" != "`git rev-parse HEAD`" ]; then
+		keep=`git diff --name-only --diff-filter=D "$oldhead" HEAD 2>/dev/null |
+			git check-ignore --no-index --stdin 2>/dev/null`
+		if [ -n "$keep" ]; then
+			echo "  keeping `echo "$keep" | wc -l` ignored file(s) the old branch tracked (dist/, plugins/ ...)"
+			echo "$keep" | tr '\n' '\0' | xargs -0 git archive "$oldhead" -- | tar -x
+		fi
 	fi
 	git reset --hard --quiet
 	if [ "$SPD_CLEAN" = "1" ]; then
