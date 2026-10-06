@@ -66,7 +66,7 @@ fnupdate () {
 
 cd /TopStor/
 branch=`echo $@ | awk '{print $1}'`
-cjobs=(`echo TopStor_TopStordev pace_HC topstorweb_TopStorWeb`)
+cjobs=(`echo TopStor_TopStordev pace_HC topstorweb_TopStorweb`)
 branchc=`echo $branch | wc -c`
 if [ $branchc -le 3 ];
 then
