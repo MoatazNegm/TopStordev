@@ -13,7 +13,7 @@ if [ -z "$leaderip" ] || [ ${#branch} -le 3 ]; then
 	echo "usage: $0 <primary-node-ip> <branch>"
 	exit 1
 fi
-for jobinfo in TopStor:TopStordev pace:HC topstorweb:TopStorWeb; do
+for jobinfo in TopStor:TopStordev pace:HC topstorweb:TopStorweb; do
 	job=${jobinfo%%:*}
 	repo=${jobinfo##*:}.git
 	cd /$job || continue
