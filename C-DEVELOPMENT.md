@@ -3138,3 +3138,32 @@ Where the remaining ≈ 20 – 25 s go: ≈ 8 s detection (a choice: fewer probe
 ≈ 4 – 6 s until `httpd` and `flask` containers run; then **≈ 6 s between `docker exec flask /TopStor/fapi.py` and the Python interpreter starting inside the new
 container** (measured: exec issued at +12.5…13.5 s, interpreter started at +19.5 s, serving 0.3 s later). That last part and the container starts are the nested
 dockerd of the container flavour (`vfs` storage driver, load 4 – 6 on the host while the loopers are restarted); a physical node should be quicker, not measured.
+
+### 25.4 The client side of a take over: the cluster ip must be announced (gratuitous ARP) — `QSD5.225`
+
+**Found by an outlier.** In the regression cycle one fail back was "visible after 47 s" (and earlier ones 34 s, 41 s) although the new leader's own timestamps said
+`httpd` at +13 s and the API serving at +18.3 s. From the host, ping, port 2379, UI and API all came back **in the same instant**. Reproduced on purpose with
+`timing2.sh` (the host talks to the cluster ip just before the kill, so its ARP entry is fresh): everything reachable at **+34.0 s**, API process serving at +19 s.
+
+**Cause.** A client keeps `cluster ip → MAC of the dead leader` until its own ARP entry ages out (Linux: 15–45 s reachable time, then a probe). Nothing told it
+that the address moved: `docker_primary.sh` adds the ip with `nmcli conn mod cmynode +ipv4.addresses … ; nmcli conn up cmynode` and relied on NetworkManager's
+announcement, which goes out on the connection's device only. In the container flavour that device (`bond0`, port `eth10`) has **no carrier**; the address is
+answered on the node's `eth0` (the host's ARP table shows the cluster ip on the `eth0` MAC), so no announcement ever reached the wire. On a physical node the bond
+is real, but right after `conn up` it can still be without its port. How long a client waited was luck: the state of its ARP entry.
+
+**Fix (`docker_primary.sh`, both flavours).** After the cluster ip is up: `arping -U -c 1 -I <dev> -s <cluster ip> <cluster ip>` on **every interface with a
+connected route to the cluster ip** (`ip -o -4 route show to match <cluster ip>`, without the default route), at 0, 1, 3 and 7 s, in the background.
+
+**Result (worst case, same instrument):** cluster ip answers ping at **8.7 s** (was 34.0), UI at 14.0 – 15.6 s, API at **19.0 – 21.2 s**.
+
+| Seconds after the leader died | `QSD5.224` | `QSD5.225` |
+|---|---|---|
+| leader declared lost | 7.1 | 7.4 – 7.7 |
+| cluster ip reachable for a client with a fresh ARP entry | up to 34 – 47 | 8.7 |
+| etcd on the cluster ip | 10.3 | 9.8 – 10.4 |
+| UI answers | 16.5 (if ARP allowed) | 14.0 – 15.6 |
+| API answers | 32.5 (if ARP allowed) | 19.0 – 21.2 |
+| grafana / prometheus back | 36 / 34 | 21 – 25 / 20 – 23 |
+
+Of the ≈ 20 s that remain: ≈ 7.5 s detection (two probe rounds, by design), ≈ 1 s ip, ≈ 1.5 s etcd, ≈ 4 s to the `httpd` container and the UI, ≈ 1 – 2 s to the
+`flask` container, ≈ 5 s from `docker exec flask /TopStor/fapi.py` to the interpreter starting in the new container (nested dockerd), 0.3 s API start-up.
