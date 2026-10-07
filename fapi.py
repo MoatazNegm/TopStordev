@@ -1,6 +1,10 @@
 #!/usr/bin/python3
 import time as _startclock; _FAPI_T0 = _startclock.time()      # for the start-up log at the bottom: when the interpreter started
 import time
+# sample-data mode (pzfs UI work): /TopStordata/mockapi exists -> serve mockfapi.py instead of the real API (rm it to switch off)
+import os as _os
+if _os.path.exists('/TopStordata/mockapi'):
+    import mockfapi; mockfapi.run(); raise SystemExit
 import flask, os, Evacuate, subprocess, Joincluster, sys, re
 from getversions import getversions
 from functools import wraps
