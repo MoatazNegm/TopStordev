@@ -2344,6 +2344,17 @@ from `volumes/puppet-srv`, branch **`QSD5.230`**; `/root` seeded from the image)
 `ssh -p 2225`, UI `-p 8443:443`. **No `--device` loops**; because `--privileged` still shows the host's `/dev/loop*`
 nodes, `run_pzfs` deletes them inside the container (host untouched; redo after a re-create).
 Caution: it shares the L2 with the zfs cluster, so the `ping 10.11.11.250` test in `docker_setup.sh` sees that cluster's IP.
+
+Lessons from the first builds (2026-10-07):
+- `/root/nodestatus` must contain **`reset`** on the first start: `docker_setup.sh` creates the UI user `admin` / `tmatem` only when
+  `nodestatus` + `isprimary` match `reset1`, and then writes `runningnode`. Without it the UI says "Invalid username" (login API answers `baduser`).
+  Seed it on the host (`/home/topstor/pzfs/linux-env/root/nodestatus`) before the first start; no work inside the container is needed.
+- `origin` of the three repos is `git://10.11.11.252/{TopStordev,HC,TopStorweb}.git` (container flavour; the physical flavour uses http via the
+  node's `software` container, `http://<ip>/git/<repo>.git`).
+- On a first boot from the image the entrypoint cannot rename the baked `bond0` (it still holds `.250`), so `docker_setup.sh` can take the *join* path
+  (etcd never forms, no admin). A start with clean `nodestatus`/`etcddata` after the NM profiles had autoconnect off went primary.
+- A host-wide `sync` (run by the container at start/stop) blocks while any ZFS pool on the host kernel is `SUSPENDED` (zfs1's pool on the shared loop disks):
+  `docker restart pzfs` then hangs on a `D`-state `sync`. Fix on the pool owner's side (`zpool clear`), not in pzfs.
 ### 21.1 Scope
 
 - Flavour: physical servers. Code: `TopStordev` / `HC` / `TopStorWeb` on branch **QSD5.204**, "the latest app
@@ -2885,3 +2896,5 @@ The pool take-over timeline of a clean stop with these fixes is measured by the 
 
 
 ## 32. Own loop disks for `zfs1`/`zfs2`, allow-list of exportable disks — `QSD5.233` (2026-10-07)
+
+## 33. Pools of the container flavour are created with `failmode=continue` — `QSD5.235` (2026-10-07)

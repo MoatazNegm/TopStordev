@@ -3343,3 +3343,11 @@ the same `loop1,2,3,7` (backstores `loopN-<host>` of both clusters on one disk).
 **`QSD5.234`: LUN mapping with two clusters in one kernel.** `caddtargetdisks.sh` mapped the LUNs to every target it found in `targetcli ls` (`tpgs`), passing all of them as ONE
 string to `targetcli iscsi/iqn<...>` — with the other cluster's target (`pzfs`) in the shared LIO config that call failed and **no LUN of this node was ever mapped**
 (backstores `loop4..8` stayed `deactivated`, API listed 0 disks). It now takes only its own `iqn.2016-03.com.<myhost>:t1`. (Both flavours; on a physical server there is only the own target.)
+
+## 33. Pools of the container flavour are created with `failmode=continue` — `QSD5.235` (2026-10-07)
+**Why.** ZFS has no timeout that ends a suspension: with the default `failmode=wait` a pool that loses its disks is SUSPENDED until `zpool clear`
+(`zfs_deadman_*` only log hung I/O here, `zfs_deadman_failmode=wait`). In the container flavour all nodes share one host kernel and their LIO/iSCSI disks vanish whenever a test
+node is recreated, and a suspended pool hangs every `sync` on the host (§27.3). **Change.** `TopStor/DGsetPool` adds `-o failmode=continue` to every `zpool create` when
+`is_container` (a physical server keeps the default). `continue` answers *new* writes with EIO instead of blocking; writes already queued can still block, so it reduces the
+hang but does not make it impossible — the rule stays: never remove nodes or disks under an imported pool (§27.5, `phaseA.sh` guard). Existing pools are not changed
+(`zpool set failmode=continue <pool>` by hand). Not applied on a physical server: there a lost disk must stop the writes, not fail them.
