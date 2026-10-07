@@ -3255,3 +3255,20 @@ First fresh cycle after the reboot (`cyclep.sh`, QSD5.228): users, disks, pool +
   local). The automated chain after the fixes has **not** completed yet.
 - **Test rule added:** a node container is killed *only* by `fo/*` scripts that run on a host whose ZFS answers (`timeout 10 zpool list`); after a kill, never run anything but `zpool status`, `/proc`
   reads and `closthost.sh` on the suspended pool until its disks are back.
+
+### 27.5 Clean stop of a node container: the pools are handed over first — `QSD5.230` (written 2026-10-07, **not yet run**: the host's ZFS was still deadlocked)
+Decided with the maintainer: the shared-kernel hang (§27.3, §27.4) is a property of the container emulation; the physical flavour is tested later. For the container flavour a
+node that is stopped *normally* must not leave an imported pool behind, so:
+- `scripts/entrypoint-zfs.sh` (bind-mounted into the node, so no image rebuild) ends with `tail -f /dev/null &` + `wait`, and a `trap` on `TERM`/`INT` calls `/pace/cstop.sh`
+  and exits. `tini` (`--init`) passes `docker stop` / `docker restart` / host-shutdown's SIGTERM on to the entrypoint. (A trap does not run while a *foreground* command runs,
+  which is why `tail` is in the background; simulated: the trap runs 2 ms after the signal.) `manage.sh`: `--stop-timeout 30` → `120` (new containers only).
+- `pace/cstop.sh` — for every pool this node owns (`cpoolowner.sh mine <host>`) whose kernel state is `ONLINE` and whose first vdev answers a direct read: `zpool export <pool>`
+  (never `-a`, never `-f`), log in `/root/cstop.log`. A pool that is not ONLINE, or does not export (busy), is left alone.
+- After that the cluster does what it does for any lost node: the leader notices (`heartbeat.py`), `closthost.sh` removes the stopped node's target and backstores so the
+  survivor can export the shared loop disks (same serials), the leader assigns the pool (`poolnxt`), the survivor imports it (`zpooltoimport.py`) and `fixcachelocality.py`
+  moves the cache to the survivor. No suspended pool, so none of the lock-holding commands can hang.
+- **Not covered:** `docker kill` / power loss cannot run any code on the node — that is `closthost.sh` + the guards of §27.4. A pool that is busy (mounted datasets in use,
+  CIFS / NFS / iSCSI volumes on it) will refuse the export; handling that belongs to the volume scripts and is not done here.
+- **Test (`fo/cyclepm.sh <n>`, `MODE=graceful|kill`):** the full cycle (users, disks, 3-disk RAID5 + auto cache on the owner, stop the owner, pool + cache arrive on the survivor,
+  owner returns, stop the other, ...). `graceful` uses `docker stop -t 120`, `kill` uses `docker kill`. A guard runs `timeout 10 zpool list` before every stop and after every
+  step and ends the run with the reason if ZFS stops answering. Order planned: `graceful` first, then `kill`.
