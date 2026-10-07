@@ -44,8 +44,13 @@ def ioperf(myclusterip,myhost):
   #cmdline='docker exec etcdclient /TopStor/etcdput.py '+myclusterip+' dskperf/'+myhost+'/'+thedsk['name']+' '+str(thedsk['tps'])+'/'+str(thedsk['through'])+'/'+str(thedsk['read'])+'/'+dsk
   put(myclusterip,'dskperf/'+myhost+'/'+thedsk['name'], str(thedsk['tps'])+'/'+str(thedsk['throuput'])+'/'+str(thedsk['read'])+'/'+dsk)
   #result=subprocess.run(cmdline.split(),stdout=subprocess.PIPE).stdout.decode('utf-8')
-  with open('/pacedata/perfmon') as f:
-   perfmon = f.readline()
+  # the file is not there on every node; without it this raised, and zpooltoimport.py -- which calls ioperf
+  # right before 'zpool import' -- never imported a pool
+  try:
+   with open('/pacedata/perfmon') as f:
+    perfmon = f.readline()
+  except OSError:
+   perfmon = '0'
   #if '1' in perfmon:
  # with open('/TopStordata/dskperfmon.txt','a') as f:
  #  f.write(str(time())+' dskperf/'+myhost+'/'+thedsk['name']+'\t '+str(thedsk['tps'])+'/'+str(thedsk['throuput'])+'/'+str(thedsk['read'])+'/'+dsk+'\n')

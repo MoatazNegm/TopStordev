@@ -1041,6 +1041,9 @@ fi
 #rm txt/${0:2}$userreq.txt
 #sed -i "/p${nextpool}/c\\" $runningpools
 fi
+# container flavour: one kernel for all nodes, so the owner is written on the pool (see /pace/cpoolowner.sh)
+[ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
+is_container 2>/dev/null && [ -n "$myhost" ] && /pace/cpoolowner.sh claim $myhost
 /pace/etcddel.py $leaderip requests/DGsetpool/$myhost $myhost/$userreq
 #systemctl restart zfs-zed
 docker exec etcdclient /TopStor/logqueue.py `basename "$0"` stop $userreq 
