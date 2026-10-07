@@ -1,6 +1,7 @@
 #!/usr/bin/python3
-import pandas as pd
-import numpy as np
+# pandas was imported here and never used; numpy is needed by one function only and is imported there.
+# Both at the top cost the API (fapi.py imports this module through getallraids) 4-14 s of start-up -- the
+# largest single part of the fail over time, because the API starts in a new container on the node that takes over.
 from etcdgetpy import etcdget as get
 from itertools import combinations_with_replacement as combine
 # Define a function to operate on elements
@@ -48,6 +49,7 @@ def calc_host(comb):
     hostcounts = []
     for host in hosts:
         hostcounts.append( " ".join(comb).count(host))
+    import numpy as np      # here, not at the top of the module (see the note there)
     nphostcounts = np.array(hostcounts)
     hostcalc = np.sum(np.abs(nphostcounts[:,np.newaxis]-nphostcounts)) // 2
     return hostcalc
