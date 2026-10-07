@@ -822,6 +822,11 @@ if [ -n "$mydns" ] && [ "$mydns" != "_1" ]; then
 	nmcli conn  up cmynode 
 	enslave_eth10_to_bond0
 fi
+
+enslave_eth10_to_bond0
+
+/TopStor/registerports.sh $myclusterip
+setsid nohup /pace/fapilooper.sh >/dev/null 2>&1 </dev/null &
 #nmcli con modify cmynode bond.options "mode=active-backup,miimon=100,fail_over_mac=1"
 #nmcli conn down cmynode && nmcli conn up cmynode
 docker rm -f promexport
@@ -829,7 +834,3 @@ docker run --rm -d -p $mynodeip:9100:9100 -v /proc:/proc -v /sys:/sys --name pro
 docker rm -f promcadvisor
 docker run   --rm   --volume=/:/rootfs:ro   --volume=/var/run:/var/run:ro   --volume=/sys:/sys:ro   --volume=/var/lib/docker/:/var/lib/docker:ro   --volume=/dev/disk/:/dev/disk:ro   --publish=$mynodeip:9101:8080   --detach=true   --name=promcadvisor   --privileged   --device=/dev/kmsg   gcr.io/cadvisor/cadvisor
 
-enslave_eth10_to_bond0
-
-/TopStor/registerports.sh $myclusterip
-setsid nohup /pace/fapilooper.sh >/dev/null 2>&1 </dev/null &
