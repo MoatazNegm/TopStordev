@@ -3105,3 +3105,36 @@ both nodes after 20 s.
 
 **Not covered:** physical hardware; users **with** a home (needs a pool and a volume); groups; user deletion and password change across a fail over; the bulk upload
 file itself; more than two real nodes. The API answer still echoes the request (including `Password`), as before.
+
+### 25.3 Take-over time again: web server and API before monitoring, and the API's imports — 2026-10-07, branch `QSD5.225`
+
+Instrument: `timing2.sh` (session scratchpad `fo/`) — the leader is removed with `docker kill`, a sampler on the host polls ping / port 2379 / UI / API every
+~0.2 s, and afterwards the new leader's own timestamps are read (mtime of `/root/heartproblem` and `/root/leaderlost`, `StartedAt` of the containers, and
+`/TopStordata/fapistart.log`). Nothing on the nodes is changed for the measurement; the standby sat idle ≥ 2 minutes before each kill. Seconds after the leader died:
+
+| Event | `QSD5.224` | `QSD5.225` (3 runs) | What it is |
+|---|---|---|---|
+| leader declared lost | 7.1 | 7.5 – 8.0 | `heartbeat.py`: two probe rounds (`nmap` on port 2379 ≈ 1.5 s, `ping -w 1`, 1 s pause), by design |
+| cluster ip answers ping | 10.0 | 8.7 – 9.9 | `docker_primary.sh`: `nmcli` adds the ip to `cmynode` |
+| etcd open on the cluster ip | 10.3 | 9.6 – 11.2 | etcd container restarted on the cluster ip |
+| `httpd` container started | 14.8 | 11.8 – 14.8 | |
+| UI answers 200 | 16.5 | 13.4 – 16.4 | |
+| `flask` container started | 16.8 | 13.9 – 16.8 | |
+| API answers 200 | **32.5** | **20.2 – 25.1** | |
+| grafana / prometheus started | 36 / 34 | 23 – 29 / 21 – 27 | `promserver.sh`, in the background once the API answers |
+
+What changed in `QSD5.225` (shared code, both flavours):
+1. **`docker_primary.sh`: no monitoring container in the take-over path.** grafana was recreated there *before* `httpd` and `flask` (≈ 6 s between etcd and httpd),
+   from `/ToStor/promgrafhosts` (a path that does not exist), and was thrown away a moment later by `promserver.sh`, which `leaderlost.sh` runs in the background
+   once the API answers and which recreates prometheus and grafana properly. Order now: cluster ip → etcd → `httpd` → `flask`; monitoring after the API.
+   (Putting grafana merely *after* flask made its container creation compete with the API start, so it was removed from this script.)
+2. **`fastselect.py`: `import pandas` (never used) removed, `import numpy` moved into the one function that needs it.** `fapi.py` imports that module through
+   `getallraids`, so every API start loaded pandas + numpy: 9.6 s for `import fapi` in a fresh `flask` container on a quiet node, **13.7 – 14 s** on the node that
+   was taking over (`fapistart.log`: `main` reached 14 s after the process started, the rest of the start-up 0.1 s). Now `import fapi` takes **1.2 s** there and
+   0.1 s during a take over; the first disk selection for a new pool pays the numpy import once.
+3. `fapi.py` writes `/TopStordata/fapistart.log` at every start (interpreter start time, then seconds until imports done / etcd read / `initallphy` / `getalltime`).
+
+Where the remaining ≈ 20 – 25 s go: ≈ 8 s detection (a choice: fewer probe rounds = faster, but a lost packet could start a take over); ≈ 2 s ip + etcd;
+≈ 4 – 6 s until `httpd` and `flask` containers run; then **≈ 6 s between `docker exec flask /TopStor/fapi.py` and the Python interpreter starting inside the new
+container** (measured: exec issued at +12.5…13.5 s, interpreter started at +19.5 s, serving 0.3 s later). That last part and the container starts are the nested
+dockerd of the container flavour (`vfs` storage driver, load 4 – 6 on the host while the loopers are restarted); a physical node should be quicker, not measured.
