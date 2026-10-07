@@ -10,13 +10,6 @@ def send(*bargs):
   args=bargs[0].split()
  else:
   args=bargs
- with open('/pacedata/perfmon') as f:
-  if '1' in f.readline():
-   perfmon = 1
-  else:
-   perfmon = 0
- if perfmon:
-   queuethis('VolumeChangeHome.py','broadcast',bargs[-1])
  pool=args[0]
  pool=str(pool)
  z=[]

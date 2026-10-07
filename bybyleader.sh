@@ -73,7 +73,6 @@ docker run -itd --rm --name flask --hostname apisrv -v /etc/localtime:/etc/local
 #/pace/zfsping.py $leaderip $myhost & disown
 #/pace/rebootmeplslooper.sh $leaderip $myhost & disown 
 echo hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
-/TopStor/ioperf.py $leaderip $myhost
 isbybyleader=`/TopStor/etcdget.py bybyleader --prefix`
 echo 'hihi'$isbybyleader | grep 'dhcp'
 if [ $? -eq 0 ];

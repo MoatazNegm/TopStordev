@@ -24,19 +24,6 @@ def cpuperf(leaderip):
  return perfslst
 
 
-def dskperf(leaderip):
- perfs = get(leaderip,'dskperf','--prefix')
- perfslst = []
- for perf in perfs:
-  host = perf[0].split('/')[1]
-  diskname = perf[0].split('/')[2]
-  dsk = perf[1].split('/')
-  perfdict = { 'host':host, 'diskname':diskname, 'disklun':dsk[-1], 'tps':dsk[0], 
-               'thr':dsk[1], 'readpercent':dsk[2]
-             }
-  perfslst.append(perfdict)
- return perfslst
-
 def statsvol(leaderip, voldict, limit=3):
  global vollisting
  statsdict = dict()
@@ -90,8 +77,6 @@ if __name__=='__main__':
  allinfo = getall(leaderip, alldsks)
  vols = volumes(allinfo['volumes'])
  #statsvol(vols)
- res = dskperf(leaderip)
- print('dskperf',res)
  res = cpuperf(leaderip)
  print('cpuprf',res)
  res = allvolstats(leaderip, allinfo)

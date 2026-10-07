@@ -2,11 +2,6 @@
 echo $@ >/root/volchangenfs
 cd /TopStor
 export ETCDCTL_API=3
-perfmon=`cat /pacedata/perfmon`
-echo $perfmon | grep 1
-if [ $? -eq 0 ]; then
- docker exec etcdclient /TopStor/logqueue.py VolumeChangeNFS start system 
-fi
 echo hhhhhhhhhhhhhhhhhhhhhhhhhh
 myhost=`hostname -s`
 leaderip=`echo $@ | awk '{print $1}'`;
@@ -53,7 +48,3 @@ then
  docker exec etcdclient /TopStor/logmsg.py VolCsu01 info $userreq $name
 fi;
  /pace/putzpool.py &
-echo $perfmon | grep 1
-if [ $? -eq 0 ]; then
- docker exec etcdclient /TopStor/logqueue.py VolumeChangeNFS finish system 
-fi

@@ -19,14 +19,13 @@ from etcdput import etcdput as put
 from sendhost import sendhost
 from socket import gethostname as hostname
 from getlogs import getlogs, onedaylog
-from fapistats import allvolstats, dskperf, cpuperf
+from fapistats import allvolstats, cpuperf
 from datetime import datetime
 from getallraids import newraids
 from fastselect import selectdisks
 from raid10 import selectraid10
 from raid5060 import selectraid50, selectraid60
 from secrets import token_hex
-from ioperf import ioperf
 from time import time as timestamp
 import logmsg
 from collectNodeConfig import getConfig, downloadConfig
@@ -917,12 +916,6 @@ def volpoolsinfo(data):
       return {'response': 'baduser'}
  allpools = getpools()
  return jsonify({'results':allpools})
-
-@app.route('/api/v1/stats/dskperf', methods=['GET','POST'])
-def dskperfs():
- #ioperf(leaderip,myhost)
- global leaderip
- return jsonify({'dsk':dskperf(leaderip), 'cpu':cpuperf(leaderip)})
 
 
 @app.route('/api/v1/volumes/snapshots/snapshotsinfo', methods=['GET','POST'])

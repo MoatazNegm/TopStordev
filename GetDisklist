@@ -10,10 +10,6 @@ def linewords(theline,lword):
  lwordx=[c+" 0 "+h[h.index(c)+1] for c in h if lword in c]
  return lwordx[0]
 
-with open('/pacedata/perfmon','r') as f:
- perfmon = f.readline()
-if '1' in perfmon:
- queuethis('GetDisklist','running','web')
 iscsimapping=open("/pacedata/iscsimapping")
 runningpools=open("/pacedata/pools/runningpools")
 linepool=runningpools.read().splitlines()
@@ -109,5 +105,3 @@ fdisklist2.close()
 iscsimapping.close()
 runningpools.close()
 #print(sorted(disklist,key=itemgetter("id")))
-if '1' in perfmon:
- queuethis('GetDisklist','stop','web')

@@ -5,10 +5,6 @@ web='/var/www/html/des20/Data/Hostprop.txt';
 Topweb='/TopStordata/Hostprop.txt';
 echo hither > /root/Hostgetips
 user=`echo $@ | awk '{print $1}'`
-perfmon=`cat /pacedata/perfmon`
- if [[ $perfmon -eq 1 ]]; then
-  /TopStor/logqueue.py HostgetIPs running $user
- fi
 hostname=`hostname`
 myhost=`hostname`
 hostn=`/TopStor/etcdget.py alias/$hostname`
@@ -73,6 +69,3 @@ fi
 ETCDCTL_API=3 /pace/etcdput.py prop/$hostname $jsonips
 echo $jsonips > $web; 
 echo $jsonips > $Topweb; 
- if [[ $perfmon -eq 1 ]]; then
-  /TopStor/logqueue.py HostgetIPs stop $user
- fi

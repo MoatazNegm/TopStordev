@@ -697,8 +697,6 @@ docker rm -f httpd 2>/dev/null
 docker rm -f flask 2>/dev/null
 docker rm -f react-dev-ui 2>/dev/null
 rm -rf $httpdf
-/TopStor/ioperf.py $etcd $myhost >/dev/null 2>&1 & disown
-echo /TopStor/ioperf.py $etcd $myhost 
 echo docker exec etcdclient /TopStor/etcdput.py $myclusterip ready/$myhost $mynodeip 
 /TopStor/etcdput.py $myclusterip ready/$myhost $mynodeip 
 echo InitiatorName=iqn.1994-05.com.redhat:$myhost > /etc/iscsi/initiatorname.iscsi
@@ -815,8 +813,6 @@ then
 	[ -s /root/topstorwebetc/TopStor.crt ] || cp -p /TopStor/topstorwebetc/TopStor.crt /TopStor/topstorwebetc/TopStor.key /root/topstorwebetc/
 	echo running httpd
 	docker run --rm --name httpd --hostname shttpd --net intdns-net -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $myclusterip:19999:19999 -p $myclusterip:81:81 -p 443:443 -v $shttpdf:/usr/local/apache2/conf/httpd.conf -v /root/topstorwebetc:/usr/local/apache2/topstorwebetc -v /topstorweb:/usr/local/apache2/htdocs/ -itd moataznegm/quickstor:git
-	# many scripts read this switch (performance logging); it must exist, '0' = off
-	[ -f /pacedata/perfmon ] || { mkdir -p /pacedata; echo 0 > /pacedata/perfmon; }
 	docker run -itd --rm --name flask --hostname apisrv -v /etc/localtime:/etc/localtime:ro -v /pace/:/pace -v /pacedata/:/pacedata/ -v /root/gitrepo/resolv.conf:/etc/resolv.conf --net intdns-net -p $myclusterip:5001:5001 -v /TopStor/:/TopStor -v /TopStordata/:/TopStordata moataznegm/quickstor:flask3
 	/TopStor/promserver.sh $myclusterip
 fi

@@ -54,7 +54,3 @@ then
  fi
  rm -rf /$DG/exports.$volname
 fi
-echo $perfmon | grep 1
-if [ $? -eq 0 ]; then
- docker exec etcdclient /TopStor/logqueue.py VolumeDeleteNFS stop system 
-fi

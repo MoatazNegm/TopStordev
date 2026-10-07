@@ -3,11 +3,6 @@ export ETCDCTL_API=3
 cd /TopStor/
 echo $@ > /root/volchange
 leaderip=` ./etcdgetlocal.py leaderip `
-perfmon=`cat /pacedata/perfmon`
-echo $perfmon | grep 1
-if [ $? -eq 0 ]; then
- /TopStor/logqueue.py VolumeChangeCIFS start system 
-fi
 name=`echo $@ | awk '{print $2}'`;
 pDG=`echo $@ | awk '{print $1}'`;
 quota=`echo $@ | awk '{print $3}'`;
@@ -76,8 +71,4 @@ then
  /pace/putzpool.py 
  /TopStor/logmsg.py VolCsu01 info $userreq $name
  echo ready ;
-fi
-echo $perfmon | grep 1
-if [ $? -eq 0 ]; then
- /TopStor/logqueue.py VolumeChangeCIFS stop system 
 fi

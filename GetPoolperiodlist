@@ -5,11 +5,6 @@ websnaps='/var/www/html/des20/Data/periodlist.txt';
 resweb='/var/www/html/des20/Data/periodlist.txtupdated';
 list=`/usr/bin/crontab -l | grep -w Snapshotnowhost | awk -F"nowhost" '{print $2}' 2>/dev/null`;
 result='[';
-perfmon=`cat /pacedata/perfmon`
-echo $perfmon | grep 1
-if [ $? -eq 0 ]; then
- /TopStor/logqueue.py GetPoolperiodlist start system 
-fi
 echo $list | while read -r line;
 do
  father2=`echo $line | awk '{print $1}' | awk -F/ '{print $2}' `;
@@ -30,7 +25,3 @@ echo $result > $websnaps ;
 resdate=`date +%s`;
 res=`./jsonthis3.sh updated $resdate`;
 echo $res > $resweb;
-echo $perfmon | grep 1
-if [ $? -eq 0 ]; then
- /TopStor/logqueue.py GetPoolperiodlist stop system
-fi

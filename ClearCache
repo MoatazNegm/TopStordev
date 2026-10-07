@@ -1,14 +1,5 @@
 #!/bin/sh
 export ETCDCTL_API=3
-perfmon=`cat /pacedata/perfmon`
-echo $perfmon | grep 1
-if [ $? -eq 0 ]; then
- /TopStor/logqueue.py ClearCache start system 
-fi
 echo here $@ > /root/clearcach
 #rm -rf /TopStordata/p$@
 rm -rf $@
-echo $perfmon | grep 1
-if [ $? -eq 0 ]; then
- /TopStor/logqueue.py ClearCache stop system 
-fi

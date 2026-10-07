@@ -9,13 +9,6 @@ import logmsg
 
 
 def setall(*bargs):
- try:
-  with open('/pacedata/perfmon','r') as f:
-   perfmon = f.readline()
- except FileNotFoundError:
-  perfmon = '0'
- if '1' in perfmon:
-  queuethis('Evacuate','running','system')
  myhost = bargs[1] 
  leaderip = bargs[0] 
  initqueue(leaderip, myhost)
@@ -34,8 +27,6 @@ def setall(*bargs):
  result=subprocess.run(cmdline,stdout=subprocess.PIPE)
  deli(leaderip, "",hostn)
  logmsg.sendlog('Evacuaesu01','info',userreq ,hostn)
- if '1' in perfmon:
-  queuethis('Evacuate','stop','system')
  return
 
 if __name__=='__main__':

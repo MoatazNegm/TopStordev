@@ -9,7 +9,6 @@ from os.path import getmtime
 
 def putzpool():
  global leader, leaderip, myhost, myip
- perfmon = '0'
  sitechange=0
  replacingroup = ''
  replaceflag = 0
@@ -303,8 +302,6 @@ def putzpool():
    dels(leaderip, y[0])
  for y in xnew:
   put(leaderip, y[0],y[1])
- if '1' in perfmon: 
-  queuethis('putzpool.py','stop','system')
  if silveringflag == 'yes':
   put(leaderip,'nodedirty/'+myhost, 'yes')
  else:

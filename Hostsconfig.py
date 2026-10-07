@@ -5,10 +5,6 @@ from etcdget import etcdget as get2
 from ast import literal_eval as mtuple
 
 def getall(*bargs):
- #with open('/pacedata/perfmon') as f:
- # perfmon=f.read()
- #if perfmon:
- # queuethis('HostManualconfig.py','running')
  with open('/root/tmp','w') as f:
    f.write('bargs'+str(bargs)+'\n')
  leader = get('leader')[0]

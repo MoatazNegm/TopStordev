@@ -182,7 +182,7 @@ chrony              (chronyc, chronyd)        # NTP
 git, gcc, make
 nodejs (16.x from appstream), npm (8.x from appstream), yarn (1.22 via npm -g)
 
-# Diagnostics / monitoring (used by ioperf.py + helpers)
+# Diagnostics / monitoring (used by ioperf.py (removed in QSD5.228, §28) + helpers)
 sysstat             (iostat)
 lsscsi              (lsscsi)
 jq                  (JSON parsing in many shell helpers)
@@ -358,7 +358,7 @@ Entry point: **`/TopStor/docker_setup.sh`** (630 lines, sh)
 │   ├── /pace/diskref.sh                   # addtargetdisks.sh + iscsirefresh.sh
 │   │   ├── /pace/addtargetdisks.sh
 │   │   └── /pace/iscsirefresh.sh
-│   ├── /TopStor/ioperf.py <etcdip> <myhost>    # I/O perf sample, push to etcd
+│   ├── /TopStor/ioperf.py (removed in QSD5.228, §28) <etcdip> <myhost>    # I/O perf sample, push to etcd
 │   │   └── (uses) iostat, lsscsi, etcdput
 │   └── /TopStor/etcdput.py ... ready/refreshdisown/etc.
 │
@@ -373,7 +373,7 @@ Entry point: **`/TopStor/docker_setup.sh`** (630 lines, sh)
 │   │   └── docker exec flask /TopStor/fapi.py
 │   │       ├── (imports) fapistats, Hostconfig, flask, etcdgetpy, etcdput,
 │   │       │              getallraids, getlogs, getversions, fastselect,
-│   │       │              raid10, raid5060, ioperf, sendhost, Hostsconfig
+│   │       │              raid10, raid5060, ioperf (removed in QSD5.228), sendhost, Hostsconfig
 │   │       └── (uses) etcdget/etcdput/etcddel via HTTP to etcd
 │   ├── /TopStor/refreshdisown.sh          # master loop that supervises all other loopers
 │   │   └── (kills+respawns) zfsping, receivereplylooper, syncrequestlooper,
@@ -432,7 +432,7 @@ Entry point: **`/TopStor/docker_setup.sh`** (630 lines, sh)
 | `/TopStor/Quickstor.sh` | **supervisor (bash)** (`while true`) | Run manually (NOT started by docker_setup.sh) | Polls `service TopStor status` and `service QuickStor2 status`; restarts if not running. Shebang `#!/bin/bash` (was `#!/usr/local/bin/zsh`; zsh is not installed, legacy zsh shebangs run through the `/usr/local/bin/zsh` → `/bin/bash` shim). | process state |
 | `/TopStor/Quickstor2.sh` | **supervisor (bash)** (`while true`) | Run manually | Companion to `Quickstor.sh` for the `QuickStor2` systemd service. Same `#!/bin/bash` shebang. | process state |
 | `/TopStor/getcversion.sh` | **Looper** (one-shot then exits) | Started by docker_setup.sh | Record this node's git version to etcd | etcd `cversion/<host>` |
-| `/TopStor/ioperf.py` | **Looper** (one-shot) | Started by docker_setup.sh | iostat sample → etcd | etcd `dskperf/<host>/<disk>` |
+| `/TopStor/ioperf.py (removed in QSD5.228, §28)` | **Looper** (one-shot) | Started by docker_setup.sh | iostat sample → etcd | etcd `dskperf/<host>/<disk>` |
 | `/TopStor/diskref.sh` | **Looper** (one-shot) | Called by docker_setup.sh + `/pace/diskref.sh` | Re-add target disks, refresh iSCSI | etcd mutations |
 | `/TopStor/myrepopush.sh` | **Per-demand** (operator runs with branch arg) | Operator | Push to leader's HTTP git | `git push` |
 | `/TopStor/myrepopull.sh` | **Per-demand** | docker_setup.sh / systempull.sh | Pull from leader | `git fetch` |
@@ -502,7 +502,7 @@ Entry point: **`/TopStor/docker_setup.sh`** (630 lines, sh)
 - **`/TopStor/setipports.sh <clusterip> <leader> <myhost> sync`** — push IP/port map
   - **Input**: 4 positional args
   - **Output**: writes to etcd key `etherports/<host>/<iface>`; sets `sync/etherports/<host>/request`
-- **`/TopStor/ioperf.py <etcdip> <myhost>`** — sample I/O, push to etcd
+- **`/TopStor/ioperf.py (removed in QSD5.228, §28) <etcdip> <myhost>`** — sample I/O, push to etcd
   - **Input**: etcd IP, hostname
   - **Output**: writes etcd `dskperf/<host>/<disk>` = `<tps>/<throuput>/<read%>/<lun>`
   - **Tools used**: `iostat -k`, `lsscsi`, `etcdput`
@@ -576,8 +576,8 @@ Keys visible to the controller (and to `fapi.py`):
 | `vol/<vol>` | TopStor CGI scripts (CIFSshares.txt etc.) | checksyncs, refreshdisown |
 | `pool/<pool>` | poolcreate scripts | checksyncs |
 | `alias/<host>` | docker_setup.sh (init) | checksyncs |
-| `dskperf/<host>/<disk>` | ioperf.py | dashboard |
-| `cpuperf/<host>` | ioperf.py | dashboard |
+| `dskperf/<host>/<disk>` | ioperf.py (removed in QSD5.228, §28) | dashboard |
+| `cpuperf/<host>` | `pace/getload.py` (from `zfsping.py`) | dashboard |
 | `dnsname/<host>` | (manually or DNS auto) | docker_setup.sh (DNS line 622) |
 | `usershash/<user>` | UnixsetUser.py | promserver.sh |
 | `sizevol/<pool>/<vol>` | (TopStor shell scripts) | fapistats.py |
@@ -905,7 +905,7 @@ line 622 sets `nmcli conn modify cmynode ipv4.dns $mydns` from it.
 ├── resetdocker.sh           Stop everything
 ├── setipports.sh            Push IP/port map to etcd
 ├── refreshdisown.sh         LOOPER — supervises all other loopers
-├── ioperf.py                Sample I/O, push to etcd
+├── ioperf.py (removed in QSD5.228, §28)                Sample I/O, push to etcd
 ├── getcversion.sh           Push git version to etcd
 ├── promserver.sh            Start prometheus + grafana
 ├── registerports.sh         Push ports to etcd
@@ -1071,8 +1071,8 @@ container reproducible.
 | Linux pkg | `bind-utils` (for `nslookup`/`dig`/`host`) | not direct in docker_setup.sh but used by TopStor shell helpers | `dnf install -y bind-utils` |
 | Linux pkg | `chrony` | not direct in docker_setup.sh but used by TopStor NTP loopers | `dnf install -y chrony` |
 | Linux pkg | `nmap` (for `python-nmap`) | not direct but used by TopStor discovery | `dnf install -y nmap` |
-| Linux pkg | `sysstat` (for `iostat`) | `/TopStor/ioperf.py` line 12 | `dnf install -y sysstat` |
-| Linux pkg | `lsscsi` | `/TopStor/ioperf.py` line 31 | `dnf install -y lsscsi` |
+| Linux pkg | `sysstat` (for `iostat`) | `/TopStor/ioperf.py (removed in QSD5.228, §28)` line 12 | `dnf install -y sysstat` |
+| Linux pkg | `lsscsi` | `/TopStor/ioperf.py (removed in QSD5.228, §28)` line 31 | `dnf install -y lsscsi` |
 | Linux pkg | `jq` | not direct in docker_setup.sh but used by many TopStor JSON shell helpers | `dnf install -y jq` |
 | Linux pkg | `nodejs`, `npm` | Stage 9 line 614 (`docker run … npm run build`); the build also needs node in-container | `dnf install -y nodejs npm` |
 | Linux pkg | `yarn` | (build tooling, not strictly required by docker_setup.sh) | `npm install -g yarn` |
@@ -1208,7 +1208,7 @@ modules (`Evacuate`, `Joincluster`, `getversions`, `Hostsconfig`,
 `Hostconfig`, `allphysicalinfo`, `UnixChkUser`, `etcdget2`,
 `etcdgetlocalpy`, `etcddellocal`, `etcdput`, `sendhost`, `getlogs`,
 `fapistats`, `getallraids`, `fastselect`, `raid10`, `raid5060`,
-`ioperf`, `logmsg`, `collectNodeConfig`, `broadcast`, `broadcasttolocal`,
+`ioperf (removed in QSD5.228)`, `logmsg`, `collectNodeConfig`, `broadcast`, `broadcasttolocal`,
 `logqueue`, `UpdateNameSpace`, `Evacuatebyleader`, `Evacuatelocal`,
 `PartnerAdd`, `PartnerDel`, `cachedisks`, `actionOnDisk`, `Priv`,
 `actionreply`, `topstorrecvreply`, `checkleader`, `getload`, `poolall`,
@@ -1388,8 +1388,8 @@ After both corrections, only **24** packages are in the hot path:
 | `bind-utils` | `nslookup`, `dig`, `host` | `getdiscovery.sh` line 30 (`nslookup`) |
 | `chrony` | `chronyc`, `chronyd` | `iscsiwatchdog.sh` line 47 (`chronyc tracking`), `chronyc makestep` |
 | `nmap` | `nmap` | `heartbeat.py` line 65, 132 (`nmap --max-rtt-timeout 500ms -n -p ...`), `zfsping.py` |
-| `sysstat` | `iostat` | `ioperf.py` line 12 |
-| `lsscsi` | `lsscsi` | `ioperf.py` line 31, `putzpool.py`, `zfsping.py`, `VolumeCheck.py`, `addtargetdisks.sh`, `disklost.sh`, `diskchange.sh`, `iscsiwatchdog.sh` line 61 |
+| `sysstat` | `iostat` | `ioperf.py (removed in QSD5.228, §28)` line 12 |
+| `lsscsi` | `lsscsi` | `ioperf.py (removed in QSD5.228, §28)` line 31, `putzpool.py`, `zfsping.py`, `VolumeCheck.py`, `addtargetdisks.sh`, `disklost.sh`, `diskchange.sh`, `iscsiwatchdog.sh` line 61 |
 | `jq` | `jq` | not directly by name but `/TopStor/json*.sh` and many shell helpers |
 | `policycoreutils` | `setenforce` | `docker_setup.sh` line 163 |
 | `kmod` | `modprobe` | `docker_setup.sh` lines 27-28 |
@@ -1774,7 +1774,7 @@ real gaps — they're runtime-generated by the scripts themselves:
   `VolumeActivateNFS`/`VolumeActivateCIFS` via `nfs.sh`/`cifs.sh`
 - `/TopStordata/bondconfig` — created on first run by `syncbonds.sh`
   (which explicitly handles "no current config found")
-- `/TopStordata/dskperfmon.txt`, `cpuperfmon.txt` — written by ioperf.py
+- `/TopStordata/dskperfmon.txt`, `cpuperfmon.txt` — written by ioperf.py (removed in QSD5.228, §28)
 - `/TopStordata/discovery.sh` — written by `getdiscovery.sh`
 - `/TopStordata/initstamp` — written by `iscsiwatchdog.sh`
 - `/TopStordata/httpd.conf` — bind-mounted from `/TopStor/httpd.conf`
@@ -2786,7 +2786,7 @@ wait for `etcdget.py 10.11.11.253 possible --prefix`, then the join call above.
 - LIO is one kernel table for both containers: `Cannot configure StorageObject … already in use` in zfs2's setup log means
   backstores from an earlier hostname are still claimed.
 - **Background loops need their stderr redirected** (`docker_setup.container.sh`, 2026-10-05). The loops it starts
-  (`rebootmeplslooper.sh`, `heartbeatlooper.sh`, `refreshdisown.sh` → `iscsiwatchdog.sh`, `checksyncs.py`, `ioperf.py`,
+  (`rebootmeplslooper.sh`, `heartbeatlooper.sh`, `refreshdisown.sh` → `iscsiwatchdog.sh`, `checksyncs.py`, `ioperf.py (removed in QSD5.228, §28)`,
   `getcversion.sh`) now run with `>/dev/null 2>&1`. With only stdout redirected their stderr was the pipe of the
   `docker exec` session that ran the setup; once that session ended every write to it (each nested `docker exec` prints a
   locale warning) broke, and `rebootmepls.sh` silently ignored `rebootme/<host> = pls…` — a node did not restart after an
@@ -3188,9 +3188,9 @@ so they are exported once, by the node that holds them (7 disks, not 14).
 - **Create:** `POST /api/v1/pools/cachespares` (`cache_disks[]`) puts a disk on the spare cache list; `POST /api/v1/pools/newpool` (`redundancy=raid5`,
   `useable=21.4`, `cache_bool=true`) → `DGsetPool` on the owner (= host of the first selected disk). Seen: `raidz1` of three 10.7 GB disks + one cache device, the 2 GB
   spare **on the owner's node**, pool ONLINE ~10 s after the call.
-- **Bug (both flavours): an automatic import never happened.** `zpooltoimport.py` calls `ioperf()` right before `zpool import`; `ioperf.py` opened `/pacedata/perfmon`,
-  which does not exist on every node → exception, swallowed by the `zfsping.py` looper, on every pass. Fixed: `ioperf.py` (both copies) tolerates the missing file, and
-  `docker_setup*.sh` create it (`0`). With the fix the leader's `poolnxt/<pool>` assignment was followed by the import within ~10 s.
+- **Bug (both flavours): an automatic import never happened.** `zpooltoimport.py` called `ioperf()` right before `zpool import`; `ioperf.py` opened `/pacedata/perfmon`,
+  which does not exist on every node → exception, swallowed by the `zfsping.py` looper, on every pass. With that call out of the way the leader's `poolnxt/<pool>`
+  assignment was followed by the import within ~10 s. `ioperf` and `perfmon` are removed altogether since `QSD5.228` (§28).
 - **Gap (both flavours): the cache was only relocated after a *manual* import** (`DGsetPool import` → `fixcachelocality.py`). `zpooltoimport.py` now runs
   `fixcachelocality.py <leaderip> <pool> <myhost>` after an automatic import (log `/root/fixcachelocality.log`): a cache disk that is not on the new owner is removed and
   the smallest free local disk is added.
@@ -3217,3 +3217,23 @@ so they are exported once, by the node that holds them (7 disks, not 14).
 - **So it cannot happen again** (`QSD5.227`): `docker_setup.container.sh` exports only pools the node owns and whose state is `ONLINE` (never `-a`); `closthost.sh`
   never exports a pool that is not ONLINE with a successful test write and never uses `-f`. **Rule for tests:** never remove a node container while a pool is imported —
   export it first while its disks are alive.
+
+## 28. `perfmon` and the `ioperf` monitor are gone — `QSD5.228` (2026-10-07)
+
+They were the performance monitoring from before prometheus / grafana (`promserver.sh`, `promexport`, `promcadvisor`, grafana on `:4000`). Removed from the active
+code of both flavours:
+- **`perfmon`** — the switch file `/pacedata/perfmon` and everything it gated: the read of the file, the variable, and the guarded `queuethis(...)` /
+  `logqueue.py ... start|stop|running` task entries, in 36 scripts (`TopStor`: `ClearCache`, `Evacuate.py`, `Evacuatebyleader.py`, `GetDisklist`, `GetPoolVollist`,
+  `GetPoolperiodlist`, `GetSnaplist`, `HostManualconfigTZ`, `HostgetIPs`, `Hostsconfig.py`, `Topstor.sh`, `UnixPrepUser`, `VolumeChangeHome.py`, `VolumeChangeISCSI`,
+  `VolumeChangeNFS`, `VolumeDeleteCIFS.py`, `VolumeDeleteNFS_non_container`, `Zpoolclrrun`, `putzpool.py`, both `docker_setup` scripts; `pace`: `Evacuateleader.py`,
+  `addactive.py`, `addknown.py`, `changeop.py`, `croncall.py`, `delzfsvolumetarget`, `diskdata.py`, `leaderlost.sh`, `poolstoimport.py`, `putzpool.py`, `remknown.py`,
+  `selectimport.py`, `selectospare.py`, `selectspare.py`, `zpooltoimport.py`). Unconditional `queuethis` / `logqueue` calls (the task log itself) are untouched.
+- **`ioperf`** — `TopStor/ioperf.py`, `pace/ioperf.py`, `TopStor/localioperf.py` deleted; their callers: both `docker_setup` scripts, `docker_primary.sh`,
+  `bybyleader.sh`, the `*/5` cron line in `initcron.sh`, `zpooltoimport.py`; in the API the route `/api/v1/stats/dskperf` and `fapistats.dskperf()` (the only reader of
+  the `dskperf/<host>/<disk>` keys).
+- **Not removed:** `cpuperf/<host>` (written by `pace/getload.py` from `zfsping.py`, deleted by `heartbeat.py` for a lost host) and `fapistats.cpuperf()`; 12 dead backup
+  files (`*.erase`, `*old.py`, `putzpool.orig`) still contain the old lines; the legacy jQuery page `topstorweb/QuickStor.js` still asks for `/api/v1/stats/dskperf`
+  (its CPU / disk gauges; the React UI does not use it). On nodes that are already set up: the file `/pacedata/perfmon`, `/TopStordata/dskperfmon.txt`, old `dskperf/…`
+  keys in etcd and a `*/5 … ioperf.py performance` line in root's crontab may remain until the node is set up again.
+- **Checked:** `python3 -m py_compile` / `bash -n` / `sh -n` on every changed file; `scripts/flavor-test.sh`. **Not run on a node** (the dev host's ZFS is deadlocked, §27.3).
+  `TopStor/Zpoolclrrun` had a shell syntax error before this change (`x=get('clusternode')`) and still has it.
