@@ -3237,3 +3237,21 @@ code of both flavours:
   keys in etcd and a `*/5 … ioperf.py performance` line in root's crontab may remain until the node is set up again.
 - **Checked:** `python3 -m py_compile` / `bash -n` / `sh -n` on every changed file; `scripts/flavor-test.sh`. **Not run on a node** (the dev host's ZFS is deadlocked, §27.3).
   `TopStor/Zpoolclrrun` had a shell syntax error before this change (`x=get('clusternode')`) and still has it.
+
+### 27.4 Second ZFS deadlock (2026-10-07 11:38) — the product's own `zpool reguid` — fixed in `QSD5.229`; **the host needs another reboot**
+First fresh cycle after the reboot (`cyclep.sh`, QSD5.228): users, disks, pool + cache all passed (30 + 4 + 5 + 14 checks, §27.2), then the pool owner was killed.
+- **What the logs showed.** (1) `closthost.sh` selected the dead host's backstores with `awk '{print $3}'`; in this `targetcli` output the lines have no leading `|`, so
+  column 3 was a row of dots — nothing was deleted, the survivor waited 90 s for disks that could not come back (parse the name with `sed -n 's/.*o- \(loop…-<host>\) .*/\1/p'`; fixed).
+  (2) While it waited, the pool was `SUSPENDED` (its sd devices were deleted by `hostlost.sh` / the dead iSCSI session), and `zpooltoimport.py` — the product's own looper, every
+  few seconds — ran `zpool reguid <pool>` on it. `reguid` waits for a transaction group that can never complete, **in the kernel, holding ZFS's global lock** (state `D`, stack
+  `spa_namespace_enter` / `txg_wait_synced`, not killable). From then on every `zpool` / `zfs` command on the host blocks behind it (30 stuck `zfs get` from `cpoolowner.sh`
+  after 9 minutes, `zpool list` hangs). Same mechanism as the first deadlock (`zpool export -a`): **any command that waits for a txg, on a suspended pool, kills ZFS on the host.**
+- **Fix, so a suspended pool is never touched except to resume it:** `zpooltoimport.py` `poolonline()` — no `zpool reguid` unless `/proc/spl/kstat/zfs/<pool>/state` is `ONLINE`
+  (both flavours; on physical servers a pool is never suspended by a dead *other* node, the guard is harmless there); `cpoolowner.sh` reads / writes zfs properties only of ONLINE pools
+  (a plain `/proc` read decides) and uses `timeout`; `closthost.sh` also treats every already-suspended pool as an orphan (it cannot be asked for its owner), and exports only after the
+  disks are back, `zpool clear` made it ONLINE and a test write worked.
+- **Still true:** the loop disks are exported by the node that holds them; after an owner dies the survivor must remove the dead target + backstores, export the disks under the **same
+  serials** (so the pool's vdev names stay valid), and only then `zpool clear`. Proven by hand on 2026-10-07 (pool ONLINE again in ~10 s, imported by the product on the survivor, cache disk
+  local). The automated chain after the fixes has **not** completed yet.
+- **Test rule added:** a node container is killed *only* by `fo/*` scripts that run on a host whose ZFS answers (`timeout 10 zpool list`); after a kill, never run anything but `zpool status`, `/proc`
+  reads and `closthost.sh` on the suspended pool until its disks are back.
