@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import time as _startclock; _FAPI_T0 = _startclock.time()      # for the start-up log at the bottom: when the interpreter started
 import flask, os, Evacuate, subprocess, Joincluster, sys, re
 from getversions import getversions
 from functools import wraps
@@ -2214,7 +2215,7 @@ if __name__=='__main__':
     # start-up log: one line per step with the seconds since the process started (/TopStordata/fapistart.log,
     # rewritten at every start).  It answers "why did the API take N seconds to come back after a take over".
     import time as _t
-    _t0 = _t.time()
+    _t0 = _FAPI_T0
     def _mark(step):
         try:
             with open('/TopStordata/fapistart.log', 'a') as f:
@@ -2225,7 +2226,7 @@ if __name__=='__main__':
         open('/TopStordata/fapistart.log', 'w').close()
     except Exception:
         pass
-    _mark('fapi.py main reached (imports done)')
+    _mark('imports done (interpreter started at '+_t.strftime('%H:%M:%S', _t.gmtime(_FAPI_T0))+')')
     leaderip = get('leaderip')[0]
     myhost = get('clusternode')[0]
     myhostip = get('clusternodeip')[0]
