@@ -1,4 +1,5 @@
 #!/usr/bin/sh
+[ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
 cd /pace/
 lsscsi=0
 #dmesg -n 1
@@ -58,6 +59,9 @@ do
 	else
 		etcdip=$myhostip
 	fi
+	# container flavour: no udev, so keep the /dev/disk/by-id/scsi-3<wwn> links ourselves, or lsscsi -i prints '-'
+	# as the id of every disk and all of them get the same name (see /pace/cdiskids.sh)
+	is_container 2>/dev/null && /pace/cdiskids.sh
 	lsscsinew=`lsscsi -is | wc -c `
 	cd /pace
 	if [ $lsscsinew -ne $lsscsi ];
