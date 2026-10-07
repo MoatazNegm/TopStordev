@@ -3331,3 +3331,12 @@ Residual cases it does not cover: `cleanlioluns.sh` still ends **all** iSCSI ses
 skip it); a node that is only restarting (portal silent for ~20 s) looks gone to a node that boots at that moment; a pool that suspends for any other reason still blocks `sync`.
 **Branch.** `QSD5.232` = `QSD5.231` + the maintainer's `QSD5.230.5` (merged cleanly in all three repos; it moves `enslave_eth10_to_bond0`, `registerports.sh` and the API looper start earlier in
 `docker_setup.container.sh` and adds its `apply.d` stubs; the merge also brought a committed `__pycache__/checkleader.cpython-39.pyc` into `pace`, removed again by `systempush.sh`).
+
+## 32. Own loop disks for `zfs1`/`zfs2`, allow-list of exportable disks — `QSD5.233` (2026-10-07)
+`zfs1`, `zfs2` and `pzfs` share the host's loop devices, and every node exports **all** disks it sees (`caddtargetdisks.sh`), so two clusters exported
+the same `loop1,2,3,7` (backstores `loopN-<host>` of both clusters on one disk). Separation:
+- `manage.sh` gives `zfs1`/`zfs2` their own host loops **`loop4,5,6` (10 GB, `disk4..6.img`) + `loop8` (2 GB cache, `disk-cache2.img`)**; `loop1,2,3,7` stay with `pzfs`.
+  (`loop10` and up are not usable: `loop10-<host>` exceeds the 16-character SCSI product id, see `setproduct`.)
+- `pace/caddtargetdisks.sh`, container flavour only: if `/root/loopdisks` exists and is not empty, only the disks named in it are exported
+  (`manage.sh` writes `loop4 loop5 loop6 loop8` for zfs1/zfs2). No file = every disk as before. A `pzfs` that wants the same fence writes `loop1 loop2 loop3 loop7`.
+- the test helper `kernelclean.sh` now touches only `loop4,5,6,8` and only targets that export them.

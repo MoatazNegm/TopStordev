@@ -2883,3 +2883,5 @@ stop (exit code of the container 0), `closthost.sh` removed the stopped node's t
    rounds, set the flag to `0` at the end; exact job name. Verified live: refresh finishes, flag `0`, `zfsping` back, one `VolumeChecklooper`.
 The pool take-over timeline of a clean stop with these fixes is measured by the next cycle (`fo/cyclepm.sh`, `MODE=graceful`).
 
+
+## 32. Own loop disks for `zfs1`/`zfs2`, allow-list of exportable disks — `QSD5.233` (2026-10-07)
