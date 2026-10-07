@@ -138,7 +138,14 @@ then
 	hostname $hostname
 	echo $hostname > /etc/hostname
 	resolve_local_host "$hostname"
-	zpool export -a
+	# NOT "zpool export -a": in the container flavour all nodes share one kernel, so -a would export the pools of the
+	# other nodes too -- and on a pool that is suspended (its owner container was removed) the export never returns
+	# and holds ZFS's global lock: after that every zpool/zfs command on the host hangs until it is rebooted
+	# (it happened on 2026-10-07).  Export only pools this node owns and that are healthy.
+	for mypool in `/pace/cpoolowner.sh mine $(hostname) 2>/dev/null`
+	do
+		[ "`cat /proc/spl/kstat/zfs/$mypool/state 2>/dev/null`" = "ONLINE" ] && zpool export $mypool
+	done
 fi
 /usr/bin/targetcli clearconfig confirm=True	
 targetcli saveconfig
