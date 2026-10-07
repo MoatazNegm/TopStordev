@@ -3272,3 +3272,28 @@ node that is stopped *normally* must not leave an imported pool behind, so:
 - **Test (`fo/cyclepm.sh <n>`, `MODE=graceful|kill`):** the full cycle (users, disks, 3-disk RAID5 + auto cache on the owner, stop the owner, pool + cache arrive on the survivor,
   owner returns, stop the other, ...). `graceful` uses `docker stop -t 120`, `kill` uses `docker kill`. A guard runs `timeout 10 zpool list` before every stop and after every
   step and ends the run with the reason if ZFS stops answering. Order planned: `graceful` first, then `kill`.
+
+## 29. Host installer (Rocky 9 → working dev host) — `TopStor/installer.sh`, added 2026-10-07
+
+A resumable, idempotent installer for the container-flavour **host** (generated from this document, `manage.sh`, the Dockerfiles and `scripts/` with the
+`rocky-setup-to-script` skill; kept in the maintainer's `/root/topstor-host-installer/`, copied unchanged to the root of the TopStor repo on his request).
+`installer.sh` is self-contained: a step-tracking library (state in `/var/lib/topstor-host`, log `/var/log/topstor-host.log`, a `topstor-host-resume.service` unit that continues
+after a reboot, one run at a time) followed by 27 steps — preflight (OS, ≥ 120 GB under `/home`, network, branch exists), EPEL / CRB / Docker CE repos, SELinux, `dnf update`
+(reboot if the kernel changed), host packages, Docker CE (never restarted if running), chrony / firewalld / NetworkManager, open ports, kernel modules, **OpenZFS built from source
+for the running kernel**, the parent repo `topstor-cluster` into `/root/topstor`, the three app repos at `APP_BRANCH`, the directories under `/home/topstor`, the bare repos for
+abdopuppet, the proxy workspace, the `zfs2` tree, all images (registry, or `docker save | docker load` from a reference host over ssh), `rc.local` (runs `manage.sh` at boot),
+loop nodes, `manage.sh start`, a wait for the nested images, `docker_setup.sh` in `zfs1`, and the acceptance checks of §21.4 (6 min stability).
+Use: `./installer.sh --dry-run` (changes nothing, lists the steps DONE / TODO, runs only the read-only preflight), `./installer.sh` (re-run any time to resume), `--status`,
+`--reset-step <id>`, `--from-scratch`; settings in `/root/.topstor-host.env` (`APP_BRANCH`, `IMAGE_SOURCE_HOST`, `GITHUB_TOKEN`, `DOCKERHUB_*`, `SELINUX_MODE`, `FIREWALL_MODE`,
+`OPEN_PORTS`, `WITH_ZFS2`, `RUN_DOCKER_SETUP`, ...); secrets come only from the environment or that file, never from the script. The file `steps.sh` and the `README.md` of the
+installer stay with the maintainer (the TopStor repo already has a `README.md`).
+**Status of the script itself:** only syntax, lint, dry-run and stubbed image-fetch tests were done by its author; **not run on a real Rocky host yet** (the dev host is already set up).
+It predates this session's changes: its default `APP_BRANCH` is `QSD5.220` (set it), it still creates the `docker_setup_disabled` dev flag (the auto-run no longer uses it, §21.2), and
+it does not know about the clean-stop hook (§27.5) or the loop-disk helpers (§27.1), which arrive with the repos it clones.
+
+## 30. `zfs1` no longer publishes its UI on the host — 2026-10-07
+At the maintainer's request (another agent develops the front end in a separate repo and container and needs host port **8443**), `manage.sh` creates `zfs1` **without** `-p 8443:443`
+(the SSH port `2222:22` stays). `ZFS1_PUBLISH_UI=yes sh manage.sh ...` brings the mapping back; `zfs2` keeps `8444:443`. The UI is still served inside the container network on the
+cluster ip (`https://10.11.11.250/`, after a configuration `.200`), which the proxy container and the host's bridge reach. A published port is fixed when a container is **created**: `docker start` / `docker restart`
+of an existing `zfs1` keeps the old mapping, so the container must be recreated (the fresh-cycle scripts and `manage.sh recreate` do; the old `zfs1` of 2026-10-07 was removed for that reason).
+Proven with a stubbed `docker run` dry run of `run_zfs` (default: `--name zfs1 -p 2222:22`; with `ZFS1_PUBLISH_UI=yes`: plus `-p 8443:443`); not yet seen on a live recreated container.
