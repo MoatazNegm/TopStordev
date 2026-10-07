@@ -147,7 +147,8 @@ then
 		[ "`cat /proc/spl/kstat/zfs/$mypool/state 2>/dev/null`" = "ONLINE" ] && zpool export $mypool
 	done
 fi
-/usr/bin/targetcli clearconfig confirm=True	
+# only this node's exports and those of nodes that are gone -- NOT clearconfig, which would wipe every running node's disk exports in the shared kernel
+/TopStor/cleanlioscoped.sh
 targetcli saveconfig
 /TopStor/cleanlioluns.sh
 # The entrypoint needs the image-baked bond profiles to autoconnect at the next boot: NM creates bond0
@@ -213,7 +214,7 @@ then
 			echo reset > /root/nodestatus
 			echo no_fromreset > /root/nodeconfigured
 			systemctl start target
-			targetcli clearconfig confirm=True	
+			/TopStor/cleanlioscoped.sh
 			targetcli saveconfig 
 			/TopStor/cleanlioluns.sh
 			/TopStor/resetdocker.sh	
@@ -264,7 +265,7 @@ data1dev=$dbond
 data2dev=$dbond
 setenforce 0
 aliast='alias'
-targetcli clearconfig confirm=true
+/TopStor/cleanlioscoped.sh
 targetcli saveconfig
 /TopStor/cleanlioluns.sh
 #nmcli conn delete clusterstub 

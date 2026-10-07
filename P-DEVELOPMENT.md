@@ -2334,6 +2334,16 @@ for Rocky).
 
 ## 21. Physical-server runbook (branch QSD5.204)
 
+
+### 21.13b UI-development node `pzfs` (added 2026-10-07)
+
+Standalone node for UI work, beside the zfs cluster: `./manage.sh pzfs` (`run_pzfs`, not in `start|stop|status`).
+Same image and paths as zfs1; host state under `/home/topstor/pzfs/linux-env` (own clones of `TopStordev`/`HC`/`TopStorweb`
+from `volumes/puppet-srv`, branch **`QSD5.230`**; `/root` seeded from the image), `/docker-data` =
+`/home/topstor/pzfs-docker-data` (reflink clone of `zfs-nettest-docker-data`). IP `10.11.11.103` on `topstor_gitnet`,
+`ssh -p 2225`, UI `-p 8443:443`. **No `--device` loops**; because `--privileged` still shows the host's `/dev/loop*`
+nodes, `run_pzfs` deletes them inside the container (host untouched; redo after a re-create).
+Caution: it shares the L2 with the zfs cluster, so the `ping 10.11.11.250` test in `docker_setup.sh` sees that cluster's IP.
 ### 21.1 Scope
 
 - Flavour: physical servers. Code: `TopStordev` / `HC` / `TopStorWeb` on branch **QSD5.204**, "the latest app
@@ -2872,3 +2882,4 @@ stop (exit code of the container 0), `closthost.sh` removed the stopped node's t
    copy (2 were running). Rewritten: kill, wait (≤ 10 s) until the job is really gone, start it (re-reading leader / leader ip each time), retry the ones still alive for up to 20
    rounds, set the flag to `0` at the end; exact job name. Verified live: refresh finishes, flag `0`, `zfsping` back, one `VolumeChecklooper`.
 The pool take-over timeline of a clean stop with these fixes is measured by the next cycle (`fo/cyclepm.sh`, `MODE=graceful`).
+

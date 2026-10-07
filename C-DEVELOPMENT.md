@@ -3313,3 +3313,21 @@ stop (exit code of the container 0), `closthost.sh` removed the stopped node's t
    copy (2 were running). Rewritten: kill, wait (≤ 10 s) until the job is really gone, start it (re-reading leader / leader ip each time), retry the ones still alive for up to 20
    rounds, set the flag to `0` at the end; exact job name. Verified live: refresh finishes, flag `0`, `zfsping` back, one `VolumeChecklooper`.
 The pool take-over timeline of a clean stop with these fixes is measured by the next cycle (`fo/cyclepm.sh`, `MODE=graceful`).
+
+## 31. The container setup no longer wipes other nodes' disk exports — `QSD5.232` (2026-10-07)
+**Problem.** The disk exports of LIO (targets, backstores) live in the **shared host kernel**, not in a container. `docker_setup.container.sh` (3 places), `cleanlioluns.sh`,
+`resetdocker.sh` and `pace/removetargetdisks.sh` ran `targetcli clearconfig`, which deletes **every** export on the host — also those of nodes of another cluster that are running
+and have pools on them (second cluster `pzfs` next to `zfs1`/`zfs2`). The disks of such a pool vanish, ZFS suspends it, and a suspended pool makes every `sync` on the host hang
+(`docker stop` / `docker restart` of any container then hangs too; §27.3, §27.4, seen again 2026-10-07).
+**Change (container flavour only; the physical `docker_setup.sh` keeps `clearconfig`, its kernel is its own).** New `TopStor/cleanlioscoped.sh` replaces every `clearconfig` of the container
+path (`resetdocker.sh` and `removetargetdisks.sh` branch on `is_container`). It deletes
+- an iSCSI target `iqn.2016-03.com.<host>:t1` that is **this node's** (the host name is this node's, or a portal ip is an ip of this node), or that is **gone** (no portal ip answers a ping),
+- the block backstores `<device>-<host>` whose host has no surviving target;
+and **keeps** every target whose portal answers (a running node of any cluster) and its backstores. If the node cannot reach its own default gateway the network is not up yet, "no answer"
+proves nothing, and only the node's own objects are removed. `-n` prints instead of deleting; log `/root/lioclean.log`.
+`scripts/lio-scoped-test.sh` runs the logic against a stubbed `targetcli` / `ping` / `ip` (real output format): own target only; own + a running node; a dead node removed while a running
+node and another cluster's node are kept; network not up; the other cluster gone — 5/5 pass. **Not run on a live node** (it would remove the live node's own exports); `bash -n` clean.
+Residual cases it does not cover: `cleanlioluns.sh` still ends **all** iSCSI sessions when this container owns the host's `iscsid` (the guard `iscsid_foreign` makes a second container
+skip it); a node that is only restarting (portal silent for ~20 s) looks gone to a node that boots at that moment; a pool that suspends for any other reason still blocks `sync`.
+**Branch.** `QSD5.232` = `QSD5.231` + the maintainer's `QSD5.230.5` (merged cleanly in all three repos; it moves `enslave_eth10_to_bond0`, `registerports.sh` and the API looper start earlier in
+`docker_setup.container.sh` and adds its `apply.d` stubs; the merge also brought a committed `__pycache__/checkleader.cpython-39.pyc` into `pace`, removed again by `systempush.sh`).

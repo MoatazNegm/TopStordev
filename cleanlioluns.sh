@@ -142,7 +142,8 @@ done
 rm -f /dev/disk/by-id/scsi-sd* 2>/dev/null   # links made by caddtargetdisks.sh
 
 # 5. target side
-targetcli clearconfig confirm=True >/dev/null
+# scoped: only this node's exports and those of nodes that are gone (a clearconfig would take every running node's disks)
+/TopStor/cleanlioscoped.sh >/dev/null
 targetcli saveconfig >/dev/null
 
 echo "--- remaining iSCSI sessions:"

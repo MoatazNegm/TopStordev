@@ -33,7 +33,7 @@ done
 
 is_container 2>/dev/null || systemctl stop docker
 pkill rebootme 
-targetcli clearconfig confirm=True
+if is_container 2>/dev/null; then /TopStor/cleanlioscoped.sh; else targetcli clearconfig confirm=True; fi
 systemctl stop rabbitmq-server
 systemctl stop iscsid 
 systemctl stop target 
