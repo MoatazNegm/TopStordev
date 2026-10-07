@@ -3340,3 +3340,6 @@ the same `loop1,2,3,7` (backstores `loopN-<host>` of both clusters on one disk).
 - `pace/caddtargetdisks.sh`, container flavour only: if `/root/loopdisks` exists and is not empty, only the disks named in it are exported
   (`manage.sh` writes `loop4 loop5 loop6 loop8` for zfs1/zfs2). No file = every disk as before. A `pzfs` that wants the same fence writes `loop1 loop2 loop3 loop7`.
 - the test helper `kernelclean.sh` now touches only `loop4,5,6,8` and only targets that export them.
+**`QSD5.234`: LUN mapping with two clusters in one kernel.** `caddtargetdisks.sh` mapped the LUNs to every target it found in `targetcli ls` (`tpgs`), passing all of them as ONE
+string to `targetcli iscsi/iqn<...>` — with the other cluster's target (`pzfs`) in the shared LIO config that call failed and **no LUN of this node was ever mapped**
+(backstores `loop4..8` stayed `deactivated`, API listed 0 disks). It now takes only its own `iqn.2016-03.com.<myhost>:t1`. (Both flavours; on a physical server there is only the own target.)
