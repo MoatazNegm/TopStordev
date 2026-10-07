@@ -19,6 +19,19 @@ setenforce 0
 #targetcli clearconfig confirm=true
 nmcli conn mod cmynode +ipv4.addresses $myclusterip 
 nmcli conn up cmynode
+# Tell the network that the cluster ip lives here now (gratuitous ARP).  Without it a client that talked to the
+# old leader keeps the cluster ip on the dead node's MAC until its own ARP entry ages (measured: 34-47 s, although
+# this node served the UI and the API after ~19 s).  NetworkManager's own announcement is not enough: it goes out on
+# the connection's device only, and right after "conn up" the bond may still be without its port (in the container
+# flavour bond0 has no carrier at all and the address is answered on eth0).  So: every interface with a connected
+# route to the cluster ip, a few times, in the background.
+announce_clusterip() {
+	for garpdev in `ip -o -4 route show to match $myclusterip 2>/dev/null | grep -v '^default' | sed -n 's/.* dev \([^ ]*\).*/\1/p' | sort -u`
+	do
+		arping -U -c 1 -I $garpdev -s $myclusterip $myclusterip >/dev/null 2>&1
+	done
+}
+( announce_clusterip; sleep 1; announce_clusterip; sleep 2; announce_clusterip; sleep 4; announce_clusterip ) >/dev/null 2>&1 </dev/null &
 myclusterip=$leaderip
 pkill iscsiwatch
 pkill topstorrecvreply
