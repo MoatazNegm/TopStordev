@@ -3167,3 +3167,53 @@ connected route to the cluster ip** (`ip -o -4 route show to match <cluster ip>`
 
 Of the ≈ 20 s that remain: ≈ 7.5 s detection (two probe rounds, by design), ≈ 1 s ip, ≈ 1.5 s etcd, ≈ 4 s to the `httpd` container and the UI, ≈ 1 – 2 s to the
 `flask` container, ≈ 5 s from `docker exec flask /TopStor/fapi.py` to the interpreter starting in the new container (nested dockerd), 0.3 s API start-up.
+
+## 27. Disks in the UI, pool + cache take over — work of 2026-10-07 (branches `QSD5.226`, `QSD5.227`) and the ZFS deadlock on the dev host
+
+### 27.1 Why the LIO loop disks were not shown (container flavour) — fixed in `QSD5.226`
+A container has no udev and its `/dev` is a tmpfs filled once, at container start. Three consequences, all container-only:
+1. `lsscsi -i` printed `-` as the id of every disk (no `/dev/disk/by-id/scsi-3<wwn>` links), so `putzpool.py` named every LIO disk `scsi--`; the API
+   (`/api/v1/pools/dgsinfo`) keys the disks by name and returned **one** bogus disk instead of seven.
+2. The SCSI product id (`<disk>-<host>`, the inventory takes the host from it) is cut by LIO to 15 characters: `loop1-dhcp328043` lost the last digit and the
+   disks belonged to a host that does not exist.
+3. A disk that appears after the container started (another node's LUNs, a re-login) has no `/dev/sdX` node at all.
+Fix: `/pace/cdiskids.sh` (called by `iscsiwatchdog.sh` when `is_container`) keeps what udev would keep — device nodes for `sd*` disks and partitions (`mknod` from
+sysfs), `scsi-3<naa>` and `-partN` links from `/sys/block/sdX/device/wwid`, and removes stale ones; `caddtargetdisks.sh` `setproduct` writes the full 16-character
+product id right after the backstore is created (17 or more cannot fit: more than nine loop disks per node need a shorter device name).
+Proven on a fresh primary: 7 disks, each `scsi-3…`, host = the full name; the pool wizard offers its options again. The loop disks (`loop1-3` data, `loop7` 2 GB cache
+candidate; a privileged container also sees the host's `loop4-6`) are **shared** by both nodes, like one disk shelf: LIO refuses a second export of a device in use,
+so they are exported once, by the node that holds them (7 disks, not 14).
+
+### 27.2 Pool with a cache, and its take over — `QSD5.227`, NOT finished (see 27.3)
+- **Create:** `POST /api/v1/pools/cachespares` (`cache_disks[]`) puts a disk on the spare cache list; `POST /api/v1/pools/newpool` (`redundancy=raid5`,
+  `useable=21.4`, `cache_bool=true`) → `DGsetPool` on the owner (= host of the first selected disk). Seen: `raidz1` of three 10.7 GB disks + one cache device, the 2 GB
+  spare **on the owner's node**, pool ONLINE ~10 s after the call.
+- **Bug (both flavours): an automatic import never happened.** `zpooltoimport.py` calls `ioperf()` right before `zpool import`; `ioperf.py` opened `/pacedata/perfmon`,
+  which does not exist on every node → exception, swallowed by the `zfsping.py` looper, on every pass. Fixed: `ioperf.py` (both copies) tolerates the missing file, and
+  `docker_setup*.sh` create it (`0`). With the fix the leader's `poolnxt/<pool>` assignment was followed by the import within ~10 s.
+- **Gap (both flavours): the cache was only relocated after a *manual* import** (`DGsetPool import` → `fixcachelocality.py`). `zpooltoimport.py` now runs
+  `fixcachelocality.py <leaderip> <pool> <myhost>` after an automatic import (log `/root/fixcachelocality.log`): a cache disk that is not on the new owner is removed and
+  the smallest free local disk is added.
+- **Container emulation of a dead node** (one kernel for all nodes): a real server takes its iSCSI target and its imported pools with it when it dies, a container
+  leaves both in the shared kernel. New, container-only:
+  `caddtargetdisks.sh` `diskserial` — the LIO serial depends on the disk (md5 of the loop's backing file), so a shared disk keeps its SCSI id whichever node exports it;
+  `/pace/cpoolowner.sh` — the owner of a pool is written on it (zfs property `topstor:owner`), `putzpool.py` reports only the pools the node owns, `DGsetPool` /
+  `zpooltoimport.py` set it; `/pace/closthost.sh <lost host>` (from `hostlost.sh`, leader only) — removes the lost host's target and backstores, waits until this node
+  exports and sees the disks again, `zpool clear`, and exports the pool **only if it is ONLINE again and a test write works**; then the normal path (`poolnxt` →
+  `zpooltoimport.py` → cache) is the same as on physical servers.
+  Proven **by hand** on a live pair (owner killed): re-export under the same serials → the pool's disks came back under the same ids in ~10 s → `zpool clear` resumed the
+  suspended pool → clean export → the product imported it on the survivor, API: pool ONLINE on the new owner with raid and cache. **Not yet run as an automated cycle.**
+
+### 27.3 Incident: ZFS deadlocked in the dev host's kernel (2026-10-07 ~09:51) — **the host must be rebooted before any further ZFS / node work**
+- **What happened.** The test harness removed both node containers (`docker rm -f`) while a pool was imported. The pool stayed in the shared kernel with no devices
+  (state `SUSPENDED`). The next fresh `zfs1` ran `zpool export -a` in `docker_setup.container.sh`; `spa_export_common` waits in `txg_wait_synced` (uninterruptible, stack
+  in `/proc/<pid>/task/*/stack`) **holding ZFS's namespace lock**. Every `zpool` / `zfs` command on the host, in any container, now blocks in `spa_namespace_enter`
+  (`zpool list`, `status`, `clear`, `zfs list` — all hang, state `D`, not killable). `zpool clear` is the only way to resume a suspended pool and needs that lock;
+  `zio_resume` is not exported; there is no module parameter for it (ZFS 2.4.4). Killing the process leaves the kernel thread.
+- **State left.** `zfs1` stuck in its setup (cannot pass the export), `zfs2` not created; the LIO targets are deleted, 7 backstores remain; other containers on the host
+  do not use ZFS and are not affected.
+- **After the reboot.** `manage.sh` `ensure_loop_disks` re-attaches the loops; run `fo/kernelclean.sh`-style clean-up *before* any node is created: no pool imported
+  (`ls /proc/spl/kstat/zfs/`), wipe the labels of the test loops (`zpool labelclear -f`, `wipefs -a`), then recreate the nodes.
+- **So it cannot happen again** (`QSD5.227`): `docker_setup.container.sh` exports only pools the node owns and whose state is `ONLINE` (never `-a`); `closthost.sh`
+  never exports a pool that is not ONLINE with a successful test write and never uses `-f`. **Rule for tests:** never remove a node container while a pool is imported —
+  export it first while its disks are alive.

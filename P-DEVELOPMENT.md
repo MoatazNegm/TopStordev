@@ -2817,3 +2817,18 @@ connected route to the cluster ip** (`ip -o -4 route show to match <cluster ip>`
 
 Of the ≈ 20 s that remain: ≈ 7.5 s detection (two probe rounds, by design), ≈ 1 s ip, ≈ 1.5 s etcd, ≈ 4 s to the `httpd` container and the UI, ≈ 1 – 2 s to the
 `flask` container, ≈ 5 s from `docker exec flask /TopStor/fapi.py` to the interpreter starting in the new container (nested dockerd), 0.3 s API start-up.
+
+## 27. Disks in the UI, pool + cache take over — work of 2026-10-07 (branches `QSD5.226`, `QSD5.227`) and the ZFS deadlock on the dev host
+
+
+### 27.2 Pool with a cache, and its take over — `QSD5.227`, NOT finished (see 27.3)
+- **Create:** `POST /api/v1/pools/cachespares` (`cache_disks[]`) puts a disk on the spare cache list; `POST /api/v1/pools/newpool` (`redundancy=raid5`,
+  `useable=21.4`, `cache_bool=true`) → `DGsetPool` on the owner (= host of the first selected disk). Seen: `raidz1` of three 10.7 GB disks + one cache device, the 2 GB
+  spare **on the owner's node**, pool ONLINE ~10 s after the call.
+- **Bug (both flavours): an automatic import never happened.** `zpooltoimport.py` calls `ioperf()` right before `zpool import`; `ioperf.py` opened `/pacedata/perfmon`,
+  which does not exist on every node → exception, swallowed by the `zfsping.py` looper, on every pass. Fixed: `ioperf.py` (both copies) tolerates the missing file, and
+  `docker_setup*.sh` create it (`0`). With the fix the leader's `poolnxt/<pool>` assignment was followed by the import within ~10 s.
+- **Gap (both flavours): the cache was only relocated after a *manual* import** (`DGsetPool import` → `fixcachelocality.py`). `zpooltoimport.py` now runs
+  `fixcachelocality.py <leaderip> <pool> <myhost>` after an automatic import (log `/root/fixcachelocality.log`): a cache disk that is not on the new owner is removed and
+  the smallest free local disk is added.
+
