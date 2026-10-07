@@ -2211,14 +2211,32 @@ myhost=0
 if __name__=='__main__':
     #leader = sys.argv[2]
     #leaderip = sys.argv[1]
+    # start-up log: one line per step with the seconds since the process started (/TopStordata/fapistart.log,
+    # rewritten at every start).  It answers "why did the API take N seconds to come back after a take over".
+    import time as _t
+    _t0 = _t.time()
+    def _mark(step):
+        try:
+            with open('/TopStordata/fapistart.log', 'a') as f:
+                f.write('%s +%.1fs %s\n' % (_t.strftime('%H:%M:%S', _t.gmtime()), _t.time()-_t0, step))
+        except Exception:
+            pass
+    try:
+        open('/TopStordata/fapistart.log', 'w').close()
+    except Exception:
+        pass
+    _mark('fapi.py main reached (imports done)')
     leaderip = get('leaderip')[0]
     myhost = get('clusternode')[0]
     myhostip = get('clusternodeip')[0]
     leader = get('leader')[0]
+    _mark('leaderip, clusternode, clusternodeip, leader read from etcd')
     logmsg.initlog(leaderip,myhost)
     initallphy(leaderip)
+    _mark('logmsg.initlog + initallphy')
     #myhost = sys.argv[2]
     getalltime()
+    _mark('getalltime (disks, pools, volumes) -- starting the web server now')
    #myhostip = sys.argv[5]
     app.run(host="0.0.0.0", port=5001)
 

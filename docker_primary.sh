@@ -60,10 +60,6 @@ done
 
 echo /pace/etcddel.py $leaderip sync/leader/Add_ --prefix
 
- cp /ToStor/promgrafhosts /TopStordata/hosts
- sed -i "s/MYCLUSTER/$leaderip/g" /TopStordata/hosts 
- docker rm -f promgraf
- docker run -d -p $leaderip:4000:3000 -v /TopStordata/promgraf/grafana.ini:/etc/grafana/grafana.ini -v /TopStordata/promgraf:/var/lib/grafana -v /TopStordata/promgraf/hosts:/etc/hosts --name promgraf grafana/grafana
 stamp=`date +%s%N`
 /pace/etcddel.py $leaderip sync/leader/Add_ --prefix
 echo /pace/etcdput.py $leaderip sync/leader/Add_${myhost}_$myhostip/request leader_$stamp
@@ -80,6 +76,12 @@ sed -i "s/MYCLUSTER/$leaderip/g" $shttpdf
 echo running httpd fowrarder as I am not primary
 docker run --rm --name httpd --hostname shttpd --net ${DOCKER_NET:-bridge0} -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $myclusterip:19999:19999 -p $myclusterip:80:80 -p $myclusterip:443:443 -v $shttpdf:/usr/local/apache2/conf/httpd.conf -v /root/topstorwebetc:/usr/local/apache2/topstorwebetc -v /topstorweb:/usr/local/apache2/htdocs/ -itd moataznegm/quickstor:git
 docker run -itd --rm --name flask --hostname apisrv -v /etc/localtime:/etc/localtime:ro -v /pace/:/pace -v /pacedata/:/pacedata/ -v /root/gitrepo/resolv.conf:/etc/resolv.conf --net ${DOCKER_NET:-bridge0} -p $myclusterip:5001:5001 -v /TopStor/:/TopStor -v /TopStordata/:/TopStordata moataznegm/quickstor:flask3
+# The monitoring container comes AFTER the web server and the API: what a client needs first after a take over is
+# the cluster ip, etcd, the UI and the API.  (grafana used to be recreated before httpd and flask and cost them seconds.)
+ cp /ToStor/promgrafhosts /TopStordata/hosts
+ sed -i "s/MYCLUSTER/$leaderip/g" /TopStordata/hosts 
+ docker rm -f promgraf
+ docker run -d -p $leaderip:4000:3000 -v /TopStordata/promgraf/grafana.ini:/etc/grafana/grafana.ini -v /TopStordata/promgraf:/var/lib/grafana -v /TopStordata/promgraf/hosts:/etc/hosts --name promgraf grafana/grafana
 #/TopStor/topstorrecvreply.py $myhostip & disown
 #/pace/iscsiwatchdog.sh $myhostip $myhost >/dev/null 2>/dev/null & disown 
 #/pace/syncrequestlooper.sh $leaderip $myhost & disown
