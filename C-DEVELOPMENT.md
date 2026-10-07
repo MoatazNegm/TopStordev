@@ -3297,3 +3297,19 @@ At the maintainer's request (another agent develops the front end in a separate 
 cluster ip (`https://10.11.11.250/`, after a configuration `.200`), which the proxy container and the host's bridge reach. A published port is fixed when a container is **created**: `docker start` / `docker restart`
 of an existing `zfs1` keeps the old mapping, so the container must be recreated (the fresh-cycle scripts and `manage.sh recreate` do; the old `zfs1` of 2026-10-07 was removed for that reason).
 Proven with a stubbed `docker run` dry run of `run_zfs` (default: `--name zfs1 -p 2222:22`; with `ZFS1_PUBLISH_UI=yes`: plus `-p 8443:443`); not yet seen on a live recreated container.
+
+### 27.6 First graceful-stop run — two product bugs found, `QSD5.231` (both flavours; found 2026-10-07)
+Run: fresh nodes → users, disks, 3-disk RAID5 + auto cache on the owner (all passed) → `docker stop` of the owner. What worked at once: `cstop.sh` exported the pool **0.3 s** after the
+stop (exit code of the container 0), `closthost.sh` removed the stopped node's target and backstores (0 left), the survivor exported the shared loop disks itself (visible after
+23.7 s), the cluster took over in 21 s, **ZFS on the host never stopped answering**. What did not work, and was not caused by the container emulation:
+1. **`zpooltoimport.py`: `if poolnxt in str(nxthost): continue`.** The leader skips a pool whose stored next owner equals the selected one; for an **empty** stored value
+   (`poolnxt/<pool> = ''`) `'' in 'dhcp…'` is always true, so the pool was skipped for ever and never imported (the kill cycles removed the key instead of emptying it, which is
+   why they never met it). Now `if poolnxt == nxthost`. With it: assigned and imported **~20 s** after the fix was deployed; checked on the live pair: pool `ONLINE` on the survivor (API
+   too), 3 RAID disks online, no data errors, one ONLINE cache device whose disk now belongs to the new owner, test dataset intact, pool writable.
+2. **`refreshdisown.sh` — the job that restarts a node's loopers after a take over (`zfsping`, import looper, spare looper ...).** After `kill -9` it counted the processes at once
+   (the kill is asynchronous) and skipped a job that still showed one; the list of jobs left was kept with `grep -v` on a single joined line, which emptied it, so the skipped job was
+   never retried; the flag then stayed above 0 and the inner loop spun for ever (one `docker exec` per turn), so no later refresh request was ever seen. Result seen: **`zfsping` not
+   running on the new leader** (`putzpool` / `spaceopti` loopers gone). Also the job name `volumechecklooper` never matched the process `VolumeChecklooper.sh`: every refresh added one more
+   copy (2 were running). Rewritten: kill, wait (≤ 10 s) until the job is really gone, start it (re-reading leader / leader ip each time), retry the ones still alive for up to 20
+   rounds, set the flag to `0` at the end; exact job name. Verified live: refresh finishes, flag `0`, `zfsping` back, one `VolumeChecklooper`.
+The pool take-over timeline of a clean stop with these fixes is measured by the next cycle (`fo/cyclepm.sh`, `MODE=graceful`).
