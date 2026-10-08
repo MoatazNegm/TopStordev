@@ -3497,3 +3497,6 @@ Every user is a member of the group Everyone (§53), so as the group of a CIFS/N
 
 ## 57. Share pages: units in the column headers, wider layout — `QSD5.260` (2026-10-08)
 Front end only. In the CIFS / NFS / Home lists the sizes are plain numbers and the unit is in the header: **Capacity (GB)**, **Free (GB)**, **Snapshots (GB)** (`fmtNum` in `components/Common/Capacity.jsx`: whole numbers from 100, one decimal from 1, two decimals below 1; tooltips and the Pool Capacity card keep their units). The CIFS and NFS pages use the whole right pane (outer padding `p-3`, card padding `p-4`, was `p-5` / `p-6`), and on all three pages (CIFS, NFS, Home Folders) the *New Volume* card is two thirds of the row and the *Pool Capacity* card one third (`lg:grid-cols-3`, `lg:col-span-2`); the Pool Capacity header keeps the title on one line and shows the totals below it.
+
+## 58. Share pages: no outer margin, square card — `QSD5.261` (2026-10-08)
+Front end only. The container card of the CIFS, NFS and Home Folders pages has no margin around it any more (the `p-3` wrapper is gone, the card touches the edges of the right pane) and a square border (`rounded-none`, was `rounded-xl`). The Home Folders page now sits in the same container card as CIFS and NFS (it had `content-header px-4` and no card).
