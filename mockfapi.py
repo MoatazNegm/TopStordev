@@ -107,6 +107,8 @@ vol('carol', 'pdhcp1002', 'HOME', 1.1, 5.0, groups='carol', ip='10.11.11.53')
 vol('backups', 'pdhcp1002', 'NFS', 33.9, 150.0, groups='10.11.11.0/24', ip='10.11.11.214', dedup='off', ratio='1.18x')
 vol('archive', 'pdhcp1002', 'NFS', 41.0, 300.0, groups='10.11.11.0/24', ip='10.11.11.216', ratio='1.92x')
 vol('scratch', 'pdhcp1003', 'CIFS', 190.0, 0, groups='Engineering', ip='10.11.11.217', comp='off', dedup='off', ratio='1.00x')
+vol('payroll', 'pdhcp1001', 'CIFS_corp.local', 8.4, 40.0, groups='DOMAIN', ip='10.11.11.218')
+VOLS['payroll']['type'] = 'DOMAIN'
 vol('vmstore', 'pdhcp1003', 'ISCSI', 60.0, 60.0, ip='10.11.11.215')
 VOLS['vmstore'].update({'portalport': '3260', 'initiators': 'iqn.1998-01.com.vmware:esx01', 'chapuser': 'vmuser', 'chappas': 'x'})
 
@@ -199,7 +201,7 @@ def route(path, fn):
 def vols_by_prot(prot):
     out = []
     for v in VOLS.values():
-        if prot == 'all' or v['prot'] == prot or (prot == 'all' and v['prot'] in ('CIFS', 'HOME')):
+        if prot == 'all' or v['prot'] == prot or (prot == 'CIFS' and v['prot'].startswith('CIFS_')) or (prot == 'all' and v['prot'] in ('CIFS', 'HOME')):
             c = copy.deepcopy(v)
             gids = [g[1] for g in GROUPS if g[0] in str(v['groups']).split(',')] if prot in ('CIFS', 'NFS') else []
             c['groups'] = gids

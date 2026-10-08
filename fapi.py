@@ -120,6 +120,21 @@ def only_everyone(groups):
         names = [g for g in str(groups).split(',') if g]
         return EVERYONE if EVERYONE in names else groups
 
+# Which volumes may share the IP address a new or changed volume asks for.  is_unique_ip() leaves out the volumes whose etcd
+# key holds this text: a CIFS share may share an address only with the CIFS shares of the same context (the workgroup shares
+# volumes/CIFS/..., the shares of a domain volumes/CIFS_<domain>/...: one share container serves one workgroup or one domain),
+# homes with homes, iSCSI with iSCSI; NFS shares share no address at all.
+def ip_context(kind, domain=''):
+        if kind == 'CIFS':
+                return 'volumes/CIFS/'
+        if kind == 'CIFSdom':
+                return 'volumes/CIFS_'+str(domain)+'/'
+        if kind.startswith('CIFS_'):
+                return 'volumes/'+kind+'/'
+        if 'NFS' in kind:
+                return 'ANYthing'
+        return kind
+
 def has_privilege(priv, user):
         # same rule as /TopStor/privthis.sh: admin and system may do everything, any other user needs the privilege
         if user in ('admin', 'system'):
@@ -1298,10 +1313,7 @@ def volumecreate(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
  datastr = ''
- if 'NFS' in data['type']:
-    datatype='ANYthing'
- else:
-    datatype=data['type']
+ datatype = ip_context(data['type'], data.get('domname',''))
  isvu =  int(is_valid_ip(data['ipaddress']))+int(is_unique_ip(data['ipaddress'],datatype))+int(is_unique_name(data['name']))
  if isvu == 0:
     print('ip is valid')
@@ -1452,10 +1464,7 @@ def volumeconfig(data):
  if 'ipaddress' not in data:
    data['ipaddress'] = volume['ipaddress']
  else:
-    if 'NFS' in volume['prot']:
-        datatype='ANYthing'
-    else:
-        datatype=volume['prot']
+    datatype = ip_context(volume['prot'])
 
     if data['ipaddress'] != volume['ipaddress']:
         isvu =  int(is_valid_ip(data['ipaddress']))+int(is_unique_ip(data['ipaddress'],datatype))
