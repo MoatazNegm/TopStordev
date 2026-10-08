@@ -1354,6 +1354,10 @@ def volumecreate(data):
  print(data)
  print(datastr)
  print('###########################')
+ if 'ISCSI' not in data['type']:
+  # data efficiency of the new volume: both on unless the request says off (the scripts read these two words anywhere on the line)
+  datastr += ' compression='+('off' if str(data.get('compression','on')).lower() in ('off','false','no','0') else 'lz4')
+  datastr += ' dedup='+('off' if str(data.get('dedup','on')).lower() in ('off','false','no','0') else 'on')
  cmndstring = '/TopStor/VolumeCreate'+data['type']+' '+leaderip+' '+datastr
  #z= cmndstring.split(' ')
  #msg={'req': 'Pumpthis', 'reply':z}
@@ -1755,11 +1759,18 @@ def partnerdel(data):
 @login_required
 @audit_command
 def userdel(data):
+ global allinfo
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
  if data['tenant'] == 'Cluster':
     cmndstring = '/TopStor/UnixDelUser '+leaderip+' '+data.get('name')+' '+data['user']
     postchange(cmndstring)
+    # the home folder of the user goes with the user (its dataset is <user>_<id>, protocol HOME)
+    if data.get('name') not in ('admin', 'Everyone', 'NoUser'):
+     getalltime()
+     for volname, vol in list(allinfo['volumes'].items()):
+      if vol.get('prot') == 'HOME' and volname.rsplit('_',1)[0] == data.get('name'):
+       postchange('/TopStor/VolumeDeleteHOME '+leaderip+' '+vol['pool']+' '+volname+' HOME '+data['user'], vol['host'])
  else:
     TenantDelUser(data)
  return data

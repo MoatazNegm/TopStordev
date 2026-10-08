@@ -20,6 +20,11 @@ ipaddr=`echo $@ | awk '{print $6}'`;
 ipsubnet=`echo $@ | awk '{print $7}'`;
 active=`echo $@ | awk '{print $8}'`;
 userreq=` echo $@ | awk '{print $9}'`;
+# compression=<lz4|off> and dedup=<on|off> arrive as key=value words at the end of the command line (default: both on)
+zcomp=`echo "$@" | grep -o 'compression=[a-z0-9]*' | head -1 | cut -d= -f2`
+[ "$zcomp" = "off" ] || zcomp=lz4
+zdedup=`echo "$@" | grep -o 'dedup=[a-z]*' | head -1 | cut -d= -f2`
+[ "$zdedup" = "off" ] || zdedup=on
 DG=$pDG;
 hi=`whoami`
 echo start $hi $userreq > /root/volcreate
@@ -67,7 +72,7 @@ then
  echo afterzfslist info $userreq $DG/$name >> /root/volcreate
  docker exec etcdclient /TopStor/logmsg.py NFS1004 info $userreq $DG/$name
  echo here4 >> /root/volcreate
- /sbin/zfs create -o overlay=on -o acltype=posixacl -o aclinherit=passthrough -o xattr=sa -o redundant_metadata=most -o atime=off -o quota=$quota -o dedup=on -o compression=lz4  $DG/$name  
+ /sbin/zfs create -o overlay=on -o acltype=posixacl -o aclinherit=passthrough -o xattr=sa -o redundant_metadata=most -o atime=off -o quota=$quota -o dedup=$zdedup -o compression=$zcomp  $DG/$name  
  if [ $? -ne 0 ];
  then
   echo here5 

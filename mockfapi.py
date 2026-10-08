@@ -64,7 +64,7 @@ def mkpool(pool, host, raidtype, ndisks, dsize, cache=None, used=0.0):
 
 mkpool('pdhcp1001', 'node1', 'raidz1', 4, 100.0, cache=20.0, used=118.4)
 mkpool('pdhcp1002', 'node2', 'mirror', 2, 200.0, used=64.2)
-mkpool('pdhcp1003', 'node3', 'raidz2', 6, 50.0, cache=10.0, used=71.9)
+mkpool('pdhcp1003', 'node3', 'raidz2', 6, 50.0, cache=10.0, used=282.0)
 # free disks (not part of a pool): the UI offers them for new pools / spares
 RAIDS['free'] = {'name': 'free', 'changeop': 'free', 'status': 'free', 'pool': 'pree', 'host': 'node1', 'disks': [],
                  'silvering': 'no', 'missingdisks': []}
@@ -88,20 +88,25 @@ NEWRAID = {'single': free_by_size,
 VOLS = {}
 
 
-def vol(name, pool, prot, used, quota, groups='Everyone', ip='10.11.11.210', snaps=()):
+def vol(name, pool, prot, used, quota, groups='Everyone', ip='10.11.11.210', snaps=(), comp='lz4', dedup='on', ratio='1.41x'):
     host = POOLS[pool]['host']
     VOLS[name] = {'name': name, 'pool': pool, 'groups': groups, 'ipaddress': ip, 'Subnet': '24', 'prot': prot,
                   'fullname': name + '_' + pool, 'host': host, 'creation': 'Mon Jan 12 2026', 'time': '09:14',
-                  'used': used, 'quota': quota, 'usedbysnapshots': round(used * 0.06, 2), 'refcompressratio': '1.41x',
-                  'available': round(quota - used, 1), 'referenced': used, 'statusmount': 'mounted', 'runtime': 'serviceok',
+                  'used': used, 'quota': quota, 'usedbysnapshots': round(used * 0.06 * 1024, 1), 'refcompressratio': ratio,
+                  'compression': comp, 'dedup': dedup,
+                  'available': round(quota - used, 1) if quota else round(POOLS[pool]['available'], 1), 'referenced': round(used * 1024, 1), 'statusmount': 'mounted', 'runtime': 'serviceok',
                   'type': 'WorkGroup', 'snapshots': list(snaps), 'snapperiod': []}
     POOLS[pool]['volumes'].append(name)
 
 
 vol('finance', 'pdhcp1001', 'CIFS', 41.3, 100.0, groups='Finance', ip='10.11.11.211')
 vol('engineering', 'pdhcp1001', 'CIFS', 52.8, 100.0, groups='Engineering', ip='10.11.11.212', snaps=['daily_0301'])
-vol('homes', 'pdhcp1002', 'HOME', 12.6, 50.0, groups='Everyone', ip='10.11.11.213')
-vol('backups', 'pdhcp1002', 'NFS', 33.9, 150.0, groups='10.11.11.0/24', ip='10.11.11.214')
+vol('alice', 'pdhcp1001', 'HOME', 6.2, 10.0, groups='alice', ip='10.11.11.51')
+vol('bob', 'pdhcp1002', 'HOME', 18.7, 20.0, groups='bob', ip='10.11.11.52', comp='off', dedup='off', ratio='1.00x')
+vol('carol', 'pdhcp1002', 'HOME', 1.1, 5.0, groups='carol', ip='10.11.11.53')
+vol('backups', 'pdhcp1002', 'NFS', 33.9, 150.0, groups='10.11.11.0/24', ip='10.11.11.214', dedup='off', ratio='1.18x')
+vol('archive', 'pdhcp1002', 'NFS', 41.0, 300.0, groups='10.11.11.0/24', ip='10.11.11.216', ratio='1.92x')
+vol('scratch', 'pdhcp1003', 'CIFS', 190.0, 0, groups='Engineering', ip='10.11.11.217', comp='off', dedup='off', ratio='1.00x')
 vol('vmstore', 'pdhcp1003', 'ISCSI', 60.0, 60.0, ip='10.11.11.215')
 VOLS['vmstore'].update({'portalport': '3260', 'initiators': 'iqn.1998-01.com.vmware:esx01', 'chapuser': 'vmuser', 'chappas': 'x'})
 
@@ -235,6 +240,7 @@ NOTIFS = [('info', 'Actsu1000', 'node1', 'system', 'Volumes info are synced.'),
           ('error', 'Lognfa0', 'node1', 'mallory', 'Failed logon for user mallory.'),
           ('warning', 'Volwa3', 'node5', 'system', 'Volume finance_pdhc has used 91 percent of its quota.'),
           ('error', 'DGfa25', 'node2', 'admin', 'Pool pdhcp1002 was not deleted, it still holds volumes.'),
+          ('warning', 'Poolcap90', 'node3', 'system', 'Pool pdhcp1003 is above 90 percent of its real capacity, free space left 18.0G.'),
           ('info', 'Lognsu0', 'node1', 'admin', 'User admin logged in.')]
 # cluster state shown by the sign next to the bell: cycles every 5 minutes (minutes 0-2 in sync, 3 not in sync,
 # 4 single node: only the 'active' list of hosts/allinfo shrinks to one node).  Force one with the file
