@@ -49,7 +49,7 @@ then
   echo No Volumes
   exit
  fi
- echo "${vols[@]}" |  grep "\_1"
+ echo "${vols[@]}" |  grep -E "^[[:space:]]*(\(.?_1.?,?\)?|_1)[[:space:]]*$"   # only the not-found marker _1 by itself; a volume named x_1234 contains "_1" too
  if [ $? -eq 0 ];
  then
   echo No Volumes _1

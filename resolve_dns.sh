@@ -29,9 +29,10 @@ done
 
 tmpresolv=$(mktemp)
 {
-    head -n1 "$orig_resolv"
+    # the cluster's DNS server (the domain controller) must be asked FIRST: the resolver stops at the first answer, and
+    # a first nameserver that does not know the domain (docker's, 10.11.12.7 in the flask container) answers NXDOMAIN
     echo "nameserver $ip"
-    tail -n +2 "$orig_resolv"
+    cat "$orig_resolv"
 } > "$tmpresolv"
 cp "$tmpresolv" /etc/resolv.conf
 rm -f "$tmpresolv"
