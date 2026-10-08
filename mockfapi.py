@@ -111,6 +111,9 @@ vol('payroll', 'pdhcp1001', 'CIFS_corp.local', 8.4, 40.0, groups='DOMAIN', ip='1
 VOLS['payroll']['type'] = 'DOMAIN'
 vol('vmstore', 'pdhcp1003', 'ISCSI', 60.0, 60.0, ip='10.11.11.215')
 VOLS['vmstore'].update({'portalport': '3260', 'initiators': 'iqn.1998-01.com.vmware:esx01', 'chapuser': 'vmuser', 'chappas': 'x'})
+VOLS['vmstore']['referenced'] = 34200.0          # a LUN reserves its whole size; what was written to it is 'referenced' (MB)
+vol('dbstore', 'pdhcp1001', 'ISCSI', 80.0, 80.0, ip='10.11.11.215')
+VOLS['dbstore'].update({'portalport': '3260', 'initiators': 'iqn.1998-01.com.debian:db01,iqn.1998-01.com.debian:db02', 'chapuser': 'dbuser', 'chappas': 'x', 'referenced': 71800.0})
 
 SNAPS = {'daily_0301': {'fullname': 'pdhcp1001/engineering@daily_0301', 'name': 'daily_0301', 'volume': 'engineering',
                         'pool': 'pdhcp1001', 'host': 'node1', 'creation': 'Sun Mar 01 2026', 'time': '02:00', 'used': 1.2,
