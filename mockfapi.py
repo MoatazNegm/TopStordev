@@ -226,10 +226,41 @@ def stats_payload():
     return st
 
 
+# Sample notifications for the toasts: the real API puts the severity into 'type' (info|warning|error) and the user
+# (admin, system, ...) into 'user'.  One sample per 7 s poll, round robin, so every look of the toast is seen.
+NOTIFS = [('info', 'Actsu1000', 'node1', 'system', 'Volumes info are synced.'),
+          ('info', 'Posu0', 'node2', 'admin', 'Pool pdhcp1001 status changed to ONLINE.'),
+          ('warning', 'Diwa1', 'node3', 'system', 'Pool pdhcp1002 is degraded, one disk is missing.'),
+          ('info', 'Disu6', 'node4', 'admin', 'Success attaching Disk sdh to group raidz2-0 in pool pdhcp1003.'),
+          ('error', 'Lognfa0', 'node1', 'mallory', 'Failed logon for user mallory.'),
+          ('warning', 'Volwa3', 'node5', 'system', 'Volume finance_pdhc has used 91 percent of its quota.'),
+          ('error', 'DGfa25', 'node2', 'admin', 'Pool pdhcp1002 was not deleted, it still holds volumes.'),
+          ('info', 'Lognsu0', 'node1', 'admin', 'User admin logged in.')]
+# cluster state shown by the sign next to the bell: cycles every 5 minutes (minutes 0-2 in sync, 3 not in sync,
+# 4 single node: only the 'active' list of hosts/allinfo shrinks to one node).  Force one with the file
+# /TopStordata/mockphase containing: insync | notinsync | single   (no file = the cycle).
+def phase():
+    try:
+        with open('/TopStordata/mockphase') as f:
+            w = f.read().strip()
+        if w in ('insync', 'notinsync', 'single'):
+            return w
+    except OSError:
+        pass
+    m = int(time.time() // 60) % 5
+    return 'notinsync' if m == 3 else 'single' if m == 4 else 'insync'
+
+
 def notification():
-    return {'isinsync': 'yes', 'importance': 'info', 'msgcode': 'Actsu1000', 'date': time.strftime('%m/%d/%Y'),
-            'time': time.strftime('%H:%M:%S'), 'host': 'node1', 'type': 'system', 'user': 'system',
-            'msgbody': 'Volumes info are synced.', 'requests': {}, 'response': 'Ok'}
+    slot = int(time.time() // 7)
+    imp, code, host, user, msg = NOTIFS[slot % len(NOTIFS)]
+    return {'isinsync': 'no' if phase() == 'notinsync' else 'yes', 'importance': imp, 'msgcode': code,
+            'date': time.strftime('%m/%d/%Y'), 'time': time.strftime('%H:%M:%S', time.localtime(slot * 7)), 'host': host, 'type': imp, 'user': user,
+            'msgbody': msg, 'requests': {}, 'response': 'Ok'}
+
+
+def activehosts():
+    return lst([('node1', HOSTS['node1'])] if phase() == 'single' else list(HOSTS.items()) + list(LOST.items()))
 
 
 route('/api/v1/login', lambda: jsonify({'token': 'mocktoken' + str(NOW)}))
@@ -255,9 +286,10 @@ route('/api/v1/software/setversion', echo)
 route('/api/v1/software/apply', lambda: jsonify({'versions': [{'id': 3, 'text': 'QSD5.233'}], 'current': 'QSD5.233', 'response': 'admin'}))
 route('/api/v1/software/update', lambda: jsonify({'data': 'sample: nothing is downloaded'}))
 route('/api/v1/software/localFileUpdate', lambda: jsonify({'data': 'success'}))
-route('/api/v1/hosts/allinfo', lambda: jsonify({'all': hostrows(), 'active': lst(list(HOSTS.items()) + list(LOST.items())),
+route('/api/v1/hosts/allinfo', lambda: jsonify({'all': hostrows(), 'active': activehosts(),
                                                 'ready': lst(HOSTS.items()), 'possible': lst([('node8', '10.11.11.208')]),
                                                 'lost': lst(LOST.items())}))
+route('/api/v1/hosts/syncnow', echo)
 route('/api/v1/hosts/discover', echo)
 route('/api/v1/hosts/config', echo)
 route('/api/v1/hosts/joincluster', echo)

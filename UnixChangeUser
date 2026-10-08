@@ -6,6 +6,16 @@ leaderip=`echo $@ | awk '{print $1}'`;
 username=`echo $@ | awk '{print $2}'`;
 usergroups=`echo $@ | awk  '{print $3}' | sed 's/groups//g' `;
 userreq=`echo $@  | awk '{print $4}'`;
+# every user is always a member of Everyone (the front end does not show or send that group)
+if [[ $username != 'NoUser' ]] && getent group Everyone >/dev/null;
+then
+	if [[ $usergroups == 'NoGroup' || -z $usergroups ]];
+	then
+		usergroups='Everyone'
+	else
+		echo ",$usergroups," | grep -q ',Everyone,' || usergroups=$usergroups',Everyone'
+	fi
+fi
 ischange=`echo $@  | awk '{print $5}'`;
 pullsync=`echo $@  | awk '{print $6}'`;
 stablegrp=""

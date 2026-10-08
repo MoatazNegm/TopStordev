@@ -8,6 +8,11 @@ groupusers=`echo $@ | awk  '{print $3}' | sed 's/users//g'`
 userreq=`echo $@  | awk '{print $4}'`;
 ischange=`echo $@  | awk '{print $5}'`;
 pullsync=`echo $@  | awk '{print $6}'`;
+# the members of Everyone are all users, always: never changed after its creation
+if [ "$groupname" = "Everyone" ] && [ "$ischange" = "change" ];
+then
+	exit
+fi
 allusres=`echo $groupusers | sed 's/\,/ /g'`;
 allusersel=`echo $allusers | wc -w`;
 groupusersn=`echo $groupusers | wc -c `

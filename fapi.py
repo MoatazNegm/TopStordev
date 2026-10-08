@@ -105,6 +105,15 @@ def is_unique_ip(ip, vtype='NZ#@A' ):
         print("Valid IP")
         return 0 
 
+# Every user is a member of the group Everyone, always: the front end neither shows nor edits it, so the group lists
+# it sends never contain it.  Every command that sets the groups of a user goes through this function.
+EVERYONE = 'Everyone'
+def with_everyone(groupstr):
+        names = [g for g in str(groupstr).split(',') if g and g != 'NoGroup']
+        if EVERYONE not in names:
+                names.append(EVERYONE)
+        return ','.join(names)
+
 def has_privilege(priv, user):
         # same rule as /TopStor/privthis.sh: admin and system may do everything, any other user needs the privilege
         if user in ('admin', 'system'):
@@ -451,6 +460,23 @@ def hostsactive():
   hid +=1
  return jsonify(activehosts)
 
+
+@app.route('/api/v1/hosts/syncnow', methods=['GET','POST'])
+@login_required
+@audit_command
+def hostssyncnow(data):
+ # "Nodes Not in Sync" -> Sync now: every ready node applies the pending sync requests at once (the step its
+ # syncrequestlooper repeats on its own), so the cluster does not wait for the next round of the loop
+ global leaderip
+ if 'baduser' in data['response']:
+  return {'response': 'baduser'}
+ asked = []
+ for host in get('ready','--prefix'):
+  name = host[0].replace('ready/','')
+  postchange('/pace/checksyncs.py syncrequest '+leaderip+' '+name+' '+host[1], name)
+  asked.append(name)
+ data['syncnow'] = asked
+ return data
 
 @app.route('/api/v1/hosts/discover', methods=['GET','POST'])
 @login_required
@@ -1061,6 +1087,9 @@ def pgroupchange(data):
  global leaderip
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
+ if data.get('name') == EVERYONE:
+  data['error'] = 'everyonefixed'     # all users are always members of Everyone: nobody changes it
+  return data
  usrs = data.get('users')
  usrstr = ''
  if len(usrs) < 1:
@@ -1111,6 +1140,7 @@ def userchange(data):
   for grp in grps.split(','):
    groupstr += allgroups[int(grp)][0]+','
   groupstr = groupstr[:-1]
+ groupstr = with_everyone(groupstr)
  cmndstring = '/TopStor/UnixChangeUser '+leaderip+' '+data.get('name')+' groups'+groupstr+' '+data['user']+' '+'change'
  postchange(cmndstring)
  return data
@@ -1702,6 +1732,9 @@ def volumedel(data):
 def groupdel(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
+ if data.get('name') == EVERYONE:
+  data['error'] = 'everyonefixed'
+  return data
  cmndstring = '/TopStor/UnixDelGroup '+leaderip+' '+data.get('name')+' '+data['user'] 
  postchange(cmndstring)
  return data
@@ -1738,6 +1771,9 @@ def UnixAddGroup(data):
  global allusers, allgroups
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
+ if data.get('name') == EVERYONE:
+  data['error'] = 'everyonefixed'
+  return data
  usrstr = ''
  usrs = data['users']
  if len(usrs) < 1:
@@ -1875,6 +1911,7 @@ def UnixAddUser(data):
   for grp in grps.split(','):
    groupstr += allgroups[int(grp)][0]+','
   groupstr = groupstr[:-1]
+ groupstr = with_everyone(groupstr)
  cmndstring = '/TopStor/UnixAddUser '+leaderip+' '+data.get('name')+' '+pool+' groups'+groupstr+' ' \
      +data.get('Password')+' '+data.get('Volsize')+'G '+data.get('HomeAddress')+' '+data.get('HomeSubnet')+' hoststub'+' '+data['user']
  print('*************************************************************************')
