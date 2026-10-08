@@ -44,6 +44,9 @@ def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsub
     cmdline = '/TopStor/cifs.sh '+resname+' '+mounts+' '+ipaddr+' '+ipsubnet+' '+vtype+' '+" ".join(args)
     subprocess.run(cmdline.split(),stdout=subprocess.PIPE)  
     if '_' not in vtype:
+        # the script that sets a user's samba password inside the share container; UnixAddUser_sync copies it, but the
+        # node that created the users (the leader runs UnixAddUser) never ran that, so a share created later found no file
+        subprocess.run(['cp','-f','/TopStor/smbuserfix.sh','/etc/smbuserfix.sh'],stdout=subprocess.PIPE)
         users=get(etcdip,'usershash','--prefix')
         users=[x for x in users if 'admin' not in x[0] ]
         for user in users:

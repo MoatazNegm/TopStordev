@@ -136,6 +136,8 @@ then
 	fi
  fi
 
+ # the leader does not run UnixAddUser_sync, which is what copies this script; the share containers read it from /hostetc
+ cp -f /TopStor/smbuserfix.sh /etc/smbuserfix.sh
  currentcifs=`docker ps | awk '{print $NF}' | grep CIFS | grep -v 'CIFS_'`
  echo "$currentcifs" | while read y
  do
