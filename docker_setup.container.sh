@@ -144,7 +144,7 @@ then
 	# (it happened on 2026-10-07).  Export only pools this node owns and that are healthy.
 	for mypool in `/pace/cpoolowner.sh mine $(hostname) 2>/dev/null`
 	do
-		[ "`cat /proc/spl/kstat/zfs/$mypool/state 2>/dev/null`" = "ONLINE" ] && zpool export $mypool
+		case "`cat /proc/spl/kstat/zfs/$mypool/state 2>/dev/null`" in ONLINE|DEGRADED) zpool export $mypool ;; esac
 	done
 fi
 # only this node's exports and those of nodes that are gone -- NOT clearconfig, which would wipe every running node's disk exports in the shared kernel
