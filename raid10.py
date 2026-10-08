@@ -108,6 +108,25 @@ def _is_matched(fdisks, fdisksinfo):
  return len(pairgroups) >= 2 and diskcount == totalpaired, pairgroups
 
 
+def interleave_by_host(names, fdisksinfo):
+ """Order the selected disks so that consecutive pairs come from different hosts.
+
+ DGsetPool builds the mirrors of a RAID 10 from consecutive disks (disk 1+2, 3+4 ...). The selection is balanced in numbers
+ but returned grouped by host (A A A A A B B B B B), which put both halves of most mirrors on one node: the pool is
+ not 'highly available - balanced' and a node loss takes whole mirrors with it. Round robin over the hosts (the host with
+ most disks first) puts A B A B ... so every pair spans two nodes as far as the numbers allow."""
+ groups = {}
+ for name in names:
+  groups.setdefault(fdisksinfo[name]['host'], []).append(name)
+ order = sorted(groups, key=lambda h: -len(groups[h]))
+ out = []
+ while any(groups.values()):
+  for host in order:
+   if groups[host]:
+    out.append(groups[host].pop(0))
+ return out
+
+
 def selectraid10(leaderip, fdisks, fdisksinfo, addtopool='', excludelst=''):
  """Select the best disks for a RAID 10 configuration.
  
@@ -142,8 +161,11 @@ def selectraid10(leaderip, fdisks, fdisksinfo, addtopool='', excludelst=''):
    result = selectdisks(leaderip, group_disks, filtered, addtopool, excludelst)
    if not result:
     return ''
-   all_selected.extend(result.split(','))
+   all_selected.extend(interleave_by_host(result.split(','), fdisksinfo))
   return ','.join(all_selected)
 
- return selectdisks(leaderip, fdisks, fdisksinfo, addtopool, excludelst)
+ result = selectdisks(leaderip, fdisks, fdisksinfo, addtopool, excludelst)
+ if not result:
+  return ''
+ return ','.join(interleave_by_host(result.split(','), fdisksinfo))
 

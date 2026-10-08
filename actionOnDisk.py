@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/python3
 import sys, subprocess
 from logmsg import sendlog, initlog
 from etcdput import etcdput as put
