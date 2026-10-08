@@ -21,6 +21,10 @@ then
  then
  	/TopStor/etcdput.py $myhostip nodesender/${clusterip}/$partnerip $partner   2>/dev/null
  fi
+ # a node that never used ssh as root has no /root/.ssh: without it the key below was never written and the sender stayed locked out
+ mkdir -p /root/.ssh
+ chmod 700 /root/.ssh
+ [ -f /root/.ssh/authorized_keys ] || : > /root/.ssh/authorized_keys
  authkeys=`cat /root/.ssh/authorized_keys | grep -v $partner`
  echo $authkeys > /root/.ssh/authorized_keys
  echo $keys | sed 's/\_spc\_/ /g' >> /root/.ssh/authorized_keys
