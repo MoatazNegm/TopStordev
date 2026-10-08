@@ -25,7 +25,7 @@ then
  	fi
 
 
-  docker exec etcdclient /TopStor/logmsg.py NFS1000 info $userreq $volname
+  docker exec etcdclient /TopStor/logmsg.py ISCSI1000 info $userreq $volname
  cd /TopStor
  echo $DG/$volname
  # container flavour: no udev, the zvol node and link are made here (QSD5.242)
@@ -41,7 +41,7 @@ then
  targetcli backstores/block delete ${disk}-${myhost}-$volname
  /sbin/zfs destroy -rf $DG/$volname 
  if [ $? -ne 0  ]; then
-   docker exec etcdclient /TopStor/logmsg.py NFS1001 error $userreq $volname
+   docker exec etcdclient /TopStor/logmsg.py ISCSI1001 error $userreq $volname
    echo /sbin/zfs destroy -rf $DG/$volname >/root/errorVolumeDeleteISCSI
  else
   rm -rf /$DG/iscsi.$volname
@@ -66,7 +66,7 @@ then
   #/pace/delbroadcastlocal.py volume $volname
   /pace/putzpool.py $leaderip
   docker exec etcdclient /TopStor/etcdputlocal.py dirty/volume 0
-  docker exec etcdclient /TopStor/logmsg.py NFS1002 info  $userreq $volname
+  docker exec etcdclient /TopStor/logmsg.py ISCSI1002 info  $userreq $volname
  fi
  rm -rf /$DG/iscsi.$volname
 fi

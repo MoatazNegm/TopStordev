@@ -70,7 +70,7 @@ then
   docker exec etcdclient /TopStor/logmsg.py NFS1003 warning $userreq $DG/$name
  fi
  echo afterzfslist info $userreq $DG/$name >> /root/volcreate
- docker exec etcdclient /TopStor/logmsg.py NFS1004 info $userreq $DG/$name
+ docker exec etcdclient /TopStor/logmsg.py ISCSI1004 info $userreq $DG/$name
  echo here4 >> /root/volcreate
 echo  /sbin/zfs create -V $quota -o dedup=on -o compression=lz4  $DG/$name  
 /sbin/zfs create -V $quota -o dedup=on -o compression=lz4  $DG/$name  
@@ -78,7 +78,7 @@ echo  /sbin/zfs create -V $quota -o dedup=on -o compression=lz4  $DG/$name
  if [ $? -ne 0 ];
  then
   echo here5 >> /root/volcreate
-  docker exec etcdclient /TopStor/logmsg.py NFS1006 error $userreq $DG/$name
+  docker exec etcdclient /TopStor/logmsg.py ISCSI1006 error $userreq $DG/$name
   docker exec etcdclient /TopStor/logqueue.py `basename "$0"` stop_canceled $userreq 
   exit
  fi
@@ -121,7 +121,7 @@ echo  /sbin/zfs create -V $quota -o dedup=on -o compression=lz4  $DG/$name
   zfs unmount $pool/$name
  fi
  /pace/putzpool.py 
- docker exec etcdclient /TopStor/logmsg.py NFS1007 info $userreq $DG/$name
+ docker exec etcdclient /TopStor/logmsg.py ISCSI1007 info $userreq $DG/$name
  echo ready ;
 fi
 #/TopStor/SnapshotCreateHourlytrend $DG $name 0 24 7 system 

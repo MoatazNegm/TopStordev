@@ -100,6 +100,16 @@ def is_unique_ip(ip, vtype='NZ#@A' ):
         print("Valid IP")
         return 0 
 
+def has_privilege(priv, user):
+        # same rule as /TopStor/privthis.sh: admin and system may do everything, any other user needs the privilege
+        if user in ('admin', 'system'):
+                return True
+        try:
+                res = subprocess.run(['/TopStor/privthis.sh', priv, user], cwd='/TopStor', stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=30)
+                return 'true' in res.stdout.decode()
+        except Exception:
+                return False
+
 def is_unique_name(name):
         global leaderip
         allvols = str(get('vol', '--prefix'))
@@ -1263,19 +1273,11 @@ def volumecreate(data):
         logmsg.sendlog('IPnamuqfa','error','system',loggedusers[data['token']]['user'])
     return data
  getalltime()
- # the size must fit into the pool: a quota or zvol larger than the available space is refused here, with a message
- # (it used to be accepted for CIFS/NFS/HOME and failed late or not at all for iSCSI)
- try:
-  sz = re.match(r'^\s*([0-9]*\.?[0-9]+)\s*([KMGTkmgt]?)', str(data.get('size', '')))
-  if sz:
-   units = {'': 1.0/(1024**3), 'K': 1.0/(1024**2), 'M': 1.0/1024, 'G': 1.0, 'T': 1024.0}
-   wanted = float(sz.group(1))*units[sz.group(2).upper()]
-   if wanted > float(allinfo['pools'][data['pool']]['available'])+0.05:
-    logmsg.sendlog('Volsz1','error',loggedusers[data['token']]['user'],data['name'],data['pool'])
-    data['error'] = 'sizetoolarge'
-    return data
- except (KeyError, ValueError):
-  pass
+ if data.get('pool') not in allinfo['pools']:
+  # no pool chosen / unknown pool: a clean answer instead of a KeyError (HTTP 500)
+  logmsg.sendlog('Volpool1','error',loggedusers[data['token']]['user'],str(data.get('name','')))
+  data['error'] = 'nopool'
+  return data
  ownerip = allinfo['hosts'][allinfo['pools'][data['pool']]['host']]['ipaddress']
  data['owner'] = allinfo['hosts'][allinfo['pools'][data['pool']]['host']]['name']
  if 'ISCSI' in data['type']:
@@ -1476,6 +1478,11 @@ def changepass(data):
 def hostconfig(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
+ # Node Config is the privilege 'Error' (usersauth); it used to be only a hint for the UI
+ if not has_privilege('Error', data['response']):
+  logmsg.sendlog('Priv1004','error','system',data['response'])
+  data['error'] = 'noprivilege'
+  return data
  if 'ipaddr' in data:
     isvu =  int(is_valid_ip(data['ipaddr']))+int(is_unique_ip(data['ipaddr']))
     if isvu == 0:
@@ -1532,6 +1539,10 @@ def hostjoincluster(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
  data['user'] = data['response']
+ if not has_privilege('Error', data['user']):
+  logmsg.sendlog('Priv1004','error','system',data['user'])
+  data['joinstatus'] = 'noprivilege'
+  return data
  # optional changes made together with the join: they travel to the node in tojoin/<name>
  if data.get('ipaddr'):
   isvu = int(is_valid_ip(data['ipaddr']))+int(is_unique_ip(data['ipaddr']))
