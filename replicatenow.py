@@ -115,7 +115,7 @@ def replistream(receiver, snapshot, nodeowner, poolvol, pool, volume, csnaps, us
     extras = ''
  quota=subprocess.run(cmd.split(' '),stdout=subprocess.PIPE).stdout.decode().split('\t')[2]
  oldsnap = 'noold'
- nodeloccmd = nodeloc + '/TopStor/getlatestsnap.sh '+volume
+ nodeloccmd = nodeloc + '/TopStor/getlatestsnap.sh '+volume+' '+poolvol   # only the receiver's own dataset counts
  result = subprocess.run(nodeloccmd.split(' '),stdout=subprocess.PIPE).stdout.decode()
  remotesnap = result.split('result_')
  if remotesnap != 'noold':
@@ -223,7 +223,7 @@ def repliparam(snapshot, receiver, userreq='system'):
   cmd = '/usr/sbin/zfs destroy -r '+' '+pool+'/'+volume+'@'+snapshot 
  else:
   print('success ',result)
-  nodeloccmd = nodeloc+'  /TopStor/setsnapsender.py '+snapshot+' '+leaderip
+  nodeloccmd = nodeloc+'  /TopStor/setsnapsender.py '+poolvol+'@'+snapshot+' '+leaderip   # the receiver's own dataset@snapshot
   subprocess.run(nodeloccmd.split(' '),stdout=subprocess.PIPE).stdout.decode()
   cmd = '/usr/sbin/zfs set partner:receiver='+receiver.split('_')[0]+' '+pool+'/'+volume+'@'+snapshot
  subprocess.run(cmd.split(' '),stdout=subprocess.PIPE).stdout.decode()
