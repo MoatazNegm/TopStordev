@@ -1263,6 +1263,19 @@ def volumecreate(data):
         logmsg.sendlog('IPnamuqfa','error','system',loggedusers[data['token']]['user'])
     return data
  getalltime()
+ # the size must fit into the pool: a quota or zvol larger than the available space is refused here, with a message
+ # (it used to be accepted for CIFS/NFS/HOME and failed late or not at all for iSCSI)
+ try:
+  sz = re.match(r'^\s*([0-9]*\.?[0-9]+)\s*([KMGTkmgt]?)', str(data.get('size', '')))
+  if sz:
+   units = {'': 1.0/(1024**3), 'K': 1.0/(1024**2), 'M': 1.0/1024, 'G': 1.0, 'T': 1024.0}
+   wanted = float(sz.group(1))*units[sz.group(2).upper()]
+   if wanted > float(allinfo['pools'][data['pool']]['available'])+0.05:
+    logmsg.sendlog('Volsz1','error',loggedusers[data['token']]['user'],data['name'],data['pool'])
+    data['error'] = 'sizetoolarge'
+    return data
+ except (KeyError, ValueError):
+  pass
  ownerip = allinfo['hosts'][allinfo['pools'][data['pool']]['host']]['ipaddress']
  data['owner'] = allinfo['hosts'][allinfo['pools'][data['pool']]['host']]['name']
  if 'ISCSI' in data['type']:
