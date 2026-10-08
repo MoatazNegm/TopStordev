@@ -48,11 +48,14 @@ then
  # Check if user already has a home folder
  current_userinfo=$(/pace/etcdget.py $leaderip usersinfo/$shortname 2>/dev/null)
  
- if [ ! -z "$current_userinfo" ]; then
+ # etcdget answers "_1" for a key that does not exist: that is "no such user yet" (UnixAddUser calls this script BEFORE it
+ # writes usersinfo/<user>), not an existing user.  Taking "_1" for a user made every new user with a home pool
+ # look like one that already has a home folder, and no home folder was ever created (QSD5.237, found by the QC test users_2nodes).
+ if [ ! -z "$current_userinfo" ] && [ "$current_userinfo" != "_1" ]; then
   current_pool=$(echo "$current_userinfo" | awk -F'/' '{print $2}')
   
   # Check if user already has a home folder (pool is not "NoHome")
-  if [ "$current_pool" != "NoHome" ]; then
+  if [ -n "$current_pool" ] && [ "$current_pool" != "NoHome" ]; then
    docker exec etcdclient /TopStor/logmsg.py Unlin1028 warning $userreq $shortname $current_pool
    docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
    exit
