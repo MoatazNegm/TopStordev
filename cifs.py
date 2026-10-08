@@ -3,6 +3,7 @@ import sys, subprocess, datetime
 from logqueue import queuethis, initqueue
 from etcdgetpy import etcdget as get
 from sendhost import sendhost
+from time import sleep
 
 
 def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsubnet, vtype,*args):
@@ -53,8 +54,15 @@ def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsub
             username = user[0].split('/')[1]
             cmdline = '/TopStor/decthis.sh '+username+' '+user[1]
             passwd = subprocess.run(cmdline.split(),stdout=subprocess.PIPE).stdout.decode().split('_result')[1]
-            cmdline = 'docker exec '+resname+' /hostetc/smbuserfix.sh x '+username+' '+passwd
-            subprocess.run(cmdline.split(),stdout=subprocess.PIPE)  
+            # the share container is started in the background: its samba database may not answer yet, so the password is
+            # set again until the user is in it (up to ~40 s)
+            for attempt in range(20):
+                cmdline = 'docker exec '+resname+' /hostetc/smbuserfix.sh x '+username+' '+passwd
+                subprocess.run(cmdline.split(),stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+                check = subprocess.run(['docker','exec',resname,'pdbedit','-L','-u',username],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+                if check.returncode == 0 and username.encode() in check.stdout:
+                    break
+                sleep(2)
             
     print(mounts)
     return

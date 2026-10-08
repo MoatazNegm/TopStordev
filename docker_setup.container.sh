@@ -10,6 +10,17 @@ then
 	/TopStor/cleannw.sh
 fi
 
+# --- CRON IN THE CONTAINER ---
+# The node image has crond but no /etc/pam.d/crond: PAM then falls back to "other" (pam_deny), every cron job dies at
+# once (cronie logs "pid died, stat=1") and nothing scheduled ever ran -- the periodic snapshots (Snapshotnowhost via
+# putcron.sh), the log cleaning ... Give crond its own permissive service file and restart it once.
+if [ ! -f /etc/pam.d/crond ]
+then
+	printf '#%%PAM-1.0\nauth       required   pam_permit.so\naccount    required   pam_permit.so\nsession    required   pam_permit.so\n' > /etc/pam.d/crond
+	pkill crond 2>/dev/null; sleep 1
+	(setsid /usr/sbin/crond -n </dev/null >/dev/null 2>&1 &)
+fi
+
 # Enslave eth10 to bond0 as a real NM port profile (slave-eth10-to-bond0), so
 # nmcli shows it. Call it only AFTER `nmcli conn up cmynode`/bond0 are up. The
 # profile autoconnects, so later `nmcli conn up cmynode` calls by the app
