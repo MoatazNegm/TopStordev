@@ -7,7 +7,7 @@ leaderip=`echo $@ | awk '{print $1}'`;
 pDG=`echo $@ | awk '{print $2}'`;
 pro=`echo $@ | awk '{print $4}'`;
 userreq=` echo $@ | awk '{print $5}'`;
-DG=pDG;
+DG=$pDG; name=$volname;   # the dataset of the volume (it was the text "pDG/" - the address and type lookups below found nothing, the share container kept the dataset busy)
 privilege=$pro;
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
