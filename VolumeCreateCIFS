@@ -16,6 +16,7 @@ fi
 pDG=`echo $@ | awk '{print $2}'`;
 quota=`echo $@ | awk '{print $4}'`;
 writev=`echo $@ | awk '{print $5}'`;
+echo ",$writev," | grep -q ',Everyone,' && writev=Everyone   # Everyone is every user: the other groups add nothing
 ipaddr=`echo $@ | awk '{print $6}'`;
 ipsubnet=`echo $@ | awk '{print $7}'`;
 active=`echo $@ | awk '{print $8}'`;

@@ -114,6 +114,12 @@ def with_everyone(groupstr):
                 names.append(EVERYONE)
         return ','.join(names)
 
+# Everyone as the group of a share means all users (every user is a member of it): when it is among the groups the
+# others add nothing, so the share gets Everyone alone.
+def only_everyone(groups):
+        names = [g for g in str(groups).split(',') if g]
+        return EVERYONE if EVERYONE in names else groups
+
 def has_privilege(priv, user):
         # same rule as /TopStor/privthis.sh: admin and system may do everything, any other user needs the privilege
         if user in ('admin', 'system'):
@@ -1315,6 +1321,8 @@ def volumecreate(data):
   return data
  ownerip = allinfo['hosts'][allinfo['pools'][data['pool']]['host']]['ipaddress']
  data['owner'] = allinfo['hosts'][allinfo['pools'][data['pool']]['host']]['name']
+ if 'groups' in data:
+  data['groups'] = only_everyone(data['groups'])
  if 'ISCSI' in data['type']:
   data['chapuser']='MoatazNegm'
   data['chappas']='MezoAdmin'
@@ -1481,6 +1489,8 @@ def volumeconfig(data):
 
   if 'groups' in data and len(data['groups']) < 1: 
    data['groups'] = 'NoGroup'
+  if 'groups' in data:
+   data['groups'] = only_everyone(data['groups'])
   for ele in data:
    volume[ele] = data[ele] 
   datastr = volume['pool']+' '+volume['name']+' '+str(volume['quota'])+' '+volume['groups']+' '+volume['ipaddress']+' '+str(volume['Subnet'])+' '+volume['statusmount']+' '+volume['host']+' '+volume['user']
