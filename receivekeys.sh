@@ -32,5 +32,9 @@ then
  firewall-cmd --permanent --add-port=$port/tcp
  firewall-cmd --reload
  systemctl restart sshd
+ # container flavour: the systemctl wrapper does not restart sshd, so the new Port line was never listened on and the
+ # sending cluster got 'Connection refused' on the replication port; SIGHUP makes sshd re-read its configuration
+ [ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
+ is_container 2>/dev/null && pkill -HUP -x sshd
  chmod 004 /root/.ssh/authorized_keys
 fi

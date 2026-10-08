@@ -1,5 +1,5 @@
 #!/bin/bash
-ssh -p secureport -i /TopStordata/receiver/remotenode   -N -L mycluster:tunnelport:remotecluster:2379 remotenode Lremote sshreceiver
+ssh -oStrictHostKeyChecking=no -p secureport -i /TopStordata/receiver/remotenode   -N -L mycluster:tunnelport:remotecluster:2379 remotenode Lremote sshreceiver
 if [ $? -ne 0 ];
 then
 	echo Somthing went wrong, removing active links to this remote node
