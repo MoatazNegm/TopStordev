@@ -28,6 +28,13 @@ then
   docker exec etcdclient /TopStor/logmsg.py NFS1000 info $userreq $volname
  cd /TopStor
  echo $DG/$volname
+ # container flavour: no udev, the zvol node and link are made here (QSD5.242)
+ [ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
+ is_container 2>/dev/null && /pace/czvoldev.sh
+ # the address of the target, read before the volume's files are removed
+ iscsisum=`grep SUMMARY /$DG/iscsi.$volname 2>/dev/null | head -1`
+ iscsiip=`echo $iscsisum | awk -F'/' '{print $3}'`
+ iscsisub=`echo $iscsisum | awk -F'/' '{print $4}'`
  disk=`ls -l /dev/zvol/$DG/$volname | awk -F'/' '{print $NF}'`
  echo $disk
  echo targetcli backstores/block delete ${disk}-${myhost}-$volname
@@ -39,6 +46,19 @@ then
  else
   rm -rf /$DG/iscsi.$volname
   /pace/etcddel.py $leaderip volume $volname
+  # QSD5.242: the target of the address (iqn.2016-03.com.<ip without dots>:data) and the address itself stay behind when
+  # the last LUN of the target is gone; remove both, otherwise the target is still discoverable and the address still answers
+  if [ -n "$iscsiip" ]
+  then
+   ipdom=`echo $iscsiip | sed 's/\.//g'`
+   if ! targetcli ls /iscsi/iqn.2016-03.com.$ipdom:data/tpg1/luns 2>/dev/null | grep -q 'o- lun'
+   then
+    targetcli /iscsi delete iqn.2016-03.com.$ipdom:data
+    targetcli saveconfig
+    nmcli conn mod cmynode -ipv4.addresses ${iscsiip}/${iscsisub:-24}
+    nmcli conn up cmynode
+   fi
+  fi
   stamp=`date +%s`
   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request volumes_$stamp
   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request/$leader volumes_$stamp

@@ -444,3 +444,4 @@ DGfa23:2: : from :: Failed adding RAID10 array to pool : using disks :
 DGst24:1: : from :: Creating RAID10 pool : using mirror pairs of disks : ......
 DGsu24:2: : from :: Success creating RAID10 pool : using mirror pairs of disks :
 DGfa24:2: : from :: Failed creating RAID10 pool : using mirror pairs of disks :
+DGfa25:2: : from :: Pool not deleted, it still has volumes (delete them first) :

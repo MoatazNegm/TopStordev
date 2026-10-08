@@ -493,6 +493,12 @@ def dgsdelpool(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
  getalltime()
+ # a pool that still holds volumes (NFS/CIFS/HOME/iSCSI) is not destroyed: their share containers and targets use its
+ # datasets, so the forced export/destroy would hang (container flavour) or cut running clients
+ if any(vinfo.get('pool') == data['pool'] for vinfo in allinfo['volumes'].values()):
+  logmsg.sendlog('DGfa25','error','system',data['pool'])
+  data['error'] = 'poolhasvolumes'
+  return jsonify(data)
  data['owner'] = allinfo['pools'][data['pool']]['host']
  ownerip = allinfo['hosts'][data['owner']]['ipaddress']
  datastr = data['pool']+' '+data['user'] 
