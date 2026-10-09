@@ -77,10 +77,15 @@ docker run -d $mounts --rm --privileged \
   		-e "HOSTIP=$ipaddr"  \
 		-e SHARED_DIRECTORY=$share \
   		-p $ipaddr:2049:2049/tcp \
+  		-p $ipaddr:20048:20048/tcp \
+  		-v /TopStor/nfsd.sh:/usr/bin/nfsd.sh:ro \
   		-v /TopStor/:/TopStor \
 		-v $pool'/user_'$volume:/etc/passwd:rw \
 		-v $pool'/group_'$volume:/etc/group:rw \
   		--name $resname itsthenetwork/nfs-server-alpine
+# portmap v2 on the volume ip: the container's rpcbind answers with its private address (see nfsportmap.py), exits with the container
+pkill -f "nfsportmap.py $ipaddr " 
+nohup setsid python3 /TopStor/nfsportmap.py $ipaddr $resname >/dev/null 2>&1 &
 counter=20
 while [ $counter -gt 1 ];
 do
