@@ -136,12 +136,14 @@ def ip_context(kind, domain=''):
         return kind
 
 def has_privilege(priv, user):
-        # same rule as /TopStor/privthis.sh: admin and system may do everything, any other user needs the privilege
+        # same rule as /TopStor/privthis.sh: admin and system may do everything, any other user needs the privilege flag '<priv>-true' in
+        # usersinfo/<user>.  Read from etcd here: this code runs inside the 'flask' container, where privthis.sh cannot work (/bin/sh is dash
+        # and there is no docker CLI), so shelling out answered 'false' for every non-admin user, also for one that HAS the privilege.
         if user in ('admin', 'system'):
                 return True
         try:
-                res = subprocess.run(['/TopStor/privthis.sh', priv, user], cwd='/TopStor', stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=30)
-                return 'true' in res.stdout.decode()
+                info = str(get('usersinfo/'+str(user))[0])
+                return re.search(r'(^|/)'+re.escape(str(priv))+r'-true(/|$)', info) is not None
         except Exception:
                 return False
 
