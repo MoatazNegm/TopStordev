@@ -627,7 +627,7 @@ def dgsaddtopool(data):
   datastr = 'addmirror '+data['user']+' '+data['owner']+" "+diskstring+data['pool']
  elif 'volset' in data['redundancy']:
   datastr = 'addstripeset '+data['user']+' '+data['owner']+" "+diskstring+data['pool']
- elif 'raid5' in data['redundancy']:
+ elif 'raid5' in data['redundancy'] and 'raid50' not in data['redundancy']:     # 'raid5' is a substring of 'raid50': a RAID50 request used to be created as one big single-parity group (QSD5.269)
   datastr = 'addparity '+data['user']+' '+data['owner']+" "+diskstring+data['pool']
  elif 'raid6plus' in data['redundancy']:
   datastr = 'addparity3 '+data['user']+' '+data['owner']+" "+diskstring+data['pool']
@@ -835,7 +835,7 @@ def dgsnewpool(data):
         datastr = 'mirror '+data['user']+' '+data['owner']+" "+diskstring+" "+cachestring+" "+"nopool "+data['user']+" "+data['owner']
     elif 'volset' in data['redundancy']:
         datastr = 'stripeset '+data['user']+' '+data['owner']+" "+diskstring+" "+cachestring+" nopool "+data['user']+" "+data['owner']
-    elif 'raid5' in data['redundancy']:
+    elif 'raid5' in data['redundancy'] and 'raid50' not in data['redundancy']:     # see addtopool: raid50 must not be taken for raid5
         datastr = 'parity '+data['user']+' '+data['owner']+" "+diskstring+" "+cachestring+" nopool "+data['user']+" "+data['owner']
     elif 'raid6plus' in data['redundancy']:
         datastr = 'parity3 '+data['user']+' '+data['owner']+" "+diskstring+" "+cachestring+" nopool "+data['user']+" "+data['owner']
