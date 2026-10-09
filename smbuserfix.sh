@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 x=`echo $@ | awk '{print $1}'`
 username=`echo $@ | awk '{print $2}'`
 userpass=`echo $@ | awk '{print $3}'`
