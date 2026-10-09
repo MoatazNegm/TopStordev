@@ -37,10 +37,24 @@ sed -i 's/SLEEP/sleep 10/g' /TopStordata/discovery.sh
 leaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip`
 echo starting etcd 
 docker run  --rm --name discovery --hostname discovery -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $etcd:2379:2379 -v /TopStor/:/TopStor -v /TopStordata/discovery:/default.etcd -v /TopStordata/discovery.sh:/runme.sh --net ${DOCKER_NET:-bridge0} moataznegm/quickstor:etcd  &
-sleep 3
-docker exec intdns nslookup discovery | grep Address | grep -v 127 | awk '{print $2}'
-newip=`docker exec intdns nslookup discovery | grep Address | grep -v 127 | awk '{print $2}'`
+# the container registers in the internal DNS some seconds after it starts, longer when the node is busy (a second node
+# booting): a lookup after a fixed 3 s found nothing, discovery.sh got etcdip='' , the discovery etcd never ran and the scan
+# below polled a dead port for its 600 rounds while the joining node announced itself to nobody.  Wait for the answer.
+newip=
+for tries in `seq 1 60`
+do
+	newip=`docker exec intdns nslookup discovery | grep Address | grep -v 127 | awk '{print $2}'`
+	[ -n "$newip" ] && break
+	sleep 1
+done
 echo newip=$newip
+if [ -z "$newip" ]; then
+	echo "discovery container did not get an address in the internal DNS after 60 s, scan not started"
+	docker rm -f discovery
+	nmcli connection modify cmynode -ipv4.addresses $etcd/24
+	nmcli device reapply $node_device 2>/dev/null
+	exit 1
+fi
 docker rm -f discovery
 rm -rf /TopStordata/discovery.sh
 cp /TopStor/discovery.sh /TopStordata/
@@ -60,6 +74,10 @@ done
 /TopStor/etcddel.py $leaderip  possible --prefix
 while true
 do
+	if [ -z "`docker ps -q -f name=^discovery$`" ]; then
+		echo "discovery container is not running, scan stopped"
+		break
+	fi
 	lines=`/TopStor/etcdget.py $etcd possible --prefix`
 	counter=$((counter+1))
 	echo $lines
