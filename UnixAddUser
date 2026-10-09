@@ -196,10 +196,9 @@ then
 	/pace/etcddel.py $leaderip sync/user _${username}_
 	/pace/etcdput.py $leaderip sync/user/$params/request/$myhost user_${username}_$stamp
 	/pace/etcdput.py $leaderip sync/user/$params/request user_${username}_$stamp
-	stamp=$((stamp+10))
-	params=`echo UnixChangeUser $@ s$pullsync | sed 's\ \\_\g'`
-	/pace/etcdput.py $leaderip sync/UsrChange/$params/request/$myhost UsrChange_$stamp
-	/pace/etcdput.py $leaderip sync/UsrChange/$params/request UsrChange_$stamp
+	# the UsrChange request of this user (its groups) is filed by the UnixChangeUser call above, with the arguments of UnixChangeUser;
+	# the copy that used to be filed here carried the arguments of UnixAddUser ($@), so followers ran UnixChangeUser with
+	# 'NoHome' as the groups and 'groups...' as the requester
  fi
  echo hi3
  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq 
