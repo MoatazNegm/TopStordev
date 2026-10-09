@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import sys, subprocess, datetime
+import sys, os, subprocess, datetime
 from logqueue import queuethis, initqueue
 from etcdgetpy import etcdget as get
 from sendhost import sendhost
@@ -23,6 +23,22 @@ def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsub
     cmdline='rm -rf /TopStordata/smb.'+ipaddr
     subprocess.run(cmdline.split(),stdout=subprocess.PIPE)  
     mounts =''
+    # right after a take over this runs while the pool is still being imported: the volume's dataset is not mounted and
+    # /<pool>/smb.<volume> is not readable yet. Reading it then (the error was skipped) gave an empty smb config and a
+    # share container without any share, and nothing retried. Wait for the dataset; if it never comes, start nothing:
+    # the volume stays dirty and the next volume check starts it again.
+    for vol in volsip:
+        if vol in notsametype:
+           continue
+        leftvol = vol[0].split('/')[4]
+        for attempt in range(90):
+            mounted = subprocess.run(['zfs','list','-H','-o','mounted',pool+'/'+leftvol],stdout=subprocess.PIPE,stderr=subprocess.PIPE).stdout.decode().strip()
+            if mounted == 'yes' and os.path.exists('/'+pool+'/smb.'+leftvol):
+                break
+            sleep(2)
+        else:
+            print('pool volume not mounted yet, not starting the share', pool, leftvol)
+            return
     for vol in volsip:
         if vol in notsametype:
            continue
