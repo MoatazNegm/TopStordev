@@ -59,7 +59,23 @@ def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsub
     print('cmd: '+'/TopStor/cifs.sh '+resname+' '+mounts+' '+ipaddr+' '+ipsubnet+' '+vtype+' '+" ".join(args))
     print('end of cmd')
     cmdline = '/TopStor/cifs.sh '+resname+' '+mounts+' '+ipaddr+' '+ipsubnet+' '+vtype+' '+" ".join(args)
-    subprocess.run(cmdline.split(),stdout=subprocess.PIPE)  
+    # the share container can die within seconds of its start (docker --rm then removes it and its logs): after the second
+    # take over of a test the container was created, found "not running" 2 s later and nobody started it again -- the
+    # password loop below then ran for minutes against a container that did not exist, and VolumeCheck (which waits for
+    # this script) could not repair anything.  Start it again until it stays up; keep the output of every try.
+    running = False
+    for attempt in range(5):
+        res = subprocess.run(cmdline.split(),stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+        with open('/root/cifsrun.log','a') as flog:
+            flog.write(str(datetime.datetime.now())+' '+resname+' try '+str(attempt)+'\n'+res.stdout.decode()[-1500:]+'\n')
+        sleep(8)
+        up = subprocess.run(['docker','ps','-q','-f','name=^'+resname+'$'],stdout=subprocess.PIPE).stdout.decode().strip()
+        if up:
+            running = True
+            break
+    if not running:
+        print('share container did not stay up after 5 tries, see /root/cifsrun.log', resname)
+        return
     if '_' not in vtype:
         # the script that sets a user's samba password inside the share container; UnixAddUser_sync copies it, but the
         # node that created the users (the leader runs UnixAddUser) never ran that, so a share created later found no file
@@ -73,6 +89,9 @@ def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsub
             # the share container is started in the background: its samba database may not answer yet, so the password is
             # set again until the user is in it (up to ~3 min; two shares created together take longer)
             for attempt in range(75):
+                if not subprocess.run(['docker','ps','-q','-f','name=^'+resname+'$'],stdout=subprocess.PIPE).stdout.decode().strip():
+                    print('share container is gone, password of', username, 'not set')
+                    break
                 cmdline = 'docker exec '+resname+' /hostetc/smbuserfix.sh x '+username+' '+passwd
                 subprocess.run(cmdline.split(),stdout=subprocess.PIPE,stderr=subprocess.PIPE)
                 check = subprocess.run(['docker','exec',resname,'pdbedit','-L','-u',username],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
