@@ -58,7 +58,7 @@ else
  echo vol=$vol $userreq
 # ./VolumeDeleteHome.py $pool $vol $userreq
  fi
- /pace/etcddel.py $etcd usersigroup $username
+ /pace/etcddel.py $etcd usersigroup/$username
  echo s$pullsync | grep pull
  if [ $? -ne 0 ];
  then

@@ -30,5 +30,5 @@ fi
 cat /etc/passwd | grep $username
 if [ $? -ne 0 ];
 then
- /pace/etcddellocal.py $myip users $username 
+ /pace/etcddellocal.py $myip users /$username/ 
 fi
