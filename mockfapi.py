@@ -166,7 +166,30 @@ def logrows():
         t = time.gmtime(NOW - 3600 * (len(rows) - i))
         out.append({'importance': imp, 'msgcode': code, 'date': time.strftime('%m/%d/%Y', t), 'time': time.strftime('%H:%M:%S', t),
                     'host': host, 'type': typ, 'user': user, 'msgbody': msg})
+    return out + sentlogs()
+
+
+# every notification the toast poller was offered since the mock started is also an event of the system log (like
+# the real TopStorglobal.log): same slot -> same sample, newest 100 as getlogs() (tail -n 100); onedaylog counts them
+def sentlogs():
+    now = int(time.time() // 7)
+    out = []
+    for slot in range(max(START_SLOT, now - 99), now + 1):
+        imp, code, host, user, msg = NOTIFS[slot % len(NOTIFS)]
+        t = time.localtime(slot * 7)
+        out.append({'importance': imp, 'msgcode': code, 'date': time.strftime('%m/%d/%Y', t), 'time': time.strftime('%H:%M:%S', t),
+                    'host': host, 'type': user, 'user': user, 'msgbody': msg})
     return out
+
+
+def onedaylog():
+    res = {'failedlogon': [], 'info': [], 'warning': [], 'error': []}
+    for l in logrows():
+        line = ' '.join((l['msgcode'], l['importance'], l['type'], l['user']))
+        res[l['importance']].append(line)
+        if l['msgcode'] == 'Lognfa0':
+            res['failedlogon'].append(line)
+    return res
 
 
 def allinfo():
@@ -238,15 +261,23 @@ def stats_payload():
 
 # Sample notifications for the toasts: the real API puts the severity into 'type' (info|warning|error) and the user
 # (admin, system, ...) into 'user'.  One sample per 7 s poll, round robin, so every look of the toast is seen.
+START_SLOT = int(time.time() // 7)
 NOTIFS = [('info', 'Actsu1000', 'node1', 'system', 'Volumes info are synced.'),
           ('info', 'Posu0', 'node2', 'admin', 'Pool pdhcp1001 status changed to ONLINE.'),
           ('warning', 'Diwa1', 'node3', 'system', 'Pool pdhcp1002 is degraded, one disk is missing.'),
-          ('info', 'Disu6', 'node4', 'admin', 'Success attaching Disk sdh to group raidz2-0 in pool pdhcp1003.'),
-          ('error', 'Lognfa0', 'node1', 'mallory', 'Failed logon for user mallory.'),
-          ('warning', 'Volwa3', 'node5', 'system', 'Volume finance_pdhc has used 91 percent of its quota.'),
           ('error', 'DGfa25', 'node2', 'admin', 'Pool pdhcp1002 was not deleted, it still holds volumes.'),
+          ('info', 'Disu6', 'node4', 'admin', 'Success attaching Disk sdh to group raidz2-0 in pool pdhcp1003.'),
+          ('warning', 'Volwa3', 'node5', 'system', 'Volume finance_pdhc has used 91 percent of its quota.'),
+          ('error', 'Lognfa0', 'node1', 'mallory', 'Failed logon for user mallory.'),
+          ('info', 'Snsu1', 'node1', 'admin', 'Snapshot daily_0100 of volume finance_pdhc was created.'),
           ('warning', 'Poolcap90', 'node3', 'system', 'Pool pdhcp1003 is above 90 percent of its real capacity, free space left 18.0G.'),
-          ('info', 'Lognsu0', 'node1', 'admin', 'User admin logged in.')]
+          ('error', 'Nofa3', 'node2', 'system', 'Node node2 did not answer for 60 seconds, it is considered lost.'),
+          ('info', 'Lognsu0', 'node1', 'admin', 'User admin logged in.'),
+          ('warning', 'Syncwa2', 'node4', 'system', 'The cluster is not in sync, node4 has not acknowledged the last change.'),
+          ('error', 'Repfa7', 'node1', 'system', 'Replication of volume nfs_data to partner site2 failed: connection timed out.'),
+          ('info', 'Cfsu2', 'node3', 'admin', 'Success creating the CIFS volume shared_docs in pool pdhcp1001.'),
+          ('warning', 'Diwa4', 'node5', 'system', 'Disk sdk of pool pdhcp1001 reports 12 read errors.'),
+          ('error', 'Disfa8', 'node4', 'admin', 'Failed attaching Disk sdm to pool pdhcp1003: the disk is in use.')]
 # cluster state shown by the sign next to the bell: cycles every 5 minutes (minutes 0-2 in sync, 3 not in sync,
 # 4 single node: only the 'active' list of hosts/allinfo shrinks to one node).  Force one with the file
 # /TopStordata/mockphase containing: insync | notinsync | single   (no file = the cycle).
@@ -284,12 +315,11 @@ route('/api/v1/info/performance', lambda: jsonify([{'host': h, 'cpu': str(12 + 9
 route('/api/v1/telemetry/heartbeat', lambda: jsonify({'status': 'boost_active'}))
 route('/api/v1/info/notification', lambda: jsonify(notification()))
 route('/api/v1/info/logs', lambda: jsonify({'alllogs': logrows()}))
-route('/api/v1/info/onedaylog', lambda: jsonify({'failedlogon': ['Lognfa0 error system mallory'], 'info': ['Lognsu0 info system admin'],
-                                                 'warning': ['Diwa1 warning system'], 'error': ['Lognfa0 error system mallory']}))
+route('/api/v1/info/onedaylog', lambda: jsonify(onedaylog()))
 route('/api/v1/info/commandlog', lambda: jsonify({'response': 'Ok', 'commands': [
     {'user': 'admin', 'endpoint': '/api/v1/pools/newpool', 'method': 'POST', 'time': NOW - 600},
     {'user': 'admin', 'endpoint': '/api/v1/volumes/create', 'method': 'POST', 'time': NOW - 300}]}))
-route('/api/v1/info/cversion', lambda: jsonify({'response': 'Ok', 'cversion': 'QSD5.233'}))
+route('/api/v1/info/cversion', lambda: jsonify({'response': 'Ok', 'cversion': 'QSD5.286-f40cc2f1'}))
 route('/api/v1/software/versions', lambda: jsonify({'versions': [{'id': 1, 'text': 'QSD5.231'}, {'id': 2, 'text': 'QSD5.232'},
                                                                   {'id': 3, 'text': 'QSD5.233'}], 'current': 'QSD5.233',
                                                     'response': 'admin'}))
