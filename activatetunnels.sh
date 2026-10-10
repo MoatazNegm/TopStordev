@@ -271,6 +271,19 @@ for receiver in "${receivers_array[@]}"; do
         echo "[CMD] /TopStor/initreplipartner.py readyonly $cluster $clusterip $myhost $myhostip $leaderip $repliport $phrase $readyport"
         /TopStor/initreplipartner.py readyonly $cluster $clusterip $myhost $myhostip $leaderip $repliport $phrase $readyport
     fi
+
+    # the receiver's pull of users/groups/snapshots runs on ITS LEADER against its own cluster address: the reverse tunnel (-R)
+    # has to end on the leader node (a tunnel to another node cannot bind the cluster address), so the tunnel scripts of the
+    # partner's leader are started as well, whichever node was used first
+    partnerleader=$(/TopStor/etcdget.py $clusterip leader)
+    partnerleaderip=$(/TopStor/etcdget.py $clusterip ready/$partnerleader)
+    if [ -n "$partnerleaderip" ] && [ "$partnerleaderip" != "_1" ] && [ -f $current_dir/$cluster/Rremote_${cluster}_${partnerleaderip}_.sh ]; then
+        ps -ef | grep Rremote | grep ssh$cluster | grep -q "$partnerleaderip Rremote" || {
+            echo "[ACTION] starting the tunnels to the partner leader $partnerleader ($partnerleaderip)"
+            $current_dir/$cluster/Lremote_${cluster}_${partnerleaderip}_.sh & disown
+            $current_dir/$cluster/Rremote_${cluster}_${partnerleaderip}_.sh & disown
+        }
+    fi
     
 done
 
