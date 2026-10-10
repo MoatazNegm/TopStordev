@@ -8,6 +8,26 @@ echo $@ > /root/dgset
 POOLFM=""
 [ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
 is_container 2>/dev/null && POOLFM="-o failmode=continue"
+
+# zpool create that survives the short "Device or resource busy" on a partition that was created a second ago (udev/blkid still
+# holds it, seen right after a pool was destroyed on the same disks: RAID50 right after a delete, test 10).  Retried only on that error.
+zpoolcreate() {
+    zc_try=0
+    while :; do
+        zc_err=`/sbin/zpool create "$@" 2>&1 >/dev/null`
+        zc_rc=$?
+        if [ $zc_rc -eq 0 ]; then return 0; fi
+        zc_try=$((zc_try+1))
+        if echo "$zc_err" | grep -q "resource busy" && [ $zc_try -lt 8 ]; then
+            echo "zpool create busy, retry $zc_try" >> /root/dgcreateretry
+            udevadm settle 2>/dev/null
+            sleep 5
+            continue
+        fi
+        echo "$zc_err" >&2
+        return $zc_rc
+    done
+}
 leaderip=` echo $@ | awk '{print $1}'`;
 raid=` echo $@ | awk '{print $2}'`;
 userreq=` echo $@ | awk '{print $3}'`;
@@ -341,7 +361,7 @@ else
    fi
    i=$((i+1));
   done;
-  /sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 $POOLFM -o autoexpand=on -o autoreplace=on -f p${nextpool} ${disk1} ${cache_disks}
+  zpoolcreate -o cachefile=/TopStordata/p${nextpool} -o ashift=12 $POOLFM -o autoexpand=on -o autoreplace=on -f p${nextpool} ${disk1} ${cache_disks}
   if [ $? -ne 0 ]; then
     docker exec etcdclient /TopStor/logmsg.py DG1fa6 error $userreq ${nextpool} $diskn1 
   else 
@@ -426,7 +446,7 @@ else
   done;
   nextpool='dhcp'${RANDOM}$RANDOM;
    docker exec etcdclient /TopStor/logmsg.py DGst13 info $userreq p${nextpool} $diskns
-  /sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 $POOLFM -o autoexpand=on -o autoreplace=on -f p${nextpool} raidz3 ${disk1} ${cache_disks}
+  zpoolcreate -o cachefile=/TopStordata/p${nextpool} -o ashift=12 $POOLFM -o autoexpand=on -o autoreplace=on -f p${nextpool} raidz3 ${disk1} ${cache_disks}
   if [ $? -eq 0 ]; then
      zfs set acltype=posixacl p$nextpool
      zfs set avail:type=Availbility p$nextpool
@@ -514,7 +534,7 @@ else
   done;
   nextpool='dhcp'${RANDOM}$RANDOM;
    docker exec etcdclient /TopStor/logmsg.py DGst15 info $userreq p${nextpool} $diskns
-  /sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 $POOLFM -o autoexpand=on -o autoreplace=on -f p${nextpool} raidz2 ${disk1} ${cache_disks}
+  zpoolcreate -o cachefile=/TopStordata/p${nextpool} -o ashift=12 $POOLFM -o autoexpand=on -o autoreplace=on -f p${nextpool} raidz2 ${disk1} ${cache_disks}
   if [ $? -eq 0 ]; then
      zfs set acltype=posixacl p$nextpool
      zfs set avail:type=Availbility p$nextpool
@@ -604,7 +624,7 @@ else
   echo /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on cachefile=/TopStordata/p${nextpool} -f p${nextpool} raidz1 ${disk1} ${cache_disks} >/root/tmp
   echo /sbin/zpool create -o ashift=12 -o autoexpand=on -o autoreplace=on cachefile=/TopStordata/p${nextpool} -f p${nextpool} raidz1 ${disk1} ${cache_disks}
    echo stop creating p$nextpool  >>/root/tmp2
-  /sbin/zpool create -o ashift=12 $POOLFM -o autoexpand=on -o cachefile=/TopStordata/p${nextpool} -o autoreplace=on -f p${nextpool} raidz1 ${disk1} ${cache_disks}
+  zpoolcreate -o ashift=12 $POOLFM -o autoexpand=on -o cachefile=/TopStordata/p${nextpool} -o autoreplace=on -f p${nextpool} raidz1 ${disk1} ${cache_disks}
   if [ $? -eq 0 ]; then
      echo itisdone >> /root/tmp2
      zfs set acltype=posixacl p$nextpool
@@ -702,7 +722,7 @@ else
   nextpool='dhcp'${RANDOM}$RANDOM;
    docker exec etcdclient /TopStor/logmsg.py DGst21 info $userreq p${nextpool} $diskns
   echo /sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 -o autoexpand=on -o autoreplace=on -f p${nextpool} ${disk1} ${cache_disks} > /root/dgsetzpool
-  /sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 $POOLFM -o autoexpand=on -o autoreplace=on -f p${nextpool} ${disk1} ${cache_disks}
+  zpoolcreate -o cachefile=/TopStordata/p${nextpool} -o ashift=12 $POOLFM -o autoexpand=on -o autoreplace=on -f p${nextpool} ${disk1} ${cache_disks}
   if [ $? -eq 0 ]; then
      echo zfs set acltype=posixacl p$nextpool
      zfs set acltype=posixacl p$nextpool
@@ -767,7 +787,7 @@ else
   done
   nextpool='dhcp'${RANDOM}$RANDOM;
   docker exec etcdclient /TopStor/logmsg.py DGst24 info $userreq p${nextpool} $diskns
-  /sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 $POOLFM -o autoexpand=on -o autoreplace=on -f p${nextpool} ${mirror_groups} ${cache_disks} 2>/root/dgcreateerror
+  zpoolcreate -o cachefile=/TopStordata/p${nextpool} -o ashift=12 $POOLFM -o autoexpand=on -o autoreplace=on -f p${nextpool} ${mirror_groups} ${cache_disks} 2>/root/dgcreateerror
 
   if [ $? -eq 0 ]; then
      zfs set acltype=posixacl p$nextpool
@@ -836,7 +856,7 @@ else
      done
      nextpool='dhcp'${RANDOM}$RANDOM;
      docker exec etcdclient /TopStor/logmsg.py DGst17 info $userreq p${nextpool} $diskns
-     /sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 $POOLFM -o autoexpand=on -o autoreplace=on -f p${nextpool} ${raidz_groups} ${cache_disks} 2>/root/dgcreateerror
+     zpoolcreate -o cachefile=/TopStordata/p${nextpool} -o ashift=12 $POOLFM -o autoexpand=on -o autoreplace=on -f p${nextpool} ${raidz_groups} ${cache_disks} 2>/root/dgcreateerror
 
      if [ $? -eq 0 ]; then
         zfs set acltype=posixacl p$nextpool
@@ -906,7 +926,7 @@ else
      done
      nextpool='dhcp'${RANDOM}$RANDOM;
      docker exec etcdclient /TopStor/logmsg.py DGst15 info $userreq p${nextpool} $diskns
-     /sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 $POOLFM -o autoexpand=on -o autoreplace=on -f p${nextpool} ${raidz_groups} ${cache_disks} 2>/root/dgcreateerror
+     zpoolcreate -o cachefile=/TopStordata/p${nextpool} -o ashift=12 $POOLFM -o autoexpand=on -o autoreplace=on -f p${nextpool} ${raidz_groups} ${cache_disks} 2>/root/dgcreateerror
 
      if [ $? -eq 0 ]; then
         zfs set acltype=posixacl p$nextpool
@@ -970,7 +990,7 @@ else
   nextpool='dhcp'${RANDOM}$RANDOM;
   docker exec etcdclient /TopStor/logmsg.py DGst19 info $userreq p${nextpool} $diskns
   #/sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 $POOLFM -o autoexpand=on -o autoreplace=on -f p${nextpool} mirror ${disk1} 2>/root/dgcreateerror
-  /sbin/zpool create -o cachefile=/TopStordata/p${nextpool} -o ashift=12 $POOLFM -o autoexpand=on -o autoreplace=on -f p${nextpool} mirror ${data_disks} ${cache_disks} 2>/root/dgcreateerror
+  zpoolcreate -o cachefile=/TopStordata/p${nextpool} -o ashift=12 $POOLFM -o autoexpand=on -o autoreplace=on -f p${nextpool} mirror ${data_disks} ${cache_disks} 2>/root/dgcreateerror
 
   if [ $? -eq 0 ]; then
      zfs set acltype=posixacl p$nextpool
