@@ -50,7 +50,7 @@ echo iam in >> /root/tmp2
  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq 
  docker exec etcdclient /TopStor/logmsg.py DGst5 info $userreq $pool
   stamp=`date +%s`
-  ETCDCTL_API=3 /pace/etcddel.py $leaderip ActPools/$pool 
+  ETCDCTL_API=3 /pace/etcddel.py $leaderip ActPool/$pool 
   ETCDCTL_API=3 /pace/etcddel.py $leaderip sync/ActPool/ ${pool} 
   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/ActPool/Del_${pool}_$guid/request actpools_$stamp 
   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/ActPool/Del_${pool}_$guid/request/$leader actpools_$stamp 
