@@ -3747,3 +3747,17 @@ Found in the local re-run of test 10 (`QSD5.285`), step 35 "Delete this created 
 
 - **UI (`topstorweb/src/QServicePerformance.jsx`).** The static "Active Pulse" chip is removed (it showed no data); the header keeps the Running Partners torus and the Grafana link.
 - **Single line.** QSD5.292 sits on QSD5.291, which contains all of QSD5.290, so one version is the complete one (TopStor `62e1943d`, pace `af5aa93d`, topstorweb `eab27329`; TopStor and pace carry an empty version-bump commit). Further fixes branch from QSD5.292.
+
+## 91. One counting rule in the UI: Running Partners = Nodes view, bell counts = System Logs — `QSD5.293` (2026-10-10)
+
+- **Problem.** The Running Partners torus counted `partners/partnerlist` (no readiness, so never moved) and the bell dropdown counted `onedaylog` over 7 days, while the Nodes view and the System Logs page used other sources.
+- **UI (`topstorweb/src`, front end only).** `QServicePerformance.jsx`: the torus reads `api/v1/hosts/allinfo` like `QNodes`/`ActiveNodes`: members = `active`, off (not ready) = those also in `lost`; the label is `ready/total ready` and the green arc shrinks with each off node (amber, red when none is ready). `components/Navbar.jsx`: the bell counts are derived from `fetchLogs()` (`alllogs`) with `matchesLogSev` of `logFilter.js`, the rule the System Logs page filters with, so a bell number always equals the rows shown after the click. The header is now "Notifications" (no "7 days"). `fetchOneDayLog` is unused.
+- **Open point.** The mock must return `lost` entries in `hosts/allinfo` for the torus to show an off node; a mock/backend change, if missing, is for the other agent.
+- **Rule.** `QSD5.293` = `QSD5.292` + the test agent's later `QSD5.290` commits merged (no gap; TopStor `f8fd1a4d`, pace `ad71eac`, topstorweb `79b931b2`; TopStor and pace carry a version-bump commit). The running test is not disturbed; the next test pulls it.
+
+## 92. Stale same-portal iSCSI session hid a re-created node's disks — `QSD5.294` (2026-10-10) `C`
+
+- **Found by** QC test 14 (round 2, step 8): after node 2 re-joined, node 1 never logged in to its new target (`iqn.2016-03.com.dhcp222291:t1`), so no disks appeared and the pool stayed degraded. Manual `iscsiadm -m node -T … -p 10.11.11.77:3266 -l` fixed it at once.
+- **Cause.** `pace/iscsirefresh.sh` treated a host as connected when the session table contained `${host}:3266`. A stale session (state REOPEN, old IQN of the same IP from before the node was re-created) matched, so discovery/login of the current IQN never ran; the stale session cannot be logged out (error 32).
+- **Fix, pace `iscsirefresh.sh`.** Per ready host: discover the current IQN (`timeout 30`); connected only when a session of that portal carries exactly that IQN; otherwise log in, after a best-effort logout of stale same-portal sessions with another IQN. If discovery returns nothing the old portal-only decision is kept.
+- **Rule.** Branch `QSD5.294` on `QSD5.293` (pace `7adf3a0`; TopStor/topstorweb unchanged, same as QSD5.293). Not deployed during test 14; the next test pulls it.
