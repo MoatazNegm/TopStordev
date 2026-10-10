@@ -44,14 +44,14 @@ then
    docker exec etcdclient /TopStor/logmsg.py ISCSI1001 error $userreq $volname
    echo /sbin/zfs destroy -rf $DG/$volname >/root/errorVolumeDeleteISCSI
  else
-  rm -rf /$DG/iscsi.$volname
+  rm -rf /$DG/iscsi.$volname /TopStordata/iscsi.$volname
   /pace/etcddel.py $leaderip volume $volname
   # QSD5.242: the target of the address (iqn.2016-03.com.<ip without dots>:data) and the address itself stay behind when
   # the last LUN of the target is gone; remove both, otherwise the target is still discoverable and the address still answers
   if [ -n "$iscsiip" ]
   then
    ipdom=`echo $iscsiip | sed 's/\.//g'`
-   if ! targetcli ls /iscsi/iqn.2016-03.com.$ipdom:data/tpg1/luns 2>/dev/null | grep -q 'o- lun'
+   if ! targetcli ls /iscsi/iqn.2016-03.com.$ipdom:data/tpg1/luns 2>/dev/null | grep -q 'o- lun[0-9]'
    then
     targetcli /iscsi delete iqn.2016-03.com.$ipdom:data
     targetcli saveconfig
