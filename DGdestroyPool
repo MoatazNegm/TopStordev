@@ -79,7 +79,17 @@ echo iam in >> /root/tmp2
  echo iam here2 >> /root/tmp2
  /sbin/zpool export -f $pool
  sleep 1
- /sbin/zpool import $pool
+ # the import right after the export sometimes finds no pool ("cannot import: no such pool available") while the
+ # devices are rescanned: the destroy then failed, the pool stayed exported and a node re-imported it later (QSD5.286)
+ imptry=0
+ while :; do
+  /sbin/zpool import $pool 2>/root/dgdestroyerror && break
+  imptry=$((imptry+1))
+  echo "zpool import $pool retry $imptry: `cat /root/dgdestroyerror`" >> /root/dgdestroyretry
+  [ $imptry -ge 10 ] && break
+  udevadm settle 2>/dev/null
+  sleep 3
+ done
  sleep 1
  /sbin/zpool destroy -f $pool 2>/root/dgdestroyerror
  if [ $? -ne 0 ]; then
