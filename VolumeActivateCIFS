@@ -49,7 +49,7 @@ then
   writev=`echo $writev | sed 's/\,/ /g' `;
   volhost=`/pace/etcdget.py $etcd volumes/CIFS/ $name | awk -F'/' '{print $3}'`
   volsvalue=`/pace/etcdget.py $etcd volumes/CIFS/$volhost/$pool/$name`
-  chmod 770 /$pool/$name
+  chmod 1770 /$pool/$name
   sleep 1 
   setfacl -b /$pool/$name
   echo $writev | grep -w nogroup

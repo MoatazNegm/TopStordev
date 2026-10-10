@@ -115,7 +115,7 @@ then
  ETCDCTL_API=3 /pace/etcdput.py $leaderip volumes/CIFS/$myhost/$DG/$name $DG/$name/no/yes/$writev/administrator/yes/$ipaddr/$ipsubnet/$active
  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request volumes_$stamp
  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request/$leader volumes_$stamp
- chmod 2770 /$DG/$name
+ chmod 3770 /$DG/$name
  setfacl -b -R /$DG/$name
  echo $writev | grep -w nogroup
  if [ $? -ne 0 ];

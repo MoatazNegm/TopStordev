@@ -186,7 +186,7 @@ then
    sed -i "s/DOMADM/$winadm/g" /TopStordata/smb.${name}
    sed -i "s/DOMPASS/$winpass/g" /TopStordata/smb.${name}
    sed -i "s/ACTIVE/$active/g" /TopStordata/smb.${name}
-   chmod 777 /$pool/$name
+   chmod 1777 /$pool/$name
    echo running cifs.sh=$pool $name $ipaddr $ipsubnet cifs >> /root/volactivateparam
    echo /TopStor/cifs.sh $leaderip $pool $name $ipaddr $ipsubnet cifs
    yes | cp /TopStordata/smb.$name /$pool/
@@ -224,7 +224,7 @@ then
   domain=`/pace/etcdget.py $etcd volumes $name | grep CIFS | awk -F'/' '{print $14}'`
   echo /pace/etcdget.py $etcd volumes/CIFS_$domain/$volhost/$pool/$name
   volsvalue=`/pace/etcdget.py $etcd volumes/CIFS_$domain/$volhost/$pool/$name`
-  chmod 777 /$pool/$name
+  chmod 1777 /$pool/$name
   sleep 1 
   setfacl -b /$pool/$name
   #echo $writev | grep -w nogroup
