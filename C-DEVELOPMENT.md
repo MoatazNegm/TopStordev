@@ -3727,3 +3727,9 @@ Found in the local re-run of test 10 (`QSD5.285`), step 35 "Delete this created 
 - **Colours.** Rows are tinted by severity: error red, warning amber, info blue; the severity badge and message text follow. The severity column and its sort use the same classification, so the mock (whose `type` column holds the user) is coloured too.
 - **Note.** The bell counts cover 7 days (`onedaylog`) while the page lists the newest 100 events; on the mock both agree, on a busy real system the filtered list can be shorter than the count.
 - **Rule.** Branch `QSD5.289` (TopStor `c4f70c5e`, pace `7531fcea`, topstorweb `4beab380`) pushed from the `/home/topstor/wt-ui288` worktrees; the next test pulls it, the running one is not disturbed.
+
+## 89. Service Performance page: Running Partners torus, compact cards — `QSD5.291` (2026-10-10)
+
+- **UI (`topstorweb/src`, front end only).** The "Real-time ZFS heuristics..." subtitle is removed; the Active Pulse area gets a **Running Partners** card: a torus that is fully green when every partner of `api/v1/partners/partnerlist` is ready and shows a green arc proportional to ready/total otherwise (the rest amber, red when none is ready), with an `n/m ready` count; refreshed every 5 s. "ZFS ARC Cache" is now "Cache". `MetricCard`, `PerformanceChart` and the page panel use tighter padding, smaller icons/fonts and a shorter chart (90 px minimum).
+- **Open backend point.** `partnerlist` returns no readiness field (`alias/ip/port/type` only). The card reads `ready`, `status` or `state` when present and counts a partner without one as ready; a real readiness field from the backend is needed for the ring to move.
+- **Rule.** `QSD5.290` was already taken by the test agent, so this is `QSD5.291` = `QSD5.290` merged with the UI commit (TopStor `17014903`, pace `b1f5068d`, topstorweb `f49f6c0e`), pushed from the `/home/topstor/wt-ui288` worktrees.
