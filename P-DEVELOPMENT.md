@@ -3246,7 +3246,7 @@ Found in the local re-run of test 10 (`QSD5.285`), step 35 "Delete this created 
 
 - **UI (`topstorweb/src`, front end only).** The "Real-time ZFS heuristics..." subtitle is removed; the Active Pulse area gets a **Running Partners** card: a torus that is fully green when every partner of `api/v1/partners/partnerlist` is ready and shows a green arc proportional to ready/total otherwise (the rest amber, red when none is ready), with an `n/m ready` count; refreshed every 5 s. "ZFS ARC Cache" is now "Cache". `MetricCard`, `PerformanceChart` and the page panel use tighter padding, smaller icons/fonts and a shorter chart (90 px minimum).
 - **Open backend point.** `partnerlist` returns no readiness field (`alias/ip/port/type` only). The card reads `ready`, `status` or `state` when present and counts a partner without one as ready; a real readiness field from the backend is needed for the ring to move.
-- **Rule.** `QSD5.290` was already taken by the test agent, so this is `QSD5.291` = `QSD5.290` merged with the UI commit (TopStor `17014903`, pace `b1f5068d`, topstorweb `f49f6c0e`), pushed from the `/home/topstor/wt-ui288` worktrees.
+- **Rule.** `QSD5.290` was already taken by the test agent, so this is `QSD5.291` = `QSD5.290` merged with the UI commit (first merge TopStor `17014903`, pace `b1f5068d`, topstorweb `f49f6c0e`; after the test agent's later QSD5.290 commits were merged too: TopStor `99367944`, pace `3bcf156b`, topstorweb `1d69c6ba`), pushed from the `/home/topstor/wt-ui288` worktrees.
 
 ## 90. Take over / return: stale leg imported by name, pool "balanced" while still resilvering — `QSD5.290` (2026-10-10) `C`
 
@@ -3256,3 +3256,8 @@ Found in the local re-run of test 10 (`QSD5.285`), step 35 "Delete this created 
 - **Harness.** `waitbal.sh` no longer trusts the card alone: it also needs `zpool status` ONLINE, no resilver/scrub, no `poouids` retry marker, and two stable samples in a row.
 - **Note.** The pool card (`PoolCard.jsx`) still says "balanced" from `missingdisks`/`raidrank` only; a UI change is not part of this branch.
 - **Rule.** Branch `QSD5.290`; the coordinator merges it into `QSD5.291` (the single line from the next test on).
+
+## 90. Service Performance: Active Pulse chip removed — `QSD5.292` (2026-10-10)
+
+- **UI (`topstorweb/src/QServicePerformance.jsx`).** The static "Active Pulse" chip is removed (it showed no data); the header keeps the Running Partners torus and the Grafana link.
+- **Single line.** QSD5.292 sits on QSD5.291, which contains all of QSD5.290, so one version is the complete one (TopStor `62e1943d`, pace `af5aa93d`, topstorweb `eab27329`; TopStor and pace carry an empty version-bump commit). Further fixes branch from QSD5.292.
