@@ -1,0 +1,1 @@
+* * * * * pgrep -f /usr/local/sbin/iscsi-guardian.sh >/dev/null 2>&1 || (setsid /usr/local/sbin/iscsi-guardian.sh </dev/null >>/var/log/iscsid.log 2>&1 &)
