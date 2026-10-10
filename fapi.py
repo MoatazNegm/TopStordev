@@ -1790,7 +1790,7 @@ def userdel(data):
     if data.get('name') not in ('admin', 'Everyone', 'NoUser'):
      getalltime()
      for volname, vol in list(allinfo['volumes'].items()):
-      if vol.get('prot') == 'HOME' and volname.rsplit('_',1)[0] == data.get('name'):
+      if vol.get('prot') in ('HOME', 'HOMEE') and volname.rsplit('_',1)[0] == data.get('name'):
        postchange('/TopStor/VolumeDeleteHOME '+leaderip+' '+vol['pool']+' '+volname+' HOME '+data['user'], vol['host'])
  else:
     TenantDelUser(data)
