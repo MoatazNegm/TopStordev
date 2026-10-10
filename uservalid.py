@@ -8,7 +8,7 @@
 import re, sys
 
 NAME_MIN, NAME_MAX = 3, 32
-PASS_MIN, PASS_MAX = 3, 128
+PASS_MIN, PASS_MAX = 4, 128
 
 # Accounts of the system and of the appliance.  UnixAddUser runs "userdel -f <name>" before it creates
 # the user, so one of these names would delete a system account.
