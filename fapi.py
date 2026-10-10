@@ -29,7 +29,7 @@ from datetime import datetime
 from getallraids import newraids
 from fastselect import selectdisks
 from raid10 import selectraid10
-from raid5060 import selectraid50, selectraid60
+from raid5060 import selectraid50, selectraid60, raidwidthof
 from secrets import token_hex
 from time import time as timestamp
 import logmsg
@@ -636,9 +636,9 @@ def dgsaddtopool(data):
  elif 'raid10' in data['redundancy']:
   datastr = 'addraid10 '+data['user']+' '+data['owner']+" "+diskstring+data['pool']
  elif 'raid50' in data['redundancy']:
-  datastr = 'addraid50 '+data['user']+' '+data['owner']+" "+diskstring+data['pool']
+  datastr = 'addraid50w'+str(raidwidthof('raid50',selecteddisks,allinfo['disks']))+' '+data['user']+' '+data['owner']+" "+diskstring+data['pool']
  elif 'raid60' in data['redundancy']:
-  datastr = 'addraid60 '+data['user']+' '+data['owner']+" "+diskstring+data['pool']
+  datastr = 'addraid60w'+str(raidwidthof('raid60',selecteddisks,allinfo['disks']))+' '+data['user']+' '+data['owner']+" "+diskstring+data['pool']
  elif 'raid6' in data['redundancy']:
   datastr = 'addparity2 '+data['user']+' '+data['owner']+" "+diskstring+data['pool']
  cmndstring = '/TopStor/DGsetPool '+leaderip+' '+datastr
@@ -844,9 +844,9 @@ def dgsnewpool(data):
     elif 'raid10' in data['redundancy']:
         datastr = 'raid10 '+data['user']+' '+data['owner']+" "+diskstring+" "+cachestring+" nopool "+data['user']+" "+data['owner']
     elif 'raid50' in data['redundancy']:
-        datastr = 'raid50 '+data['user']+' '+data['owner']+" "+diskstring+" "+cachestring+" nopool "+data['user']+" "+data['owner']
+        datastr = 'raid50w'+str(raidwidthof('raid50',selecteddisks,allinfo['disks']))+' '+data['user']+' '+data['owner']+" "+diskstring+" "+cachestring+" nopool "+data['user']+" "+data['owner']
     elif 'raid60' in data['redundancy']:
-        datastr = 'raid60 '+data['user']+' '+data['owner']+" "+diskstring+" "+cachestring+" nopool "+data['user']+" "+data['owner']
+        datastr = 'raid60w'+str(raidwidthof('raid60',selecteddisks,allinfo['disks']))+' '+data['user']+' '+data['owner']+" "+diskstring+" "+cachestring+" nopool "+data['user']+" "+data['owner']
     elif 'raid6' in data['redundancy']:
         datastr = 'parity2 '+data['user']+' '+data['owner']+" "+diskstring+" "+cachestring+" nopool "+data['user']+" "+data['owner']
 

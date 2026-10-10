@@ -30,6 +30,12 @@ zpoolcreate() {
 }
 leaderip=` echo $@ | awk '{print $1}'`;
 raid=` echo $@ | awk '{print $2}'`;
+# RAID50 / RAID60 group width chosen by fapi (raid5060.raidwidth): the width of a group must divide by the number of nodes or the
+# pool can never be "balanced" (3 disks on 2 nodes).  Sent as raid50w4 / addraid60w4 ...; plain raid50 = width 3, raid60 = 4 as before.
+RW=""
+case "$raid" in
+ raid50w[0-9]*|raid60w[0-9]*|addraid50w[0-9]*|addraid60w[0-9]*) RW=`echo $raid | sed 's/.*w\([0-9]*\)$/\1/'`; raid=`echo $raid | sed 's/w[0-9]*$//'`;;
+esac
 userreq=` echo $@ | awk '{print $3}'`;
 host=` echo $@ | awk '{print $4}'`;
 hostnam=$host
@@ -205,12 +211,12 @@ else
      diskns=${diskns}$diskn","
     done;
     num_disks=${#all_disks[@]}
-    if [ $num_disks -lt 6 ] || [ $((num_disks % 3)) -ne 0 ]; then
+    if [ $num_disks -lt $((2*${RW:-3})) ] || [ $((num_disks % ${RW:-3})) -ne 0 ]; then
      docker exec etcdclient /TopStor/logmsg.py DGfa16 error $userreq ${nextpool} $diskns .
     else
      raidz_groups=""
-     for (( idx=0; idx<num_disks; idx+=3 )); do
-      raidz_groups="${raidz_groups} raidz1 ${all_disks[$idx]} ${all_disks[$((idx+1))]} ${all_disks[$((idx+2))]}"
+     for (( idx=0; idx<num_disks; idx+=${RW:-3} )); do
+      raidz_groups="${raidz_groups} raidz1 ${all_disks[@]:$idx:${RW:-3}}"
      done
      docker exec etcdclient /TopStor/logmsg.py DGst16 info $userreq ${nextpool} $diskns .
      /sbin/zpool add -f ${nextpool} ${raidz_groups} 2>/TopStordata/zpoolerr
@@ -241,12 +247,12 @@ else
      diskns=${diskns}$diskn","
     done;
     num_disks=${#all_disks[@]}
-    if [ $num_disks -lt 8 ] || [ $((num_disks % 4)) -ne 0 ]; then
+    if [ $num_disks -lt $((2*${RW:-4})) ] || [ $((num_disks % ${RW:-4})) -ne 0 ]; then
      docker exec etcdclient /TopStor/logmsg.py DGfa14 error $userreq ${nextpool} $diskns .
     else
      raidz_groups=""
-     for (( idx=0; idx<num_disks; idx+=4 )); do
-      raidz_groups="${raidz_groups} raidz2 ${all_disks[$idx]} ${all_disks[$((idx+1))]} ${all_disks[$((idx+2))]} ${all_disks[$((idx+3))]}"
+     for (( idx=0; idx<num_disks; idx+=${RW:-4} )); do
+      raidz_groups="${raidz_groups} raidz2 ${all_disks[@]:$idx:${RW:-4}}"
      done
      docker exec etcdclient /TopStor/logmsg.py DGst14 info $userreq ${nextpool} $diskns .
      /sbin/zpool add -f ${nextpool} ${raidz_groups} 2>/TopStordata/zpoolerr
@@ -847,12 +853,12 @@ else
       fi
     done;
     num_disks=${#all_disks[@]}
-    if [ $num_disks -lt 6 ] || [ $((num_disks % 3)) -ne 0 ]; then
+    if [ $num_disks -lt $((2*${RW:-3})) ] || [ $((num_disks % ${RW:-3})) -ne 0 ]; then
      docker exec etcdclient /TopStor/logmsg.py DGfa17 error $userreq p${nextpool} $diskns
     else
      raidz_groups=""
-     for (( idx=0; idx<num_disks; idx+=3 )); do
-      raidz_groups="${raidz_groups} raidz1 ${all_disks[$idx]} ${all_disks[$((idx+1))]} ${all_disks[$((idx+2))]}"
+     for (( idx=0; idx<num_disks; idx+=${RW:-3} )); do
+      raidz_groups="${raidz_groups} raidz1 ${all_disks[@]:$idx:${RW:-3}}"
      done
      nextpool='dhcp'${RANDOM}$RANDOM;
      docker exec etcdclient /TopStor/logmsg.py DGst17 info $userreq p${nextpool} $diskns
@@ -917,12 +923,12 @@ else
       fi
     done;
     num_disks=${#all_disks[@]}
-    if [ $num_disks -lt 8 ] || [ $((num_disks % 4)) -ne 0 ]; then
+    if [ $num_disks -lt $((2*${RW:-4})) ] || [ $((num_disks % ${RW:-4})) -ne 0 ]; then
      docker exec etcdclient /TopStor/logmsg.py DGfa15 error $userreq p${nextpool} $diskns
     else
      raidz_groups=""
-     for (( idx=0; idx<num_disks; idx+=4 )); do
-      raidz_groups="${raidz_groups} raidz2 ${all_disks[$idx]} ${all_disks[$((idx+1))]} ${all_disks[$((idx+2))]} ${all_disks[$((idx+3))]}"
+     for (( idx=0; idx<num_disks; idx+=${RW:-4} )); do
+      raidz_groups="${raidz_groups} raidz2 ${all_disks[@]:$idx:${RW:-4}}"
      done
      nextpool='dhcp'${RANDOM}$RANDOM;
      docker exec etcdclient /TopStor/logmsg.py DGst15 info $userreq p${nextpool} $diskns
