@@ -3829,7 +3829,7 @@ Front end only (topstorweb `src`); TopStor and pace are unchanged and carry the 
 - **Other.** Sidebar: one icon per entry, the active entry is highlighted in the collapsed rail, new entry API Keys; S3: Home Volume Insights panel removed; Snapshots: Weekly day dropdown shows all days.
 - **Open.** The backend `QSD5.306` commits (AddPartner port check, `partners/freeport`, API guide) sit on the local `QSD5.306` branch of `TopStor` and are not released; they have to be rebased on `QSD5.307` and released as `QSD5.308`.
 
-## 100. Partner port check, `partners/freeport`, API keys and the API user guide — `QSD5.308` (2026-10-11) `M`
+## 101. Partner port check, `partners/freeport`, API keys and the API user guide — `QSD5.308` (2026-10-11) `M`
 
 Requested by the front-end developer (UI side built in QSD5.307). Released on top of `QSD5.307` (TopStor/pace = the QSD5.305 backend, topstorweb = UI).
 
@@ -3840,3 +3840,20 @@ Requested by the front-end developer (UI side built in QSD5.307). Released on to
 - **Proof.** Live on zfs1 (flask restarted): freeport `{"port":7495}`; `AddPartner` port 99 → `select another port`; key create → list (no secret) → `volumesinfo` with the key OK → `pools/newpool` `key is read only` → `apikeys/list` with the key `not allowed for an API key` → revoke → the key answers `baduser` → delete → list empty.
 - **Lesson.** Route code that uses `@login_required` must come after its definition: the first version put the key routes before `def login_required` and `fapi.py` died at import (`NameError`) — caught by `import fapi` in the flask container before the next run.
 
+
+## 102. RAID50 create right after a pool delete: "one or more vdevs refer to the same device" — `QSD5.310` (2026-10-12) `M`
+
+* **Found by:** QC test 10 round 13 (QSD5.308/309), step 14 (RAID50 on the 8 free 10 GB disks). The previous pool was deleted at
+  23:58:16, the test harness saw "no pool, all disks free" and the create request came in the same second. `DGsetPool` logged
+  `DGst17` and then `DGfa17` 14 s later; `/root/dgcreateerror` held `cannot create 'pdhcp…': one or more vdevs refer to the same
+  device, or one of the devices is part of an active md or lvm device`. The same request sent two minutes later created the pool in
+  17 s, so the disks were fine: the kernel/udev was still tearing down the old partitions of the destroyed pool (`*-part1` links
+  with the creation time of the previous pool were still there).
+* **Cause:** the `zpoolcreate()` wrapper of `DGsetPool` (§ test 10 RAID50 busy retry) retried only on `resource busy`; this is the
+  twin message of the same race.
+* **Fix:** `DGsetPool` `zpoolcreate()` also retries (max 8 × `udevadm settle` + 5 s) on `refer to the same device`. Nothing else
+  changes: any other error is reported at once as before.
+* **Also seen in round 13 (not changed):** the first `delpool` of `pdhcp458925210` (mirror + cache, 23:26:01) was logged by ZFS as
+  `zpool destroy -f` only at 23:26:36 after an owner move (`reguid` + `set owner`, 23:26:06) and the pool stayed imported for
+  >3 min; the second `delpool` removed it in 45 s. Watch for a repeat.
+* **Harness:** `round10.sh` waits up to 3 min for an empty `zpool list` after its own `delpool` instead of 25 s.

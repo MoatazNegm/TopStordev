@@ -10,7 +10,8 @@ POOLFM=""
 is_container 2>/dev/null && POOLFM="-o failmode=continue"
 
 # zpool create that survives the short "Device or resource busy" on a partition that was created a second ago (udev/blkid still
-# holds it, seen right after a pool was destroyed on the same disks: RAID50 right after a delete, test 10).  Retried only on that error.
+# holds it, seen right after a pool was destroyed on the same disks: RAID50 right after a delete, test 10).  Retried only on that error
+# and on its twin "one or more vdevs refer to the same device" (the old partitions still being removed, test 10 round 13, QSD5.310).
 zpoolcreate() {
     zc_try=0
     while :; do
@@ -18,7 +19,7 @@ zpoolcreate() {
         zc_rc=$?
         if [ $zc_rc -eq 0 ]; then return 0; fi
         zc_try=$((zc_try+1))
-        if echo "$zc_err" | grep -q "resource busy" && [ $zc_try -lt 8 ]; then
+        if echo "$zc_err" | grep -q "resource busy\|refer to the same device" && [ $zc_try -lt 8 ]; then
             echo "zpool create busy, retry $zc_try" >> /root/dgcreateretry
             udevadm settle 2>/dev/null
             sleep 5
