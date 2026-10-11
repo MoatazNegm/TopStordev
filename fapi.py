@@ -1824,6 +1824,66 @@ def UnixAddGroup(data):
  postchange(cmndstring)
  return data
 
+PARTNER_PORT_MIN = 3001
+PARTNER_PORT_MAX = 8000
+
+def partner_ports_used():
+ # ports already given to a partner entry:  Partner/<alias>_<type> = <ip>/<type>/<port>/<phrase>
+ used = set()
+ try:
+  for partner in etcdgetjson(leaderip,'Partner/','--prefix'):
+   split = partner["prop"].split('/')
+   if len(split) > 2:
+    used.add(str(split[2]).strip())
+ except Exception as e:
+  print('partner_ports_used:', e)
+ return used
+
+def port_listening(port):
+ # a listener of this node holds the port (ss), or it cannot be bound (bind test)
+ try:
+  out = subprocess.run(['ss','-ltnH'],stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,timeout=10).stdout.decode('utf-8','replace')
+  for line in out.split('\n'):
+   cols = line.split()
+   if len(cols) > 3 and cols[3].rsplit(':',1)[-1] == str(port):
+    return True
+ except Exception as e:
+  print('port_listening ss:', e)
+ sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+ try:
+  sock.bind(('0.0.0.0', int(port)))
+  return False
+ except OSError:
+  return True
+ finally:
+  sock.close()
+
+def partner_port_free(port, used=None):
+ try:
+  port = int(str(port).strip())
+ except (TypeError, ValueError):
+  return False
+ if port < PARTNER_PORT_MIN or port > PARTNER_PORT_MAX:
+  return False
+ if used is None:
+  used = partner_ports_used()
+ return str(port) not in used and not port_listening(port)
+
+@app.route('/api/v1/partners/freeport', methods=['GET'])
+@login_required
+@audit_command
+def api_partners_freeport(data):
+ # a random free port in 3001..8000 for a new partner; no side effects
+ if 'baduser' in data['response']:
+  return {'response': 'baduser'}
+ import random
+ used = partner_ports_used()
+ for _ in range(50):
+  port = random.randint(PARTNER_PORT_MIN, PARTNER_PORT_MAX)
+  if partner_port_free(port, used):
+   return {'port': port}
+ return {'port': 0, 'response': 'select another port'}
+
 @app.route('/api/v1/partners/AddPartner', methods=['GET','POST'])
 @login_required
 @audit_command
@@ -1841,6 +1901,11 @@ def AddPartner(data):
         else:
             logmsg.sendlog('IPnamuqfa','error','system',loggedusers[data['token']]['user'])
         return data
+
+ # the port must be 3001-8000, not used by another partner and not listened on by this node: nothing is authorized otherwise
+ if 'port' not in data or not partner_port_free(data['port']):
+  logmsg.sendlog('Partnportfa','error','system',loggedusers[data['token']]['user'])
+  return 'select another port'
 
  print('##########################33333')
  print(data)
