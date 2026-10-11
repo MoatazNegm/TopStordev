@@ -332,100 +332,6 @@ def apikey_access(value, default='read'):
  value = str(value or default).lower()
  return value if value in ('read', 'write') else None
 
-@app.route('/api/v1/apikeys/list', methods=['GET','POST'])
-@login_required
-@audit_command
-def apikeys_list(data):
- refused = apikey_manager(data)
- if refused:
-  return refused
- allkeys = []
- for name, rec in sorted(apikeys_all().items()):
-  allkeys.append({'name': name, 'access': rec['access'], 'status': rec['status'], 'created': rec['created'],
-                  'createdby': rec['createdby'], 'lastused': rec['lastused'], 'revoked': rec['revoked']})
- return {'response': 'Ok', 'allkeys': allkeys}
-
-@app.route('/api/v1/apikeys/create', methods=['GET','POST'])
-@login_required
-@audit_command
-def apikeys_create(data):
- refused = apikey_manager(data)
- if refused:
-  return refused
- name = str(data.get('name', ''))
- access = apikey_access(data.get('access'))
- if not APIKEY_NAME_RE.match(name):
-  return {'response': 'error', 'message': 'name must be 3-32 characters: letters, digits, _ or -, starting with a letter'}
- if access is None:
-  return {'response': 'error', 'message': 'access must be read or write'}
- if name in apikeys_all():
-  return {'response': 'error', 'message': 'a key with this name already exists'}
- if apikey_nameclash(name):
-  return {'response': 'error', 'message': 'the name is already used by a user or a group'}
- rec = {'access': access, 'status': 'active', 'created': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
-        'createdby': data['user'], 'lastused': '-', 'revoked': '-', 'salt': '', 'hash': ''}
- secret = apikey_newsecret(rec)
- apikey_put(name, rec)
- apikey_sync(name)
- logmsg.sendlog('ApiKey1000', 'info', data['user'], name)
- return {'response': 'Ok', 'name': name, 'access': access, 'key': 'qsk.'+name+'.'+secret}
-
-@app.route('/api/v1/apikeys/regenerate', methods=['GET','POST'])
-@login_required
-@audit_command
-def apikeys_regenerate(data):
- refused = apikey_manager(data)
- if refused:
-  return refused
- name = str(data.get('name', ''))
- rec = apikeys_all().get(name)
- if not rec:
-  return {'response': 'error', 'message': 'no such key'}
- access = apikey_access(data.get('access'), rec['access'])
- if access is None:
-  return {'response': 'error', 'message': 'access must be read or write'}
- rec.update({'access': access, 'status': 'active', 'revoked': '-', 'lastused': '-',
-             'created': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'), 'createdby': data['user']})
- secret = apikey_newsecret(rec)
- apikey_put(name, rec)
- apikey_sync(name)
- logmsg.sendlog('ApiKey1001', 'info', data['user'], name)
- return {'response': 'Ok', 'name': name, 'access': access, 'key': 'qsk.'+name+'.'+secret}
-
-@app.route('/api/v1/apikeys/revoke', methods=['GET','POST'])
-@login_required
-@audit_command
-def apikeys_revoke(data):
- refused = apikey_manager(data)
- if refused:
-  return refused
- name = str(data.get('name', ''))
- rec = apikeys_all().get(name)
- if not rec:
-  return {'response': 'error', 'message': 'no such key'}
- rec['status'] = 'revoked'
- rec['revoked'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
- apikey_put(name, rec)
- apikey_sync(name)
- logmsg.sendlog('ApiKey1002', 'info', data['user'], name)
- return {'response': 'Ok', 'name': name, 'status': 'revoked'}
-
-@app.route('/api/v1/apikeys/delete', methods=['GET','POST'])
-@login_required
-@audit_command
-def apikeys_delete(data):
- refused = apikey_manager(data)
- if refused:
-  return refused
- name = str(data.get('name', ''))
- if name not in apikeys_all():
-  return {'response': 'error', 'message': 'no such key'}
- _delleader(leaderip, 'apikeys/'+name)
- apikey_sync(name)
- logmsg.sendlog('ApiKey1003', 'info', data['user'], name)
- return {'response': 'Ok', 'name': name}
-
-
 def login_required(f):
  global loggedusers
  @wraps(f)
@@ -539,6 +445,100 @@ def audit_command(f):
     pass
   return result
  return decorated_function
+
+@app.route('/api/v1/apikeys/list', methods=['GET','POST'])
+@login_required
+@audit_command
+def apikeys_list(data):
+ refused = apikey_manager(data)
+ if refused:
+  return refused
+ allkeys = []
+ for name, rec in sorted(apikeys_all().items()):
+  allkeys.append({'name': name, 'access': rec['access'], 'status': rec['status'], 'created': rec['created'],
+                  'createdby': rec['createdby'], 'lastused': rec['lastused'], 'revoked': rec['revoked']})
+ return {'response': 'Ok', 'allkeys': allkeys}
+
+@app.route('/api/v1/apikeys/create', methods=['GET','POST'])
+@login_required
+@audit_command
+def apikeys_create(data):
+ refused = apikey_manager(data)
+ if refused:
+  return refused
+ name = str(data.get('name', ''))
+ access = apikey_access(data.get('access'))
+ if not APIKEY_NAME_RE.match(name):
+  return {'response': 'error', 'message': 'name must be 3-32 characters: letters, digits, _ or -, starting with a letter'}
+ if access is None:
+  return {'response': 'error', 'message': 'access must be read or write'}
+ if name in apikeys_all():
+  return {'response': 'error', 'message': 'a key with this name already exists'}
+ if apikey_nameclash(name):
+  return {'response': 'error', 'message': 'the name is already used by a user or a group'}
+ rec = {'access': access, 'status': 'active', 'created': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+        'createdby': data['user'], 'lastused': '-', 'revoked': '-', 'salt': '', 'hash': ''}
+ secret = apikey_newsecret(rec)
+ apikey_put(name, rec)
+ apikey_sync(name)
+ logmsg.sendlog('ApiKey1000', 'info', data['user'], name)
+ return {'response': 'Ok', 'name': name, 'access': access, 'key': 'qsk.'+name+'.'+secret}
+
+@app.route('/api/v1/apikeys/regenerate', methods=['GET','POST'])
+@login_required
+@audit_command
+def apikeys_regenerate(data):
+ refused = apikey_manager(data)
+ if refused:
+  return refused
+ name = str(data.get('name', ''))
+ rec = apikeys_all().get(name)
+ if not rec:
+  return {'response': 'error', 'message': 'no such key'}
+ access = apikey_access(data.get('access'), rec['access'])
+ if access is None:
+  return {'response': 'error', 'message': 'access must be read or write'}
+ rec.update({'access': access, 'status': 'active', 'revoked': '-', 'lastused': '-',
+             'created': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'), 'createdby': data['user']})
+ secret = apikey_newsecret(rec)
+ apikey_put(name, rec)
+ apikey_sync(name)
+ logmsg.sendlog('ApiKey1001', 'info', data['user'], name)
+ return {'response': 'Ok', 'name': name, 'access': access, 'key': 'qsk.'+name+'.'+secret}
+
+@app.route('/api/v1/apikeys/revoke', methods=['GET','POST'])
+@login_required
+@audit_command
+def apikeys_revoke(data):
+ refused = apikey_manager(data)
+ if refused:
+  return refused
+ name = str(data.get('name', ''))
+ rec = apikeys_all().get(name)
+ if not rec:
+  return {'response': 'error', 'message': 'no such key'}
+ rec['status'] = 'revoked'
+ rec['revoked'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+ apikey_put(name, rec)
+ apikey_sync(name)
+ logmsg.sendlog('ApiKey1002', 'info', data['user'], name)
+ return {'response': 'Ok', 'name': name, 'status': 'revoked'}
+
+@app.route('/api/v1/apikeys/delete', methods=['GET','POST'])
+@login_required
+@audit_command
+def apikeys_delete(data):
+ refused = apikey_manager(data)
+ if refused:
+  return refused
+ name = str(data.get('name', ''))
+ if name not in apikeys_all():
+  return {'response': 'error', 'message': 'no such key'}
+ _delleader(leaderip, 'apikeys/'+name)
+ apikey_sync(name)
+ logmsg.sendlog('ApiKey1003', 'info', data['user'], name)
+ return {'response': 'Ok', 'name': name}
+
 
 @app.route('/api/v1/users/uploadUsers', methods=['GET','POST'])
 @login_required
