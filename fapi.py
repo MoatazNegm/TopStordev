@@ -171,6 +171,261 @@ def getalltime(renew='no'):
   getalltimestamp = timestamp()
  return
 
+# ---------------------------------------------------------------------------------------------------------------------------
+# API keys (QSD5.308): named credentials for scripts and applications.  A key is NOT a system user (no unix user, group, home,
+# no usersinfo/usersigroup entry, no console login); its name is the user name of the audit log and of the notifications.
+# The key  qsk.<name>.<secret>  is passed as 'token'.  etcd (leader, synced to every node as the whole-etcd sync 'apikeys'):
+#    apikeys/<name> = <access>/<status>/<created>/<createdby>/<lastused>/<revoked>/<salt>/<hash>     ('-' = empty)
+# only a salted HMAC of the secret is stored; the key itself is shown once, on create/regenerate.
+import hmac as _hmac, hashlib as _hashlib, secrets as _secrets
+from etcdgetpy import etcdget as _getleader
+from etcddel import etcddel as _delleader
+
+APIKEY_NAME_RE = re.compile(r'^[A-Za-z][A-Za-z0-9_-]{2,31}$')
+APIKEY_FAIL_MAX = 10                 # failed key attempts from one source IP ...
+APIKEY_FAIL_WINDOW = 300             # ... within this many seconds lock that IP out ...
+APIKEY_LOCKOUT = 300                 # ... for this many seconds
+APIKEY_LASTUSED_EVERY = 60           # lastused is written at most once a minute per key
+_apikey_fails = {}                   # ip -> [timestamps of failures]
+_apikey_locked = {}                  # ip -> locked until
+_apikey_lastwrite = {}               # name -> time of the last lastused write
+
+# the key may never call these (key management, users, groups, privileges, joining, software, login session)
+APIKEY_NEVER = ('/api/v1/users/uploadUsers', '/api/v1/groups/groupchange', '/api/v1/users/userchange', '/api/v1/users/userdel',
+                '/api/v1/groups/groupdel', '/api/v1/groups/UnixAddgroup', '/api/v1/users/UnixAddUser', '/api/v1/users/usersauth',
+                '/api/v1/user/changepass', '/api/v1/tenant/adduser', '/api/v1/hosts/joincluster', '/api/v1/software/update',
+                '/api/v1/software/localFileUpdate', '/api/v1/software/setversion', '/api/v1/software/apply',
+                '/api/v1/login/renewtoken', '/api/v1/logout', '/api/v1/replication/addpartner')
+# calls that change nothing: a 'read' key may call only these (every other call is a change call)
+APIKEY_READ = ('/api/v1/volumes/connections', '/api/v1/software/versions', '/api/v1/hosts/allinfo', '/api/v1/pools/dgsinfo',
+               '/api/v1/volumes/stats', '/api/v1/volumes/volumelist', '/api/v1/tenants/tenantinfo', '/api/v1/volumes/poolsinfo',
+               '/api/v1/volumes/snapshots/snapshotsinfo', '/api/v1/volumes/CIFS/volumesinfo', '/api/v1/volumes/ISCSI/volumesinfo',
+               '/api/v1/volumes/NFS/volumesinfo', '/api/v1/volumes/HOME/volumesinfo', '/api/v1/volumes/volumesinfo',
+               '/api/v1/pools/poolsinfo', '/api/v1/info/onedaylog', '/api/v1/info/logs', '/api/v1/info/commandlog',
+               '/api/v1/info/cversion', '/api/v1/info/notification', '/api/v1/info/summary', '/api/v1/volumes/grouplist',
+               '/api/v1/groups/grouplist', '/api/v1/users/userauths', '/api/v1/partners/partnerlist',
+               '/api/v1/partners/freeport', '/api/v1/users/userlist', '/api/v1/groups/userlist', '/api/v1/users/grouplist',
+               '/api/v1/hosts/getConfig', '/api/v1/hosts/getAllConfig', '/api/v1/login/test')
+
+def _apikey_hash(salt, secret):
+ return _hmac.new(salt.encode(), secret.encode(), _hashlib.sha256).hexdigest()
+
+def _apikey_record(raw):
+ # etcd value -> dict (None when it is not a key record)
+ f = str(raw).split('/')
+ if len(f) != 8:
+  return None
+ return {'access': f[0], 'status': f[1], 'created': f[2], 'createdby': f[3], 'lastused': f[4], 'revoked': f[5], 'salt': f[6], 'hash': f[7]}
+
+def _apikey_value(rec):
+ return '/'.join(str(rec[k]) or '-' for k in ('access','status','created','createdby','lastused','revoked','salt','hash'))
+
+def apikeys_all():
+ # name -> record, read from the leader's etcd (a revoke is effective at once, on whichever node the call arrives)
+ keys = {}
+ try:
+  rows = _getleader(leaderip, 'apikeys/', '--prefix')
+ except Exception:
+  rows = get('apikeys/', '--prefix')
+ for row in rows:
+  if not isinstance(row, (tuple, list)) or len(row) < 2:
+   continue
+  rec = _apikey_record(row[1])
+  if rec:
+   keys[str(row[0]).split('/', 1)[1]] = rec
+ return keys
+
+def apikey_sync(name):
+ # whole-etcd sync 'apikeys' (checksyncs.py): every node copies apikeys/* from the leader
+ global myhost
+ _delleader(leaderip, 'sync', 'apikeys_')
+ stampv = 'apikeys_'+str(timestamp())
+ put(leaderip, 'sync/apikeys/Add_'+name+'/request', stampv)
+ put(leaderip, 'sync/apikeys/Add_'+name+'/request/'+myhost, stampv)
+
+def apikey_put(name, rec):
+ put(leaderip, 'apikeys/'+name, _apikey_value(rec))
+
+def apikey_clientip():
+ try:
+  return request.remote_addr or '-'
+ except Exception:
+  return '-'
+
+def apikey_refused(ip, name, why):
+ now = timestamp()
+ fails = [t for t in _apikey_fails.get(ip, []) if t > now-APIKEY_FAIL_WINDOW]
+ fails.append(now)
+ _apikey_fails[ip] = fails
+ try:
+  if len(fails) <= APIKEY_FAIL_MAX:
+   logmsg.sendlog('ApiKeyfa0', 'warning', 'system', str(name)[:40] or '-', ip)
+  if len(fails) == APIKEY_FAIL_MAX:
+   logmsg.sendlog('ApiKeyfa1', 'warning', 'system', ip)
+ except Exception:
+  pass
+ if len(fails) >= APIKEY_FAIL_MAX:
+  _apikey_locked[ip] = now+APIKEY_LOCKOUT
+ return {'response': 'baduser'}
+
+def apikey_authenticate(data):
+ # returns (None, data prepared) when the key is good, else (reply, None)
+ ip = apikey_clientip()
+ now = timestamp()
+ if _apikey_locked.get(ip, 0) > now:
+  return {'response': 'baduser'}, None
+ token = str(data.get('token', ''))
+ parts = token.split('.', 2)
+ if len(parts) != 3 or parts[0] != 'qsk' or not APIKEY_NAME_RE.match(parts[1]) or len(parts[2]) < 32:
+  return apikey_refused(ip, parts[1] if len(parts) > 1 else '-', 'malformed'), None
+ name, secret = parts[1], parts[2]
+ rec = apikeys_all().get(name)
+ if not rec:
+  return apikey_refused(ip, name, 'unknown'), None
+ if not _hmac.compare_digest(_apikey_hash(rec['salt'], secret), rec['hash']) or rec['status'] != 'active':
+  return apikey_refused(ip, name, 'bad'), None
+ path = request.path
+ if path.startswith('/api/v1/apikeys/') or path in APIKEY_NEVER:
+  return {'response': 'error', 'message': 'not allowed for an API key'}, None
+ if rec['access'] != 'write' and path not in APIKEY_READ:
+  return {'response': 'error', 'message': 'key is read only'}, None
+ _apikey_fails.pop(ip, None)
+ if _apikey_lastwrite.get(name, 0)+APIKEY_LASTUSED_EVERY < now:
+  _apikey_lastwrite[name] = now
+  rec['lastused'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+  try:
+   apikey_put(name, rec)
+  except Exception:
+   pass
+ data['user'] = name
+ data['response'] = name
+ data['keyaccess'] = rec['access']
+ return None, data
+
+def apikey_manager(data):
+ # None when the caller (a logged in user, never a key) may manage keys, else the reply
+ if 'baduser' in data['response']:
+  return {'response': 'baduser'}
+ if data.get('keyaccess') or not has_privilege('UserPrivilegesch', data['user']):
+  return {'response': 'error', 'message': 'not authorized'}
+ return None
+
+def apikey_nameclash(name):
+ if name in ('admin', 'system', 'root'):
+  return True
+ try:
+  if name in [u['name'].replace('usersinfo/', '') for u in etcdgetjson(leaderip, 'usersinfo', '--prefix')]:
+   return True
+  if name in [str(g[0]) for g in getgroups()]:
+   return True
+ except Exception as e:
+  print('apikey_nameclash:', e)
+ return False
+
+def apikey_newsecret(rec):
+ secret = _secrets.token_urlsafe(30)
+ rec['salt'] = _secrets.token_hex(16)
+ rec['hash'] = _apikey_hash(rec['salt'], secret)
+ return secret
+
+def apikey_access(value, default='read'):
+ value = str(value or default).lower()
+ return value if value in ('read', 'write') else None
+
+@app.route('/api/v1/apikeys/list', methods=['GET','POST'])
+@login_required
+@audit_command
+def apikeys_list(data):
+ refused = apikey_manager(data)
+ if refused:
+  return refused
+ allkeys = []
+ for name, rec in sorted(apikeys_all().items()):
+  allkeys.append({'name': name, 'access': rec['access'], 'status': rec['status'], 'created': rec['created'],
+                  'createdby': rec['createdby'], 'lastused': rec['lastused'], 'revoked': rec['revoked']})
+ return {'response': 'Ok', 'allkeys': allkeys}
+
+@app.route('/api/v1/apikeys/create', methods=['GET','POST'])
+@login_required
+@audit_command
+def apikeys_create(data):
+ refused = apikey_manager(data)
+ if refused:
+  return refused
+ name = str(data.get('name', ''))
+ access = apikey_access(data.get('access'))
+ if not APIKEY_NAME_RE.match(name):
+  return {'response': 'error', 'message': 'name must be 3-32 characters: letters, digits, _ or -, starting with a letter'}
+ if access is None:
+  return {'response': 'error', 'message': 'access must be read or write'}
+ if name in apikeys_all():
+  return {'response': 'error', 'message': 'a key with this name already exists'}
+ if apikey_nameclash(name):
+  return {'response': 'error', 'message': 'the name is already used by a user or a group'}
+ rec = {'access': access, 'status': 'active', 'created': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+        'createdby': data['user'], 'lastused': '-', 'revoked': '-', 'salt': '', 'hash': ''}
+ secret = apikey_newsecret(rec)
+ apikey_put(name, rec)
+ apikey_sync(name)
+ logmsg.sendlog('ApiKey1000', 'info', data['user'], name)
+ return {'response': 'Ok', 'name': name, 'access': access, 'key': 'qsk.'+name+'.'+secret}
+
+@app.route('/api/v1/apikeys/regenerate', methods=['GET','POST'])
+@login_required
+@audit_command
+def apikeys_regenerate(data):
+ refused = apikey_manager(data)
+ if refused:
+  return refused
+ name = str(data.get('name', ''))
+ rec = apikeys_all().get(name)
+ if not rec:
+  return {'response': 'error', 'message': 'no such key'}
+ access = apikey_access(data.get('access'), rec['access'])
+ if access is None:
+  return {'response': 'error', 'message': 'access must be read or write'}
+ rec.update({'access': access, 'status': 'active', 'revoked': '-', 'lastused': '-',
+             'created': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'), 'createdby': data['user']})
+ secret = apikey_newsecret(rec)
+ apikey_put(name, rec)
+ apikey_sync(name)
+ logmsg.sendlog('ApiKey1001', 'info', data['user'], name)
+ return {'response': 'Ok', 'name': name, 'access': access, 'key': 'qsk.'+name+'.'+secret}
+
+@app.route('/api/v1/apikeys/revoke', methods=['GET','POST'])
+@login_required
+@audit_command
+def apikeys_revoke(data):
+ refused = apikey_manager(data)
+ if refused:
+  return refused
+ name = str(data.get('name', ''))
+ rec = apikeys_all().get(name)
+ if not rec:
+  return {'response': 'error', 'message': 'no such key'}
+ rec['status'] = 'revoked'
+ rec['revoked'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+ apikey_put(name, rec)
+ apikey_sync(name)
+ logmsg.sendlog('ApiKey1002', 'info', data['user'], name)
+ return {'response': 'Ok', 'name': name, 'status': 'revoked'}
+
+@app.route('/api/v1/apikeys/delete', methods=['GET','POST'])
+@login_required
+@audit_command
+def apikeys_delete(data):
+ refused = apikey_manager(data)
+ if refused:
+  return refused
+ name = str(data.get('name', ''))
+ if name not in apikeys_all():
+  return {'response': 'error', 'message': 'no such key'}
+ _delleader(leaderip, 'apikeys/'+name)
+ apikey_sync(name)
+ logmsg.sendlog('ApiKey1003', 'info', data['user'], name)
+ return {'response': 'Ok', 'name': name}
+
+
 def login_required(f):
  global loggedusers
  @wraps(f)
@@ -192,6 +447,11 @@ def login_required(f):
    if isinstance(data[dat], str):
     data[dat] = data[dat].replace(' ','')
   data['response'] = 'baduser'
+  if str(data.get('token', '')).startswith('qsk.'):
+   reply, keydata = apikey_authenticate(data)
+   if reply is not None:
+    return reply
+   return f(keydata)
   if data['token'] in loggedusers:
    if loggedusers[data['token']]['timestamp'] > timestamp():
     data['user'] = loggedusers[data['token']]['user']
@@ -218,7 +478,7 @@ def record_command(data, endpoint, method, commands=None):
   user = data.get('user')
   if not user:
    return
-  excluded = ('response', 'user', 'token')
+  excluded = ('response', 'user', 'token', 'keyaccess')
   params = dict()
   for k in data:
    if k in excluded:
@@ -231,6 +491,7 @@ def record_command(data, endpoint, method, commands=None):
    'time': datetime.now().strftime('%H:%M:%S'),
    'ts': timestamp(),
    'user': user,
+   'source': 'apikey' if data.get('keyaccess') else 'login',
    'host': hostname(),
    'endpoint': endpoint,
    'method': method,
