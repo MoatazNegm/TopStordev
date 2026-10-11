@@ -341,6 +341,7 @@ route('/api/v1/users/userlist', lambda: jsonify(users_payload()))
 route('/api/v1/users/userauths', lambda: jsonify({'auths': 'CIFS/NFS/ISCSI/HOME/POOLS/USERS', 'response': 'admin'}))
 route('/api/v1/users/usersauth', echo)
 route('/api/v1/partners/partnerlist', lambda: jsonify({'allpartners': PARTNERS}))
+route('/api/v1/partners/freeport', lambda: jsonify({'port': __import__('random').randint(3001, 8000)}))
 for _p in ('/api/v1/groups/groupchange', '/api/v1/groups/groupdel', '/api/v1/groups/UnixAddgroup', '/api/v1/replication/addpartner',
            '/api/v1/partners/partnerdel', '/api/v1/partners/AddPartner', '/api/v1/users/userchange', '/api/v1/users/userdel',
            '/api/v1/users/UnixAddUser', '/api/v1/users/uploadUsers', '/api/v1/user/changepass', '/api/v1/tenant/adduser'):
