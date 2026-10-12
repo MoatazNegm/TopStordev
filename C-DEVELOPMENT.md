@@ -3967,3 +3967,14 @@ Requested by the front-end developer (UI side built in QSD5.307). Released on to
   used...` (is_unique_name) although nothing matched; not reproducible after ~10 min (same calls accepted) — stale view right
   after the pool / volumes were created; `user/changepass` with a 2 char password does not change the password (login with
   the old one still works) but gives no error text.
+
+## 109. A password change erased the pending password changes of every other user: admin password lost on the node that was down — `QSD5.318` (2026-10-12) `C` `P`
+
+* **Found by:** QC test 26, steps 30–35: admin password changed to `Admin2` while zfs2 was stopped (step 30), zfs2 started (31),
+  `usr12` changed his password while zfs2 was coming up (32), then zfs1 was stopped (34). On zfs2 (now the leader) `usr12` logged
+  in with the new password but `admin` / `Admin2` was `baduser`; the old `tmatem` worked again (`usershash/admin` = factory hash).
+* **Cause:** `Hostconfig.py` (`user/changepass`) wrote the new hash and then ran `dels(leaderip, 'sync', 'passwd_')`, which
+  deletes **every** `sync/passwd/UnixChangePass_<user>_<req>` request (and its per-node acks), not only the one of this user.
+  The request of `admin` that zfs2 had not yet applied was removed by the request of `usr12`; zfs2 only ever applied the last one.
+* **Fix:** `TopStor/Hostconfig.py`: `dels(leaderip, 'sync', 'UnixChangePass_'+username+'_')` — the same narrow delete that
+  `usersyncall.pulladminhash` already used. Requests of other users stay until every node has applied them.
