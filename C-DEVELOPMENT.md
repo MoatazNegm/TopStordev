@@ -3906,3 +3906,17 @@ Requested by the front-end developer (UI side built in QSD5.307). Released on to
   only if that fails the failure is logged (`DGfa5`, `/root/dgdestroyretry`) and the script exits. Then the normal
   export/import/destroy path runs.
 * **Harness note:** delete domain volumes with type `CIFS` (not `CIFSdom`).
+
+
+## 106. A stopped node's exported pool was taken over by the OTHER cluster's leader — `QSD5.315` (2026-10-12) `C`
+
+* **Found by:** QC test 21 (two clusters, C1 = zfs3 alone, C2 = zfs1+zfs2, one shared kernel). After `stopnode.sh zfs3` (pool
+  exported by `cstop.sh`) and the node's return, C1's pool `pdhcp1985917510` was imported by C2's zfs1 (`topstor:owner` =
+  zfs1, `fixcachelocality.log` 16:48:50), C1 lost its volumes/CIFS (`getvols.sh` lists only `cpoolowner.sh mine`). After a manual
+  export it was imported again 20 s later by zfs2.
+* **Cause:** `foreignpool()` (§ QSD5.280) judges a pool by its owner property, which cannot be read while the pool is exported
+  (`cpoolowner.sh of` prints nothing, "no owner"). The C2 leader's loop in `zpooltoimport.py` takes every pool that `zpool import`
+  lists and that has no `ActPool/` key as a pool nobody knows, and assigns it (`poolnxt/`) to a C2 node.
+* **Fix:** `pace/zpooltoimport.py`: container flavour: a listed pool without `ActPool/<pool>` in this cluster's etcd is never
+  assigned. (Pools of this cluster always have it; a pool that is only in `pools/` is still handled by the first loop.)
+* **Live repair needs the new code in the running `zfsping.py`** (the old one re-assigns within 9 s): node restart.
