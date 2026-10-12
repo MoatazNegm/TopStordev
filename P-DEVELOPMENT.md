@@ -3371,3 +3371,22 @@ Requested by the front-end developer (UI side built in QSD5.307). Released on to
   `zpool destroy -f` only at 23:26:36 after an owner move (`reguid` + `set owner`, 23:26:06) and the pool stayed imported for
   >3 min; the second `delpool` removed it in 45 s. Watch for a repeat.
 * **Harness:** `round10.sh` waits up to 3 min for an empty `zpool list` after its own `delpool` instead of 25 s.
+
+
+## 103. A joined node wiped and re-founded as its own primary after a bond-sync reboot — `QSD5.312` (2026-10-12) `M`
+
+* **Found by:** QC test 10 round 17 (QSD5.311), join check: `ready/<zfs2>` stayed `_1`, zfs2's etcd was published on `10.11.11.250`
+  (zfs2 was node `.34`, its own leader with cluster ip `.250`) although the join had been acknowledged (04:16:16) and
+  `ActivePartners/<zfs2> = 10.11.11.77` was on zfs1.
+* **Cause:** after the join zfs2's first sync of `bond` (`syncbonds.sh` rc 10, "bond config changed") wrote
+  `rebootme/<zfs2> = pls_fromsyncs`. `rebootmepls.sh` then read `configured/<zfs2>` from the leader and from the local etcd; both were
+  empty at that moment (on zfs1 `configured/`, `known/` and `hostipsubnet/` of the node were absent, only `ActivePartners`, `alias`,
+  `nextlead` were there) and the script treats "neither `yes` nor `reset`" as "never configured": `rm -rf /TopStordata/*`,
+  `/root/nodeconfigured = no_pls_fromsyncs…`, `docker_setup.sh reboot`. The container came back as a first boot: `ping 10.11.11.250`
+  without an answer → primary, new random node ip, own etcd. zfs1 declared it lost 45 s later (`closthost`).
+  This path was already there; rounds 13–16 and the test 14 rounds did not hit it because the record was present in time. It is not
+  caused by QSD5.310/311 (DGsetPool retry, UI only).
+* **Fix:** `pace/rebootmepls.sh`: when the record is missing, a node whose `/root/nodeconfigured` already starts with `yes` keeps its
+  configuration (`configured='yes'`); only a node that is really unconfigured is wiped as before. `reset` (evacuate) is unchanged.
+* **Not found (open):** why `configured/<node>` was missing on the leader although `addknown.py` writes it before `ActivePartners`;
+  watch `etcdget configured --prefix` right after the next joins.
