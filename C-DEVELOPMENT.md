@@ -3920,3 +3920,19 @@ Requested by the front-end developer (UI side built in QSD5.307). Released on to
 * **Fix:** `pace/zpooltoimport.py`: container flavour: a listed pool without `ActPool/<pool>` in this cluster's etcd is never
   assigned. (Pools of this cluster always have it; a pool that is only in `pools/` is still handled by the first loop.)
 * **Live repair needs the new code in the running `zfsping.py`** (the old one re-assigns within 9 s): node restart.
+
+## 107. Plugging a replicated CIFS volume on the receiver never started the share — `QSD5.316` (2026-10-12) `C` `P`
+
+* **Found by:** QC test 22 (`replication_2node_1transmitter_2recv`, step 21 "activate the volume (plug icon)") on `QSD5.315`:
+  the plug was accepted (`VolumeChangeCIFS` finished, `statusmount=active`), but no `CIFS-<ip>` container appeared. Reproduced twice
+  (`cif1vol_7570902`, `cif2vol_2072120490`): `cifs.py` sat 3 min (90 x 2 s) waiting for `zfs list -o mounted` = yes and then
+  gave up ("pool volume not mounted yet, not starting the share"); the volume stayed `active` with no container.
+  A manual `zfs mount <pool>/<volume>` at any time made the container start at once.
+* **Cause:** `zfs recv` leaves the received dataset unmounted. §50 documents a `zfs mount` in `VolumeChangeCIFS` ("It now runs
+  `zfs mount` first when the dataset is unmounted"), but `git log -S'zfs mount' -- VolumeChangeCIFS` shows the line was never in
+  the file (the other activate scripts, `VolumeActivateCIFSdom/NFS/ISCSI`, have theirs). The wait loop added in §73 for the
+  take-over case (`cifs.py` waits for the mount) therefore only delayed the failure.
+* **Fix:** `TopStor/VolumeChangeCIFS`, local-user branch: right after `zfs set status:mount=$active`, when `$active` = `active`
+  and the dataset reports `mounted no`, `zfs mount $DG/$name` (before the share config, `chmod 2770` and `setfacl`, which would
+  otherwise have been applied to the empty mount point directory). Domain branch unchanged (`VolumeActivateCIFSdom` mounts).
+* **Not changed:** `VolumeChangeNFS`, `VolumeChangeHome` (same gap, not tested).

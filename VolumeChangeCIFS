@@ -67,6 +67,8 @@ then
 	 /sbin/zfs set ip:addr=$ipaddr $DG/$name
 	 /sbin/zfs set ip:subnet=$ipsubnet $DG/$name
 	 /sbin/zfs set status:mount=$active $DG/$name
+	 # a replicated volume (zfs recv) arrives unmounted: mount it before the share, chmod/setfacl and cifs.py need its content
+	 if [ "$active" = active ] && [ "`/sbin/zfs get -H -o value mounted $DG/$name`" = no ]; then /sbin/zfs mount $DG/$name; fi
 	 shortname=`echo ${name} | rev | cut -d_ -f2- | rev`
 	 yes | cp sharecifs.txt /TopStordata/smb.${name}
 	 sed -i "s/Vtype/CIFS/g"  /TopStordata/smb.${name}
