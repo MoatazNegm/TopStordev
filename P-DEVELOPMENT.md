@@ -3390,3 +3390,20 @@ Requested by the front-end developer (UI side built in QSD5.307). Released on to
   configuration (`configured='yes'`); only a node that is really unconfigured is wiped as before. `reset` (evacuate) is unchanged.
 * **Not found (open):** why `configured/<node>` was missing on the leader although `addknown.py` writes it before `ActivePartners`;
   watch `etcdget configured --prefix` right after the next joins.
+
+
+## 104. closthost exported a pool the take-over had already imported: the share container saw an empty directory — `QSD5.313` (2026-10-12) `C`
+
+* **Found by:** QC test 14 round 17 (QSD5.312), step 18 after STAGE 8: `VERDICT DATASET_FILEX_OK`, `VERDICT FILEX_MISSING`. The share
+  `//10.11.11.211/cifs1_…` was empty for 180 s, the dataset on zfs1 held `file-x.txt`. In the `CIFS-10.11.11.211` container the path
+  was an `overlay` mount (empty mountpoint directory), not the ZFS mount.
+* **Timeline (zfs1, `zpool history` + `closthost.log`):** 04:12:02 take-over `zpool import`; 04:12:03 `closthost.sh dhcp866212`
+  starts (it had read its orphan list before the import set `topstor:owner`); 04:12:16 `zpool export` of the pool (it succeeded);
+  04:12:16–19 the CIFS container was created (cifs.py after the import); 04:12:26 the leader imported the pool again. The container
+  bind-mounted the datasets' directories while they were unmounted, and the later mount is not propagated into it.
+* **Same family as §98** (closthost vs the take-over import in the same second); §98 handled a *refused* export, this is an export
+  that went through.
+* **Not a regression** of QSD5.310/311/312 (DGsetPool retry, UI, rebootmepls): a timing race; rounds 13–16 had the second import
+  before the container start or no export at all.
+* **Fix:** `pace/closthost.sh`: right before the resume/export the owner is read again (`cpoolowner.sh of`); a pool owned by
+  another node than the lost one (the take-over already has it) is logged `already taken over by … -- NOT exported` and left alone.
