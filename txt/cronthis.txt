@@ -1,1 +1,2 @@
+*/2 * * * *  /TopStor/putcron.sh /TopStor/etcdput.py 10.11.11.200 call/1791821625 /TopStor/Snapshotnowhost::pdhcp2007324094/cif2vol_2072120490::Minutely.5.2.na.na::1791821625::DRsite
 * * * * * pgrep -f /usr/local/sbin/iscsi-guardian.sh >/dev/null 2>&1 || (setsid /usr/local/sbin/iscsi-guardian.sh </dev/null >>/var/log/iscsid.log 2>&1 &)

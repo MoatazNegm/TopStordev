@@ -3936,3 +3936,34 @@ Requested by the front-end developer (UI side built in QSD5.307). Released on to
   and the dataset reports `mounted no`, `zfs mount $DG/$name` (before the share config, `chmod 2770` and `setfacl`, which would
   otherwise have been applied to the empty mount point directory). Domain branch unchanged (`VolumeActivateCIFSdom` mounts).
 * **Not changed:** `VolumeChangeNFS`, `VolumeChangeHome` (same gap, not tested).
+* **Proof (`QSD5.316`, test 22 local re-run, 2026-10-12 19:23):** `cif2vol_2072120490` unplugged, dataset unmounted (`mounted no`,
+  empty directory), plugged again through the API: `mounted yes` after 2 s, `CIFS-10.11.11.152` up after 4 s, `fil4.txt`/`fil5.txt`
+  in the dataset, no manual `zfs mount`. Before the fix the same plug left `mounted no` and no container for good (3 min, then
+  `cifs.py` gave up).
+* **Test-environment notes (no product change):** (a) in the container flavour all nodes share one kernel, so `zpool list`
+  on every node shows the pool: `croncall.py`'s `ispoolhere()` is true on both nodes of the sender cluster, and a Minutely
+  tick can be consumed by the node that does not own the pool ("host not owner"): 3 of 6 ticks of the 2 min schedule were lost
+  while both nodes ran (16:18, 16:20, 16:24 UTC) and none after the second node was stopped. On physical servers `zpool list`
+  shows only the node's own pools. (b) After the take-over by c1node_2 both clusters serve the same IP (10.11.11.150) for the
+  DR copy and the original; the sheet's step 21/22 assumes cluster 1 is down as a whole.
+
+## 108. Requests queued behind a slow request were lost: user / group / password changes "accepted" and never run — `QSD5.317` (2026-10-12) `C` `P`
+
+* **Found by:** QC test 26 (users, 2 nodes, 1 cluster), after the take-over by zfs2: 12 users, 11 CIFS/HOME shares to start.
+* **Symptom:** `users/UnixAddUser` (usr13, filo, filope, usr16), `users/userchange` (usr1–3 → grp1–3) answered `accepted`, the
+  request was in `/TopStordata/tempdata` (sent to the node's own `recvreply` queue) but `/root/recvreply` never showed it and
+  the user / group never appeared. Re-sending the same request when the node was idle worked at once.
+* **Cause:** `topstorrecvreply.py` ran the request (`actionreply.do`) inside pika's consume callback. `UnixAddUser` with a
+  home folder starts a share container and `cifs.py` then sets the samba password of every user in it (2–3 min with 12+ users,
+  and the VolumeCheck of the other shares runs at the same time). While the callback ran, pika did not answer the broker's
+  heartbeat; RabbitMQ closed the connection, the script died and `receivereplylooper.sh` started it again (`ps` lstart changed
+  from 18:58 to 19:11 exactly after the usr12 / usr16 home creations). The requests already delivered behind the slow one
+  (auto ack) were lost.
+* **Fix:** `TopStor/topstorrecvreply.py`: the callback only puts the body into a `queue.Queue`; one worker thread runs
+  `actionreply.do` for the requests one after the other (same order as before), so the consume loop keeps answering heartbeats.
+* **Not changed:** the per-user samba password loop of `cifs.py` (slow start of many shares after a take-over: ~2.5 min each
+  with 17 users) — a performance item, not a failure.
+* **Other notes of the run:** the first four `UnixAddUser` for usr1–usr5 with home answered `rejected: the name is already
+  used...` (is_unique_name) although nothing matched; not reproducible after ~10 min (same calls accepted) — stale view right
+  after the pool / volumes were created; `user/changepass` with a 2 char password does not change the password (login with
+  the old one still works) but gives no error text.
