@@ -3407,3 +3407,16 @@ Requested by the front-end developer (UI side built in QSD5.307). Released on to
   before the container start or no export at all.
 * **Fix:** `pace/closthost.sh`: right before the resume/export the owner is read again (`cpoolowner.sh of`); a pool owned by
   another node than the lost one (the take-over already has it) is logged `already taken over by … -- NOT exported` and left alone.
+
+
+## 105. delpool on an exported pool was a silent no-op: the pool came back and stole a disk — `QSD5.314` (2026-10-12) `M`
+
+* **Found by:** QC test 16 run on QSD5.313. Test 15's pool `pdhcp625716866` was exported (10:07:41) when `pools/delpool` was issued
+  (10:19:34, accepted, no error). `DGdestroyPool` does `zpool status | grep $pool || exit`, so nothing was destroyed and no etcd
+  key removed; a new pool was created from other disks. At 10:35:21, when the other node returned, the old pool was imported again
+  as an orphan, `zpool detach`/`reguid`/`attach -f` took disk `786f70` out of the new pool (now degraded onto other disks) and the
+  node-stop guard refused to stop zfs1 ("pool … imported by another node").
+* **Fix:** `TopStor/DGdestroyPool`: when the pool is not imported on the owner, `zpool import` it first (after `udevadm settle`);
+  only if that fails the failure is logged (`DGfa5`, `/root/dgdestroyretry`) and the script exits. Then the normal
+  export/import/destroy path runs.
+* **Harness note:** delete domain volumes with type `CIFS` (not `CIFSdom`).
