@@ -3492,3 +3492,16 @@ Requested by the front-end developer (UI side built in QSD5.307). Released on to
   The request of `admin` that zfs2 had not yet applied was removed by the request of `usr12`; zfs2 only ever applied the last one.
 * **Fix:** `TopStor/Hostconfig.py`: `dels(leaderip, 'sync', 'UnixChangePass_'+username+'_')` — the same narrow delete that
   `usersyncall.pulladminhash` already used. Requests of other users stay until every node has applied them.
+
+## 110. Deleting a user erased every user whose name contains it: `usr1` took `usr10`…`usr16` with it — `QSD5.319` (2026-10-12) `C` `P`
+
+* **Found by:** QC test 26, step 28 (delete `usr1`, zfs2 stopped, zfs1 serving): afterwards `usr10`, `usr11`, `usr13`, `usr16` were
+  gone from the user list on the node that applied the delete, `usr12` lost its `usersinfo` (only `usershash/usr12` stayed) and
+  its home share could no longer be reached/deleted.
+* **Cause:** `pace/usersyncall.py` `thread_del` ran `dels(syncip, 'user', username)`. `etcddel.py` with a second argument deletes
+  every key/value under the prefix whose *text contains* the argument, so `usr1` matched `usersinfo/usr10`, `usershash/usr12`…
+  Same substring family as §81. The leader side (`UnixDelUser`) only deleted `users /<name>/`, which matches `usersinfo/<name>`
+  by accident of the value text (home volume path) and not at all for users without home.
+* **Fix:** `thread_del` deletes the exact keys `usersinfo/<name>` and `usershash/<name>`; `UnixDelUser` additionally deletes
+  `usersinfo/<name>` exactly.
+* **Test sheet note:** step 28 expects the home of the deleted user to stay; by design (§80) the home volume is deleted with the user.
