@@ -44,7 +44,17 @@ echo iam in >> /root/tmp2
  zpool status | grep $pool 
  if [ $? -ne 0 ];
  then
-  exit
+  # the pool is listed but exported (partner stop/return, failed take-over): import it here so it is really destroyed;
+  # a silent exit left the pool behind and a node re-imported it later, stealing disks of a new pool (QSD5.314)
+  udevadm settle 2>/dev/null
+  /sbin/zpool import $pool 2>/root/dgdestroyerror
+  zpool status | grep $pool
+  if [ $? -ne 0 ];
+  then
+   echo "zpool import $pool before destroy failed: `cat /root/dgdestroyerror`" >> /root/dgdestroyretry
+   docker exec etcdclient /TopStor/logmsg.py DGfa5 error $userreq $pool
+   exit
+  fi
  fi
  /pace/etcdput.py $leaderip requests/DGdestroypool/$myhost $myhost/$userreq
  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq 
