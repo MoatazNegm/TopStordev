@@ -85,7 +85,9 @@ def config(leader, leaderip, myhost, *bargs):
    cmdlinep=['/TopStor/encthis.sh',arglist['username'],arglist['password']]
    encthis=subprocess.run(cmdlinep,stdout=subprocess.PIPE).stdout.decode('utf-8').split('_result')[1]
    put(leaderip, 'usershash/'+arglist['username'], encthis)
-   dels(leaderip, 'sync', 'passwd_')
+   # QSD5.318: only this user's earlier request; every request still waiting for a node that is down (or not yet applied)
+   # used to be deleted here -- the next password change of ANY user erased the admin change a stopped node had not seen
+   dels(leaderip, 'sync', 'UnixChangePass_'+arglist['username']+'_')
    put(leaderip, 'sync/passwd/UnixChangePass_'+arglist['username']+'_'+arglist['user']+'/request','passwd_'+stampi)
    #put(leaderip, 'sync/passwd/UnixChangePass_'+arglist['username']+'_'+arglist['user']+'/request/'+myhost,'passwd_'+stampi)
 #   broadcast('UserPassChange','/TopStor/pump.sh','UnixChangePass',arglist['password'],arglist['username'],arglist['user'])
