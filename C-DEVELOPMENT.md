@@ -3991,3 +3991,15 @@ Requested by the front-end developer (UI side built in QSD5.307). Released on to
 * **Fix:** `thread_del` deletes the exact keys `usersinfo/<name>` and `usershash/<name>`; `UnixDelUser` additionally deletes
   `usersinfo/<name>` exactly.
 * **Test sheet note:** step 28 expects the home of the deleted user to stay; by design (§80) the home volume is deleted with the user.
+
+## 111. Scheduled snapshots lost to a node that does not own the pool (container flavour, 2nd node back) — `QSD5.320` (2026-10-13) `C`
+
+* **Found by:** QC test 22 (replication, 2 nodes sender), cycle 2 on `QSD5.319`, steps 27/28 after c1node_1 had returned: the 2 min
+  Minutely schedule of `cif2vol` produced no tick snapshot for 7 minutes (every tick ran on c1node_1, which does not own the pool).
+* **Cause:** known from §107 test-environment note (a), now with a worse outcome. All node containers share one kernel, so
+  `zpool list` shows the pool on every node and `croncall.py` `ispoolhere()` is true on both; the node that wins the delete
+  race runs `Snapshotnowhost`, whose `zfs` calls on a pool it does not own produce no snapshot ("snapshotresult :" empty).
+* **Fix:** `pace/croncall.py` `ispoolhere()` (container flavour only: `/.dockerenv` or `eth10`) uses the pool owner
+  (`cpoolowner.sh of <pool>`, zfs property `topstor:owner`) and compares it with the node's hostname; a pool without owner
+  (`-`/empty) keeps the old `zpool list` test. Physical servers unchanged.
+* **Proof:** see the test 22 run log `scripts/qc-harness/b22t/run.log` (ticks every 2 min after the fix).
