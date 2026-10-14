@@ -3555,3 +3555,31 @@ Requested by the front-end developer (UI side built in QSD5.307). Released on to
 - **Documented** in `API-USER-GUIDE.md` §1 (row "Error answers").
 - **Proof (live, zfs1, flask restarted).** Missing parameter on `volumedel`, `delpool`, `snapshotdel`, `groupdel`, `getConfig`, `actionOnDisk`, `setversion`, `userdel` (empty name) → `missing parameter: <key>`; 5000-char name → `parameter too long: name`; `a;rm` → `invalid character in parameter: name`; `port=abc` → `parameter must be a number: port`; body 3 MB → `request too large`; no token → `baduser`; DELETE → HTTP 405 JSON; unknown route → HTTP 404 JSON; `volumes/create` without `size` → clean answer (`nopool`), no 500. After each class the next `groups/UnixAddgroup`, `groupdel` and `volumesinfo` (10 times, none refused) answered normally.
 
+
+## 115. closthost exported the pool the take-over had just imported — `QSD5.323` (2026-10-14)
+
+- **Seen.** QC test 16 round 3 (build 260, QSD5.322), S21 `stopnode zfs1`: zfs2 had NO pool for 9 minutes (`zpool list` empty, CIFS IP on the node,
+  `zpooltoimportlooper`/`selectimportlooper` looping). `zpool history` on zfs2: `18:33:21 import`, `18:33:22 set topstor:owner=dhcp153026`,
+  `18:33:33 reguid`, `18:33:34 zpool export` (by `/pace/closthost.sh` of the dead node, `closthost.log`: "pool … exported -- it can be imported by
+  the node the leader names"), then nothing until a manual `zpool import` at 18:42.
+- **Cause (race, QSD5.313 guard too early).** `closthost.sh` read the pool owner once at the start (still the lost host at 18:33:22 – the take-over
+  sets the owner ~1 s later), then waited for `zpool clear`/ONLINE (~12 s because the pool was degraded and was re-guid'ed meanwhile), and exported.
+  Not a regression of QSD5.321/322 (no changed file in this path); a latent window that earlier cycles did not hit.
+- **Fix.** `closthost.sh`: read `cpoolowner.sh of <pool>` again immediately before `zpool export`; a pool owned by another host meanwhile is NOT
+  exported (`closthost.log`: "taken over by <host> meanwhile -- NOT exported").
+- **Observation, not changed.** After the early export the importer kept failing for 9 min (`poolnxt/<pool>` stayed, `pools/<pool>` was put and
+  deleted every 9 s); the likely cause is a stale `ActPool/<pool>` id (the retry `reguid` of poouids ran at 18:33:33 while the cluster IP moved), as
+  the import is by id on purpose (stale-leg protection). A plain import by name worked at once. Left as is: the id import is the safety rule.
+
+## 116. Parameter guard rejected periodic snapshots — `QSD5.324` (2026-10-15)
+
+- **Seen.** QC test 21 build 263 (QSD5.323), S28/29 "Minutely every 2 min keep 5": `volumes/snapshots/create` answered
+  `{"message":"missing parameter: name","response":"error"}`; the same call passed in b21t/b21u (QSD5.319/320).
+- **Cause (regression of QSD5.322, §114).** `REQUIRED_PARAMS['volumes/snapshots/create'] = 'name volume pool'` was applied to every `snapsel`; the
+  handler (`volumesnapshotscreate`) takes `name` only for `Once`, the periodic types send `snapsel, pool, volume, every, keep` (+ `sminute` Hourly,
+  `stime` Weekly) and no name. The Snapshots page schedules and tests 14/21/22/23 were affected.
+- **Fix.** `fapi.py` guard: `SNAPSEL_REQUIRED` per `snapsel` — Once `name volume pool`; Minutely `volume pool every keep`; Hourly + `sminute`;
+  Weekly + `stime`; `snapsel` itself always required; the entry was removed from `REQUIRED_PARAMS`.
+- **Checked** the other `REQUIRED_PARAMS` entries against the handlers and the UI calls (`topstorweb/src/api`): snaprollback / snapshotdel /
+  perioddelete (`name`), volumes/create, volumes/config (`type volume`), hosts/evacuate (`name`), usersauth (`tochange auths`), userauths
+  (`username`), userdel (`name tenant`), groupdel, UnixAddgroup, partnerdel, AddPartner, grouplist (`tenant`) — all match what the UI/harness send.

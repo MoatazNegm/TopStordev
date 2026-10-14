@@ -558,13 +558,16 @@ SECRET_KEYS = {'token', 'pass', 'Password', 'password', 'dompass', 'oldpass', 'n
 REQUIRED_PARAMS = {'/api/v1/'+p: v.split() for p, v in {
  'software/setversion': 'version', 'software/apply': 'version', 'pools/delpool': 'pool', 'pools/addtopool': 'pool redundancy',
  'pools/newpool': 'redundancy', 'pools/updatecache': 'host', 'pools/actionOnDisk': 'action actualdisk pool',
- 'volumes/snapshots/create': 'name volume pool', 'volumes/snapshots/snaprollback': 'name',
+ 'volumes/snapshots/snaprollback': 'name',
  'volumes/snapshots/perioddelete': 'name', 'volumes/snapshots/snapshotdel': 'name', 'volumes/create': 'type name ipaddress',
  'volumes/volumedel': 'name type', 'volumes/volumeactive': 'name active', 'volumes/config': 'type volume',
  'hosts/evacuate': 'name', 'users/usersauth': 'auths tochange', 'users/userauths': 'username', 'groups/UnixAddgroup': 'name users',
  'groups/groupdel': 'name', 'users/userdel': 'name tenant', 'users/UnixAddUser': 'name', 'partners/partnerdel': 'name',
  'partners/AddPartner': 'alias ip port type', 'tenant/adduser': 'name tenant', 'users/grouplist': 'tenant',
  'hosts/getConfig': 'nodeName'}.items()}
+# snapshots/create needs a different set per snapsel (QSD5.324: Minutely/Hourly/Weekly send no name)
+SNAPSEL_REQUIRED = {'Once': 'name volume pool', 'Minutely': 'volume pool every keep', 'Hourly': 'volume pool sminute every keep',
+                    'Weekly': 'volume pool stime every keep'}
 NONEMPTY_KEYS = {'name', 'pool', 'volume', 'type', 'version', 'nodeName', 'username', 'alias', 'ip', 'host', 'action',
                  'actualdisk', 'redundancy', 'tenant'}
 NUMERIC_KEYS = {'port': r'\d+', 'portalport': r'\d+', 'userid': r'\d+', 'useable': r'\d+(\.\d+)?'}
@@ -613,7 +616,10 @@ def _guard_before():
     token = str(args.get('token', ''))
     if path in ('/api/v1/login', '/api/v1/login/test', '/api/v1/logout') or not _token_ok(token):
         return None          # login_required answers baduser in its own format
-    for k in REQUIRED_PARAMS.get(path, ()):
+    req = REQUIRED_PARAMS.get(path, ())
+    if path == '/api/v1/volumes/snapshots/create':
+        req = ['snapsel'] + SNAPSEL_REQUIRED.get(args.get('snapsel'), 'volume pool').split()
+    for k in req:
         v = args.get(k)
         if v is None or (k in NONEMPTY_KEYS and not str(v).strip()):
             return _err('missing parameter: '+k)
