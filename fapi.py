@@ -477,12 +477,16 @@ def _debounce_exempt():
 @app.before_request
 def debounce_before():
     g.debounce_key = None
+    try:
+        return _debounce_before()
+    except Exception:       # the guard itself can never fail a request: fail open
+        g.debounce_key = None
+        return None
+
+def _debounce_before():
     if request.method not in ('GET', 'POST') or request.path not in DEBOUNCE_PATHS or _debounce_exempt():
         return None
-    try:
-        key = _debounce_key()
-    except Exception:
-        return None
+    key = _debounce_key()
     now = time.time()
     with _debounce_lock:
         if len(_debounce_tbl) > DEBOUNCE_MAX_ENTRIES//2:
@@ -516,22 +520,147 @@ def _debounce_failed(resp):
 
 @app.after_request
 def debounce_after(resp):
-    key = getattr(g, 'debounce_key', None)
-    if key:
-        g.debounce_key = None
-        with _debounce_lock:
-            if _debounce_failed(resp):
-                _debounce_tbl.pop(key, None)
-            else:
-                _debounce_tbl[key] = ['done', time.time()+DEBOUNCE_SECONDS]
+    try:
+        key = getattr(g, 'debounce_key', None)
+        if key:
+            g.debounce_key = None
+            with _debounce_lock:
+                if _debounce_failed(resp):
+                    _debounce_tbl.pop(key, None)
+                else:
+                    _debounce_tbl[key] = ['done', time.time()+DEBOUNCE_SECONDS]
+    except Exception:
+        pass
     return resp
 
 @app.teardown_request
 def debounce_teardown(exc):
-    key = getattr(g, 'debounce_key', None)
-    if key:      # no after_request ran (unhandled exception): a failed request does not block a retry
-        with _debounce_lock:
-            _debounce_tbl.pop(key, None)
+    try:
+        key = getattr(g, 'debounce_key', None)
+        if key:      # no after_request ran (unhandled exception): a failed request does not block a retry
+            with _debounce_lock:
+                _debounce_tbl.pop(key, None)
+    except Exception:
+        pass
+
+# ---- crash prevention (QSD5.322): parameter guard, safety net, command timeout ----------------------------------------
+# Every refusal has the shape of the existing errors: HTTP 200 {"response":"error","message":"..."} (a bad token keeps
+# {"response":"baduser"}).  1) before_request guard: body size, value length, required parameters of the changing calls,
+# numeric parameters, shell characters in names.  2) errorhandler: any uncaught exception (KeyError of a missing
+# parameter, TypeError of a None, ...) and every 404/405/413/415 answers JSON, the trace goes to the log only.
+# 3) subprocess.run gets a default timeout, so a hung zfs/etcd command frees the worker.
+MAX_BODY_BYTES = 2*1024*1024
+MAX_BODY_UPLOAD = 1024*1024*1024         # software/localFileUpdate, users/uploadUsers
+MAX_VALUE_LEN = 1000
+LONG_VALUE_KEYS = {'users', 'groups', 'auths', 'initiators', 'tochange', 'disks', 'cache', 'cache_disks', 'dompass', 'cacheids'}
+SECRET_KEYS = {'token', 'pass', 'Password', 'password', 'dompass', 'oldpass', 'newpass'}
+# required parameters per path (presence); keys in NONEMPTY_KEYS must also be non-empty
+REQUIRED_PARAMS = {'/api/v1/'+p: v.split() for p, v in {
+ 'software/setversion': 'version', 'software/apply': 'version', 'pools/delpool': 'pool', 'pools/addtopool': 'pool redundancy',
+ 'pools/newpool': 'redundancy', 'pools/updatecache': 'host', 'pools/actionOnDisk': 'action actualdisk pool',
+ 'volumes/snapshots/create': 'name volume pool', 'volumes/snapshots/snaprollback': 'name',
+ 'volumes/snapshots/perioddelete': 'name', 'volumes/snapshots/snapshotdel': 'name', 'volumes/create': 'type name ipaddress',
+ 'volumes/volumedel': 'name type', 'volumes/volumeactive': 'name active', 'volumes/config': 'type volume',
+ 'hosts/evacuate': 'name', 'users/usersauth': 'auths tochange', 'users/userauths': 'username', 'groups/UnixAddgroup': 'name users',
+ 'groups/groupdel': 'name', 'users/userdel': 'name tenant', 'users/UnixAddUser': 'name', 'partners/partnerdel': 'name',
+ 'partners/AddPartner': 'alias ip port type', 'tenant/adduser': 'name tenant', 'users/grouplist': 'tenant',
+ 'hosts/getConfig': 'nodeName'}.items()}
+NONEMPTY_KEYS = {'name', 'pool', 'volume', 'type', 'version', 'nodeName', 'username', 'alias', 'ip', 'host', 'action',
+                 'actualdisk', 'redundancy', 'tenant'}
+NUMERIC_KEYS = {'port': r'\d+', 'portalport': r'\d+', 'userid': r'\d+', 'useable': r'\d+(\.\d+)?'}
+# names that end up in a shell command line: no shell metacharacters, no path, no leading '-'
+SHELLSAFE_KEYS = {'name', 'pool', 'volume', 'owner', 'type', 'alias', 'nodeName', 'username', 'host', 'tenant', 'receiver',
+                  'cluster', 'redundancy', 'action', 'version'}
+_SHELL_BAD = re.compile(r'[;|&$`<>\\"\'\n\r\x00*?(){}\[\]]|\.\.')
+_PATH_BAD_KEYS = {'name', 'pool', 'volume', 'owner', 'alias', 'username', 'tenant', 'receiver'}
+
+def _err(msg, **kw):
+    d = {'response': 'error', 'message': msg}
+    d.update(kw)
+    return jsonify(d)
+
+def _token_ok(token):
+    if token.startswith('qsk.'):
+        return True
+    try:
+        return token in loggedusers and loggedusers[token]['timestamp'] > timestamp()
+    except Exception:
+        return False
+
+@app.before_request
+def guard_before():
+    try:
+        return _guard_before()
+    except Exception:       # never fail a request because of the guard: the handlers still have their own checks
+        return None
+
+def _guard_before():
+    path = request.path
+    if not path.startswith('/api/v1/') or request.method not in ('GET', 'POST'):
+        return None
+    limit = MAX_BODY_UPLOAD if path in ('/api/v1/software/localFileUpdate', '/api/v1/users/uploadUsers') else MAX_BODY_BYTES
+    if (request.content_length or 0) > limit:
+        return _err('request too large')
+    if path in ('/api/v1/getAllConfig', '/api/v1/hosts/getAllConfig', '/api/v1/software/update', '/api/v1/software/localFileUpdate'):
+        g.cmd_timeout = 900
+    args = request.args
+    for k in args.keys():
+        if k in SECRET_KEYS and k != 'token':
+            continue
+        for v in args.getlist(k):
+            if len(v) > (20000 if k in LONG_VALUE_KEYS else MAX_VALUE_LEN):
+                return _err('parameter too long: '+k)
+    token = str(args.get('token', ''))
+    if path in ('/api/v1/login', '/api/v1/login/test', '/api/v1/logout') or not _token_ok(token):
+        return None          # login_required answers baduser in its own format
+    for k in REQUIRED_PARAMS.get(path, ()):
+        v = args.get(k)
+        if v is None or (k in NONEMPTY_KEYS and not str(v).strip()):
+            return _err('missing parameter: '+k)
+    for k, pat in NUMERIC_KEYS.items():
+        v = args.get(k)
+        if v not in (None, '') and not re.fullmatch(pat, str(v).strip()):
+            return _err('parameter must be a number: '+k)
+    if path in DEBOUNCE_PATHS:
+        for k in SHELLSAFE_KEYS:
+            for v in args.getlist(k):
+                v = str(v)
+                if _SHELL_BAD.search(v) or v.startswith('-') or (k in _PATH_BAD_KEYS and ('/' in v or '\\' in v)):
+                    return _err('invalid character in parameter: '+k)
+    return None
+
+_orig_subprocess_run = subprocess.run
+def _run_with_timeout(*a, **kw):
+    if kw.get('timeout') is None:
+        try:
+            kw['timeout'] = getattr(g, 'cmd_timeout', 120) if flask.has_request_context() else 120
+        except Exception:
+            kw['timeout'] = 120
+    return _orig_subprocess_run(*a, **kw)
+subprocess.run = _run_with_timeout
+
+@app.errorhandler(Exception)
+def safety_net(exc):
+    from werkzeug.exceptions import HTTPException
+    if isinstance(exc, HTTPException):
+        msgs = {400: 'bad request', 404: 'not found', 405: 'method not allowed', 413: 'request too large',
+                415: 'unsupported content type'}
+        return _err(msgs.get(exc.code, 'request refused')), (exc.code if exc.code in msgs else 400)
+    try:
+        print('Unhandled exception in', request.method, request.path, '\n', traceback.format_exc())
+    except Exception:
+        pass
+    if isinstance(exc, KeyError):
+        k = str(exc.args[0]) if exc.args else ''
+        if k == 'token':
+            return jsonify({'response': 'baduser'})
+        return _err('missing parameter: '+k)
+    if isinstance(exc, subprocess.TimeoutExpired):
+        return _err('the command timed out')
+    if isinstance(exc, (TypeError, ValueError, IndexError, AttributeError)):
+        return _err('invalid or missing parameter')
+    return _err('internal error')
+
 
 def audit_command(f):
  @wraps(f)
@@ -2765,6 +2894,6 @@ if __name__=='__main__':
     getalltime()
     _mark('getalltime (disks, pools, volumes) -- starting the web server now')
    #myhostip = sys.argv[5]
-    app.run(host="0.0.0.0", port=5001)
+    app.run(host="0.0.0.0", port=5001, use_debugger=False)
 
 
