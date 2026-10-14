@@ -430,6 +430,109 @@ def get_command_log(user=None, limit=200):
    break
  return entries
 
+# ---- request debouncing (QSD5.321): one central guard for every mutating endpoint --------------------------------------
+# A human can click OK/Submit many times; every click is a separate request (duplicate volumes, deletes).  The guard keys a
+# request by (user or key name, path, hash of its sorted arguments without token/time fields).  An identical request is
+# refused while the first is in flight and for DEBOUNCE_SECONDS after the first finished OK; a failed request never blocks
+# a retry.  Refusal: HTTP 200 {"response":"duplicate","message":"duplicate request ignored (debounce)"}.
+# Callers that really need a quick identical repeat pass nodebounce=1 (API key or localhost callers only).
+DEBOUNCE_SECONDS = 3
+DEBOUNCE_INFLIGHT_MAX = 180      # an in-flight entry older than this is stale (request lost): no longer blocks
+DEBOUNCE_MAX_ENTRIES = 2000      # bound on the memory of the table
+DEBOUNCE_PATHS = set('/api/v1/'+x for x in (
+ 'apikeys/create apikeys/regenerate apikeys/revoke apikeys/delete users/uploadUsers software/setversion software/apply '
+ 'software/update software/localFileUpdate pools/delpool pools/addtopool pools/delcachespares pools/newpool '
+ 'pools/updatecache pools/actionOnDisk groups/groupchange replication/addpartner users/userchange '
+ 'volumes/snapshots/create volumes/create user/changepass hosts/config hosts/joincluster hosts/evacuate '
+ 'volumes/snapshots/snaprollback volumes/snapshots/perioddelete volumes/snapshots/snapshotdel volumes/volumeactive '
+ 'volumes/volumedel groups/groupdel partners/partnerdel users/userdel groups/UnixAddgroup partners/AddPartner '
+ 'tenant/adduser users/UnixAddUser volumes/config users/usersauth').split())
+_DEBOUNCE_IGNORE_ARGS = {'token', 'nodebounce', 'timestamp', 'time', 'ts', 't', '_', 'nonce', 'requestid', 'reqid', 'rand'}
+_debounce_tbl = {}               # key -> ['inflight'|'done', time]  (done: expiry time)
+_debounce_lock = threading.Lock()
+
+def _debounce_key():
+    token = str(request.values.get('token', ''))
+    if token.startswith('qsk.'):
+        who = 'key:'+token.split('.')[1] if len(token.split('.')) > 1 else token
+    else:
+        try:
+            who = 'user:'+str(loggedusers[token]['user'])
+        except Exception:
+            who = 'tok:'+token
+    items = []
+    for k in sorted(request.values.keys()):
+        if k in _DEBOUNCE_IGNORE_ARGS:
+            continue
+        items.append((k, sorted(request.values.getlist(k))))
+    body = request.get_data(cache=True) if request.is_json else b''
+    h = _hashlib.sha1(repr(items).encode('utf-8', 'replace')+body).hexdigest()
+    return who+'|'+request.path+'|'+h
+
+def _debounce_exempt():
+    if str(request.values.get('nodebounce', '')) != '1':
+        return False
+    return str(request.values.get('token', '')).startswith('qsk.') or request.remote_addr in ('127.0.0.1', '::1')
+
+@app.before_request
+def debounce_before():
+    g.debounce_key = None
+    if request.method not in ('GET', 'POST') or request.path not in DEBOUNCE_PATHS or _debounce_exempt():
+        return None
+    try:
+        key = _debounce_key()
+    except Exception:
+        return None
+    now = time.time()
+    with _debounce_lock:
+        if len(_debounce_tbl) > DEBOUNCE_MAX_ENTRIES//2:
+            for k in [k for k, v in _debounce_tbl.items() if (v[0] == 'done' and v[1] < now) or (v[0] == 'inflight' and v[1]+DEBOUNCE_INFLIGHT_MAX < now)]:
+                del _debounce_tbl[k]
+            if len(_debounce_tbl) > DEBOUNCE_MAX_ENTRIES:
+                _debounce_tbl.clear()
+        cur = _debounce_tbl.get(key)
+        if cur and ((cur[0] == 'done' and cur[1] > now) or (cur[0] == 'inflight' and cur[1]+DEBOUNCE_INFLIGHT_MAX > now)):
+            dup = True
+        else:
+            dup = False
+            _debounce_tbl[key] = ['inflight', now]
+            g.debounce_key = key
+    if dup:
+        print('Debounce: duplicate request ignored', request.path, key.split('|')[0])
+        return jsonify({'response': 'duplicate', 'message': 'duplicate request ignored (debounce)'})
+    return None
+
+def _debounce_failed(resp):
+    if resp.status_code >= 400:
+        return True
+    try:
+        d = resp.get_json(silent=True)
+    except Exception:
+        d = None
+    if isinstance(d, dict):
+        r = str(d.get('response', ''))
+        return 'baduser' in r or r == 'error' or 'error' in d
+    return False
+
+@app.after_request
+def debounce_after(resp):
+    key = getattr(g, 'debounce_key', None)
+    if key:
+        g.debounce_key = None
+        with _debounce_lock:
+            if _debounce_failed(resp):
+                _debounce_tbl.pop(key, None)
+            else:
+                _debounce_tbl[key] = ['done', time.time()+DEBOUNCE_SECONDS]
+    return resp
+
+@app.teardown_request
+def debounce_teardown(exc):
+    key = getattr(g, 'debounce_key', None)
+    if key:      # no after_request ran (unhandled exception): a failed request does not block a retry
+        with _debounce_lock:
+            _debounce_tbl.pop(key, None)
+
 def audit_command(f):
  @wraps(f)
  def decorated_function(data, *args, **kwargs):

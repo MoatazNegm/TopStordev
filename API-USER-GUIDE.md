@@ -18,6 +18,7 @@ not fixed in the code it says so.
 | Arrays | Send as `disks[]=a&disks[]=b` (also `cache[]`, `cache_disks[]`). They arrive as `disks`, `cache`, `cache_disks` lists. |
 | Audit | Every change call is recorded in the command log (`info/commandlog`); parameters whose name contains `pass` are never logged. |
 | Cache buster | The UI adds `_=<epoch ms>`; harmless. |
+| Duplicate clicks (debounce) | A change call that is **identical** (same user or key, same path, same parameters apart from `token` and time fields) to one still running, or to one that finished OK in the last 3 seconds, is not executed again: HTTP 200 `{"response": "duplicate", "message": "duplicate request ignored (debounce)"}`. A call that failed never blocks a retry. Reads are never debounced. API-key callers (and localhost) that really need a quick identical repeat add `nodebounce=1`. |
 
 Example (curl):
 

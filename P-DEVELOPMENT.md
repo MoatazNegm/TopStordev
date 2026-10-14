@@ -3517,3 +3517,31 @@ Requested by the front-end developer (UI side built in QSD5.307). Released on to
   (`cpoolowner.sh of <pool>`, zfs property `topstor:owner`) and compares it with the node's hostname; a pool without owner
   (`-`/empty) keeps the old `zpool list` test. Physical servers unchanged.
 * **Proof:** see the test 22 run log `scripts/qc-harness/b22t/run.log` (ticks every 2 min after the fix).
+
+## 112. Observation: user with a home added right after a take-over loses the home (container flavour) — no code change (2026-10-13) `C`
+
+* **Seen by:** QC test 26, cycle 2 on `QSD5.320` (build 241), step 13: `usr12` with home `10.11.11.156` was added 5 s after the
+  cluster API answered again from the second node (stopnode of the primary, API back after ~40 s).
+* **What happened:** the user was created (`usersinfo`, uid), `VolumeCreateHOME` ran `zfs create` 1 s later and failed
+  (`NFS1004` info then `NFS1006` error in `TopStorglobal.log`); no retry, the user stays without a home. The same add 7 min later
+  (and again after delete/re-add) created the home in 5 s. The volumes already show `serviceok` in the old etcd state while the
+  take-over (pool import, 5 CIFS + 6 HOMEE containers) still runs for ~3 min.
+* **Verdict (regression rule):** not an undeployed fix, not a regression (QSD5.319 re-run added usr12 ~100 s after the
+  take-over and it worked), not a tool change: a timing window that no earlier cycle hit. Seen once, the import-still-running
+  cause is inferred from the timing, not proven.
+* **Not fixed:** treated as a known timing guard; wait for the home volumes of the take-over to be up before adding homes. A
+  fix would be to refuse/queue home creation while the pool is not imported on the node (open).
+* **Also seen:** two `UnixAddUser` calls for the same new name within 1 s are both accepted (the second one is rejected with
+  "a user with this name already exists" when it comes ≥ 8 s later; replication window of `usersinfo`).
+
+## 113. Request debouncing: one central guard against duplicate clicks on every changing call — `QSD5.321` (2026-10-14)
+
+- **Problem.** A human can click OK / Cancel / Submit many times; every click was a separate request and made duplicate volumes, duplicate deletes. The UI now locks its buttons (`clickGuard.js`, `Common/Button.jsx`); the backend refuses duplicates too, so scripts and slow networks are covered.
+- **Where.** `fapi.py`, before `audit_command`: `before_request` / `after_request` / `teardown_request` (`debounce_before`, `debounce_after`, `debounce_teardown`), one guard for all routes, no per-route code. Only the paths in `DEBOUNCE_PATHS` (the changing calls: volumes create/delete/active/config, snapshots create/rollback/delete/perioddelete, pools newpool/addtopool/delpool/cache/actionOnDisk, users and groups add/change/delete/auth/upload, hosts config/joincluster/evacuate, partners/replication add/delete, changepass, software calls, apikeys create/regenerate/revoke/delete). Reads (`…info`, `…list`, stats, logs, notification, getConfig, versions, summary, heartbeat, login, renewtoken …) and login/logout are never in the set.
+- **Key.** `(user name of the token, or key name for qsk.* keys) | path | sha1 of the sorted parameters without token, nodebounce and time fields (_, t, ts, time, timestamp, nonce, requestid, reqid, rand)`.
+- **Rules.** (a) identical request in flight (`DEBOUNCE_INFLIGHT_MAX` 180 s, then stale) → refused; (b) identical request within `DEBOUNCE_SECONDS` (3) after one finished OK → refused; (c) a failed request (HTTP >= 400, exception, `baduser`, `response: error` or an `error` field in the answer) removes its entry, so a retry is accepted at once. Refusal is HTTP 200 `{"response":"duplicate","message":"duplicate request ignored (debounce)"}` and a `Debounce:` line on the flask stdout. The UI only treats `baduser` (and, in a few pages, answers containing `fail`/`error`) as errors, so `duplicate` is a harmless message.
+- **Memory.** A lock-protected dict per fapi process (per node); expired entries are purged when it holds more than 1000 entries, hard cap 2000 (cleared).
+- **Exemption.** `nodebounce=1` skips the guard, honoured only for API-key tokens and for localhost callers; from any other address it is ignored. The QC harness uses admin tokens and never repeats an identical changing call within 3 s on purpose; no TopStor/pace script calls the REST API.
+- **Proof (live, zfs1, flask restarted).** `groups/UnixAddgroup name=dbgrp1` twice at once: first `response: admin`, second `duplicate`; the same call 4 s later accepted; `volumes/volumedel name=nosuchvol` (KeyError, HTTP 500) twice in a row: both executed, none `duplicate`; `volumes/volumesinfo` 20 times: 0 refused; `nodebounce=1` from the host (not localhost, no key) did not exempt.
+- **Documented** in `API-USER-GUIDE.md` §1 (new reply value `duplicate`).
+
