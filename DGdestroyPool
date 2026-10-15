@@ -114,6 +114,17 @@ echo iam in >> /root/tmp2
    docker exec etcdclient /TopStor/logmsg.py DGfa5 error $userreq $pool
  else
    docker exec etcdclient /TopStor/logmsg.py DGsu5 info $userreq $pool 
+   # the pool is gone: whatever a node's import loop wrote for it meanwhile (poolnxt/pools, also the doubled-p variants seen in
+   # QC test 10) must not survive; a node importing the stale name held the disks of the next pool 'in use' (QSD5.326)
+   stamp=`date +%s`
+   for stale in $pool p$pool; do
+    ETCDCTL_API=3 /pace/etcddel.py $leaderip poolnxt/$stale
+    ETCDCTL_API=3 /pace/etcddel.py $leaderip pools/$stale
+   done
+   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/poolnxt/Del_poolnxt_${pool}/request poolnxt_$stamp
+   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/poolnxt/Del_poolnxt_${pool}/request/$leader poolnxt_$stamp
+   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/pools/Del_pools_${pool}/request pools_$stamp
+   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/pools/Del_pools_${pool}/request/$leader pools_$stamp
 fi
 /pace/etcddel.py $leaderip requests/DGdestroypool/$myhost $myhost/$userreq
 #systemctl restart zfs-zed

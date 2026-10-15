@@ -3583,3 +3583,17 @@ Requested by the front-end developer (UI side built in QSD5.307). Released on to
 - **Checked** the other `REQUIRED_PARAMS` entries against the handlers and the UI calls (`topstorweb/src/api`): snaprollback / snapshotdel /
   perioddelete (`name`), volumes/create, volumes/config (`type volume`), hosts/evacuate (`name`), usersauth (`tochange auths`), userauths
   (`username`), userdel (`name tenant`), groupdel, UnixAddgroup, partnerdel, AddPartner, grouplist (`tenant`) — all match what the UI/harness send.
+
+## 117. Pool delete raced the standby node's take-over — `QSD5.325` (2026-10-15)
+
+- **Seen.** QC test 10 build 269 (QSD5.324), S8 "delete the pool": `pools/delpool` was accepted but the pool stayed in kernel and API (`NOT clean after 150s`),
+  `/root/dgdestroyretry` on zfs1 `zpool import ... a pool with that name already exists`, `/root/tmp2` `cannot destroy ...: pool is busy`.
+  `zpool history` of the pool: `export -f` (02:17:12) `import` `reguid` `set topstor:owner=<zfs2 host>` 3 s after the delete request, then the
+  selectspare loops of both nodes ran `zpool replace` back and forth every ~14 s (`needtoreplace/<zfs2>/...`), and `poolnxt/p<pool>` (stale) existed.
+  The same step passed in build 232 (QSD5.319): a timing race, not a new code path.
+- **Cause.** `DGdestroyPool` deletes `pools/`, `ActPool/` and then exports + re-imports the pool (to free it) before `destroy -f`. During the
+  export the standby node named by `poolnxt/<pool>` sees an assignment for a pool that is no longer in `pools`, imports it (the container flavour
+  shares one kernel), reguids it and takes the ownership; the destroy then finds the pool busy.
+- **Fix.** `TopStor/DGdestroyPool` withdraws `poolnxt/<pool>` (and syncs the delete) right before the export; `pace/zpooltoimport.py`
+  re-reads `poolnxt/<pool>` just before the import and skips a withdrawn assignment.
+- **Tools.** `scripts/qc-harness/build10/mon.sh` logs poolnxt/pools/needtoreplace and the pool history every 3 s during a test.
