@@ -3597,3 +3597,14 @@ Requested by the front-end developer (UI side built in QSD5.307). Released on to
 - **Fix.** `TopStor/DGdestroyPool` withdraws `poolnxt/<pool>` (and syncs the delete) right before the export; `pace/zpooltoimport.py`
   re-reads `poolnxt/<pool>` just before the import and skips a withdrawn assignment.
 - **Tools.** `scripts/qc-harness/build10/mon.sh` logs poolnxt/pools/needtoreplace and the pool history every 3 s during a test.
+
+## 118. Stale `poolnxt`/`pools` keys after a pool delete — `QSD5.326` (2026-10-15)
+
+- **Seen.** QC test 10 build 270 (QSD5.325), S14: a raid50 create right after the delete of a raid10 pool was accepted but no pool appeared;
+  `/root/dgcreateerror` listed the first group's disks "is in use and contains a unknown filesystem", the same on a retry minutes later. `build10/mon.log`
+  shows `poolnxt/p<pool>` / `pools/p<pool>` (a doubled `p`) and `pools/<deleted pool>` written by the standby node after the delete. The create worked again
+  once the stale names were gone (after manual host-side create/destroy of the same disks).
+- **Cause (probable).** The import loops of a node write `poolnxt`/`pools` for a name that is exported for a moment during the destroy; nothing removed
+  them after the destroy, so a node kept trying to import a destroyed pool name and held its disks (one kernel for all containers).
+- **Fix.** `TopStor/DGdestroyPool` deletes `poolnxt/<pool>`, `pools/<pool>` and the `p<pool>` variants (with syncs) after the destroy succeeded.
+- **Open.** The writer of the doubled-`p` key was not found; test 10 is rerun on QSD5.326 with `build10/mon.sh` to confirm.
