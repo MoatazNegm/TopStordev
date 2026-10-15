@@ -87,6 +87,14 @@ echo iam in >> /root/tmp2
   echo > /etc/exports
  fi
  echo iam here2 >> /root/tmp2
+ # container flavour: the pool is exported for a moment below; the standby node of poolnxt/<pool> imports a pool that is
+ # unknown to it at once, reguids it and takes the ownership (zfs2 did it 3 s after the delete of QC test 10, QSD5.325), and
+ # the destroy then ends 'pool is busy' with both nodes replacing disks.  Withdraw the assignment first.
+ stamp=`date +%s`
+ ETCDCTL_API=3 /pace/etcddel.py $leaderip poolnxt/$pool
+ ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/poolnxt/Del_poolnxt_${pool}/request poolnxt_$stamp
+ ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/poolnxt/Del_poolnxt_${pool}/request/$leader poolnxt_$stamp
+ sleep 2
  /sbin/zpool export -f $pool
  sleep 1
  # the import right after the export sometimes finds no pool ("cannot import: no such pool available") while the
