@@ -1,12 +1,22 @@
 #!/usr/bin/python3
-import sys, os, subprocess, datetime
+import sys, os, subprocess, datetime, fcntl
 from logqueue import queuethis, initqueue
 from etcdgetpy import etcdget as get
 from sendhost import sendhost
 from time import sleep
 
 
+_cifslock = None
+
+
 def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsubnet, vtype,*args):
+    # QSD5.327: after a take over the activation script and VolumeCheck both start cifs.py for the same address. Each run
+    # starts with rm -rf of /TopStordata/smb.<ip> and tempsmb.<ip>, so one run deleted the config of the other and docker
+    # bind-mounted the missing file as an empty DIRECTORY: the share container ran without any share (BAD_NETWORK_NAME)
+    # and nobody repaired it. One run per address at a time; the lock is released when the process ends.
+    global _cifslock
+    _cifslock = open('/TopStordata/cifs.'+ipaddr+'.lock','w')
+    fcntl.flock(_cifslock, fcntl.LOCK_EX)
     volsip = get(etcdip,'volume','/'+ipaddr+'/')
     volsip = [ x for x in volsip if 'active' in str(x) ]
     nodesip = get(etcdip, 'Active','/'+ipaddr+'/') 
@@ -50,8 +60,13 @@ def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsub
                     fip.write(fvol.read())
             except:
                continue 
+    # a leftover DIRECTORY (docker creates one for a missing bind-mount source) makes cp copy INTO it
+    subprocess.run(['rm','-rf','/TopStordata/smb.'+ipaddr],stdout=subprocess.PIPE)
     cmdline = 'cp /TopStordata/tempsmb.'+ipaddr+' /TopStordata/smb.'+ipaddr
     subprocess.run(cmdline.split(),stdout=subprocess.PIPE)  
+    if not os.path.isfile('/TopStordata/smb.'+ipaddr) or os.path.getsize('/TopStordata/smb.'+ipaddr) == 0:
+        print('no share config for', ipaddr, 'volumes found:', len(volsip), 'not starting an empty share container')
+        return
     if '_' not in vtype:
         cmdline = 'cp /TopStor/VolumeCIFSupdate.sh /etc/'
         subprocess.run(cmdline.split(),stdout=subprocess.PIPE)  

@@ -3608,3 +3608,20 @@ Requested by the front-end developer (UI side built in QSD5.307). Released on to
   them after the destroy, so a node kept trying to import a destroyed pool name and held its disks (one kernel for all containers).
 - **Fix.** `TopStor/DGdestroyPool` deletes `poolnxt/<pool>`, `pools/<pool>` and the `p<pool>` variants (with syncs) after the destroy succeeded.
 - **Open.** The writer of the doubled-`p` key was not found; test 10 is rerun on QSD5.326 with `build10/mon.sh` to confirm.
+
+## 119. Two cifs.py runs for one address left the share container without a config — `QSD5.327` (2026-10-15)
+
+- **Seen.** QC test 16 build 278 (QSD5.326), S21 "close node_1" (the leader): zfs2 took the pool over and started `CIFS_QC.LOCAL-10.11.11.232` at
+  10:27, but every smbclient answered `NT_STATUS_BAD_NETWORK_NAME` for 9 minutes and again after zfs1 returned. In the container
+  `process_usershare_file: stat of /var/lib/samba/usershares/<vol> failed`, `/etc/smb.conf` (bind mount of `/TopStordata/smb.<ip>`) was a
+  **directory** (docker creates one for a missing source), `/root/cifsrun.log` of zfs2 showed `cat: /TopStordata/smb.10.11.11.232: No such file` and
+  two `cifs.py` runs 32 s apart. Nothing repaired the share afterwards (the container was running).
+- **Cause.** After a take-over the volume activation (`VolumeActivateCIFSdom`) and `pace/VolumeCheck.py` both start `cifs.py` for the same address.
+  Each run begins with `rm -rf /TopStordata/smb.<ip> tempsmb.<ip>`, so one run removed the config the other had just written and started its
+  container with a missing file. Earlier rounds only passed because the two runs did not overlap.
+- **Fix.** `TopStor/cifs.py`: an exclusive `flock` on `/TopStordata/cifs.<ip>.lock` for the whole run (one run per address), `smb.<ip>` is removed
+  before the `cp` (a leftover directory made `cp` copy into it) and the run stops without starting a container when the config is missing or empty.
+- **Verified.** On zfs2 with `smb.<ip>` made a directory and the broken container running, two `cifs.py` runs started at once: the second waits, the
+  config is a 469 byte file, the container is rebuilt and `smbclient //10.11.11.232/<vol> -U 'QC\usr1'` lists the old files. Test 16 is rerun on QSD5.327.
+- **Open.** A share container that runs without a share is still not detected by `VolumeCheck`; a check for `smb.<ip>` being a regular file would
+  catch it.
