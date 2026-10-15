@@ -3625,3 +3625,17 @@ Requested by the front-end developer (UI side built in QSD5.307). Released on to
   config is a 469 byte file, the container is rebuilt and `smbclient //10.11.11.232/<vol> -U 'QC\usr1'` lists the old files. Test 16 is rerun on QSD5.327.
 - **Open.** A share container that runs without a share is still not detected by `VolumeCheck`; a check for `smb.<ip>` being a regular file would
   catch it.
+
+## 120. A follower never received `usershash/admin`: admin was `baduser` after the take-over — `QSD5.328` (2026-10-15)
+
+- **Seen.** QC test 26 round 5 build 286 (QSD5.327), S12 (`stopnode.sh zfs1`, the leader): zfs2 took over, flask answered at once, but `admin/tmatem`
+  gave `baduser` and the user list was empty for 6+ minutes (the script's polls timed out). zfs2's etcd had `usersinfo/*` and `usershash/usr*` but neither
+  `usershash/admin` nor `usershashadm/admin`; zfs1's local etcd (restarted afterwards) still had both. Earlier rounds (QSD5.324) passed the same step.
+- **Cause.** `admin` has no `usersinfo`, so the per-user sync (`oneusersync`, one `UnixAddUser` per user) never carries its hash. The only copy to a follower
+  was in `usersyncall()` (full user sync), which runs on the `sync/user` initial request; a follower that joined and then only saw single user adds never
+  ran it, so its own etcd never held `usershash/admin`, and as new leader it could not log admin in. Whether the full sync happened in earlier rounds was
+  luck of the timing (a pending `sync/user` request at the join).
+- **Fix.** `pace/usersyncall.py` `followadminhash(leaderip, myhostip)` (the former block of `usersyncall`, unchanged logic) and `pace/checksyncs.py`
+  `syncrequest` calls it on every pass of a follower (not for the replication pull): the leader's `usershash/admin` is copied into the node's own etcd and applied
+  with `UnixChangePass admin admin` when it differs. Two etcd reads per pass.
+- **Verified.** see the test 26 round 5 rerun on QSD5.328.
