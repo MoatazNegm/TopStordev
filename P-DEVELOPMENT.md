@@ -3638,4 +3638,17 @@ Requested by the front-end developer (UI side built in QSD5.307). Released on to
 - **Fix.** `pace/usersyncall.py` `followadminhash(leaderip, myhostip)` (the former block of `usersyncall`, unchanged logic) and `pace/checksyncs.py`
   `syncrequest` calls it on every pass of a follower (not for the replication pull): the leader's `usershash/admin` is copied into the node's own etcd and applied
   with `UnixChangePass admin admin` when it differs. Two etcd reads per pass.
-- **Verified.** see the test 26 round 5 rerun on QSD5.328.
+- **Verified.** test 26 round 5 rerun on QSD5.328 (build 287): S12 passed, `admin/tmatem` ok 22 s after the stop, 11 users, 5 vols and 5 homes serviceok.
+
+## 121. A deleted home left its registry record: a new home on the same address never came up — `QSD5.329` (2026-10-15)
+
+- **Seen.** QC test 26 round 5 build 287 (QSD5.328), S37: after the take-over `usr12` (home .156) was deleted at S38 about 2 min after zfs2 became leader. The
+  dataset went, `volumes/HOMEE/.../usr12_*` stayed. A new user `usr17` on .156 was then `HOST_UNREACHABLE` for 10+ minutes, and re-adding `usr12` was rejected
+  ("name already used").
+- **Cause.** `VolumeDeleteHOME` read ip and type of the volume from etcd once; right after a take-over the answer was empty, `cifsremove.sh` got no address
+  and its `etcddel vol` did not remove the record. `cifs.py` then waited 90 x 2 s for the stale volume's dataset to mount, on every run, so the address
+  share was never started.
+- **Fix.** `TopStor/VolumeDeleteHOME` asks etcd again (8 x 5 s) before it reads ip/type and, after the destroy, removes the record itself until it is gone.
+  `TopStor/cifs.py` skips a volume record whose dataset does not exist while its pool does (a pool still importing is still waited for).
+- **Not fixed.** After a take-over the home IP/container of each home came up one by one, `.155` took about 6 min (S37 first attempt unreachable); open.
+- **Verified.** see the test 26 round 5 rerun on QSD5.329.
