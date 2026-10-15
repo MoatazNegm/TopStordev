@@ -27,6 +27,12 @@ then
  echo etcd=$etcd
  docker exec etcdclient /TopStor/logmsg.py NFS1000 info $userreq $volname
  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq
+ # QSD5.329: right after a take over the registry did not answer for a while: ip and type came back empty, cifsremove.sh removed
+ # no registry record and the stale record kept the address blocked (a new home on it never came up). Ask again.
+ for try in 1 2 3 4 5 6 7 8; do
+  [ -n "`/TopStor/etcdget.py $etcd volume $volname | grep administrator`" ] && break
+  sleep 5
+ done
  ipaddr=`/TopStor/etcdget.py $etcd volume $volname | awk -F'administrator' '{ print $2}' | awk -F'/' '{print $3}'`
  vtype=`/TopStor/etcdget.py $etcd volume $volname | awk -F'/' '{print $2}'`
  echo ip=$ipaddr
@@ -46,6 +52,12 @@ then
  fi
  rm -rf $pDG/$volname
  echo rm -rf $pDG/$volname
+ # the registry record goes with the dataset (cifsremove.sh does it too, but with no answer from etcd it silently did not)
+ for try in 1 2 3 4 5 6; do
+  /TopStor/etcddel.py $leaderip vol $volname
+  [ -z "`/TopStor/etcdget.py $etcd volume $volname | grep administrator`" ] && break
+  sleep 5
+ done
  docker exec etcdclient /TopStor/logmsg.py NFS1002 info $userreq $pDG/$volname
  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` stop $userreq
 fi

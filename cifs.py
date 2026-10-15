@@ -37,10 +37,19 @@ def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsub
     # /<pool>/smb.<volume> is not readable yet. Reading it then (the error was skipped) gave an empty smb config and a
     # share container without any share, and nothing retried. Wait for the dataset; if it never comes, start nothing:
     # the volume stays dirty and the next volume check starts it again.
+    staleskip = []
     for vol in volsip:
         if vol in notsametype:
            continue
         leftvol = vol[0].split('/')[4]
+        # QSD5.329: a stale volume record (the user and its dataset are gone, the etcd record stayed) waited 180 s per run
+        # and the share of the address was never started. No dataset at all = nothing to wait for and nothing to share.
+        exist = subprocess.run(['zfs','list','-H','-o','name',pool+'/'+leftvol],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        poolok = subprocess.run(['zfs','list','-H','-o','name',pool],stdout=subprocess.PIPE,stderr=subprocess.PIPE).returncode == 0
+        if exist.returncode != 0 and poolok:
+            print('stale volume record, dataset missing, skipped', pool, leftvol)
+            staleskip.append(vol)
+            continue
         for attempt in range(90):
             mounted = subprocess.run(['zfs','list','-H','-o','mounted',pool+'/'+leftvol],stdout=subprocess.PIPE,stderr=subprocess.PIPE).stdout.decode().strip()
             if mounted == 'yes' and os.path.exists('/'+pool+'/smb.'+leftvol):
@@ -49,6 +58,7 @@ def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsub
         else:
             print('pool volume not mounted yet, not starting the share', pool, leftvol)
             return
+    volsip = [ x for x in volsip if x not in staleskip ]
     for vol in volsip:
         if vol in notsametype:
            continue
