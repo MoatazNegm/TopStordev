@@ -3651,4 +3651,11 @@ Requested by the front-end developer (UI side built in QSD5.307). Released on to
 - **Fix.** `TopStor/VolumeDeleteHOME` asks etcd again (8 x 5 s) before it reads ip/type and, after the destroy, removes the record itself until it is gone.
   `TopStor/cifs.py` skips a volume record whose dataset does not exist while its pool does (a pool still importing is still waited for).
 - **Not fixed.** After a take-over the home IP/container of each home came up one by one, `.155` took about 6 min (S37 first attempt unreachable); open.
-- **Verified.** see the test 26 round 5 rerun on QSD5.329.
+- **Verified.** test 26 round 5 rerun on QSD5.329 (build 288): S12 22 s, S37 smb reachable 2 min after the take-over, usr12 volume record removed after delete, all 38 steps passed.
+
+## 122. A once snapshot right after a take-over was reported as sent but never left the sender — `QSD5.331` (2026-10-16)
+
+- **Seen.** QC test 22 cycle 6 (QSD5.330), S19/S20: `stopnode.sh zfs1` at 14:37:04, 31 s later `once2` was created on the new pool owner (c1node_2). The log said `Replispacesu01` (success) at once, but 150 s later the receiver still had only `once1`. A manual `replicatenow.py` a few minutes later streamed it.
+- **Cause.** `SnapshotnowOnce` started `replicatenow.py` 1-2 s before the new owner had started its ssh tunnels to the receiver (`ps` start time of `ssh ... Lremote/Rremote sshDRsite_Receiver` = 2 s after the snapshot). `replicatenow.py` then dies (no tunnel found) and prints no `result_`; the script treated the empty result as success (`Streamfa01` was only logged when the result contained `fail`). The periodic path (`Snapshotnowhost`) requires `success` and was not affected.
+- **Fix.** `TopStor/SnapshotnowOnce`: an empty answer is retried (10 tries, 6 s apart, stderr dropped) and still-empty ends as `fail_noresult` (`Streamfa01`).
+- **Verified.** shell loop checked with a stub (two empty answers, then success: 3 tries); live on zfs2 with the tunnels killed before the snapshot: `once3` reached the receiver in under 45 s. Test 22 rerun below.
