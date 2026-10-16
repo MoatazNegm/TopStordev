@@ -75,8 +75,18 @@ then
  /TopStor/etcdput.py $leaderip sync/running/____/request running_$stamp
  /TopStor/etcdput.py $leaderip sync/running/____/request/$leader running_$stamp
  echo ./replicatenow.py $leaderip $etcd $snapshot $receiver
- result=`./replicatenow.py $leaderip $etcd $snapshot $receiver`
- result=`echo $result | grep 'result_' | awk -F'result_' '{print $2}'`
+ # an empty answer means replicatenow.py died before it streamed (e.g. right after a take-over the ssh tunnel of the new owner
+ # to the receiver is not there yet): that is not a success, wait for the tunnel and try again (up to ~60 s)
+ tries=0
+ result=''
+ while [ -z "$result" ] && [ $tries -lt 10 ];
+ do
+  tries=$((tries+1))
+  result=`./replicatenow.py $leaderip $etcd $snapshot $receiver 2>/dev/null`
+  result=`echo $result | grep 'result_' | awk -F'result_' '{print $2}'`
+  [ -z "$result" ] && sleep 6
+ done
+ [ -z "$result" ] && result='fail_noresult'
  echo .................................................................
  echo result=$result
  echo ............................................
