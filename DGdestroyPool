@@ -57,6 +57,9 @@ echo iam in >> /root/tmp2
   fi
  fi
  /pace/etcdput.py $leaderip requests/DGdestroypool/$myhost $myhost/$userreq
+ # marker for the standby's import loop (zpooltoimport.py): the pool is exported for a moment below and must not be imported by
+ # the other node then (it did, 7 s after the delete started: the destroy ended 'pool is busy' and the owner changed; QC test 10, QSD5.334)
+ /pace/etcdput.py $leaderip destroying/$pool $myhost
  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq 
  docker exec etcdclient /TopStor/logmsg.py DGst5 info $userreq $pool
   stamp=`date +%s`
@@ -126,6 +129,7 @@ echo iam in >> /root/tmp2
    ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/pools/Del_pools_${pool}/request pools_$stamp
    ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/pools/Del_pools_${pool}/request/$leader pools_$stamp
 fi
+/pace/etcddel.py $leaderip destroying/$pool
 /pace/etcddel.py $leaderip requests/DGdestroypool/$myhost $myhost/$userreq
 #systemctl restart zfs-zed
  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` stop $userreq 
