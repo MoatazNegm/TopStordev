@@ -146,17 +146,10 @@ detect_dind_socket() {
     if [ "$seen" = "$MYCONTAINER" ]; then
         return 1  # host daemon (sees us)
     fi
-    # The socket sees SOMETHING. If it sees the host's set of containers
-    # (multiple, with images like nginx, etc.), it's the host daemon —
-    # not DinD, even if our name doesn't match. If it sees 0 containers
-    # or only DinD-related containers, it's DinD.
-    total=$(docker -H unix:///var/run/docker.sock ps --format '{{.Names}}' 2>/dev/null | wc -l)
-    if [ "$total" -ge 3 ]; then
-        # Many containers visible — almost certainly the host daemon.
-        # Returning 1 even though our name didn't match (could be that
-        # we're called from a sidecar without the host container's name).
-        return 1
-    fi
+    # The socket does not show OUR container by name. Inside the zfs container the socket is always the inner DinD
+    # (its children etcd, etcdclient, intsmb, intdns, software, ... can easily be 3 or more, so a container COUNT
+    # cannot tell host from DinD: it sent "docker restart <hostname>" to the inner daemon, "No such container", and
+    # the node never restarted after a join). Not seeing ourselves by name means DinD.
     return 0
 }
 
