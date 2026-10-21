@@ -8,6 +8,16 @@ vol=`echo $@ | awk -F'vol=' '{print $2}' | awk '{print $1}'`;
 pool=`echo $@ | awk -F'pool=' '{print $2}' | awk '{print $1}'`;
 userreq=`echo $@ | awk -F'user=' '{print $2}' | awk '{print $1}'`;
 ips='0'
+# read from the node etcd; a non-leader etcd may answer empty or the not-found marker _1, so retry on the leader etcd
+egl() {
+ local r
+ r=`/pace/etcdget.py $etcd "$@"`
+ if [ "$etcd" != "$leaderip" ] && { [ `echo $r | wc -c` -le 2 ] || echo "$r" | grep -qE "^[[:space:]]*(\(.?_1.?,?\)?|_1)[[:space:]]*$"; }
+ then
+  r=`/pace/etcdget.py $leaderip "$@"`
+ fi
+ echo "$r"
+}
 
 privilege="CIFS";
 contrun=`./privthis.sh $privilege $userreq`;
@@ -35,20 +45,20 @@ then
  case $stat in
   01)
    echo volume only  for  $vol
-    declare  vols=`/pace/etcdget.py $etcd volumes/CIFS $vol`
+    declare  vols=`egl volumes/CIFS $vol`
    ;;
   10)
    echo pool only $pool
-    declare  ips=`/pace/etcdget.py $etcd ipaddr $pool`
-    declare  vols=`/pace/etcdget.py $etcd volumes/CIFS  $pool`
+    declare  ips=`egl ipaddr $pool`
+    declare  vols=`egl volumes/CIFS  $pool`
    ;;
   11)
    echo 'volume and pool only'
-    declare  vols=`/pace/etcdget.py $etcd volumes/CIFS/$host/$pool/$vol`
+    declare  vols=`egl volumes/CIFS/$host/$pool/$vol`
    ;;
   00)
    echo 'host only'
-   declare  vols=`/pace/etcdget.py $etcd volumes/CIFS/$host --prefix`
+   declare  vols=`egl volumes/CIFS/$host --prefix`
  esac
  echo vols="${vols[@]}"
  volsc=`echo $vols | wc -c`
@@ -219,11 +229,11 @@ then
   name=`echo $l | awk -F'/' '{print $2}'`
   writev=`echo $l | awk -F'/' '{print $5}'`
   writev=`echo $writev | sed 's/\,/ /g' `;
-  echo /pace/etcdget.py $etcd volumes $name \| grep CIFS \| awk -F'\/' '{print $3}'
-  volhost=`/pace/etcdget.py $etcd volumes $name | grep CIFS | awk -F'/' '{print $3}'`
-  domain=`/pace/etcdget.py $etcd volumes $name | grep CIFS | awk -F'/' '{print $14}'`
-  echo /pace/etcdget.py $etcd volumes/CIFS_$domain/$volhost/$pool/$name
-  volsvalue=`/pace/etcdget.py $etcd volumes/CIFS_$domain/$volhost/$pool/$name`
+  echo egl volumes $name \| grep CIFS \| awk -F'\/' '{print $3}'
+  volhost=`egl volumes $name | grep CIFS | awk -F'/' '{print $3}'`
+  domain=`egl volumes $name | grep CIFS | awk -F'/' '{print $14}'`
+  echo egl volumes/CIFS_$domain/$volhost/$pool/$name
+  volsvalue=`egl volumes/CIFS_$domain/$volhost/$pool/$name`
   chmod 1777 /$pool/$name
   sleep 1 
   setfacl -b /$pool/$name
