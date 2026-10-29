@@ -41,6 +41,20 @@ echo 2222222222222222222222222222222222222222222222
  echo s$pullsync | grep pull
  if [ $? -ne 0 ]
  then
+ 			# QSD5.338: a NEW group never takes the name of a system account or group -- "groupdel" and "useradd" below would
+ 			# delete/replace it.  (The sync copy of an accepted group is not checked.)
+ 			why=`/TopStor/uservalid.py --group "$username"`
+ 			sysline=`getent passwd "$username"`
+ 			sysgrp=`getent group "$username"`
+ 			if [ -z "$why" ] && [ -n "$sysline" ] && ! echo "$sysline" | awk -F':' '{print $5}' | grep -q '^TopStor'; then why='x'; fi
+ 			if [ -z "$why" ] && [ -z "$sysline" ] && [ -n "$sysgrp" ]; then why='x'; fi
+ 			if [ -n "$why" ]
+ 			then
+ 				echo UnixAddGroup: group "$username" rejected: it is reserved or a system account/group on this node
+ 				docker exec etcdclient /TopStor/logmsg.py Unlin1027rs error $userreq `echo "$username" | cut -c1-32 | tr -c 'A-Za-z0-9.\n-' '.'`
+ 				docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
+ 				exit 1
+ 			fi
  			/pace/etcdget.py $leaderip volumes --prefix | grep -w $username
  			if [ $? -eq 0 ];
  			then

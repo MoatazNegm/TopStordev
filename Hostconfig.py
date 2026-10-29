@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import socket, subprocess,sys, datetime
-from uservalid import check_password
+from uservalid import check_password, check_password_target
 from time import sleep
 from logqueue import queuethis, initqueue
 from etcdgetpy import etcdget as get
@@ -79,6 +79,10 @@ def config(leader, leaderip, myhost, *bargs):
   if arglist.get('user') not in ('admin','system') and arglist.get('user') != arglist.get('username'):
    logmsg.sendlog('Priv1004','error','system',arglist.get('user'))
    arglist['error'] = 'noprivilege'
+  # QSD5.338: never root, 'system' or another system account (even for admin)
+  elif check_password_target(arglist.get('username')):
+   logmsg.sendlog('Unlin1027rs','error',arglist['user'],str(arglist.get('username'))[:32])
+   arglist['error'] = 'reservedname'
   elif check_password(arglist['password']):      # empty, shorter than 3, blanks, quotes ... (uservalid.py)
    logmsg.sendlog('Unlinfa12','error',arglist['user'],arglist['username'])
   else:

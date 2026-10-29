@@ -16,6 +16,7 @@ RESERVED = {
  'root','admin','bin','daemon','adm','lp','sync','shutdown','halt','mail','operator','games','ftp','nobody',
  'dbus','polkitd','sshd','chrony','tss','rpc','rpcuser','nfsnobody','postfix','apache','nginx','named','tcpdump',
  'docker','etcd','grafana','prometheus','systemd','wheel','users','nogroup','guest','samba','smb',
+ 'system',   # QSD5.338: the appliance's internal account; fapi.has_privilege() and privthis.sh give it every right
 }
 
 # log message codes (msgsglobal.txt), so the rejection reaches the system log through logmsg
@@ -35,6 +36,27 @@ def check_username(name):
         return 'the user name may hold letters, digits and - only, and must start with a letter'
     if name.lower() in RESERVED or name.lower().startswith('systemd-'):
         return 'the user name is reserved for the system'
+    return ''
+
+def check_group_name(name):
+    # QSD5.338: UnixAddGroup runs "groupdel <name>" and "useradd <name>" (a group is a nologin user of the same name), so a
+    # group may not take the name of a system account / group either.  Only the reserved list is checked here (an existing
+    # group may hold older names the user rules would refuse); UnixAddGroup also looks at /etc/passwd and /etc/group.
+    name = '' if name is None else str(name)
+    if name.lower() in RESERVED or name.lower().startswith('systemd-'):
+        return 'the group name is reserved for the system'
+    return ''
+
+def check_password_target(username):
+    # QSD5.338: whose password may be changed through user/changepass.  root and the internal system account never;
+    # the other reserved names are system accounts without an appliance login.  'admin' is allowed (the admin changes his own).
+    n = '' if username is None else str(username).strip().lower()
+    if n == '':
+        return 'the user name is empty'
+    if n == 'admin':
+        return ''
+    if n in RESERVED or n.startswith('systemd-'):
+        return 'the password of a system account cannot be changed here'
     return ''
 
 def check_password(password):
@@ -72,6 +94,12 @@ def logname(name):
 
 if __name__ == '__main__':
     # prints "<code>|<reason>" and exits 1 when the user must not be created
+    if len(sys.argv) > 2 and sys.argv[1] == '--group':
+        reason = check_group_name(sys.argv[2])
+        if reason:
+            print(CODE_RESERVED+'|'+reason)
+            sys.exit(1)
+        sys.exit(0)
     name = sys.argv[1] if len(sys.argv) > 1 else ''
     password = sys.argv[2] if len(sys.argv) > 2 else ''
     code, reason = check_new_user_coded(name, password)

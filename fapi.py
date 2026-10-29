@@ -14,7 +14,7 @@ import re, ipaddress, traceback
 import Hostsconfig
 from Hostconfig import config
 from allphysicalinfo import getall, initallphy
-from uservalid import check_new_user_coded, logname
+from uservalid import check_new_user_coded, logname, check_group_name
 from UnixChkUser import setlogin
 import sqlite3
 from etcdget2 import etcdgetjson
@@ -2358,6 +2358,10 @@ def UnixAddGroup(data):
      usrstr += suser['name']+',' 
   usrstr = usrstr[:-1]
 
+ if check_group_name(data.get('name')):     # QSD5.338: system account / group names (UnixAddGroup would groupdel them)
+    logmsg.sendlog('Unlin1027rs','error',data['user'],logname(data.get('name')))
+    data['error'] = 'reservedname'
+    return data
  if int(is_unique_name(data['name']))==1000:
     logmsg.sendlog('IPnamuqfa','error','system',loggedusers[data['token']]['user'])
     return data
