@@ -49,7 +49,9 @@ then
  	docker exec etcdclient /TopStor/logmsg.py Unst1025 info $userreq $groupname
  fi
  echo $groupusers | grep NoUser
- if [ $? -ne 0 ];
+ nousernow=$?
+ # an explicit change to NoUser (last member removed) must empty the group; a create keeps the old path
+ if [ $nousernow -ne 0 ] || [ "$ischange" = "change" ];
  then
 #### getting users need to removed
   echo ------------------------- $groupusers ---------------
@@ -88,6 +90,7 @@ then
    cusersleft=`echo $originalgroup | cut -d/ -f1-2`
    cusersright=`echo $originalgroup | cut -d/ -f4-`
    newusers=$originalusers
+   if [ -z "$newusers" ]; then newusers='NoUser'; fi
    groupres=$cusersleft'/'$newusers'/'$cusersright
    /pace/etcdput.py $etcd usersigroup/$groupname  $groupres 
   fi 

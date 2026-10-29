@@ -1621,16 +1621,18 @@ def pgroupchange(data):
  if data.get('name') == EVERYONE:
   data['error'] = 'everyonefixed'     # all users are always members of Everyone: nobody changes it
   return data
- usrs = data.get('users')
+ usrs = data.get('users') or ''
  usrstr = ''
  if len(usrs) < 1:
   usrstr = 'NoUser'
  else:
   for usr in usrs.split(','):
    for suser in allusers:
-    if str(suser['id']) == str(usr):
-     usrstr += suser['name']+',' 
+    if (str(suser['id']) == str(usr) or suser['name'] == str(usr)) and suser['name'] not in usrstr.split(','):
+     usrstr += suser['name']+','
   usrstr = usrstr[:-1]
+  if usrstr == '':
+   usrstr = 'NoUser'
  cmndstring = '/TopStor/UnixChangeGroup '+leaderip+' '+' '+data.get('name')+' users'+usrstr+' '+data['user']+' '+'change'
  postchange(cmndstring)
  return data
@@ -1669,7 +1671,21 @@ def userchange(data):
   groupstr = 'NoGroup'
  else:
   for grp in grps.split(','):
-   groupstr += allgroups[int(grp)][0]+','
+   grp = grp.strip()
+   if not grp:
+    continue
+   gname = None
+   for agrp in allgroups:      # the UI sends group names, older callers send the numeric id/index
+    if str(agrp[0]) == grp:
+     gname = agrp[0]
+     break
+   if gname is None:
+    try:
+     gname = allgroups[int(grp)][0]
+    except (ValueError, IndexError):
+     data['error'] = 'invalidgroup'
+     return data
+   groupstr += gname+','
   groupstr = groupstr[:-1]
  groupstr = with_everyone(groupstr)
  cmndstring = '/TopStor/UnixChangeUser '+leaderip+' '+data.get('name')+' groups'+groupstr+' '+data['user']+' '+'change'
@@ -2565,7 +2581,7 @@ def api_groups_groupslist(data):
   for user in allusers:
    grpusrs = str(group[2]).split(',')
    for grp  in grpusrs:
-    if user['name'] == grp:
+    if user['name'] == grp and user['id'] not in groupusers:
      groupusers.append(user['id'])
 #   if user['name'] in str(group[2]) :
 #    groupusers.append(user['id'])
