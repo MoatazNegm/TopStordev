@@ -55,10 +55,11 @@ echo 2222222222222222222222222222222222222222222222
  				docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
  				exit 1
  			fi
- 			/pace/etcdget.py $leaderip volumes --prefix | grep -w $username
+ 			/pace/etcdget.py $leaderip volumes --prefix | grep -E "(^|[^A-Za-z0-9_])${username}(_[0-9]+)?([^A-Za-z0-9_]|$)"
  			if [ $? -eq 0 ];
  			then
   				docker exec etcdclient /TopStor/logmsg.py Unlin1021gv warning $userreq $username
+  				docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
   				exit
  			fi
                         /TopStor/etcdget.py $etcd user --prefix | grep -w $username 
