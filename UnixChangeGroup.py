@@ -48,9 +48,12 @@ def main(leaderip, myhost, groupname, groupusers, userreq, ischange):
     else:
         put( etcdip, 'usersigroup/'+groupname, "/".join(neworiggrp))
     if leader == myhost:
-        stampi=str(stamp())
-        put( leaderip, 'sync/user/usergroups/request/'+myhost, 'GrpChange_'+groupname+'_'+stampi)
-        put( leaderip, 'sync/user/usergroups/request/', 'GrpChange_'+groupname+'_'+stampi)
+        # same key as the shell UnixChangeGroup: a request under sync/user/usergroups named a script that does not exist
+        # (/TopStor/usergroups) and made every follower's syncrequest crash on it, so later group/user deletes never arrived
+        stampi=str(int(stamp()))
+        params = '_'.join(['UnixChangeGroup', leaderip, groupname, 'users'+(groupusers or 'NoUser'), userreq, ischange, 'pull'])
+        put( leaderip, 'sync/GrpChange/'+params+'/request/'+myhost, 'GrpChange_'+groupname+'_'+stampi)
+        put( leaderip, 'sync/GrpChange/'+params+'/request', 'GrpChange_'+groupname+'_'+stampi)
     
     for user in toremove:
         cmdline='gpasswd -d '+user+' '+groupname
