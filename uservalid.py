@@ -8,7 +8,7 @@
 import re, sys
 
 NAME_MIN, NAME_MAX = 3, 32
-PASS_MIN, PASS_MAX = 4, 128
+PASS_MIN, PASS_MAX = 3, 128
 
 # Accounts of the system and of the appliance.  UnixAddUser runs "userdel -f <name>" before it creates
 # the user, so one of these names would delete a system account.
@@ -42,7 +42,7 @@ def check_password(password):
     if password == '':
         return 'the password is empty'
     if len(password) < PASS_MIN:
-        return 'the password is shorter than %d characters' % PASS_MIN
+        return 'the password must be %d characters or more' % PASS_MIN
     if len(password) > PASS_MAX:
         return 'the password is longer than %d characters' % PASS_MAX
     if re.search(r'\s', password):

@@ -200,7 +200,7 @@ APIKEY_NEVER = ('/api/v1/users/uploadUsers', '/api/v1/groups/groupchange', '/api
 APIKEY_READ = ('/api/v1/volumes/connections', '/api/v1/software/versions', '/api/v1/hosts/allinfo', '/api/v1/pools/dgsinfo',
                '/api/v1/volumes/stats', '/api/v1/volumes/volumelist', '/api/v1/tenants/tenantinfo', '/api/v1/volumes/poolsinfo',
                '/api/v1/volumes/snapshots/snapshotsinfo', '/api/v1/volumes/CIFS/volumesinfo', '/api/v1/volumes/ISCSI/volumesinfo',
-               '/api/v1/volumes/NFS/volumesinfo', '/api/v1/volumes/HOME/volumesinfo', '/api/v1/volumes/volumesinfo',
+               '/api/v1/volumes/NFS/volumesinfo', '/api/v1/volumes/HOME/volumesinfo', '/api/v1/volumes/S3/volumesinfo', '/api/v1/volumes/volumesinfo',
                '/api/v1/pools/poolsinfo', '/api/v1/info/onedaylog', '/api/v1/info/logs', '/api/v1/info/commandlog',
                '/api/v1/info/cversion', '/api/v1/info/notification', '/api/v1/info/summary', '/api/v1/volumes/grouplist',
                '/api/v1/groups/grouplist', '/api/v1/users/userauths', '/api/v1/partners/partnerlist',
@@ -1578,6 +1578,15 @@ def volumeshomeinfo(data):
  if 'baduser' in data['response']:
       return {'response': 'baduser'}
  volumes = volumesinfo('HOME') 
+ return jsonify({'allvolumes':volumes})
+
+@app.route('/api/v1/volumes/S3/volumesinfo', methods=['GET','POST'])
+@login_required
+@audit_command
+def volumess3info(data):
+ if 'baduser' in data['response']:
+      return {'response': 'baduser'}
+ volumes = volumesinfo('S3')   # volumes whose prot is S3 in the cluster info; an empty list when there are none
  return jsonify({'allvolumes':volumes})
 
 @app.route('/api/v1/volumes/volumesinfo', methods=['GET','POST'])
