@@ -3663,6 +3663,7 @@ Found by the QualityCheck test `users_2nodes_OneCluster` (test 26, `QSD5.280`), 
 - **Proof (live, zfs2 leader, flask restarted with the new file).** `userdel usr12` -> 8 s later the HOME volume is gone from `volumes/HOME/volumesinfo`, `zfs list` has no `usr12_*` dataset and `HOMEE-10.11.11.156` is no longer in the node's docker; then `UnixAddUser usr12` with `10.11.11.156` again -> `"adduser": "accepted"` and a new `usr12_<id>` home on .156 (add / delete / add, same name, same ip).
 - **Note.** Other users' homes of the test cluster were untouched; the guard for `admin`/`Everyone`/`NoUser` is unchanged.
 - **Second change of the same branch.** `uservalid.py` `PASS_MIN` 3 -> 4 and `topstorweb/src/utils/userRules.js` `USER_PASS_MIN = 4`: test step 20/21 says a password of <= 3 characters must be refused, the product accepted exactly 3 (live: `shortp`/3 chars refused, `okfour`/4 accepted; same on the change-password path, `Hostconfig.py`).
+- **Reversed 2026-10-29 (QSD5.336, TopStor `c566bcbf`, topstorweb `29547afe`).** The user decision in the QC test 606 description is a minimum of 3 characters: `PASS_MIN = 3` in `uservalid.py` (message `the password must be %d characters or more`) and `USER_PASS_MIN = 3` in `userRules.js`. The 3 -> 4 change above is superseded.
 - **Open at that time (re-run step 18).** two `UnixAddUser` of the same name sent about a second apart: both were accepted by the guard, only one user results (the later one is refused "a user with this name already exists"); step 17 (home folder without IP) creates nothing but gives no `adduser` rejection text.
 
 ## 81. Deleting a user deleted the passwords of every user whose name contains his — `QSD5.282` (2026-10-10)
@@ -4145,3 +4146,5 @@ Requested by the front-end developer (UI side built in QSD5.307). Released on to
 - **Cause.** `SnapshotnowOnce` started `replicatenow.py` 1-2 s before the new owner had started its ssh tunnels to the receiver (`ps` start time of `ssh ... Lremote/Rremote sshDRsite_Receiver` = 2 s after the snapshot). `replicatenow.py` then dies (no tunnel found) and prints no `result_`; the script treated the empty result as success (`Streamfa01` was only logged when the result contained `fail`). The periodic path (`Snapshotnowhost`) requires `success` and was not affected.
 - **Fix.** `TopStor/SnapshotnowOnce`: an empty answer is retried (10 tries, 6 s apart, stderr dropped) and still-empty ends as `fail_noresult` (`Streamfa01`).
 - **Verified.** shell loop checked with a stub (two empty answers, then success: 3 tries); live on zfs2 with the tunnels killed before the snapshot: `once3` reached the receiver in under 45 s. Test 22 rerun below.
+
+## 123. QLean React container `qlean` (2026-10-22)
