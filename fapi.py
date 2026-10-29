@@ -2648,6 +2648,16 @@ def api_partners_userslist(data):
   allpartners.append({'alias': alias, "ip":split[0], "type":split[1], "port":split[2]})
  return { "allpartners":allpartners }
 
+def userhomeinfo(volumes, username):
+ # QSD5.339: the home address and subnet of a user come from the user's HOME volume (<user>_<id>); '' when there is none
+ for volname, vol in volumes.items():
+  if vol.get('prot') in ('HOME', 'HOMEE') and volname.rsplit('_',1)[0] == username:
+   addr = str(vol.get('ipaddress', ''))
+   if addr in ('NoAddress', '_1'):
+    addr = ''
+   return addr, str(vol.get('Subnet', '') or '')
+ return '', ''
+
 @app.route('/api/v1/users/userlist', methods=['GET'])
 @login_required
 @audit_command
@@ -2693,6 +2703,11 @@ def api_users_userslist(data):
  usersnohome = []
  nohomeid = 0
  uid = 0
+ try:
+  getalltime()
+  homevols = allinfo['volumes']
+ except Exception:
+  homevols = {}
  for user in userlst:
   username = user['name'].replace('usersinfo/','')
   usersize = user['prop'].split('/')[3]
@@ -2702,7 +2717,8 @@ def api_users_userslist(data):
    groups = ['NoGroup']
   else:
    groups = userdict[username]
-  allusers.append({"name":username, 'id':uid, "pool":userpool, "size":usersize, "groups":groups, 'priv':priv})
+  homeaddr, homesub = ('', '') if 'NoHome' in userpool else userhomeinfo(homevols, username)
+  allusers.append({"name":username, 'id':uid, "pool":userpool, "size":usersize, "groups":groups, 'priv':priv, 'HomeAddress':homeaddr, 'HomeSubnet':homesub})
   uid += 1
   if 'NoHome' in userpool:
    usersnohome.append({ 'id':nohomeid, 'text': username })
