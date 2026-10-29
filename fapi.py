@@ -2319,6 +2319,14 @@ def userdel(data):
  if data['tenant'] == 'Cluster':
     cmndstring = '/TopStor/UnixDelUser '+leaderip+' '+data.get('name')+' '+data['user']
     postchange(cmndstring)
+    # QSD5.337: the deleted user's login token stayed valid (loggedusers + etcd login/<user>): drop both
+    if data.get('name') not in ('admin', 'Everyone', 'NoUser', 'system'):
+     for tok in [t for t, v in list(loggedusers.items()) if v.get('user') == data.get('name')]:
+      loggedusers.pop(tok, None)
+     try:
+      subprocess.run(['etcdctl', '--endpoints=http://etcd:2379', 'del', 'login/'+data.get('name')], stdout=subprocess.PIPE, timeout=20)
+     except Exception:
+      pass
     # the home folder of the user goes with the user (its dataset is <user>_<id>, protocol HOME)
     if data.get('name') not in ('admin', 'Everyone', 'NoUser'):
      getalltime()
@@ -2520,10 +2528,14 @@ def UnixAddUser(data):
     else:
         if isvu < 100:
             logmsg.sendlog('IPaddrfa','error','system',loggedusers[data['token']]['user'])
+            data['adduser'] = 'rejected: invalid IP address'
         elif isvu > 10 and isvu < 120: 
             logmsg.sendlog('IPadduqfa','error','system',loggedusers[data['token']]['user'])
+            data['adduser'] = 'rejected: the IP address is already in use'
         else:
             logmsg.sendlog('IPnamuqfa','error','system',loggedusers[data['token']]['user'])
+            data['adduser'] = 'rejected: the name is already used'
+        data['response'] = 'rejected'
         return data
 
 

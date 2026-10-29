@@ -1,4 +1,7 @@
 #!/bin/sh
+# QSD5.337: user/group scripts run one at a time (several Add User clicks in a row ran useradd/userdel in parallel and lost users);
+# a nested call (UnixChangeGroup -> UnixChangeUser, UnixAddUser -> ...) inherits TS_USRLOCK and does not lock again
+if [ -z "$TS_USRLOCK" ] && command -v flock >/dev/null 2>&1; then export TS_USRLOCK=1; exec flock -w 900 /tmp/topstor-users.lock "$0" "$@"; fi
 cd /TopStor
 echo $@ > /root/userdel
 export ETCDCTL_API=3
@@ -48,6 +51,9 @@ then
  #/bin/smbpasswd -x $username;
  #rm -rf /home/$username &>/dev/null
  userdel -f  $username 
+ # QSD5.337: the Samba entry went on living after the unix user was deleted (pdbedit -L kept it on every node)
+ docker exec intsmb pdbedit -x -u $username >/dev/null 2>&1
+ for y in `docker ps | egrep 'CIFS|HOM' | awk '{print $1}'`; do docker exec $y /bin/smbpasswd -x $username >/dev/null 2>&1; done
  datenow=`date +%m/%d/%Y`;timenow=`date +%T`;
  cat /etc/passwd |  grep -w $username
  if [ $? -eq 0 ]; then

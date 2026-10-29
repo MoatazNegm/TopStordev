@@ -75,7 +75,11 @@ def config(leader, leaderip, myhost, *bargs):
 
 ############ changing user password ###############
  if 'password' in arglist:
-  if check_password(arglist['password']):      # empty, shorter than 3, blanks, quotes ... (uservalid.py)
+  # QSD5.337: only admin/system or the user himself may change a password (an unprivileged user used to change anybody's)
+  if arglist.get('user') not in ('admin','system') and arglist.get('user') != arglist.get('username'):
+   logmsg.sendlog('Priv1004','error','system',arglist.get('user'))
+   arglist['error'] = 'noprivilege'
+  elif check_password(arglist['password']):      # empty, shorter than 3, blanks, quotes ... (uservalid.py)
    logmsg.sendlog('Unlinfa12','error',arglist['user'],arglist['username'])
   else:
    print('changing password')

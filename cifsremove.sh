@@ -32,6 +32,19 @@ cat /TopStordata/smb.$volip | grep start | grep only
 if [ $? -ne 0 ]
 then 
   nmcli conn mod cmynode -ipv4.addresses $volip 
+  # QSD5.337 (container flavour): the address is stored as <ip>/<prefix>, so the removal above did not match and the home
+  # address stayed on cmynode/bond0 (answering ping for minutes): remove it with its prefix, then from the live interface
+  [ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
+  if is_container 2>/dev/null && [ -n "$volip" ]; then
+   for a in `nmcli -g ipv4.addresses conn show cmynode | tr ',' ' '`; do
+    case $a in
+     $volip/*) nmcli conn mod cmynode -ipv4.addresses $a ;;
+    esac
+   done
+   for a in `ip -o -4 addr show | awk -v ip=$volip '{split($4,a,"/"); if (a[1]==ip) print $2"|"$4}'`; do
+    ip addr del ${a#*|} dev ${a%|*}
+   done
+  fi
   nmcli conn up cmynode
   rm -rf /TopStordata/smb.$volip;
 else
@@ -66,4 +79,8 @@ else
 fi
 /TopStor/etcddel.py $leaderip vol $vol
 /TopStor/etcddel.py $leaderip replivol $vol
+# QSD5.337: nothing of the address' share is left behind (delblock.py rewrites .new; the lock came from cifs.sh)
+if [ -n "$volip" ] && [ ! -s /TopStordata/smb.$volip ]; then
+ rm -f /TopStordata/smb.${volip}.new /TopStordata/cifs.${volip}.lock /TopStordata/smb.$volip
+fi
  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq

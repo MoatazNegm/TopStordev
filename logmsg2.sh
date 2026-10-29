@@ -34,7 +34,8 @@ while [ $x -le $# ]; do
     x=$((x+1))
 done
 
-if ! echo "$code" | grep -q "@@@"; then
+# QSD5.337: a message with no argument ($# = 6: date time host code type user) has only the "@@" after the code and is valid
+if [ $# -gt 6 ] && ! echo "$code" | grep -q "@@@"; then
     error_detail="incorrect format: missing @@@ separator in $msg"
     echo "$dt $tm $fromhost error system admin LogError@@@error while logging message: $error_detail $dtn" >> $glog
     exit 1

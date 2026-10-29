@@ -21,6 +21,12 @@ then
 	(setsid /usr/sbin/crond -n </dev/null >/dev/null 2>&1 &)
 fi
 
+# --- `python` AND openpyxl IN THE CONTAINER (QSD5.337) ---
+# The image has only python3: the bulk user upload pump runs `python /TopStor/UsersMassAddition.py` (needs the `python`
+# name) and that script imports openpyxl.  Both are idempotent no-ops once present; a failed pip (no network) is not fatal.
+[ -e /usr/bin/python ] || ln -s python3 /usr/bin/python 2>/dev/null
+python3 -c 'import openpyxl' 2>/dev/null || pip3 install --no-cache-dir --break-system-packages openpyxl >/dev/null 2>&1 || pip3 install --no-cache-dir openpyxl >/dev/null 2>&1 || echo "[!] openpyxl install failed (bulk user upload will not work)" >&2
+
 # Enslave eth10 to bond0 as a real NM port profile (slave-eth10-to-bond0), so
 # nmcli shows it. Call it only AFTER `nmcli conn up cmynode`/bond0 are up. The
 # profile autoconnects, so later `nmcli conn up cmynode` calls by the app
