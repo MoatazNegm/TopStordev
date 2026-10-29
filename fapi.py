@@ -838,6 +838,28 @@ def getusers():
   uid += 1
  return users
 
+def groupnames_from(grps, allgroups):
+ """Group names for a comma list of group NAMES (what the UI sends) or numeric group ids/indexes (older callers).
+ Returns None when an entry matches neither."""
+ names = []
+ for grp in str(grps).split(','):
+  grp = grp.strip()
+  if not grp:
+   continue
+  gname = None
+  for agrp in allgroups:
+   if str(agrp[0]) == grp:
+    gname = agrp[0]
+    break
+  if gname is None:
+   try:
+    gname = allgroups[int(grp)][0]
+   except (ValueError, IndexError):
+    return None
+  if gname not in names:
+   names.append(gname)
+ return ','.join(names)
+
 def getgroups():
  global leaderip
  groupslst = etcdgetjson(leaderip, 'usersigroup','--prefix') 
@@ -1670,23 +1692,10 @@ def userchange(data):
  if len(grps) < 1:
   groupstr = 'NoGroup'
  else:
-  for grp in grps.split(','):
-   grp = grp.strip()
-   if not grp:
-    continue
-   gname = None
-   for agrp in allgroups:      # the UI sends group names, older callers send the numeric id/index
-    if str(agrp[0]) == grp:
-     gname = agrp[0]
-     break
-   if gname is None:
-    try:
-     gname = allgroups[int(grp)][0]
-    except (ValueError, IndexError):
-     data['error'] = 'invalidgroup'
-     return data
-   groupstr += gname+','
-  groupstr = groupstr[:-1]
+  groupstr = groupnames_from(grps, allgroups)
+  if groupstr is None:
+   data['error'] = 'invalidgroup'
+   return data
  groupstr = with_everyone(groupstr)
  cmndstring = '/TopStor/UnixChangeUser '+leaderip+' '+data.get('name')+' groups'+groupstr+' '+data['user']+' '+'change'
  postchange(cmndstring)
@@ -2529,9 +2538,10 @@ def UnixAddUser(data):
  if len(grps) < 1:
   groupstr = 'NoGroup'
  else:
-  for grp in grps.split(','):
-   groupstr += allgroups[int(grp)][0]+','
-  groupstr = groupstr[:-1]
+  groupstr = groupnames_from(grps, allgroups)
+  if groupstr is None:
+   data['adduser'] = 'rejected: unknown group'
+   return data
  groupstr = with_everyone(groupstr)
  cmndstring = '/TopStor/UnixAddUser '+leaderip+' '+data.get('name')+' '+pool+' groups'+groupstr+' ' \
      +data.get('Password')+' '+data.get('Volsize')+'G '+data.get('HomeAddress')+' '+data.get('HomeSubnet')+' hoststub'+' '+data['user']
