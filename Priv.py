@@ -26,8 +26,12 @@ def changepriv(leader, leaderip, myhost, myip, user,priv,request='admin'):
  res = subprocess.run(cmdline,stdout=subprocess.PIPE).stdout
  if 'true' not in res.decode('utf-8'):
   return
- logmsg.sendlog('Priv1002 ','info',request,user)
+ # QSD5.341: a user that does not exist is refused; it used to write usersinfo/<name>=_1/<priv> and break users/userlist
  userinfo = get(etcdip,'usersinfo/'+user)
+ if not user or str(userinfo[0]) in ('_1', '-1', '', 'None') or len(str(userinfo[0]).split('/')) < 4:
+  logmsg.sendlog('Priv1005','error',request,user)
+  return
+ logmsg.sendlog('Priv1002 ','info',request,user)
  leftpart = userinfo[0].split('/')[0:4]
  put(leaderip, 'usersinfo/'+user, '/'.join(leftpart)+'/'+priv)
  dosync(leader, leaderip, 'sync/priv/'+user,'sync/priv/'+user+'/request', 'priv_'+user+'_'+str(stamp()))
