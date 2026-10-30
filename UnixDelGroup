@@ -47,7 +47,8 @@ if [ $? -eq 0 ]; then
 else
   #/TopStor/broadcast.py GroupDel /TopStor/pump.sh UnixDelGroup_sync -d$myhost $username $userreq
  echo usename=$username
- groupdel $username 
+ /TopStor/UnixDelGroupAcl $username
+ groupdel $username
  ETCDCTL_API=3 /pace/etcdget.py $etcd usersigroup $username 
  pool=`ETCDCTL_API=3 /pace/etcdget.py $etcd usersigroup/$username | awk -F'/' '{print $2}'`
  echo Home=$pool

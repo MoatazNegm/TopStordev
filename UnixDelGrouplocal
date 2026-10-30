@@ -28,6 +28,7 @@ if [ $? -eq 0 ]; then
   /TopStor/logmsg.py Unlin1g10011 error $userreq $myhost
 else
   /TopStor/logmsg.py Unlin11100 info $userreq $username
-  groupdel $username 
+  /TopStor/UnixDelGroupAcl $username
+  groupdel $username
 fi;
 fi

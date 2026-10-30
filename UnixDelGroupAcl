@@ -1,0 +1,19 @@
+#!/bin/sh
+# usage: UnixDelGroupAcl <groupname>
+# Removes the ACL entries (access + default, recursive) of the group from every
+# mounted ZFS dataset that carries them. Run BEFORE groupdel, while the gid resolves.
+grp=$1
+[ -z "$grp" ] && exit 0
+gid=`getent group $grp | awk -F: '{print $3}'`
+[ -z "$gid" ] && exit 0
+zfs list -H -t filesystem -o mountpoint 2>/dev/null | grep '^/' | while read mp; do
+ [ -d "$mp" ] || continue
+ if getfacl -p "$mp" 2>/dev/null | grep -q -E "^(default:)?group:($grp|$gid):"; then
+  echo UnixDelGroupAcl: removing group $grp gid $gid ACL from $mp
+  setfacl -R -x g:$gid "$mp" 2>/dev/null
+  setfacl -R -x g:$grp "$mp" 2>/dev/null
+  setfacl -R -d -x g:$gid "$mp" 2>/dev/null
+  setfacl -R -d -x g:$grp "$mp" 2>/dev/null
+ fi
+done
+exit 0
