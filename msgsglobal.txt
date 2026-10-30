@@ -461,4 +461,4 @@ ApiKey1002:1: : from :: API key : revoked
 ApiKey1003:1: : from :: API key : deleted
 ApiKeyfa0:2: : from :: API key : refused (unknown, revoked or malformed) from : 
 ApiKeyfa1:1: : from :: Too many refused API keys, the address : is locked out for 5 minutes
-Priv1005:2: : from :: Not done, the user does not exist : user :
+Priv1005:2: : from :: Not done, privileges cannot be set: the user : does not exist
