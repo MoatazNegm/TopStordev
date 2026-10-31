@@ -139,10 +139,17 @@ def has_privilege(priv, user):
         # same rule as /TopStor/privthis.sh: admin and system may do everything, any other user needs the privilege flag '<priv>-true' in
         # usersinfo/<user>.  Read from etcd here: this code runs inside the 'flask' container, where privthis.sh cannot work (/bin/sh is dash
         # and there is no docker CLI), so shelling out answered 'false' for every non-admin user, also for one that HAS the privilege.
+        # QSD5.343: a name without usersinfo/<name> may be an API key: same rule as privthis.sh / privthis.py (an active write key
+        # has every privilege except APIKEY_DENIED_PRIVS, a read key none).
         if user in ('admin', 'system'):
                 return True
         try:
                 info = str(get('usersinfo/'+str(user))[0])
+                if info in ('_1', '-1', '', 'None'):
+                        if priv in APIKEY_DENIED_PRIVS:
+                                return False
+                        rec = apikeys_all().get(str(user))
+                        return bool(rec) and rec.get('access') == 'write' and rec.get('status') == 'active'
                 return re.search(r'(^|/)'+re.escape(str(priv))+r'-true(/|$)', info) is not None
         except Exception:
                 return False
@@ -196,6 +203,9 @@ APIKEY_NEVER = ('/api/v1/users/uploadUsers', '/api/v1/groups/groupchange', '/api
                 '/api/v1/user/changepass', '/api/v1/tenant/adduser', '/api/v1/hosts/joincluster', '/api/v1/software/update',
                 '/api/v1/software/localFileUpdate', '/api/v1/software/setversion', '/api/v1/software/apply',
                 '/api/v1/login/renewtoken', '/api/v1/logout', '/api/v1/replication/addpartner')
+# QSD5.343: privileges an API key never has, also when the executor checks them (privthis.sh / privthis.py keep the same list):
+# users and groups (Box_Users, Box_users), privileges (UserPrivilegesch), software (Uploadch), node config / join (Error)
+APIKEY_DENIED_PRIVS = ('UserPrivilegesch', 'Box_Users', 'Box_users', 'Uploadch', 'Error')
 # calls that change nothing: a 'read' key may call only these (every other call is a change call)
 APIKEY_READ = ('/api/v1/volumes/connections', '/api/v1/software/versions', '/api/v1/hosts/allinfo', '/api/v1/pools/dgsinfo',
                '/api/v1/volumes/stats', '/api/v1/volumes/volumelist', '/api/v1/tenants/tenantinfo', '/api/v1/volumes/poolsinfo',
