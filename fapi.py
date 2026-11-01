@@ -22,6 +22,7 @@ from etcdgetlocalpy import etcdget  as get
 from etcddellocal import etcddel  as dels 
 from etcdput import etcdput as put
 from sendhost import sendhost
+from secretmask import secret_values, mask_text, masked, is_secret_key, MASK
 from socket import gethostname as hostname
 from getlogs import getlogs, onedaylog
 from fapistats import allvolstats, cpuperf
@@ -412,7 +413,7 @@ def record_command(data, endpoint, method, commands=None):
    'endpoint': endpoint,
    'method': method,
    'params': params,
-   'commands': commands or [],
+   'commands': [mask_text(c, _request_secrets(data)) for c in (commands or [])],
   }
   with open(COMMAND_LOG_PATH, 'a') as fh:
    fh.write(json.dumps(entry)+'\n')
@@ -539,6 +540,23 @@ def debounce_after(resp):
                     _debounce_tbl.pop(key, None)
                 else:
                     _debounce_tbl[key] = ['done', time.time()+DEBOUNCE_SECONDS]
+    except Exception:
+        pass
+    return resp
+
+@app.after_request
+def secrets_out_of_answers(resp):
+    # QSD5.344: an answer never carries a password, CHAP secret or pass phrase back (many handlers return the request
+    # dict; UnixAddUser and changepass echoed the password, QC test 701).  Top-level fields only; the login token and an
+    # API key shown once on create (field 'key') are not secrets of this kind and stay.
+    try:
+        if resp.mimetype == 'application/json' and not resp.direct_passthrough:
+            body = resp.get_json(silent=True)
+            if isinstance(body, dict) and any(is_secret_key(k) for k in body):
+                for k in list(body):
+                    if is_secret_key(k) and body[k] not in (None, ''):
+                        body[k] = MASK
+                resp.set_data(json.dumps(body))
     except Exception:
         pass
     return resp
@@ -826,10 +844,25 @@ def postchange(cmndstring,host='leader'):
         ownerip=get('ready/'+host,'--prefix')[0][1]
     except:
         return 'host is not ready'
+ # QSD5.344: the executor still gets the real values; the debug files (/TopStordata/tempdata, /root/sendhostparam)
+ # get the line with the request's passwords / secrets masked (QC test 701)
+ logline = mask_text(str(msg), _request_secrets())
  with open('/TopStordata/tempdata','a') as f:
-  f.write(str((ownerip, str(msg),'recvreply',myhost))+'\n')
- sendhost(ownerip, str(msg),'recvreply',myhost)
+  f.write(str((ownerip, logline,'recvreply',myhost))+'\n')
+ sendhost(ownerip, str(msg),'recvreply',myhost, logreq=logline)
  return 'queued'
+
+def _request_secrets(data=None):
+ # the secret values of the current request (as sent and without blanks), for masking what is written down
+ vals = []
+ try:
+  if flask.has_request_context():
+   vals = secret_values(request.values.to_dict())
+ except Exception:
+  vals = []
+ if data:
+  vals = sorted(set(vals) | set(secret_values(data)), key=len, reverse=True)
+ return vals
 
 def dict_factory(cursor, row):
     d = {}
@@ -1915,9 +1948,9 @@ def volumecreate(data):
   datastr = data['pool']+' '+data['name']+' '+data['size']+' '+data['groups']+' '+data['ipaddress']+' '+data['Subnet']+' '+data['active']+' '+data['user']+' '+data['owner']+' '+data['user']
  print('#############################')
  with open('/TopStordata/volcreate','a') as f:
-    f.write(str(data)+'\n'+'owner '+str(data['owner'])+'\n')
- print(data)
- print(datastr)
+    f.write(str(masked(data))+'\n'+'owner '+str(data['owner'])+'\n')
+ print(masked(data))
+ print(mask_text(datastr, _request_secrets(data)))
  print('###########################')
  if 'ISCSI' not in data['type']:
   # data efficiency of the new volume: both on unless the request says off (the scripts read these two words anywhere on the line)
@@ -1982,14 +2015,12 @@ def testlogin():
 @app.route('/api/v1/login', methods=['GET','POST'])
 def login():
  data = request.args.to_dict()
- print('#######################')
- print(data)
- print('#######################')
+ print('login request for', str(data.get('user'))[:32])     # QSD5.344: no password in the log
  userdict, token = setlogin(leaderip,myhost, data['user'],data['pass'])
  if token != 0:
   loggedusers[token] = userdict.copy()
   logmsg.sendlog('Lognsu0','info','system',data['user'])
-  print('login okkkkkkk',loggedusers)
+  print('login ok', str(data.get('user'))[:32])
  else:
   print('login faileddddddddddddddddddd')
   logmsg.sendlog('Lognfa0','error','system',data['user'])
@@ -2485,9 +2516,7 @@ def AddPartner(data):
   logmsg.sendlog('Partnportfa','error','system',loggedusers[data['token']]['user'])
   return 'select another port'
 
- print('##########################33333')
- print(data)
- print('##########################33333')
+ print('AddPartner', masked(data))
  cmdstring = '/TopStor/PartnerAdd.py '+data['ip']+' '+data['alias']+' '+data['type']+' '+data['port']+' '+data['pass']+' '+data['user'] + ' init'
  postchange(cmdstring)
  return data
@@ -2594,9 +2623,7 @@ def UnixAddUser(data):
  groupstr = with_everyone(groupstr)
  cmndstring = '/TopStor/UnixAddUser '+leaderip+' '+data.get('name')+' '+pool+' groups'+groupstr+' ' \
      +data.get('Password')+' '+data.get('Volsize')+'G '+data.get('HomeAddress')+' '+data.get('HomeSubnet')+' hoststub'+' '+data['user']
- print('*************************************************************************')
- print(cmndstring)
- print('*************************************************************************')
+ print('UnixAddUser', mask_text(cmndstring, _request_secrets(data)))
  postchange(cmndstring)
  data['adduser'] = 'accepted'
  return data 

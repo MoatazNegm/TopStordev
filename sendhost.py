@@ -2,9 +2,10 @@
 import pika
 from ast import literal_eval as mtuple
 
-def sendhost(host, req, que, frmhst, port=5672):
+def sendhost(host, req, que, frmhst, port=5672, logreq=None):
+ # QSD5.344: logreq = the text written to the debug file instead of req (fapi passes the request with its secrets masked)
  with open('/root/sendhostparam','a') as f:
-  f.write(host+' '+str(req)+' '+str(que)+' '+str(frmhst)+'\n')
+  f.write(host+' '+str(req if logreq is None else logreq)+' '+str(que)+' '+str(frmhst)+'\n')
 # Check if the file needs to be pruned
  with open('/root/sendhostparam', 'r') as f:
         lines = f.readlines()

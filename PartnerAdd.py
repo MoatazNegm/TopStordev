@@ -7,6 +7,7 @@ from logmsg import sendlog, initlog
 from sendhost import sendhost
 from privthis import privthis 
 from time import time as stamp
+from secretmask import phrase_encrypt, MASK
 #from replicatenow import syncpush, repliinit
 
 
@@ -55,8 +56,11 @@ def addpartner(*bargs):
  sendlog('Partner1000','info',userreq,partneralias,replitype)
  #repliinit(leaderip,leader, etcd)
  if 'init' in init:
-  put(leaderip, 'Partner/'+partneralias+'_'+replitype , partnerip+'/'+replitype+'/'+str(repliport)+'/'+phrase) 
-  dosync(myhost,'Partnr_str_', 'sync/Partnr/Add_'+partneralias+':::'+replitype+'_'+partnerip+'::'+replitype+'::'+str(repliport)+'::'+phrase+'/request','Partnr_str_'+str(stamp())) 
+  # QSD5.344: the pass phrase is stored encrypted (secretmask.phrase_encrypt, 'enc~...'; QC tests 674, 704) and is no
+  # longer part of the sync request key: the followers copy the whole Partner/ prefix (checksyncs 'Partnr'), the key
+  # only names the request
+  put(leaderip, 'Partner/'+partneralias+'_'+replitype , partnerip+'/'+replitype+'/'+str(repliport)+'/'+phrase_encrypt(partneralias, phrase)) 
+  dosync(myhost,'Partnr_str_', 'sync/Partnr/Add_'+partneralias+':::'+replitype+'_'+partnerip+'::'+replitype+'::'+str(repliport)+'::x/request','Partnr_str_'+str(stamp())) 
  if 'Sender' not in replitype:
   #syncpush(partneralias+'_'+replitype,userreq) 
   put(leaderip, 'pushusers',partneralias+'/'+clusterip)
@@ -68,5 +72,6 @@ if __name__=='__main__':
  with open('/root/PartnerAdd','w') as f:
     #import json
     #json.dump(sys.argv[1:], f)
-    f.write(' '.join(sys.argv))
+    # QSD5.344: the pass phrase (argument 5) is masked in this debug copy
+    f.write(' '.join(MASK if i == 5 else a for i, a in enumerate(sys.argv)))
  addpartner(*sys.argv[1:])

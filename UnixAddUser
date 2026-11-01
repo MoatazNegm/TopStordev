@@ -2,7 +2,8 @@
 # QSD5.337: user/group scripts run one at a time (several Add User clicks in a row ran useradd/userdel in parallel and lost users);
 # a nested call (UnixChangeGroup -> UnixChangeUser, UnixAddUser -> ...) inherits TS_USRLOCK and does not lock again
 if [ -z "$TS_USRLOCK" ] && command -v flock >/dev/null 2>&1; then export TS_USRLOCK=1; exec flock -w 900 /tmp/topstor-users.lock "$0" "$@"; fi
-echo $@ > /root/unixadduser
+# QSD5.344: the debug copy of the arguments has the password (argument 5) masked (QC test 701)
+echo $@ | awk '{ if (NF >= 5) $5 = "****"; print }' > /root/unixadduser
 export ETCDCTL_API=3
 cd /TopStor
 leaderip=`echo $@  | awk '{print $1}'`;

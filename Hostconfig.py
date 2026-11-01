@@ -13,20 +13,22 @@ from sendhost import sendhost
 from UpdateNameSpace import updatenamespace
 import logmsg
 from time import time as stamp
+from secretmask import masked
 
 def config(leader, leaderip, myhost, *bargs):
  arglist = bargs[0]
  initqueue(leaderip, myhost)
  logmsg.initlog(leaderip, myhost)
  #arglist = {'ipaddr': '10.11.11.123', 'ipaddrsubnet': '24', 'id': '0', 'user': 'admin', 'name': 'dhcp32502'}
- queuethis('Hostconfig','running',arglist)
+ # QSD5.344: the queue entry and the debug file below carry no password (QC test 701)
+ queuethis('Hostconfig','running',masked(arglist))
  enpdev='enp0s8'
  needreboot=False
  for key in arglist:
   if arglist[key] == -1:
    arglist[key] = '-1'
  with open('/TopStordata/Hostconfig','w') as f:
-  f.write(str(arglist)+'\n')
+  f.write(str(masked(arglist))+'\n')
  stampi = str(stamp())
  ######### managing port bonds ###############
  if any(key in arglist for key in ['nmports', 'cmports', 'dports', 'iports']):

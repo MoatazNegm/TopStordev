@@ -10,6 +10,8 @@ replitype=`echo $partnerinfo | awk -F'/' '{print $2}'`
 pport=`echo $partnerinfo | awk -F'/' '{print $3}'`
 clusterip=`./etcdgetlocal.py namespace/mgmtip | awk -F'/' '{print $1}'`
 phrase=`echo $partnerinfo | awk -F'/' '{print $NF}'`
+# QSD5.344: the stored phrase is encrypted ('enc~...'); a clear phrase of an older version comes back unchanged
+phrase=`/TopStor/secretmask.py phrasedec "$partner" "$phrase"`
 isopen='closed'
 echo pport=$pport
 strict='-oStrictHostKeyChecking=yes' 
@@ -34,7 +36,7 @@ do
   break
  fi
  echo partnerip=$partnerip
- echo ./checkpartner.sh $partner $replitype $partnerip $pport $clusterip $phrase $isnew
+ echo ./checkpartner.sh $partner $replitype $partnerip $pport $clusterip "****" $isnew
  isopen=`./checkpartner.sh $partner $replitype $partnerip $pport $clusterip $phrase $isnew`
  echo isnew=$isopen 
  echo $isopen | grep open

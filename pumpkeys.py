@@ -3,6 +3,7 @@ import sys, subprocess
 from sendhost import sendhost
 from time import sleep 
 from etcdget import etcdget as get
+from secretmask import phrase_decrypt
 
 def initpumpkeys(*args):
     global leader, leaderip, myhost, myhostip
@@ -26,7 +27,8 @@ def pumpthis(receiver):
     replitype = 'Receiver'
     repliport = receiver[1].split('/')[1]
     cluster = receiver[0].split('/')[1]
-    phrase = get(leaderip, 'Partner',cluster)[0][1].split('/')[-1] 
+    # QSD5.344: the stored phrase is encrypted ('enc~...'); a clear phrase of an older version is used as it is
+    phrase = phrase_decrypt(cluster, get(leaderip, 'Partner',cluster)[0][1].split('/')[-1])
     pumpkeys(partnerip, replitype, repliport, phrase)
     
 def pumpall():
