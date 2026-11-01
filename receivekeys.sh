@@ -1,5 +1,6 @@
 #!/bin/sh
-echo $@ > /root/receivekeys
+# QSD5.344: the debug copy of the arguments has the pass phrase (argument 5) masked
+echo $@ | awk '{ if (NF >= 5) $5 = "****"; print }' > /root/receivekeys
 partner=`echo $@ | awk '{print $1}'`
 partnerip=`echo $@ | awk '{print $2}'`
 clusterip=`echo $@ | awk '{print $3}'`
@@ -11,8 +12,21 @@ leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader `
 leaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip `
 myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode `
 myhostip=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip `
-/TopStor/etcdget.py $leaderip Partner $clusterip | grep $ppass 
-if [ $? -eq 0 ];
+# QSD5.344: the phrase in Partner/<alias>_<type> = ip/type/port/<phrase> is stored encrypted ('enc~...'); each matching
+# record's last field is decrypted (a clear phrase of an older version comes back unchanged) and compared exactly with the
+# phrase the sender gave (the old 'grep $ppass' on the stored value matched any substring, and never the encrypted form)
+phraseok=1
+if [ -n "$ppass" ]; then
+ for pval in `/TopStor/etcdget.py $leaderip Partner $clusterip | grep "^('Partner/" | awk -F"'" '{print $4}'`
+ do
+  pphrase=`/TopStor/secretmask.py phrasedec partner "${pval##*/}"`
+  if [ "$pphrase" = "$ppass" ]; then
+   phraseok=0
+   break
+  fi
+ done
+fi
+if [ $phraseok -eq 0 ];
 then
  echo it is okok >> /root/receivekeys
  /TopStor/etcdput.py $leaderip nodesender/${clusterip}/$partnerip/$myhostip $partner

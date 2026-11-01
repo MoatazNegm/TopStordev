@@ -3,7 +3,7 @@ import sys, subprocess
 from sendhost import sendhost
 from time import sleep 
 from etcdget import etcdget as get
-from secretmask import phrase_decrypt
+from secretmask import phrase_decrypt, MASK
 
 def initpumpkeys(*args):
     global leader, leaderip, myhost, myhostip
@@ -39,7 +39,7 @@ def pumpall():
 
 def pumpkeys(*bargs):
  global leader, leaderip, myhost, myhostip
- print(str(bargs))
+ print(str(bargs[:3]))      # QSD5.344: not the pass phrase (bargs[3])
  partnerip = bargs[0]
  replitype = bargs[1]
  repliport = bargs[2]
@@ -48,8 +48,10 @@ def pumpkeys(*bargs):
  result = subprocess.run(cmdline.split(),stdout=subprocess.PIPE).stdout.decode('utf-8').split('\n')[0].replace(' ','_spc_')
  z=['/TopStor/receivekeys.sh',myhost,myhostip,leaderip, replitype, repliport, phrase, result]
  msg={'req': 'Exchange', 'reply':z}
- print(msg)
- sendhost(partnerip, str(msg),'recvreply',myhost)
+ # QSD5.344: the printed request and /root/sendhostparam carry the pass phrase masked
+ zlog = z[:6]+[MASK]+z[7:]
+ print({'req': 'Exchange', 'reply':zlog})
+ sendhost(partnerip, str(msg),'recvreply',myhost, logreq=str({'req': 'Exchange', 'reply':zlog}))
  sleep(2)
  nodeloc = 'ssh -oBatchmode=yes -i /TopStordata/'+partnerip+'_keys/'+partnerip+' -p '+repliport+' -oStrictHostKeyChecking=no '+partnerip+' ls'
  print(nodeloc)

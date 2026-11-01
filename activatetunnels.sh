@@ -52,11 +52,14 @@ for receiver in "${receivers_array[@]}"; do
     cluster=$(echo $receiver | awk -F'/' '{print $2}' | awk -F"'," '{print $1}')
     clusterip=$(echo $receiver | awk -F"', '" '{print$2}' | awk -F"/" '{print $1}')
     phrase=$(echo $receiver | awk -F"/" '{print$5}' | awk -F"'" '{print $1}')
+    # QSD5.344: the stored phrase is encrypted ('enc~...'); the partner's receivekeys.sh compares the clear phrase.
+    # A clear phrase of an older version comes back unchanged.  The phrase is never echoed.
+    phrase=$(/TopStor/secretmask.py phrasedec "$cluster" "$phrase")
     repliport=$(echo $receiver | awk -F"/" '{print$4}')
     
     echo "[INFO] Parsed cluster=$cluster"
     echo "[INFO] Parsed clusterip=$clusterip"
-    echo "[INFO] Parsed phrase=$phrase"
+    echo "[INFO] Parsed phrase=****"
     echo "[INFO] Parsed repliport=$repliport"
     
     # Check if tunnel is already running and working
@@ -187,7 +190,7 @@ for receiver in "${receivers_array[@]}"; do
         
         # Perform key exchange for the new node
         echo "[ACTION] Performing key exchange for $new_primary_ip"
-        echo "[CMD] /TopStor/replisubmitkeys.py $cluster $new_primary_ip yes $myhost $myhostip $leaderip $repliport $phrase"
+        echo "[CMD] /TopStor/replisubmitkeys.py $cluster $new_primary_ip yes $myhost $myhostip $leaderip $repliport ****"
         /TopStor/replisubmitkeys.py $cluster $new_primary_ip "yes" $myhost $myhostip $leaderip $repliport $phrase
         
         if [ $? -ne 0 ]; then
@@ -260,7 +263,7 @@ for receiver in "${receivers_array[@]}"; do
             etcdip=$(/TopStor/etcdget.py $leaderip clusternodeip)
         fi
         
-        echo "[CMD] /TopStor/initreplipartner.py init $leaderip $myhostip $myhost $cluster $clusterip $repliport $phrase"
+        echo "[CMD] /TopStor/initreplipartner.py init $leaderip $myhostip $myhost $cluster $clusterip $repliport ****"
         /TopStor/initreplipartner.py init $leaderip $myhostip $myhost $cluster $clusterip $repliport $phrase
     fi
     
@@ -268,7 +271,7 @@ for receiver in "${receivers_array[@]}"; do
     echo $Lremote | grep continue >/dev/null
     if [ $? -eq 0 ]; then
         echo "[ACTION] ============ Checking new remote ready nodes ============"
-        echo "[CMD] /TopStor/initreplipartner.py readyonly $cluster $clusterip $myhost $myhostip $leaderip $repliport $phrase $readyport"
+        echo "[CMD] /TopStor/initreplipartner.py readyonly $cluster $clusterip $myhost $myhostip $leaderip $repliport **** $readyport"
         /TopStor/initreplipartner.py readyonly $cluster $clusterip $myhost $myhostip $leaderip $repliport $phrase $readyport
     fi
 

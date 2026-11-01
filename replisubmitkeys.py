@@ -3,6 +3,7 @@ import subprocess
 import sys
 from time import sleep
 from sendhost import sendhost
+from secretmask import MASK
 
 def submitkeys(partner, partnerip, isleader, myhost, myhostip, leaderip, repliport, phrase):
     cmdline = '/TopStor/preparekeys.sh '+partner+' '+partnerip
@@ -12,8 +13,11 @@ def submitkeys(partner, partnerip, isleader, myhost, myhostip, leaderip, replipo
     else:
         z=['/TopStor/sendreceivekeys.py',partnerip, myhost,myhostip,leaderip, repliport, phrase, result]
     msg={'req': 'Exchange', 'reply':z}
+    # QSD5.344: /root/sendhostparam gets the request with the pass phrase masked
+    zlog = list(z)
+    zlog[5 if 'yes' in isleader else 6] = MASK
     try:
-        sendhost(partnerip, str(msg),'recvreply',myhost)
+        sendhost(partnerip, str(msg),'recvreply',myhost, logreq=str({'req': 'Exchange', 'reply':zlog}))
     except:
         print('the cluster is down')
         exit()
