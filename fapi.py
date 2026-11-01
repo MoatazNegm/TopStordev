@@ -2063,13 +2063,32 @@ def logout():
   return {'response': 'error', 'message': 'missing parameter: token'}
  if token.startswith('qsk.'):
   return {'response': 'error', 'message': 'not allowed for an API key'}
- dels('login',token)
+ # QSD5.344 (validator M3): this route has no login check, and etcddel matches a substring of key and value, so
+ # 'token=a' or 'token=1' deleted every login record of the cluster.  A login token is 32 hex characters
+ # (UnixChkUser.setlogin, token_hex(16)); only the record login/<user> whose value is <token>/<expiry> is deleted.
+ if not LOGIN_TOKEN_RE.match(token):
+  return {'response': 'error', 'message': 'invalid parameter: token'}
+ _del_login_record(get('login', '--prefix'), token, 'etcd')
  try:
-  _delleader(leaderip, 'login', token)      # the login record is written on the leader (UnixChkUser.setlogin)
+  _del_login_record(_getleader(leaderip, 'login', '--prefix'), token, leaderip)  # written on the leader (setlogin)
  except Exception:
   pass
  loggedusers.pop(token, None)
  return data
+
+LOGIN_TOKEN_RE = re.compile(r'^[0-9a-f]{32}$')
+
+def _del_login_record(records, token, etcdhost):
+ # records: (key, value) pairs of the prefix 'login'; deletes the exact key whose value starts with '<token>/'
+ for rec in records:
+  if not isinstance(rec, tuple) or len(rec) != 2:
+   continue
+  key, val = str(rec[0]), str(rec[1])
+  if key.startswith('login/') and val.startswith(token+'/'):
+   try:
+    subprocess.run(['etcdctl', '--endpoints=http://'+etcdhost+':2379', 'del', key], stdout=subprocess.PIPE, timeout=20)
+   except Exception:
+    pass
 
 @app.route('/api/v1/login/test', methods=['GET','POST'])
 def testlogin():
