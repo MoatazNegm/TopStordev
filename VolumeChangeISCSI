@@ -1,33 +1,38 @@
 #!/bin/sh
 export ETCDCTL_API=3
 cd /TopStor/
-echo $@ > /root/volchange
-leaderip=` ./etcdgetlocal.py leaderip `
-name=`echo $@ | awk '{print $2}'`;
-pDG=`echo $@ | awk '{print $1}'`;
-quota=`echo $@ | awk '{print $3}'`;
-ipaddr=`echo $@ | awk '{print $4}'`;
-ipsubnet=`echo $@ | awk '{print $5}'`;
-active=`echo $@ | awk '{print $6}'`;
+# QSD5.344: no CHAP secret in the debug copy (argument 10)
+echo $@ | awk '{ if (NF >= 10) $10 = "****"; print }' > /root/volchange
+# QSD5.344 (QC tests 650, 653): the arguments in the order fapi volumes/config sends them -- every slot used to be read
+# one place off (the leader address first was not expected), so privthis.sh got the wrong user and every iSCSI change
+# (initiators, port, CHAP) was ignored:
+#   leaderip pool name quota ipaddr subnet portalport initiators chapuser chappas active user owner user
+leaderip=`echo $@ | awk '{print $1}'`;
+pDG=`echo $@ | awk '{print $2}'`;
+name=`echo $@ | awk '{print $3}'`;
+quota=`echo $@ | awk '{print $4}'`;
+ipaddr=`echo $@ | awk '{print $5}'`;
+ipsubnet=`echo $@ | awk '{print $6}'`;
 portalport=`echo $@ | awk '{print $7}'`;
 initiators=`echo $@ | awk '{print $8}'`;
 chapuser=`echo $@ | awk '{print $9}'`;
 chappas=`echo $@ | awk '{print $10}'`;
-myhost=`hostname -s`;
-userreq=` echo $@ | awk '{print $11}'`;
+active=`echo $@ | awk '{print $11}'`;
+userreq=` echo $@ | awk '{print $12}'`;
 DG=`echo $pDG `;
 privilege="ISCSI";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
 then
- /TopStor/logmsg.py VolCst01 info $userreq $name
+ docker exec etcdclient /TopStor/logmsg.py VolCst01 info $userreq $name
  echo name=$name
- myhost=`hostname -s`
+ # the node name of the volume record, as VolumeCreateISCSI writes it
+ myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
  older=`ETCDCTL_API=3 /pace/etcdgetlocal.py volumes $name `
  echo /pace/etcdput.py $leaderip volumes/ISCSI/$myhost/$DG/$name $DG/$name/$ipaddr/$ipsubnet/$portalport/$initiators/$chapuser/$chappas/$active
  /pace/etcdput.py $leaderip volumes/ISCSI/$myhost/$DG/$name $DG/$name/$ipaddr/$ipsubnet/$portalport/$initiators/$chapuser/$chappas/$active
   stamp=`date +%s`
-  leader=` ./etcdgetlocal.py leader `
+  leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request volumes_$stamp
   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request/$leader volumes_$stamp
  #/pace/broadcasttolocal.py volumes/ISCSI/$myhost/$DG/$name $DG/$name/$ipaddr/$ipsubnet/$portalport/$initiators/$chapuser/$chappas/$active
@@ -63,12 +68,12 @@ then
  for i in $(echo $initiators | sed "s/,/ /g")
  do
 #pdhcp2524812990 pool1is_250024055 10.11.11.11 3263 iqn.1991-05.com.microsoft:desktop-jckvhk3 MoatazNegm MezoAdmin
-  echo /pace/addzfsvolumeastarget.sh $DG $name $ipaddr $portalport $i $chapuser $chappas 
+  echo /pace/addzfsvolumeastarget.sh $DG $name $ipaddr $portalport $i $chapuser '****'
   /pace/addzfsvolumeastarget.sh $DG $name $ipaddr $portalport $i $chapuser $chappas 
   
     # call your procedure/other scripts here below
  done
  /pace/putzpool.py 
- /TopStor/logmsg.py VolCsu01 info $userreq $name
+ docker exec etcdclient /TopStor/logmsg.py VolCsu01 info $userreq $name
  echo ready ;
 fi

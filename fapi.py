@@ -22,7 +22,7 @@ from etcdgetlocalpy import etcdget  as get
 from etcddellocal import etcddel  as dels 
 from etcdput import etcdput as put
 from sendhost import sendhost
-from secretmask import secret_values, mask_text, masked, is_secret_key, MASK
+from secretmask import secret_values, mask_text, masked, is_secret_key, MASK, SECRET_KEYS, phrase_encrypt
 from socket import gethostname as hostname
 from getlogs import getlogs, onedaylog
 from fapistats import allvolstats, cpuperf
@@ -547,15 +547,30 @@ def debounce_after(resp):
 @app.after_request
 def secrets_out_of_answers(resp):
     # QSD5.344: an answer never carries a password, CHAP secret or pass phrase back (many handlers return the request
-    # dict; UnixAddUser and changepass echoed the password, QC test 701).  Top-level fields only; the login token and an
-    # API key shown once on create (field 'key') are not secrets of this kind and stay.
+    # dict; UnixAddUser and changepass echoed the password, QC test 701).  The login token and an API key shown once on
+    # create (field 'key') are not secrets of this kind and stay.
+    # Nested objects (the volume lists carry chappas of every iSCSI volume) are masked for the exact secret field names.
     try:
         if resp.mimetype == 'application/json' and not resp.direct_passthrough:
+            raw = resp.get_data().lower()
+            if b'pass' not in raw and b'phrase' not in raw and b'secret' not in raw:
+                return resp
             body = resp.get_json(silent=True)
-            if isinstance(body, dict) and any(is_secret_key(k) for k in body):
-                for k in list(body):
-                    if is_secret_key(k) and body[k] not in (None, ''):
-                        body[k] = MASK
+            changed = [False]
+            def walk(o, top):
+                if isinstance(o, dict):
+                    for k in list(o):
+                        if (is_secret_key(k) if top else str(k).lower() in SECRET_KEYS) and isinstance(o[k], str) \
+                           and o[k] not in ('', CHAP_NONE, MASK):
+                            o[k] = MASK
+                            changed[0] = True
+                        else:
+                            walk(o[k], False)
+                elif isinstance(o, list):
+                    for x in o:
+                        walk(x, False)
+            walk(body, True)
+            if changed[0]:
                 resp.set_data(json.dumps(body))
     except Exception:
         pass
@@ -1914,8 +1929,11 @@ def volumecreate(data):
  if 'groups' in data:
   data['groups'] = only_everyone(data['groups'])
  if 'ISCSI' in data['type']:
-  data['chapuser']='MoatazNegm'
-  data['chappas']='MezoAdmin'
+  chapuser, chapstored, why = iscsi_chap(data)
+  if why:
+   logmsg.sendlog('ISCSIfa02','error',data['user'],logname(data.get('name')))
+   return {'response': 'error', 'message': why}
+  data['chapuser'], data['chappas'] = chapuser, chapstored
   datastr = data['pool']+' '+data['name']+' '+data['size']+' '+data['ipaddress']+' '+data['Subnet']+' '+data['portalport']+' '+data['initiators']+' '+data['chapuser']+' '+data['chappas']+' '+data['active']+' '+data['user']+' '+data['owner']+' '+data['user']
  elif 'CIFSdom' in data['type']:
 
@@ -1962,6 +1980,42 @@ def volumecreate(data):
  #sendhost(ownerip, str(msg),'recvreply',myhost)
  postchange(cmndstring,data['owner'])
  return data
+
+# ---- iSCSI CHAP (QSD5.344, QC test 653) ---------------------------------------------------------------------------------
+# volumes/create and volumes/config used to replace chapuser/chappas with one hard-coded pair, and the target never asked
+# for CHAP.  Now: no chapuser and no chappas = no CHAP (stored as NoCHAP/NoCHAP); both given = CHAP on every initiator
+# ACL of the LUN, the target asks for it (pace/addzfsvolumeastarget.sh).  The secret is stored and passed on encrypted
+# ('enc~...', secretmask.phrase_encrypt), only the target script decrypts it.  volumes/config without the two fields keeps
+# the stored ones; both sent empty switches CHAP off.
+CHAP_NONE = 'NoCHAP'
+CHAP_USER_RE = re.compile(r'^[A-Za-z0-9._:@-]{1,64}$')
+CHAP_SECRET_RE = re.compile(r'^[A-Za-z0-9._:+=,~-]{12,64}$')
+
+def iscsi_chap(data, volume=None):
+ # returns (chapuser, stored secret, None) or (None, None, error message)
+ if 'chapuser' not in data and 'chappas' not in data:
+  if volume is not None:
+   return str(volume.get('chapuser', CHAP_NONE)), str(volume.get('chappas', CHAP_NONE)), None
+  return CHAP_NONE, CHAP_NONE, None
+ user, secret = str(data.get('chapuser', '')), str(data.get('chappas', ''))
+ try:      # login_required removed every blank: a value typed with a blank is refused, not silently shortened
+  for k in ('chapuser', 'chappas'):
+   if re.search(r'\s', str(request.values.get(k, ''))):
+    return None, None, 'invalid character in parameter: '+k+' (no blanks)'
+ except RuntimeError:
+  pass
+ if user == '' and secret == '':
+  return CHAP_NONE, CHAP_NONE, None
+ if user == '' or secret == '':
+  return None, None, 'chapuser and chappas must be given together'
+ if user == CHAP_NONE or not CHAP_USER_RE.match(user):
+  return None, None, 'invalid character in parameter: chapuser (1-64 letters, digits, . _ : @ -)'
+ if not CHAP_SECRET_RE.match(secret):
+  return None, None, 'invalid character in parameter: chappas (12-64 letters, digits, . _ : + = , ~ -)'
+ try:
+  return user, phrase_encrypt('chap', secret), None
+ except Exception:
+  return None, None, 'the CHAP secret could not be stored'
 
 def getlogin(token):
  global leaderip
@@ -2071,8 +2125,11 @@ def volumeconfig(data):
  datastr = ''
  data['owner'] = allinfo['hosts'][allinfo['pools'][volume['pool']]['host']]['name']
  if 'ISCSI' in data['type']:
-  data['chapuser']='MoatazNegm'
-  data['chappas']='MezoAdmin'
+  chapuser, chapstored, why = iscsi_chap(data, volume)
+  if why:
+   logmsg.sendlog('ISCSIfa02','error',data['user'],logname(data.get('volume')))
+   return {'response': 'error', 'message': why}
+  data['chapuser'], data['chappas'] = chapuser, chapstored
   if 'initiators' not in data:
    data['initiators'] = volume['initiators']
   if 'portalport' not in data:
