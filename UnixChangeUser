@@ -184,14 +184,17 @@ then
  echo $leader | grep $myhost
  if [ $? -eq 0 ];
  then
-	stamp=`date +%s`;
-	stamp=$((stamp+10))
+	# QSD5.345: the value names the user and is in nanoseconds (10 s ahead, as before, so it is applied after the user
+	# request).  It was UsrChange_<seconds>: two changes in the same second (UnixChangeGroup changes every member in a
+	# row) had the SAME value; the followers track done requests by value and the leader prunes by value, so the second
+	# change was taken as done / pruned before any follower ran it -- the follower missed the member (QC tests 638, 678).
+	stamp=$(( `date +%s%N` + 10000000000 ))
 	myscript=`basename "$0"`
 	params=`echo $myscript $@ pull | sed 's\ \\_\g'`
 	echo params=$params
-	echo /pace/etcdput.py $etcd sync/UsrChange/$params/request/$myhost UsrChange_$stamp
-	/TopStor/etcdput.py $etcd sync/UsrChange/$params/request/$myhost UsrChange_$stamp
-	/TopStor/etcdput.py $etcd sync/UsrChange/$params/request UsrChange_$stamp
+	echo /pace/etcdput.py $etcd sync/UsrChange/$params/request/$myhost UsrChange_${username}_$stamp
+	/TopStor/etcdput.py $etcd sync/UsrChange/$params/request/$myhost UsrChange_${username}_$stamp
+	/TopStor/etcdput.py $etcd sync/UsrChange/$params/request UsrChange_${username}_$stamp
  fi
  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq 
 fi

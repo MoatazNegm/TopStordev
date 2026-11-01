@@ -161,7 +161,7 @@ then
 # 	echo "$currentcifs" | while read y; do docker exec $y  sh /hostetc/smbuserfix.sh x $username $userpass;  done; 
 # fi
  docker exec intsmb /root/smbuser.sh $username $userpass
- userline=`cat /etc/passwd | grep $username`
+ userline=`getent passwd "$username"`     # QSD5.345: this name only (grep took qu10's line for qu1, see UnixAddGroup)
  if [ $? -ne  0  ]; then
  	echo $pullsync | grep pull
  	if [ $? -ne 0 ]

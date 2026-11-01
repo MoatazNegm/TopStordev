@@ -135,7 +135,7 @@ then
  echo ${ischange}$leader | grep change$myhost
  if [ $? -eq 0 ];
  then
-  stamp=`date +%s`;
+  stamp=`date +%s%N`;     # QSD5.345: nanoseconds, two changes of one group in the same second had the same value (see UnixChangeUser)
   myscript=`basename "$0"`
   params=`echo $myscript $@ pull | sed 's\ \\_\g'`
   echo params=$params

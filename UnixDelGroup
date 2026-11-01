@@ -37,7 +37,9 @@ then
 userdel -f  $username 
 rm  key/${username}fixed
 sleep 2
-cat /etc/passwd |  grep $username
+# QSD5.345: the account of THIS name is still there (exact first field); 'grep $username /etc/passwd' matched any line
+# holding the text, so a short group name (ab: in .../lib/..., nobody, ...) was never deleted (Unlin1g1001, test 708)
+cut -d: -f1 /etc/passwd | grep -qxF -- "$username"
 if [ $? -eq 0 ]; then
 	echo s$pullsync | grep pull
 	if [ $? -ne 0 ];
