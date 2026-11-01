@@ -106,7 +106,7 @@ def is_valid_ip(ip):
         return 10 
 
 
-def is_unique_ip(ip, vtype='NZ#@A' ):
+def is_unique_ip(ip, vtype='NZ#@A', partnerskip=()):
         global leaderip
         if not ip or not str(ip).strip():
             return 0
@@ -116,6 +116,12 @@ def is_unique_ip(ip, vtype='NZ#@A' ):
         allnodes= get('Active','--prefix')
         allnodes = str(allnodes)
         allpartners= get('Partner','--prefix')
+        # QSD5.345: partnerskip = names '<alias>_<type>' (lower case, as Partner/<name> is stored) whose address may be
+        # shared: AddPartner passes the OTHER type of the same alias, so one cluster can be both the Sender and the
+        # Receiver partner (same address); every other use of the address stays refused
+        if partnerskip:
+            allpartners = [x for x in allpartners if not (isinstance(x, (list, tuple)) and len(x) > 1
+                           and str(x[0]).startswith('Partner/') and str(x[0]).split('/',1)[1].lower() in partnerskip)]
         allpartners = str(allpartners)
         allips = allvols+'/'+leaderip+'/'+allnodes+'/'+allpartners
         ip_pattern = rf'\b{re.escape(ip)}\b' 
@@ -2664,6 +2670,14 @@ def partner_alias_taken(alias, ptype):
   print('partner_alias_taken:', e)
  return False
 
+def partner_other_type(alias, ptype):
+ # QSD5.345: the stored name of the same alias under the other type ('<alias>_Sender' for a Receiver add and back), lower
+ # case; its address may be the address of the new entry (is_unique_ip partnerskip).  Empty for an unknown type.
+ other = {'sender': 'Receiver', 'receiver': 'Sender'}.get(str(ptype or '').lower())
+ if not other:
+  return ()
+ return ((partner_alias_key(alias)+'_'+other).lower(),)
+
 @app.route('/api/v1/partners/AddPartner', methods=['GET','POST'])
 @login_required
 @audit_command
@@ -2675,7 +2689,9 @@ def AddPartner(data):
  if partner_alias_taken(data.get('alias'), data.get('type')):
   logmsg.sendlog('Partner1001','error',data.get('user','system'),partner_alias_key(data.get('alias')))
   return 'partner alias already exists'
- isvu =  int(is_valid_ip(data['ip']))+int(is_unique_ip(data['ip']))
+ # the address of the same alias under the other type may be shared (one cluster as Sender and Receiver); any other
+ # partner, node, leader or volume address stays refused (IPadduqfa)
+ isvu =  int(is_valid_ip(data['ip']))+int(is_unique_ip(data['ip'], partnerskip=partner_other_type(data.get('alias'), data.get('type'))))
  if isvu == 0:
         print('ip is valid')
  else:
