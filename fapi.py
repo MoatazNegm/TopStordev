@@ -14,7 +14,7 @@ import re, ipaddress, traceback
 import Hostsconfig
 from Hostconfig import config
 from allphysicalinfo import getall, initallphy
-from uservalid import check_new_user_coded, logname, check_group_name
+from uservalid import check_new_user_coded, logname, check_group_name, check_password_target
 from UnixChkUser import setlogin
 import sqlite3
 from etcdget2 import etcdgetjson
@@ -2067,11 +2067,24 @@ def changepass(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
  data['user'] = data['response']
- print('#############################')
- print(data)
- print('###########################')
- config(leader, leaderip,myhost, data)
- return data
+ # QSD5.344: this call changes a password and nothing else.  Hostconfig.config() also changes the alias, the cluster
+ # address, the time zone, NTP, DNS, ports ... (the Node Config calls of hosts/config, privilege 'Error'); passing the
+ # whole request let any logged-in user change those through user/changepass without the privilege.  Only the three
+ # password fields go on; the own-user / admin check (QSD5.337) and the reserved names (QSD5.338) stay in config().
+ # The answer no longer echoes the request (it carried the new password and the token).
+ req = {'user': data['user'], 'username': data.get('username'), 'password': data.get('password')}
+ target = str(req['username'] or '')
+ # QSD5.344: admin setting a password for a user that does not exist used to write usershash/<name>; a later Add User
+ # of that name was then refused as 'already used' (QC test 671).  admin always exists.
+ if req['password'] is not None and req['user'] in ('admin', 'system') and target not in ('', 'admin') \
+    and not check_password_target(target) and str(get('usersinfo/'+target)[0]) in ('_1', '-1', '', 'None'):
+  logmsg.sendlog('Unlinfa13','error',req['user'],logname(target))
+  return {'response': data['response'], 'username': target, 'error': 'nouser'}
+ config(leader, leaderip,myhost, req)
+ reply = {'response': data['response'], 'username': req['username']}
+ if 'error' in req:
+  reply['error'] = req['error']
+ return reply
 
 
 

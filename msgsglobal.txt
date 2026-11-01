@@ -83,6 +83,7 @@ Unlin1105:0: : from :: syncing groups between nodes
 Unlin1011: Changing user password for :
 Unlin1012:1: : from :: Changing password for user :
 Unlinfa12:1: : from :: Failed chaning password for user : it is too small
+Unlinfa13:1: : from :: Not done, the password was not changed: there is no user named :
 Unlin1013:2: : from :: problem occurred while changing password for user :
 Unlin1015:2: : from :: Success changing password for user :
 Unlin1017: Adding user : ......
