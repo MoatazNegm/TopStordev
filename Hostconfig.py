@@ -233,7 +233,7 @@ def config(leader, leaderip, myhost, *bargs):
     pass
   queuethis('Hostconfig_ip','finish',arglist['user'])
 ######################################
- queuethis('Hostconfig','finish',arglist)
+ queuethis('Hostconfig','finish',masked(arglist))      # QSD5.344: no password in the queue (validator M1)
  return 1
 
 

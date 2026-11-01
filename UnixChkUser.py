@@ -10,7 +10,7 @@ import subprocess
 def setlogin(leaderip,myhost, user,passw,token=0):
  
  with open('/TopStordata/chkuser','w') as f:
-  f.write(" ".join([leaderip,myhost, user,passw,str(token),'\n']))
+  f.write(" ".join([leaderip,myhost, user,'****',str(token),'\n']))     # QSD5.344: never the login password (validator M2)
  if len(str(token)) < 2:
   oldpass = str(get(leaderip, 'usershash/'+user)[0])
   if len(oldpass) < 3:

@@ -22,7 +22,8 @@ from etcdgetlocalpy import etcdget  as get
 from etcddellocal import etcddel  as dels 
 from etcdput import etcdput as put
 from sendhost import sendhost
-from secretmask import secret_values, mask_text, masked, is_secret_key, MASK, SECRET_KEYS, phrase_encrypt
+from secretmask import secret_values, mask_text, masked, is_secret_key, MASK, phrase_encrypt, phrase_decrypt
+from secretmask import SECRET_KEYS as MASK_KEYS     # QSD5.344: own name, the request guard below has its own SECRET_KEYS
 from socket import gethostname as hostname
 from getlogs import getlogs, onedaylog
 from fapistats import allvolstats, cpuperf
@@ -388,6 +389,15 @@ def login_required(f):
     return f({'response':'baduser'})
  return decorated_function
 
+def logsafe(d):
+ # QSD5.344 (validator L5): what the flask log prints of a request: the secret fields and the login token / API key
+ # ('qsk.<name>.<secret>' comes in as token) are masked
+ m = masked(d)
+ if isinstance(m, dict) and m.get('token') not in (None, ''):
+  m = dict(m)
+  m['token'] = MASK
+ return m
+
 COMMAND_LOG_PATH = '/TopStordata/cmdaudit.log'
 
 def record_command(data, endpoint, method, commands=None):
@@ -400,7 +410,7 @@ def record_command(data, endpoint, method, commands=None):
   for k in data:
    if k in excluded:
     continue
-   if 'pass' in k.lower():
+   if is_secret_key(k):      # QSD5.344: password, chappas, phrase ... (was only names with 'pass')
     continue
    params[k] = data[k]
   entry = {
@@ -553,14 +563,15 @@ def secrets_out_of_answers(resp):
     try:
         if resp.mimetype == 'application/json' and not resp.direct_passthrough:
             raw = resp.get_data().lower()
-            if b'pass' not in raw and b'phrase' not in raw and b'secret' not in raw:
+            # 'chappas' does not contain 'pass': without b'chap' a volume list skipped the walk
+            if b'pass' not in raw and b'phrase' not in raw and b'secret' not in raw and b'chap' not in raw:
                 return resp
             body = resp.get_json(silent=True)
             changed = [False]
             def walk(o, top):
                 if isinstance(o, dict):
                     for k in list(o):
-                        if (is_secret_key(k) if top else str(k).lower() in SECRET_KEYS) and isinstance(o[k], str) \
+                        if (is_secret_key(k) if top else str(k).lower() in MASK_KEYS) and isinstance(o[k], str) \
                            and o[k] not in ('', CHAP_NONE, MASK):
                             o[k] = MASK
                             changed[0] = True
@@ -1884,8 +1895,8 @@ def volumesnapshotscreate(data):
  else:
    datastr += data['receiver']
  print('#############################')
- print(data)
- print(datastr)
+ print(logsafe(data))
+ print(mask_text(datastr, _request_secrets(data)))
  print('###########################')
  cmndstring = '/TopStor/SnapshotCreate'+datastr+' '+data['user']
  postchange(cmndstring,data['owner'])
@@ -1967,7 +1978,7 @@ def volumecreate(data):
  print('#############################')
  with open('/TopStordata/volcreate','a') as f:
     f.write(str(masked(data))+'\n'+'owner '+str(data['owner'])+'\n')
- print(masked(data))
+ print(logsafe(data))
  print(mask_text(datastr, _request_secrets(data)))
  print('###########################')
  if 'ISCSI' not in data['type']:
@@ -2147,7 +2158,7 @@ def volumeconfig(data):
    volume[ele] = data[ele] 
   datastr = volume['pool']+' '+volume['name']+' '+str(volume['quota'])+' '+volume['groups']+' '+volume['ipaddress']+' '+str(volume['Subnet'])+' '+volume['statusmount']+' '+volume['host']+' '+volume['user']
   print('33333333333333333333333333333333333333333333333#############################')
-  print('volume',volume)
+  print('volume',logsafe(volume))
   print('owner',ownerip)
   print('33333333333333333333333333333333333333333333333#############################')
  cmndstring = '/TopStor/VolumeChange'+data['type']+' '+leaderip+' '+datastr
@@ -2170,11 +2181,13 @@ def changepass(data):
  # whole request let any logged-in user change those through user/changepass without the privilege.  Only the three
  # password fields go on; the own-user / admin check (QSD5.337) and the reserved names (QSD5.338) stay in config().
  # The answer no longer echoes the request (it carried the new password and the token).
- req = {'user': data['user'], 'username': data.get('username'), 'password': data.get('password')}
+ req = {'user': data['user'], 'username': data.get('username')}
+ if 'password' in data:      # only when given: a None password made config() log Unlinfa12 for nothing
+  req['password'] = data['password']
  target = str(req['username'] or '')
  # QSD5.344: admin setting a password for a user that does not exist used to write usershash/<name>; a later Add User
  # of that name was then refused as 'already used' (QC test 671).  admin always exists.
- if req['password'] is not None and req['user'] in ('admin', 'system') and target not in ('', 'admin') \
+ if 'password' in req and req['user'] in ('admin', 'system') and target not in ('', 'admin') \
     and not check_password_target(target) and str(get('usersinfo/'+target)[0]) in ('_1', '-1', '', 'None'):
   logmsg.sendlog('Unlinfa13','error',req['user'],logname(target))
   return {'response': data['response'], 'username': target, 'error': 'nouser'}
@@ -2233,7 +2246,7 @@ def hostconfig(data):
   datastr += ele+'='+data[ele]+' '
  datastr = datastr[:-1]
  print('#############################')
- print(data)
+ print(logsafe(data))
  print('###########################')
 
  if 'discovered' in data:
@@ -2312,7 +2325,7 @@ def volumesnapshotrol(data):
 # z= cmndstring.split(' ')
 # msg={'req': 'Pumpthis', 'reply':z}
  print('##################################')
- print(data)
+ print(logsafe(data))
  print('################################333')
 # sendhost(ownerip, str(msg),'recvreply',myhost)
         		 
@@ -2354,7 +2367,7 @@ def volumesnapshotdel(data):
 # z= cmndstring.split(' ')
 # msg={'req': 'Pumpthis', 'reply':z}
  print('##################################')
- print(data)
+ print(logsafe(data))
  print('################################333')
 # sendhost(ownerip, str(msg),'recvreply',myhost)
         		 
@@ -2399,7 +2412,7 @@ def volumedel(data):
 # z= cmndstring.split(' ')
 # msg={'req': 'Pumpthis', 'reply':z}
  print('##################################')
- print(data)
+ print(logsafe(data))
  print('################################333')
 # sendhost(ownerip, str(msg),'recvreply',myhost)
         		 
@@ -2573,7 +2586,7 @@ def AddPartner(data):
   logmsg.sendlog('Partnportfa','error','system',loggedusers[data['token']]['user'])
   return 'select another port'
 
- print('AddPartner', masked(data))
+ print('AddPartner', logsafe(data))
  cmdstring = '/TopStor/PartnerAdd.py '+data['ip']+' '+data['alias']+' '+data['type']+' '+data['port']+' '+data['pass']+' '+data['user'] + ' init'
  postchange(cmdstring)
  return data
