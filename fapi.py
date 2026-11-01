@@ -22,7 +22,8 @@ from etcdgetlocalpy import etcdget  as get
 from etcddellocal import etcddel  as dels 
 from etcdput import etcdput as put
 from sendhost import sendhost
-from secretmask import secret_values, mask_text, masked, is_secret_key, MASK, phrase_encrypt, phrase_decrypt
+from secretmask import secret_values, mask_text, masked, is_secret_key, MASK, phrase_encrypt, phrase_decrypt, mask_query
+import logging
 from secretmask import SECRET_KEYS as MASK_KEYS     # QSD5.344: own name, the request guard below has its own SECRET_KEYS
 from socket import gethostname as hostname
 from getlogs import getlogs, onedaylog
@@ -71,6 +72,23 @@ possiblehosts = []
 pooldict = dict()
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
+
+class _AccessLogMask(logging.Filter):
+ # QSD5.345 (QX-233 step 4): the werkzeug access log line holds the request line with its query string -- the login token
+ # or the API key (qsk.<name>.<secret>) of every call and the password of a form sent by GET.  The prints of the routes
+ # were masked in QSD5.344 (logsafe), this line was not.  The secret parameter values are written as ****.
+ def filter(self, record):
+  try:
+   msg = record.getMessage()
+   safe = mask_query(msg)
+   if safe != msg:
+    record.msg = safe
+    record.args = ()
+  except Exception:
+   pass
+  return True
+
+logging.getLogger('werkzeug').addFilter(_AccessLogMask())
 logcatalog = ''
 with open('/TopStor/msgsglobal.txt') as f:
  logcatalog = f.read().split('\n')
@@ -2629,12 +2647,34 @@ def api_partners_freeport(data):
    return {'port': port}
  return {'port': 0, 'response': 'select another port'}
 
+def partner_alias_key(alias):
+ # the alias as PartnerAdd.py stores it (Partner/<alias>_<type>): '_' dropped, '/' written as ':::'
+ return str(alias or '').replace('_','').replace('/',':::')
+
+def partner_alias_taken(alias, ptype):
+ # QSD5.345: a partner of this alias and type exists already (Partner/<alias>_<type>, compared without case).  The add used
+ # to overwrite it silently with the new address, port and phrase (QC tests 694, 705); the other type of the same alias
+ # stays allowed (a cluster can be both the sender and the receiver of another one).
+ want = (partner_alias_key(alias)+'_'+str(ptype or '')).lower()
+ try:
+  for partner in etcdgetjson(leaderip,'Partner/','--prefix'):
+   if str(partner['name']).split('/',1)[-1].lower() == want:
+    return True
+ except Exception as e:
+  print('partner_alias_taken:', e)
+ return False
+
 @app.route('/api/v1/partners/AddPartner', methods=['GET','POST'])
 @login_required
 @audit_command
 def AddPartner(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'} 
+ # QSD5.345: checked before the address: the same alias with the same address used to end in the address refusal with a
+ # success-looking answer
+ if partner_alias_taken(data.get('alias'), data.get('type')):
+  logmsg.sendlog('Partner1001','error',data.get('user','system'),partner_alias_key(data.get('alias')))
+  return 'partner alias already exists'
  isvu =  int(is_valid_ip(data['ip']))+int(is_unique_ip(data['ip']))
  if isvu == 0:
         print('ip is valid')

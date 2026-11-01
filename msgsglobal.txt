@@ -210,7 +210,7 @@ Partnerfa03:0: : from :: No No space for receiving replication in the  receiver 
 Partner1000:2: : from :: Adding partner : in : mode.
 Partner1001:1: : from :: Partner : already exists
 Partner1002:1: : from :: Success adding partner : in : mode
-Partner1fa2:1: : from :: Failed Aadding partner : in : mode, pls try again later. make sure the partner is accessible and up and running
+Partner1fa2:1: : from :: Failed adding partner : in : mode. The address does not answer as a TopStor cluster. Make sure the partner is accessible and up and running, then try again
 Partner1003:1: : from :: Deleting partner : ......
 Partner1004:1: : from :: Success deleting partner :
 Partner1005:1: : from :: Deleting partner : ......

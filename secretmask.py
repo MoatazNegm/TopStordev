@@ -49,6 +49,21 @@ def mask_text(text, values):
     return text
 
 
+_QUERY_RE = None
+
+def mask_query(text):
+    """QSD5.345: the values of secret query parameters in a request line / URL (token, any name with pass, phrase, secret
+    or chap in it, the SECRET_KEYS) become ****.  The web server's access log prints the whole request line, and the UI and
+    API keys send the login token (and some forms their passwords) in the query string (QX-233 step 4)."""
+    global _QUERY_RE
+    import re
+    if _QUERY_RE is None:
+        names = '|'.join(sorted((re.escape(k) for k in SECRET_KEYS), key=len, reverse=True))
+        _QUERY_RE = re.compile(r'([?&;](?:token|apikey|key|' + names + r'|[A-Za-z0-9_.-]*(?:pass|phrase|secret|chap)[A-Za-z0-9_.-]*)=)[^&;\s"\']*',
+                               re.IGNORECASE)
+    return _QUERY_RE.sub(lambda m: m.group(1) + MASK, str(text))
+
+
 def masked(d):
     try:
         return {k: (MASK if is_secret_key(k) and v not in (None, '') else v) for k, v in d.items()}
