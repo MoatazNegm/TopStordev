@@ -1959,8 +1959,18 @@ def getlogin(token):
 def logout():
  global leaderip
  data = request.args.to_dict()
- dels('login',data['token'])
- loggedusers.pop(data['token'], None)
+ token = str(data.get('token', ''))
+ # QSD5.344: the UI Logout button now calls this (QC test 700).  No token: nothing to end, a clean answer (was a KeyError).
+ if token in ('', '0'):
+  return {'response': 'error', 'message': 'missing parameter: token'}
+ if token.startswith('qsk.'):
+  return {'response': 'error', 'message': 'not allowed for an API key'}
+ dels('login',token)
+ try:
+  _delleader(leaderip, 'login', token)      # the login record is written on the leader (UnixChkUser.setlogin)
+ except Exception:
+  pass
+ loggedusers.pop(token, None)
  return data
 
 @app.route('/api/v1/login/test', methods=['GET','POST'])
