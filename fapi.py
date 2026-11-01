@@ -2108,7 +2108,10 @@ def logout():
  # (UnixChkUser.setlogin, token_hex(16)); only the record login/<user> whose value is <token>/<expiry> is deleted.
  if not LOGIN_TOKEN_RE.match(token):
   return {'response': 'error', 'message': 'invalid parameter: token'}
- _del_login_record(get('login', '--prefix'), token, 'etcd')
+ # QSD5.344 (validator N1): read quietly. get() (etcdgetlocalpy) print()s the whole login list, so every active login
+ # token went to the flask stdout on each logout; etcdgetpy (_getleader) is the same etcdctl read without the print,
+ # and with the host 'etcd' it reads the local etcd (the endpoint etcdgetlocalpy uses).
+ _del_login_record(_getleader('etcd', 'login', '--prefix'), token, 'etcd')
  try:
   _del_login_record(_getleader(leaderip, 'login', '--prefix'), token, leaderip)  # written on the leader (setlogin)
  except Exception:

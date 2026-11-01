@@ -13,7 +13,16 @@ from sendhost import sendhost
 from UpdateNameSpace import updatenamespace
 import logmsg
 from time import time as stamp
-from secretmask import masked
+from secretmask import masked, MASK
+
+def qsafe(d):
+ # QSD5.344 (validator N2): what is written for people to read (queue entry /root/logqueuetmp, /TopStordata/Hostconfig):
+ # the secret fields AND the session token are masked (as fapi.logsafe does); the executors still get the real dict
+ m = masked(d)
+ if isinstance(m, dict) and m.get('token') not in (None, ''):
+  m = dict(m)
+  m['token'] = MASK
+ return m
 
 def config(leader, leaderip, myhost, *bargs):
  arglist = bargs[0]
@@ -21,14 +30,14 @@ def config(leader, leaderip, myhost, *bargs):
  logmsg.initlog(leaderip, myhost)
  #arglist = {'ipaddr': '10.11.11.123', 'ipaddrsubnet': '24', 'id': '0', 'user': 'admin', 'name': 'dhcp32502'}
  # QSD5.344: the queue entry and the debug file below carry no password (QC test 701)
- queuethis('Hostconfig','running',masked(arglist))
+ queuethis('Hostconfig','running',qsafe(arglist))
  enpdev='enp0s8'
  needreboot=False
  for key in arglist:
   if arglist[key] == -1:
    arglist[key] = '-1'
  with open('/TopStordata/Hostconfig','w') as f:
-  f.write(str(masked(arglist))+'\n')
+  f.write(str(qsafe(arglist))+'\n')
  stampi = str(stamp())
  ######### managing port bonds ###############
  if any(key in arglist for key in ['nmports', 'cmports', 'dports', 'iports']):
@@ -233,7 +242,7 @@ def config(leader, leaderip, myhost, *bargs):
     pass
   queuethis('Hostconfig_ip','finish',arglist['user'])
 ######################################
- queuethis('Hostconfig','finish',masked(arglist))      # QSD5.344: no password in the queue (validator M1)
+ queuethis('Hostconfig','finish',qsafe(arglist))      # QSD5.344: no password and no token in the queue (validator M1, N2)
  return 1
 
 
