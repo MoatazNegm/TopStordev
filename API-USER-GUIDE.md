@@ -35,7 +35,7 @@ curl -sk "https://NODE:8443/api/v1/partners/partnerlist?token=$T"
 | `GET /login` | `user`, `pass` | `{"token": "<token>"}`; `{"token": "baduser"}` on failure |
 | `GET /login/test` | `token` | `{"response": "<user>"}` or `baduser` — is the token valid |
 | `GET /login/renewtoken` | `token` | extends the token lifetime |
-| `GET /logout` | `token` | invalidates the token |
+| `GET /logout` | `token` | invalidates the token (only a 32-hex login token: anything else answers `invalid parameter: token`, nothing is deleted) |
 | `POST /user/changepass` | `token`, user name and new password (UI sends `username`, `password`) | queued password change |
 
 ## 3. Cluster, nodes, software
@@ -83,7 +83,7 @@ curl -sk "https://NODE:8443/api/v1/partners/partnerlist?token=$T"
 | `/volumes/snapshots/create` | `pool`, `volume`, `name`, `snapsel`, `receiver`, `owner` | create a snapshot / schedule |
 | `/volumes/snapshots/snaprollback`, `…/snapshotdel`, `…/perioddelete` | `name`, `owner` | roll back / delete / delete a schedule |
 
-iSCSI CHAP (QSD5.344): give `chapuser` and `chappas` together (user 1-64 of letters, digits, `. _ : @ -`; secret 12-64 of letters, digits, `. _ : + = , ~ -`, no blanks) or leave both out for no CHAP; anything else is refused with `invalid character in parameter: ...` or `chapuser and chappas must be given together` (log `ISCSIfa02`). CHAP is set on each initiator ACL of the LUN and the target then asks for it (one target per address: it asks while any initiator ACL of that address has CHAP). `volumes/config` without the two fields keeps the stored CHAP; both sent empty turns CHAP off. The secret is never shown again: answers and lists show `****`.
+iSCSI CHAP (QSD5.344): give `chapuser` and `chappas` together (user 1-64 of letters, digits, `. _ : @ -`; secret 12-64 of letters, digits, `. _ : + = , ~ -`, no blanks) or leave both out for no CHAP; anything else is refused with `invalid character in parameter: ...` or `chapuser and chappas must be given together` (log `ISCSIfa02`). CHAP is set on each initiator ACL of the LUN and the target then asks for it (one target per address: it asks while any initiator ACL of that address has CHAP). `volumes/config` without the two fields keeps the stored CHAP; both sent empty turns CHAP off. The secret is never shown again: answers and lists show `****`. Every iSCSI volume of one address has the same CHAP (all none, or all the same user and secret): a different one is refused with `CHAP must be the same for every iSCSI volume on <ip>: volume <name> has ...` (log `ISCSIfa03`); to switch the volumes of an address to CHAP, move them one by one to a new address with the new CHAP (`volumes/config ipaddress=... chapuser=... chappas=...`). `chapuser` `NoCHAP`, `nochap`, `-` or `NULL` (any case) is refused (reserved words).
 
 ## 6. Users, groups, tenants
 

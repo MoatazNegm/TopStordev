@@ -1944,6 +1944,10 @@ def volumecreate(data):
   if why:
    logmsg.sendlog('ISCSIfa02','error',data['user'],logname(data.get('name')))
    return {'response': 'error', 'message': why}
+  why = iscsi_chap_same_address(allinfo.get('volumes'), data.get('name'), data['ipaddress'], chapuser, chapstored)
+  if why:
+   logmsg.sendlog('ISCSIfa03','error',data['user'],logname(data.get('name')),str(data['ipaddress']))
+   return {'response': 'error', 'message': why}
   data['chapuser'], data['chappas'] = chapuser, chapstored
   datastr = data['pool']+' '+data['name']+' '+data['size']+' '+data['ipaddress']+' '+data['Subnet']+' '+data['portalport']+' '+data['initiators']+' '+data['chapuser']+' '+data['chappas']+' '+data['active']+' '+data['user']+' '+data['owner']+' '+data['user']
  elif 'CIFSdom' in data['type']:
@@ -1999,6 +2003,8 @@ def volumecreate(data):
 # ('enc~...', secretmask.phrase_encrypt), only the target script decrypts it.  volumes/config without the two fields keeps
 # the stored ones; both sent empty switches CHAP off.
 CHAP_NONE = 'NoCHAP'
+CHAP_OFF_WORDS = ('nochap', '-', 'null')
+CHAP_LEGACY = ('MoatazNegm', 'MezoAdmin')      # the pair of every volume before QSD5.344: never enforced, means no CHAP
 CHAP_USER_RE = re.compile(r'^[A-Za-z0-9._:@-]{1,64}$')
 CHAP_SECRET_RE = re.compile(r'^[A-Za-z0-9._:+=,~-]{12,64}$')
 
@@ -2019,7 +2025,11 @@ def iscsi_chap(data, volume=None):
   return CHAP_NONE, CHAP_NONE, None
  if user == '' or secret == '':
   return None, None, 'chapuser and chappas must be given together'
- if user == CHAP_NONE or not CHAP_USER_RE.match(user):
+ # QSD5.344 (validator L1): pace/addzfsvolumeastarget.sh reads NoCHAP, nochap and '-' as 'no CHAP', LIO reads NULL as
+ # 'clear': such a user would silently switch CHAP off, so it is refused (any case)
+ if user.lower() in CHAP_OFF_WORDS:
+  return None, None, 'invalid parameter: chapuser ('+user+' is a reserved word, leave chapuser and chappas out for no CHAP)'
+ if not CHAP_USER_RE.match(user):
   return None, None, 'invalid character in parameter: chapuser (1-64 letters, digits, . _ : @ -)'
  if not CHAP_SECRET_RE.match(secret):
   return None, None, 'invalid character in parameter: chappas (12-64 letters, digits, . _ : + = , ~ -)'
@@ -2027,6 +2037,36 @@ def iscsi_chap(data, volume=None):
   return user, phrase_encrypt('chap', secret), None
  except Exception:
   return None, None, 'the CHAP secret could not be stored'
+
+def _chap_owner(user, stored):
+ # None = no CHAP; else the chap user (the secret is compared only when both sides have the same user)
+ user, stored = str(user), str(stored)
+ if user.lower() in CHAP_OFF_WORDS or user in ('', '_1') or (user, stored) == CHAP_LEGACY:
+  return None
+ return user
+
+def iscsi_chap_same_address(volumes, volname, ipaddress, user, stored):
+ # QSD5.344 (validator M4): one iSCSI target per address and one ACL per initiator.  A CHAP LUN on an address shared with
+ # no-CHAP LUNs switched authentication on for the whole target (their initiators were locked out); two LUNs with
+ # different CHAP pairs flipped a shared initiator's ACL (last one wins).  So every iSCSI volume of one address has the
+ # same CHAP: all none, or all the same user and secret.  Returns None or the refusal message.
+ mine = _chap_owner(user, stored)
+ myclear = None
+ for name, vol in (volumes or {}).items():
+  if name == volname or vol.get('prot') != 'ISCSI' or str(vol.get('ipaddress')) != str(ipaddress):
+   continue
+  theirs = _chap_owner(vol.get('chapuser', CHAP_NONE), vol.get('chappas', CHAP_NONE))
+  if mine is None and theirs is None:
+   continue
+  if mine == theirs:
+   if myclear is None:
+    myclear = phrase_decrypt('chap', stored)
+   if phrase_decrypt('chap', vol.get('chappas', '')) == myclear:
+    continue
+   return 'CHAP must be the same for every iSCSI volume on '+str(ipaddress)+': volume '+str(name)+' has another secret for chapuser '+mine
+  return 'CHAP must be the same for every iSCSI volume on '+str(ipaddress)+': volume '+str(name)+' has ' \
+         +('no CHAP' if theirs is None else 'chapuser '+theirs)
+ return None
 
 def getlogin(token):
  global leaderip
@@ -2158,6 +2198,10 @@ def volumeconfig(data):
   chapuser, chapstored, why = iscsi_chap(data, volume)
   if why:
    logmsg.sendlog('ISCSIfa02','error',data['user'],logname(data.get('volume')))
+   return {'response': 'error', 'message': why}
+  why = iscsi_chap_same_address(allinfo.get('volumes'), volume.get('name'), data['ipaddress'], chapuser, chapstored)
+  if why:
+   logmsg.sendlog('ISCSIfa03','error',data['user'],logname(data.get('volume')),str(data['ipaddress']))
    return {'response': 'error', 'message': why}
   data['chapuser'], data['chappas'] = chapuser, chapstored
   if 'initiators' not in data:

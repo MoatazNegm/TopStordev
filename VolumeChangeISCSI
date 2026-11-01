@@ -64,6 +64,13 @@ then
  sed -i "s/CHAPPAS/$chappas/g" /TopStordata/iscsi.${name}
  sed -i "s/ACTIVE/$active/g" /TopStordata/iscsi.${name}
  yes | cp /TopStordata/iscsi.${name} /$DG/
+ # QSD5.344 (validator L6): an address change puts the new address on cmynode before the portal is made on it (as
+ # iscsi.sh does when the pool is imported); the old address and its target go below, once no LUN is left on them
+ if [ -n "$oldipaddr" ] && [ "$oldipaddr" != '-' ] && [ "$oldipaddr" != "$ipaddr" ]; then
+  nmcli conn mod cmynode -ipv4.addresses ${ipaddr}/$ipsubnet
+  nmcli conn mod cmynode +ipv4.addresses ${ipaddr}/$ipsubnet
+  nmcli conn up cmynode
+ fi
  /pace/delzfsvolumetarget $DG $name $userreq
  for i in $(echo $initiators | sed "s/,/ /g")
  do
@@ -73,6 +80,30 @@ then
   
     # call your procedure/other scripts here below
  done
+ # QSD5.344 (validator L6): an initiator taken off the list kept its ACL (with its CHAP user, so the target kept asking
+ # for CHAP).  On the new and the old address: an ACL without a mapped LUN is deleted, authentication is off when no ACL
+ # has a CHAP user left; the old address with no LUN left loses its target and leaves cmynode (as VolumeDeleteISCSI).
+ for addr in `echo $ipaddr $oldipaddr | tr ' ' '\n' | grep '\.' | sort -u`
+ do
+  ipdom=`echo $addr | sed 's/\.//g'`
+  tiqn=iqn.2016-03.com.$ipdom:data
+  cfsacls=/sys/kernel/config/target/iscsi/$tiqn/tpgt_1/acls
+  if [ -d $cfsacls ]; then
+   for acl in `ls $cfsacls`
+   do
+    ls -d $cfsacls/$acl/lun_* >/dev/null 2>&1 || targetcli iscsi/$tiqn/tpg1/acls delete $acl
+   done
+   chapacls=`cat $cfsacls/*/auth/userid 2>/dev/null | grep -v '^NULL$' | grep -c .`
+   [ "$chapacls" -eq 0 ] && targetcli iscsi/$tiqn/tpg1 set attribute authentication=0
+  fi
+  if [ "$addr" != "$ipaddr" ] && targetcli ls iscsi/ 2>/dev/null | grep -q "$tiqn" \
+     && ! targetcli ls /iscsi/$tiqn/tpg1/luns 2>/dev/null | grep -q 'o- lun[0-9]'; then
+   targetcli /iscsi delete $tiqn
+   nmcli conn mod cmynode -ipv4.addresses ${addr}/${oldipsubnet:-24}
+   nmcli conn up cmynode
+  fi
+ done
+ targetcli saveconfig
  /pace/putzpool.py 
  docker exec etcdclient /TopStor/logmsg.py VolCsu01 info $userreq $name
  echo ready ;

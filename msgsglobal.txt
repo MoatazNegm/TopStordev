@@ -456,6 +456,7 @@ ISCSI1004:1: : from :: Creating iSCSI volume :
 ISCSI1006:2: : from :: Problem occurred while creating iSCSI volume :
 ISCSI1007:2: : from :: Success creating iSCSI volume :
 ISCSIfa02:1: : from :: Not done, the CHAP user or secret of the iSCSI volume : is not valid, give both or none, the secret has 12 to 64 characters
+ISCSIfa03:1: : from :: Not done, the CHAP of the iSCSI volume : differs from the other iSCSI volumes on the address :
 Poolcap90:1: : from :: Pool : is above 90 percent of its real capacity, free space left : 
 ApiKey1000:1: : from :: API key : created
 ApiKey1001:1: : from :: API key : regenerated, the old key no longer works
