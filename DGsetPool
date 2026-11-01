@@ -100,6 +100,11 @@ then
    docker exec etcdclient /TopStor/logmsg.py DGfa22 error $userreq ${nextpool} 
   else 
    echo success importing  of $nextpool >> /root/tmp2
+    # QSD5.345: a pool the user imports on purpose is not a destroyed one any more (zpooltoimport.py skips tombstoned names)
+    ETCDCTL_API=3 /pace/etcddel.py $leaderip destroyedpool/$nextpool
+    tombval=destroyedpool_${nextpool}_`date +%s%N`
+    ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/destroyedpool/Del_destroyedpool_${nextpool}/request $tombval
+    ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/destroyedpool/Del_destroyedpool_${nextpool}/request/$leader $tombval
     ETCDCTL_API=3 /pace/etcdput.py $leaderip balancetype/$nextpool Availability 
     stamp=`date +%s`
     ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/balancedtype/Add_${nextpool}_Availability/request balancedtype_$stamp 

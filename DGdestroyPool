@@ -65,8 +65,12 @@ echo iam in >> /root/tmp2
   stamp=`date +%s`
   ETCDCTL_API=3 /pace/etcddel.py $leaderip ActPool/$pool 
   ETCDCTL_API=3 /pace/etcddel.py $leaderip sync/ActPool/ ${pool} 
-  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/ActPool/Del_${pool}_$guid/request actpools_$stamp 
-  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/ActPool/Del_${pool}_$guid/request/$leader actpools_$stamp 
+  # QSD5.345: the etcdonly delete template is Del_<prefix>_<text> (checksyncs.py: dels(<own etcd>, prefix, text)).  It was
+  # Del_<pool>_$guid ($guid is not set here): the followers deleted nothing and kept ActPool/<pool> in their own etcd, which
+  # becomes the cluster etcd when such a node takes the leadership -- and a pool name in ActPool/ is what lets the import
+  # loop take an exported copy of the pool again (stale pool revived after delete, QC tests 13, 17)
+  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/ActPool/Del_ActPool_${pool}/request actpools_$stamp 
+  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/ActPool/Del_ActPool_${pool}/request/$leader actpools_$stamp 
   ETCDCTL_API=3 /pace/etcddel.py $leaderip pools $pool
   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/pools/Del_pools_${pool}/request pools_$stamp 
   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/pools/Del_pools_${pool}/request/$leader pools_$stamp
@@ -124,6 +128,20 @@ echo iam in >> /root/tmp2
     ETCDCTL_API=3 /pace/etcddel.py $leaderip poolnxt/$stale
     ETCDCTL_API=3 /pace/etcddel.py $leaderip pools/$stale
    done
+   # QSD5.345: a mirror leg that was away (its node stopped, the leg detached meanwhile) still carries the pool's name and an
+   # older state of it; it is listed by 'zpool import' when its node is back.  ActPool/<pool> again (the import loop's
+   # reguid retry may have written it while this script ran) and a tombstone destroyedpool/<pool>, copied to every node
+   # (etcdonly sync), so the import loop never assigns or imports a pool of that name again (zpooltoimport.py).  The pool
+   # came back with its deleted volumes within minutes (QC test 17: pdhcp237243945 with dom16; test 13 after a node return).
+   ETCDCTL_API=3 /pace/etcddel.py $leaderip ActPool/$pool
+   nstamp=`date +%s%N`
+   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/ActPool/Del_ActPool_${pool}/request actpools_${pool}_$nstamp
+   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/ActPool/Del_ActPool_${pool}/request/$leader actpools_${pool}_$nstamp
+   ETCDCTL_API=3 /pace/etcdput.py $leaderip destroyedpool/$pool $stamp
+   ETCDCTL_API=3 /pace/etcddel.py $leaderip sync/destroyedpool/ ${pool}
+   nstamp=`date +%s%N`     # the request value names the pool and is unique (same-second values are pruned together)
+   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/destroyedpool/Add_${pool}_$stamp/request destroyedpool_${pool}_$nstamp
+   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/destroyedpool/Add_${pool}_$stamp/request/$leader destroyedpool_${pool}_$nstamp
    ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/poolnxt/Del_poolnxt_${pool}/request poolnxt_$stamp
    ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/poolnxt/Del_poolnxt_${pool}/request/$leader poolnxt_$stamp
    ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/pools/Del_pools_${pool}/request pools_$stamp
