@@ -6,8 +6,8 @@ rm -rf $txtres &>/dev/null
 myhost=`echo $@ | awk '{print $1}'`;
 username=`echo $@ | awk '{print $2}'`;
 userreq=`echo $@ | awk '{print $3}'`;
-echo NoUser | grep $username
-if [ $? -eq 0 ];
+# QSD5.350: exact name ('echo NoUser | grep $username' stopped the delete of User, Use, No, ...)
+if [ -z "$username" ] || [ "$username" = NoUser ];
 then
  exit
 fi

@@ -106,7 +106,10 @@ def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsub
         # node that created the users (the leader runs UnixAddUser) never ran that, so a share created later found no file
         subprocess.run(['cp','-f','/TopStor/smbuserfix.sh','/etc/smbuserfix.sh'],stdout=subprocess.PIPE)
         users=get(etcdip,'usershash','--prefix')
-        users=[x for x in users if 'admin' not in x[0] ]
+        # QSD5.350: skip admin by its exact key ('admin' not in x[0] was a substring test: it-admin, admin-ops ... got no
+        # samba password in a share container started later, so after a password change plus a take-over the OLD CIFS
+        # password still worked there); a '_1' answer (etcd not reachable) is not a user
+        users=[x for x in users if isinstance(x, tuple) and len(x) == 2 and x[0].startswith('usershash/') and x[0] != 'usershash/admin' ]
         for user in users:
             username = user[0].split('/')[1]
             cmdline = '/TopStor/decthis.sh '+username+' '+user[1]

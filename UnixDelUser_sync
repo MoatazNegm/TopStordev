@@ -8,13 +8,9 @@ myhost=`hostname -s`
 glog='/var/www/html/des20/Data/TopStor.log'
 username=`echo $@ | awk '{print $1}'`;
 userreq=`echo $@ | awk '{print $2}'`;
-echo NoUser | grep $username
-if [ $? -eq 0 ];
-then
- exit
-fi
-echo admin | grep $username
-if [ $? -eq 0 ];
+# QSD5.350: exact names ('echo NoUser | grep $username' / 'echo admin | grep $username' were substring tests the other way
+# round: the users User, Use, dmin, admi ... were never synced away; an empty name is not a user)
+if [ -z "$username" ] || [ "$username" = NoUser ] || [ "$username" = admin ];
 then
  exit
 fi
@@ -27,7 +23,8 @@ if [[ $contrun == 'true' ]]
 then
 /TopStor/UnixDelUserlocal $username $userreq
 fi
-cat /etc/passwd | grep $username
+# QSD5.350: the exact account name (a substring grep found 'dmin' in the line of admin and kept the users key)
+cut -d: -f1 /etc/passwd | grep -qxF -- "$username"
 if [ $? -ne 0 ];
 then
  /pace/etcddellocal.py $myip users /$username/ 

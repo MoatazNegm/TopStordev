@@ -22,6 +22,11 @@
 #   shadowscrub.py --detail -> the same per file: 'shadow=<n> shadow-=<n> opt=<n> admin=<n>' (admin = of the shadow count)
 #   QSD5.349: the check also removes /root/plhashtmp (promserver.sh wrote admin's clear password there on every admin
 #   password change up to QSD5.348).
+#   QSD5.350: a user NOT named admin whose comment is 'AdminStor<hash>' (it-admin / admin-ops: 'grep -w admin' of
+#   UnixChangePass up to QSD5.348) gets 'TopStor<hash>' (same hash) once with 'usermod -c': the user lists that read
+#   /etc/passwd lines with 'TopStor' (actionreq.py 'user' reply to the other nodes, actionreply.py, UnixListUsers,
+#   rebootme) left it out until its next password change.  Idempotent (the comment no longer starts with AdminStor).
+#   shadowscrub.py --comments -> prints how many such comments are left (changes nothing)
 import os
 import shutil
 import subprocess
@@ -57,6 +62,31 @@ def kinds(passwd='/etc/passwd', extra=()):
         except (FileNotFoundError, PermissionError):
             pass
     return out
+
+
+def adminstor_comments(passwd='/etc/passwd'):
+    """QSD5.350: [(user, comment)] of the users not named exactly admin whose comment starts with AdminStor"""
+    out = []
+    try:
+        with open(passwd) as f:
+            for line in f:
+                p = line.rstrip('\n').split(':')
+                if len(p) >= 5 and p[0] != 'admin' and p[4].startswith('AdminStor'):
+                    out.append((p[0], p[4]))
+    except (FileNotFoundError, PermissionError):
+        pass
+    return out
+
+
+def fix_comments(passwd='/etc/passwd', usermod='usermod'):
+    """QSD5.350: 'AdminStor<hash>' -> 'TopStor<hash>' for every user not named admin; returns the names changed"""
+    done = []
+    for u, c in adminstor_comments(passwd):
+        r = subprocess.run([usermod, '-c', 'TopStor' + c[len('AdminStor'):], u], stdin=subprocess.DEVNULL,
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if r.returncode == 0:
+            done.append(u)
+    return done
 
 
 def clear_fields(shadow, users):
@@ -109,6 +139,8 @@ def scrub(passwd='/etc/passwd', shadow=SHADOW, usermod='usermod', chpasswd=None,
         r = subprocess.run([usermod, '-p', '!', u], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         if r.returncode == 0:
             done.append(u)
+    # QSD5.350: before the backup step (usermod may write /etc/shadow- too)
+    done += ['comment:' + u for u in fix_comments(passwd, usermod)]
     if backup is not None and os.path.exists(backup):
         busers = kinds(passwd, (passwd + '-',))
         if clear_fields(backup, busers):
@@ -155,9 +187,11 @@ def scrub_check():
             with open(MARK, 'w') as f:
                 f.write('QSD5.349: shadow checked, nothing to change\n')
         elif done:
+            ncom = len([d for d in done if d.startswith('comment:')])
             with open(MARK, 'a') as f:
-                f.write('QSD5.349: %d change(s): %d user field(s) locked (!)%s%s%s\n' % (
-                    len(done), len([d for d in done if not d.startswith('/')]),
+                f.write('QSD5.350: %d change(s): %d user field(s) locked (!)%s%s%s%s\n' % (
+                    len(done), len([d for d in done if not d.startswith(('/', 'comment:'))]),
+                    ', %d AdminStor comment(s) of non-admin users made TopStor' % ncom if ncom else '',
                     ', /etc/shadow- rewritten' if BACKUP in done else '',
                     ', /opt/passwds/shadow linked again' if OPTSHADOW in done else '',
                     ', /root/plhashtmp removed' if PLHASHTMP in done else ''))
@@ -176,5 +210,7 @@ if __name__ == '__main__':
     elif len(sys.argv) > 1 and sys.argv[1] == '--detail':
         c = counts()
         print('shadow=%d shadow-=%d opt=%d admin=%d' % (c['shadow'], c['shadow-'], c['opt'], c['admin']))
+    elif len(sys.argv) > 1 and sys.argv[1] == '--comments':
+        print(len(adminstor_comments()))
     else:
         scrub_check()

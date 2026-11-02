@@ -10,8 +10,8 @@ leaderip=`echo $@  | awk '{print $1}'`;
 username=`echo $@ | awk '{print $2}'`;
 userreq=`echo $@ | awk '{print $3}'`;
 pullsync=`echo $@ | awk '{print $4}'`;
-echo $username | grep -w Everyone
-if [ $? -eq 0 ];
+# QSD5.350: exact name ('grep -w Everyone' also matched Everyone-x); an empty name is not a user
+if [ -z "$username" ] || [ "$username" = Everyone ];
 then
 exit
 fi
@@ -21,8 +21,8 @@ then
 exit
 fi
 
-echo NoUser | grep $username
-if [ $? -eq 0 ];
+# QSD5.350: exact name ('echo NoUser | grep $username' stopped the delete of User, Use, No, ...)
+if [ "$username" = NoUser ];
 then
  exit
 fi
@@ -55,7 +55,9 @@ then
  docker exec intsmb pdbedit -x -u $username >/dev/null 2>&1
  for y in `docker ps | egrep 'CIFS|HOM' | awk '{print $1}'`; do docker exec $y /bin/smbpasswd -x $username >/dev/null 2>&1; done
  datenow=`date +%m/%d/%Y`;timenow=`date +%T`;
- cat /etc/passwd |  grep -w $username
+ # QSD5.350: is the account still there? exact name ('grep -w it' found the line of it-admin: the delete of 'it' was
+ # reported failed and its etcd keys stayed)
+ cut -d: -f1 /etc/passwd | grep -qxF -- "$username"
  if [ $? -eq 0 ]; then
  	echo s$pullsync | grep pull
  	if [ $? -ne 0 ];
