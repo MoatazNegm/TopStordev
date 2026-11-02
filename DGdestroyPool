@@ -30,7 +30,7 @@ contrun=`./privthis.sh $privilege $userreq`;
 echo hi=$contrun >> /root/tmp2
 # QSD5.346: without the privilege nothing happens.  The 'if' below closes before the export / import / destroy part, so
 # that part (and now the tombstone) ran also for a user without DiskGroups ('pools/delpool' does not check it itself).
-echo $contrun | grep -q 'true' || { echo "no privilege $privilege for $userreq" >> /root/tmp2; exit; }
+echo $contrun | grep -q 'true' || { echo "no privilege $privilege for $userreq" >> /root/tmp2; docker exec etcdclient /TopStor/logmsg.py Priv1004 error system $userreq; exit; }
 echo $contrun | grep 'true'
 if [ $? -eq 0  ]
 then
