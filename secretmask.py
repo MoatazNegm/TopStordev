@@ -121,6 +121,121 @@ def phrase_decrypt(alias, value):
         return value
 
 
+# ---- message bus logs (QSD5.347) ---------------------------------------------------------------------------------------
+# Every message of the 'recvreply' queue is a dict {'req': ..., 'reply': [command, arg1, ...]}; the receiving node
+# (topstorrecvreply.py, actionreply.py) writes its body to /root/recvreply, /root/recv, /root/recvpump ... for debugging.
+# The command of 'Add User' (UnixAddUser) carries the new user's password as argument 5, so the clear password stayed in
+# those files on the leader (QSD5.346 proof, QX-221 step 4).  The executors still get the real values; what is WRITTEN is:
+#   1. the masked copy of the arguments the sender made (sendhost(..., logreq=...) puts it into the message as 'logreply',
+#      fapi.postchange masks the request's own secrets, the key exchange masks the pass phrase), and on top of it
+#   2. a fixed list of commands whose arguments are secrets (also for a sender of an older version without 'logreply').
+# BUS_SECRET_ARGS: command name -> positions of secret arguments, counted from the command (+n) or from the end (-n).
+BUS_SECRET_ARGS = {
+    'UnixAddUser': (5,),              # leaderip name pool groups PASSWORD size addr subnet hoststub user
+    'PartnerAdd.py': (5,),            # ip alias type port PHRASE user [init]
+    'UsersMassAddition.py': (5,),     # leaderip user myhost file TOKEN (the login token of the upload)
+    'receivekeys.sh': (-2,),          # ... PHRASE keys
+    'sendreceivekeys.py': (-2,),      # ... PHRASE keys
+}
+BUS_SECRET_FLAGS = ('--password',)   # software update from a CIFS share: '--password' <value>
+BUS_LOG_FILES = ('/root/recvreply', '/root/recv', '/root/recvpump', '/root/recv2', '/root/recvVolumeChange',
+                 '/root/recvVlumeCreate')
+BUS_SCRUB_MARK = '/root/.buslogs-masked'
+
+
+def mask_bus_reply(reply):
+    """A copy of a bus command (list) with the secret arguments of BUS_SECRET_ARGS / BUS_SECRET_FLAGS masked."""
+    if not isinstance(reply, (list, tuple)):
+        return reply
+    out = list(reply)
+    n = len(out)
+    for i, a in enumerate(reply):
+        if not isinstance(a, str):
+            continue
+        offs = BUS_SECRET_ARGS.get(a.rsplit('/', 1)[-1])
+        if offs:
+            for off in offs:
+                j = i + off if off > 0 else n + off
+                if i < j < n and isinstance(out[j], str) and out[j] != '':
+                    out[j] = MASK
+        if a in BUS_SECRET_FLAGS and i + 1 < n and isinstance(out[i + 1], str) and out[i + 1] != '':
+            out[i + 1] = MASK
+    return out
+
+
+def bus_log_reply(r):
+    """What may be written of the 'reply' of a parsed bus message r: the sender's masked copy ('logreply') when it fits,
+    else the reply, then the fixed list on top."""
+    rep = r.get('reply') if isinstance(r, dict) else None
+    lr = r.get('logreply') if isinstance(r, dict) else None
+    if isinstance(lr, (list, tuple)) and isinstance(rep, (list, tuple)) and len(lr) == len(rep):
+        rep = lr
+    return mask_bus_reply(rep)
+
+
+def parse_bus(body):
+    """The bus message as a dict (the two ways actionreply.py reads it), or None."""
+    from ast import literal_eval
+    if isinstance(body, bytes):
+        body = body.decode('utf-8', 'replace')
+    body = str(body)
+    for text in (body, body.replace("'", '"')):
+        try:
+            r = literal_eval(text)
+            if isinstance(r, dict):
+                return r
+        except Exception:
+            pass
+    return None
+
+
+def bus_log_text(body):
+    """The text to write for a bus message body: the dict without 'logreply', the reply masked.  A body that cannot be
+    read is not written at all (only its size), it could carry anything."""
+    r = parse_bus(body)
+    if r is None:
+        return '<message not readable, ' + str(len(body)) + ' bytes>'
+    shown = {k: v for k, v in r.items() if k != 'logreply'}
+    if 'reply' in shown:
+        shown['reply'] = bus_log_reply(r)
+    return str(shown)
+
+
+def with_logreply(req, logreq):
+    """sendhost: the message text req with the sender's masked copy of the reply added as 'logreply' (only when logreq is
+    a message of the same shape whose reply differs); anything else returns req unchanged."""
+    try:
+        d = parse_bus(str(req))
+        lr = parse_bus(str(logreq))
+        if d is None or lr is None or 'logreply' in d:
+            return str(req)
+        rep, lrep = d.get('reply'), lr.get('reply')
+        if isinstance(rep, list) and isinstance(lrep, list) and len(rep) == len(lrep) and rep != lrep:
+            d['logreply'] = lrep
+            return str(d)
+    except Exception:
+        pass
+    return str(req)
+
+
+def bus_scrub_once():
+    """Once per node: the bus logs written before QSD5.347 hold clear passwords; they are emptied (the files stay) and a
+    mark file says it was done.  Errors are ignored (a debug file is not worth a failed receiver)."""
+    import os
+    try:
+        if os.path.exists(BUS_SCRUB_MARK):
+            return False
+        for f in BUS_LOG_FILES:
+            if os.path.exists(f):
+                with open(f, 'w') as fh:
+                    fh.write('')
+        with open(BUS_SCRUB_MARK, 'w') as fh:
+            fh.write('bus logs emptied by QSD5.347 (they held clear passwords); messages are masked from now on\n')
+        return True
+    except Exception:
+        return False
+
+
 if __name__ == '__main__':
     # shell use:  secretmask.py phrasedec <alias> <stored value>   -> prints the clear phrase (no newline)
     #             secretmask.py phraseenc <alias> <phrase>         -> prints the stored form

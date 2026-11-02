@@ -115,16 +115,21 @@ then
 	fi
  fi
  echo iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+ # QSD5.347: the shadow password field is '!' (no unix password).  'useradd -p' takes an ENCRYPTED value; it got the clear
+ # password, so /etc/shadow of every node (bind-mounted into the share containers) held it in clear text.  Nothing logs in
+ # with it: the shell is nologin, the API checks usershash/<user>, samba has its own password database (smbuserfix.sh,
+ # smbpasswd), and crypt() of a typed password never equalled a clear-text field, so the field never worked as a password.
+ shadowpw='!'
  echo $pullsync | grep pull
  if [ $? -eq 0 ]
  then
-	useradd -c"TopStor"$pas  $homebase -u $userid -p $userpass -s /usr/sbin/nologin $username
+	useradd -c"TopStor"$pas  $homebase -u $userid -p "$shadowpw" -s /usr/sbin/nologin $username
 	groupmod -g $usergd $username
-	echo useradd \-c"TopStor"$userpass $homebase \-g $usergd \-u $userid \-p $userpass \-s /usr/sbin/nologin $username
+	echo useradd \-c"TopStor"$pas $homebase \-g $usergd \-u $userid \-p "$shadowpw" \-s /usr/sbin/nologin $username
 	
  else
-	echo useradd \-c"TopStor"$pas $homebase \-p $userpass \-s /usr/sbin/nologin $username
- 	useradd -c"TopStor"$pas $homebase -p $userpass -s /usr/sbin/nologin $username 
+	echo useradd \-c"TopStor"$pas $homebase \-p "$shadowpw" \-s /usr/sbin/nologin $username
+ 	useradd -c"TopStor"$pas $homebase -p "$shadowpw" -s /usr/sbin/nologin $username 
  fi
  echo $pullsync | grep pull
  if [ $? -ne 0 ]
@@ -196,7 +201,11 @@ then
 	echo hi2
 	stamp=`date +%s%N`
 	myscript=`basename "$0"`
-	params=`echo $myscript $@ $stamp | sed 's\ \\_\g'`
+	# QSD5.347: the request name is a copy of the arguments; argument 5 (the password, field 6 after the script name) is
+	# replaced by 'pwhidden'.  The key sync/user/<params>/request sat in the etcd of every node with the clear password
+	# in it; the followers read only the user name from it (checksyncs.py oneusersync, opers[2]) and take the hash from
+	# usershash/<user>.
+	params=`echo $myscript $@ $stamp | awk '{ if (NF >= 6) $6 = "pwhidden"; print }' | sed 's\ \\_\g'`
 	/pace/etcddel.py $leaderip sync/user _${username}_
 	/pace/etcdput.py $leaderip sync/user/$params/request/$myhost user_${username}_$stamp
 	/pace/etcdput.py $leaderip sync/user/$params/request user_${username}_$stamp

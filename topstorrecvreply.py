@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import pika, sys, subprocess, threading, queue
 import actionreply
+from secretmask import bus_log_text, bus_scrub_once
 
 
 # QSD5.317: the callback used to run the request inside pika's consume loop.  A request that takes minutes (UnixAddUser of a
@@ -14,9 +15,17 @@ def worker():
  while True:
     body = work.get()
     try:
-        with open("/root/recvreply",'a') as f:
-            f.write(" ".join([leader, leaderip, myhost, myip,etcdip, str(body)]))
-        print(" ".join([leader, leaderip, myhost, myip,etcdip, str(body)]))
+        # QSD5.347: the body as written down has its secrets masked (bus_log_text: the sender's masked copy, then the
+        # fixed list of secret arguments); it used to be the clear body, the UnixAddUser password included (QX-221 step 4).
+        # One line per message (the old file was one endless line).
+        # A failing debug write never stops the request.
+        try:
+            shown = 'b"' + bus_log_text(body) + '"'
+            with open("/root/recvreply",'a') as f:
+                f.write(" ".join([leader, leaderip, myhost, myip,etcdip, shown])+'\n')
+            print(" ".join([leader, leaderip, myhost, myip,etcdip, shown]))
+        except Exception as e:
+            print('recvreply log failed:', e)
         actionreply.do(leader, leaderip, myhost, myip,etcdip, body.decode())
     except Exception as e:
         print('recvreply request failed:', e)
@@ -38,6 +47,12 @@ if leader == myhost:
 else:
     etcdip = myip
 print('myip',myip)
+bus_scrub_once()      # QSD5.347: once per node, the bus logs of older versions (clear passwords) are emptied
+try:
+    import shadowscrub
+    shadowscrub.scrub_once()     # QSD5.347: once per node, /etc/shadow fields of older TopStor users (clear password) -> '!'
+except Exception as e:
+    print('shadowscrub failed:', e)
 threading.Thread(target=worker, daemon=True).start()
 cred = pika.PlainCredentials('rabb_Mezo', 'YousefNadody')
 param = pika.ConnectionParameters(myip,5672, '/', cred)

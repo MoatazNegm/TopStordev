@@ -19,7 +19,16 @@ def sendhost(host, req, que, frmhst, port=5672, logreq=None):
  param=pika.ConnectionParameters(host, port, '/', creds)
  conn=pika.BlockingConnection(param)
  chann=conn.channel()
- chann.basic_publish(exchange='',routing_key=que, body=str(req))
+ body = str(req)
+ if logreq is not None:
+  # QSD5.347: the masked copy of the command rides along as 'logreply', so the receiving node writes it to its bus logs
+  # (/root/recvreply, /root/recv ...) instead of the clear one (UnixAddUser password, QX-221 step 4); executors read 'reply'
+  try:
+   from secretmask import with_logreply
+   body = with_logreply(body, logreq)
+  except Exception:
+   body = str(req)
+ chann.basic_publish(exchange='',routing_key=que, body=body)
  conn.close()
 if __name__ == "__main__":
  import sys

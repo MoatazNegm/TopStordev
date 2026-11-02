@@ -233,5 +233,6 @@ def addUsers(*argv):
 
 if __name__=='__main__':
  with open('/root/fileupload','w') as f:
-    f.write(' '.join(sys.argv[1:]))
+    # QSD5.347: argument 5 is the login token of the upload: written masked
+    f.write(' '.join(a if i != 4 else '****' for i, a in enumerate(sys.argv[1:])))
  addUsers(*sys.argv[1:])

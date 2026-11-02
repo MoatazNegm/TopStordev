@@ -106,9 +106,37 @@ echo iam in >> /root/tmp2
   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/activepool/Del_activepool::${pool}_--prefix/request/$leader activepool_$stamp 
   #ETCDCTL_API=3 /TopStor/deltolocal.py activepool/$pool activepool
   pkill $pool
-  crontab -l | grep -v Snap > /TopStordata/cronfile
-  crontab -r 
-  crontab /TopStordata/cronfile
+  # QSD5.347: only the snapshot schedules of THIS pool leave the table.  'grep -v Snap' dropped every schedule line of the
+  # node, also those of the other pools, until a later Snapperiod sync rewrote the table (QX-284 step 3).  A schedule line
+  # names its volume as <pool>/<volume> (Snapshotnowhost::<pool>/<vol>::..., ...trend::<pool>/<vol>::..., the replication
+  # 'pump.sh RemoteSnapshotnowOnce <host> <name> <pool>/<vol>'): a line that has 'Snap' and the pool name followed by '/'
+  # and not preceded by a name character goes (pdhcp12/ does not match pdhcp123/ or ppdhcp12/).  The schedule records
+  # Snapperiod/<period>/<pool>/... go too, with a Snapperiod sync, so etctocron on the other nodes drops their lines
+  # instead of writing them back (and this node's next etctocron does not restore them either).
+  cronnow=/TopStordata/cronfile.before
+  crontab -l > $cronnow 2>/dev/null
+  awk -v p="$pool/" '
+   function haspool(s,   i, c) {
+    while ((i = index(s, p)) > 0) {
+     c = (i > 1) ? substr(s, i - 1, 1) : ""
+     if (c !~ /[A-Za-z0-9_.-]/) return 1
+     s = substr(s, i + 1)
+    }
+    return 0
+   }
+   !(/Snap/ && haspool($0))' $cronnow > /TopStordata/cronfile
+  if ! cmp -s $cronnow /TopStordata/cronfile; then
+   echo "pool $pool deleted: `diff $cronnow /TopStordata/cronfile | grep -c '^<'` snapshot schedule line(s) of it removed from the crontab" >> /root/dgdestroyretry
+   crontab /TopStordata/cronfile
+  fi
+  ETCDCTL_API=3 /pace/etcdget.py $leaderip Snapperiod --prefix 2>/dev/null | grep -q "/$pool/"
+  if [ $? -eq 0 ]; then
+   ETCDCTL_API=3 /pace/etcddel.py $leaderip Snapperiod "/$pool/"
+   # acknowledged for this node (its table is done above); every other node, the leader too, runs synckeys + etctocron
+   sstamp=`date +%s%N`
+   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/Snapperiod/DGdestroy_${pool}/request/$myhost Snapperiod_${pool}_$sstamp
+   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/Snapperiod/DGdestroy_${pool}/request Snapperiod_${pool}_$sstamp
+  fi
   ETCDCTL_API=3 /pace/etcddel.py $leaderip balance $pool
   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/balancedtype/Del_balance_${pool}/request balancedtype_$stamp 
   ETCDCTL_API=3 /pace/etcdput.py s$leaderip ync/balancedtype/Del_balance_${pool}/request/$leader balancedtype_$stamp 
