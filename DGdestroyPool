@@ -6,9 +6,31 @@ leaderip=` echo $@ | awk '{print $1}'`;
 pool=` echo $@ | awk '{print $2}'`;
 userreq=` echo $@ | awk '{print $3}'`;
 privilege="DiskGroups";
+# QSD5.346: 'zpool import <name>' refuses when more than one exported pool carries the name ("more than one matching
+# pool", "import by numeric ID instead"): a stale copy of the pool (a mirror leg that was away, an older pool on reused
+# disks) is listed next to it.  The destroy then never ran, the pool stayed exported with no tombstone and came back when
+# the other node returned (QSD5.345 proof).  importpool <pool> [<guid>]: by name; on that refusal by numeric id -- the
+# guid the pool had here before the export when it is known, else the copies of that name in the order ONLINE first.
+# Never '-f': a copy that is in use on another system is not taken.
+importpool() {
+ /sbin/zpool import $1 2>/root/dgdestroyerror && return 0
+ grep -q 'more than one matching pool' /root/dgdestroyerror || return 1
+ cands=`/sbin/zpool import 2>/dev/null | awk -v p="$1" '$1=="pool:" { n=$2; id="" } $1=="id:" && n==p { id=$2 } $1=="state:" && id!="" { print id, $2; id="" }'`
+ ids=''
+ [ -n "$2" ] && echo "$cands" | awk '{print $1}' | grep -qx -- "$2" && ids="$2"
+ ids="$ids `echo "$cands" | awk '$2=="ONLINE" {print $1}'` `echo "$cands" | awk '$2!="ONLINE" {print $1}'`"
+ echo "zpool import $1 ambiguous (guid here: ${2:-unknown}), copies: `echo $cands`" >> /root/dgdestroyretry
+ for id in $ids; do
+  /sbin/zpool import $id 2>>/root/dgdestroyerror && { echo "zpool import $1 by id $id" >> /root/dgdestroyretry; return 0; }
+ done
+ return 1
+}
 echo hi=$privilege > /root/tmp2
 contrun=`./privthis.sh $privilege $userreq`;
 echo hi=$contrun >> /root/tmp2
+# QSD5.346: without the privilege nothing happens.  The 'if' below closes before the export / import / destroy part, so
+# that part (and now the tombstone) ran also for a user without DiskGroups ('pools/delpool' does not check it itself).
+echo $contrun | grep -q 'true' || { echo "no privilege $privilege for $userreq" >> /root/tmp2; exit; }
 echo $contrun | grep 'true'
 if [ $? -eq 0  ]
 then
@@ -47,15 +69,18 @@ echo iam in >> /root/tmp2
   # the pool is listed but exported (partner stop/return, failed take-over): import it here so it is really destroyed;
   # a silent exit left the pool behind and a node re-imported it later, stealing disks of a new pool (QSD5.314)
   udevadm settle 2>/dev/null
-  /sbin/zpool import $pool 2>/root/dgdestroyerror
+  importpool $pool
   zpool status | grep $pool
   if [ $? -ne 0 ];
   then
    echo "zpool import $pool before destroy failed: `cat /root/dgdestroyerror`" >> /root/dgdestroyretry
    docker exec etcdclient /TopStor/logmsg.py DGfa5 error $userreq $pool
-   exit
+   # QSD5.346: no silent exit -- the tombstone and the poolnxt/ActPool clean-up below are written also when the pool
+   # cannot be taken here, so no node's import loop brings the deleted pool back later
+   skipdestroy=1
   fi
  fi
+ if [ -z "$skipdestroy" ]; then
  /pace/etcdput.py $leaderip requests/DGdestroypool/$myhost $myhost/$userreq
  # marker for the standby's import loop (zpooltoimport.py): the pool is exported for a moment below and must not be imported by
  # the other node then (it did, 7 s after the delete started: the destroy ended 'pool is busy' and the owner changed; QC test 10, QSD5.334)
@@ -92,6 +117,7 @@ echo iam in >> /root/tmp2
   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/all/request/$leader volumes_$stamp 
 
   echo > /etc/exports
+ fi   # skipdestroy
  fi
  echo iam here2 >> /root/tmp2
  # container flavour: the pool is exported for a moment below; the standby node of poolnxt/<pool> imports a pool that is
@@ -101,14 +127,18 @@ echo iam in >> /root/tmp2
  ETCDCTL_API=3 /pace/etcddel.py $leaderip poolnxt/$pool
  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/poolnxt/Del_poolnxt_${pool}/request poolnxt_$stamp
  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/poolnxt/Del_poolnxt_${pool}/request/$leader poolnxt_$stamp
+ destroyrc=1
+ if [ -z "$skipdestroy" ]; then
  sleep 2
+ # QSD5.346: the pool's own guid, so the import below takes this pool and not a stale copy of the same name
+ poolguid=`/sbin/zpool get -H -o value guid $pool 2>/dev/null`
  /sbin/zpool export -f $pool
  sleep 1
  # the import right after the export sometimes finds no pool ("cannot import: no such pool available") while the
  # devices are rescanned: the destroy then failed, the pool stayed exported and a node re-imported it later (QSD5.286)
  imptry=0
  while :; do
-  /sbin/zpool import $pool 2>/root/dgdestroyerror && break
+  importpool $pool $poolguid && break
   imptry=$((imptry+1))
   echo "zpool import $pool retry $imptry: `cat /root/dgdestroyerror`" >> /root/dgdestroyretry
   [ $imptry -ge 10 ] && break
@@ -117,10 +147,18 @@ echo iam in >> /root/tmp2
  done
  sleep 1
  /sbin/zpool destroy -f $pool 2>/root/dgdestroyerror
- if [ $? -ne 0 ]; then
+ destroyrc=$?
+ fi   # skipdestroy
+ if [ $destroyrc -ne 0 ]; then
    docker exec etcdclient /TopStor/logmsg.py DGfa5 error $userreq $pool
+   echo "zpool destroy $pool failed: `cat /root/dgdestroyerror`" >> /root/dgdestroyretry
  else
    docker exec etcdclient /TopStor/logmsg.py DGsu5 info $userreq $pool 
+ fi
+ # QSD5.346: the clean-up and the tombstone follow the delete REQUEST, not only a successful destroy: a failed destroy
+ # (ambiguous or failed import) left poolnxt/<pool> and no tombstone, and the exported pool was imported again when the
+ # other node returned (QSD5.345 proof).  The user asked for the pool to go; 'DGsetPool import' clears the tombstone.
+ {
    # the pool is gone: whatever a node's import loop wrote for it meanwhile (poolnxt/pools, also the doubled-p variants seen in
    # QC test 10) must not survive; a node importing the stale name held the disks of the next pool 'in use' (QSD5.326)
    stamp=`date +%s`
@@ -146,7 +184,7 @@ echo iam in >> /root/tmp2
    ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/poolnxt/Del_poolnxt_${pool}/request/$leader poolnxt_$stamp
    ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/pools/Del_pools_${pool}/request pools_$stamp
    ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/pools/Del_pools_${pool}/request/$leader pools_$stamp
-fi
+ }
 /pace/etcddel.py $leaderip destroying/$pool
 /pace/etcddel.py $leaderip requests/DGdestroypool/$myhost $myhost/$userreq
 #systemctl restart zfs-zed
