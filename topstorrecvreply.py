@@ -50,7 +50,9 @@ print('myip',myip)
 bus_scrub_once()      # QSD5.347: once per node, the bus logs of older versions (clear passwords) are emptied
 try:
     import shadowscrub
-    shadowscrub.scrub_once()     # QSD5.347: once per node, /etc/shadow fields of older TopStor users (clear password) -> '!'
+    # QSD5.347: /etc/shadow fields of older TopStor users (clear password) -> '!'.  QSD5.348: on every start (cheap when
+    # clean), admin's clear field -> crypt hash, /etc/shadow- and /opt/passwds/shadow cleaned too
+    shadowscrub.scrub_check()
 except Exception as e:
     print('shadowscrub failed:', e)
 threading.Thread(target=worker, daemon=True).start()

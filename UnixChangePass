@@ -24,7 +24,19 @@ then
  		etcd=$leaderip
  
 	fi
-	usermod  -p $userpass $username
+	# QSD5.348: 'usermod -p' takes an ENCRYPTED value; it got the clear password, so every password change (each sync/passwd
+	# request on every node: Hostconfig.py, usersyncall.py) wrote it back into /etc/shadow in clear text.  A TopStor user
+	# gets '!' (no unix password: nologin shell, the API checks usershash/<user>, samba has its own database); admin gets a
+	# real SHA-512 crypt hash of the password (chpasswd reads it on stdin, printf is a shell builtin: not on any command line).
+	echo $username | grep -w admin >/dev/null
+	if [ $? -eq 0 ];
+	then
+		if [ -n "$userpass" ]; then
+			printf '%s:%s\n' "$username" "$userpass" | chpasswd -c SHA512
+		fi
+	else
+		usermod -p '!' $username
+	fi
  	docker exec etcdclient /TopStor/etcdputlocal.py $myip 'usershash/'$username $pas 2>/dev/null
 	echo $username | grep -w admin
 	if [ $? -eq 0 ];
@@ -44,5 +56,8 @@ then
 		fi
  
 	fi
+	# QSD5.348: usermod/chpasswd keep the table as it was before in /etc/shadow- (an older clear field of any user), and
+	# /opt/passwds/shadow (UnixAddGroup's hard link) can hold an older copy: shadowscrub.py cleans both, cheap when clean
+	python3 /TopStor/shadowscrub.py >/dev/null 2>&1
 	docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
 fi

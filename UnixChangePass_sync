@@ -10,11 +10,21 @@ txtres='/TopStordata/'`basename $0`'.txt'
 cd /TopStor
 rm -rf $txtres 2>/dev/null
 pas=`echo $@ | awk '{print $1}'`;
-userpass=`echo $pas | openssl enc -d -base64 -aes-256-ctr -nopad -nosalt -k '#skMe22'$username`;
+# QSD5.348: decthis.sh, as UnixChangePass (the openssl line here had no -pbkdf2 and ran before the user name, its key, was
+# read: the result was not the password; it then went to chpasswd/smbpasswd below).  No caller of this script is known.
 username=`echo $@ | awk '{print $2}'`;
+userpass=`/TopStor/decthis.sh $username $pas | awk -F'_result' '{print $2}'`;
 userreq='system';
  /TopStor/logmsg.py Unlin1012 info $userreq $username
-usermod  -p $userpass $username 2> $txtres
+# QSD5.348: no clear password in /etc/shadow ('usermod -p' takes an encrypted value): '!' for a TopStor user, a SHA-512
+# crypt hash for admin (chpasswd on stdin), see UnixChangePass
+echo $username | grep -w admin >/dev/null
+if [ $? -eq 0 ];
+then
+ if [ -n "$userpass" ]; then printf '%s:%s\n' "$username" "$userpass" | chpasswd -c SHA512 2> $txtres; fi
+else
+ usermod -p '!' $username 2> $txtres
+fi
 echo $username | grep -w admin
 if [ $? -eq 0 ];
 then
@@ -44,6 +54,7 @@ else
  fi
   /TopStor/logmsg.py Unlin1015 info $userreq $username
 fi 
+python3 /TopStor/shadowscrub.py >/dev/null 2>&1   # QSD5.348: /etc/shadow- and /opt/passwds/shadow
 resdate=`date +%s`;
 resjson=`./jsonthis3.sh updated $resdate`;
 echo $resjson > $resweb;

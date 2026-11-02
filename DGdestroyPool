@@ -113,29 +113,43 @@ echo iam in >> /root/tmp2
   # and not preceded by a name character goes (pdhcp12/ does not match pdhcp123/ or ppdhcp12/).  The schedule records
   # Snapperiod/<period>/<pool>/... go too, with a Snapperiod sync, so etctocron on the other nodes drops their lines
   # instead of writing them back (and this node's next etctocron does not restore them either).
-  cronnow=/TopStordata/cronfile.before
-  crontab -l > $cronnow 2>/dev/null
-  awk -v p="$pool/" '
-   function haspool(s,   i, c) {
-    while ((i = index(s, p)) > 0) {
-     c = (i > 1) ? substr(s, i - 1, 1) : ""
-     if (c !~ /[A-Za-z0-9_.-]/) return 1
-     s = substr(s, i + 1)
-    }
-    return 0
-   }
-   !(/Snap/ && haspool($0))' $cronnow > /TopStordata/cronfile
-  if ! cmp -s $cronnow /TopStordata/cronfile; then
-   echo "pool $pool deleted: `diff $cronnow /TopStordata/cronfile | grep -c '^<'` snapshot schedule line(s) of it removed from the crontab" >> /root/dgdestroyretry
-   crontab /TopStordata/cronfile
-  fi
+  # QSD5.348: the records go FIRST and the sync request is NOT acknowledged for this node; the table is filtered last.
+  # QSD5.347 filtered the table first and marked this node done: an etctocron of this node in that second (another
+  # Snapperiod sync) read the records still there and wrote the pool's lines back, and nothing ran etctocron here again.
+  # Now any etctocron that starts after the delete writes the table without the pool, and this node runs one more itself
+  # (synckeys + etctocron for the request).  The table is read, filtered and installed under a lock
+  # (/TopStordata/cronfile.lock: two pool deletes at once on this node installed each other's old table, one pool's lines
+  # came back) in private temp files (mktemp; the fixed /TopStordata/cronfile and cronfile.before were shared).
   ETCDCTL_API=3 /pace/etcdget.py $leaderip Snapperiod --prefix 2>/dev/null | grep -q "/$pool/"
   if [ $? -eq 0 ]; then
    ETCDCTL_API=3 /pace/etcddel.py $leaderip Snapperiod "/$pool/"
-   # acknowledged for this node (its table is done above); every other node, the leader too, runs synckeys + etctocron
+   # every node, this one and the leader too, runs synckeys + etctocron
    sstamp=`date +%s%N`
-   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/Snapperiod/DGdestroy_${pool}/request/$myhost Snapperiod_${pool}_$sstamp
    ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/Snapperiod/DGdestroy_${pool}/request Snapperiod_${pool}_$sstamp
+  fi
+  crondir=`mktemp -d /TopStordata/cronfile.XXXXXX 2>/dev/null`
+  if [ -n "$crondir" ] && [ -d "$crondir" ]; then
+  (
+   flock -w 60 9 || echo "pool $pool deleted: crontab lock not taken in 60 s, table filtered without it" >> /root/dgdestroyretry
+   crontab -l > $crondir/before 2>/dev/null
+   awk -v p="$pool/" '
+    function haspool(s,   i, c) {
+     while ((i = index(s, p)) > 0) {
+      c = (i > 1) ? substr(s, i - 1, 1) : ""
+      if (c !~ /[A-Za-z0-9_.-]/) return 1
+      s = substr(s, i + 1)
+     }
+     return 0
+    }
+    !(/Snap/ && haspool($0))' $crondir/before > $crondir/after
+   if ! cmp -s $crondir/before $crondir/after; then
+    echo "pool $pool deleted: `diff $crondir/before $crondir/after | grep -c '^<'` snapshot schedule line(s) of it removed from the crontab" >> /root/dgdestroyretry
+    crontab $crondir/after
+   fi
+  ) 9>/TopStordata/cronfile.lock
+  rm -rf "$crondir"
+  else
+   echo "pool $pool deleted: no temp dir for the crontab (mktemp), its schedule lines stay until the Snapperiod sync" >> /root/dgdestroyretry
   fi
   ETCDCTL_API=3 /pace/etcddel.py $leaderip balance $pool
   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/balancedtype/Del_balance_${pool}/request balancedtype_$stamp 

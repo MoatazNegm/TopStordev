@@ -38,8 +38,9 @@ else
  homebase='-b /'$userhome' -M'  
 fi
 cp /TopStor/smbuserfix.sh /etc/
-useradd -c"TopStor"$userpass $homebase -g $usergd -u $userid -p $userpass -s /usr/sbin/nologin $username
-echo useradd \-c"TopStor"$userpass $homebase \-g $usergd \-u $userid \-p $userpass \-s /usr/sbin/nologin $username
+# QSD5.348: the shadow field is '!' (no unix password), as in UnixAddUser; it was the reversible encrypted hash (-p $userpass)
+useradd -c"TopStor"$userpass $homebase -g $usergd -u $userid -p '!' -s /usr/sbin/nologin $username
+echo useradd \-c"TopStor"$userpass $homebase \-g $usergd \-u $userid \-p "'!'" \-s /usr/sbin/nologin $username
 currentcifs=`docker ps | awk '{print $NF}' | grep CIFS | grep -v 'CIFS_'`
 echo "$currentcifs" | while read y
 do 
