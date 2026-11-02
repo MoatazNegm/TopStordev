@@ -15,8 +15,8 @@ if [ $? -eq 0 ];
 then
 exit
 fi
-echo $username | grep -w admin 
-if [ $? -eq 0 ];
+# QSD5.349: admin by its exact name ('grep -w admin' matched it-admin / admin-ops too: such a user could not be deleted)
+if [ "$username" = admin ];
 then
 exit
 fi

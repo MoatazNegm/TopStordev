@@ -51,7 +51,8 @@ bus_scrub_once()      # QSD5.347: once per node, the bus logs of older versions 
 try:
     import shadowscrub
     # QSD5.347: /etc/shadow fields of older TopStor users (clear password) -> '!'.  QSD5.348: on every start (cheap when
-    # clean), admin's clear field -> crypt hash, /etc/shadow- and /opt/passwds/shadow cleaned too
+    # clean), /etc/shadow- and /opt/passwds/shadow cleaned too.  QSD5.349: every managed user's open field, admin's
+    # included, -> '!' (no hashing); /root/plhashtmp removed
     shadowscrub.scrub_check()
 except Exception as e:
     print('shadowscrub failed:', e)

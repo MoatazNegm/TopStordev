@@ -36,7 +36,10 @@ docker rm -f promgraf
  	docker run --rm -d -p $leaderip:4000:3000 -v /promgraf/grafana.ini:/etc/grafana/grafana.ini -v /promgraf:/var/lib/grafana -v /promgraf/hosts:/etc/hosts -v /TopStor/grafana/TopStor.crt:/etc/grafana/TopStor.crt -v /TopStor/grafana/TopStor.key:/etc/grafana/TopStor.key --name promgraf grafana/grafana
 	phash=`/TopStor/etcdget.py $leaderip usershash/admin`
 	plhash=`/TopStor/decthis.sh admin $phash | awk -F'_result' '{print $2}'`
-	echo plhash=$plhash > /root/plhashtmp
+	# QSD5.349: no debug copy of admin's clear password on disk ('echo plhash=... > /root/plhashtmp' wrote one on every
+	# admin password change); an old copy goes here and in shadowscrub.py (every receiver start, every node).  The
+	# 'grafana cli ... reset-admin-password' line below still carries it on a command line while it runs (section 128 limits).
+	rm -f /root/plhashtmp
 	waitgrafana
 	docker restart promgraf
 	waitgrafana
