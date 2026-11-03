@@ -34,7 +34,7 @@ def resolve_by_id(disk_substr):
     return None
 
 
-def _cache_section(text):
+def _cache_section(text, was_name=False):
     """The device lines under the 'cache' header of `zpool status` as [(name, state)]."""
     entries = []
     lines = text.splitlines()
@@ -48,7 +48,14 @@ def _cache_section(text):
             if len(nxt) - len(nxt.lstrip()) <= indent:
                 break
             tok = nxt.split()
-            entries.append((tok[0], tok[1] if len(tok) > 1 else ''))
+            name = tok[0]
+            # a vdev missing at import is listed by its GUID: "<guid> UNAVAIL 0 0 0 was /dev/disk/by-id/<disk>-part1";
+            # with was_name (plain `zpool status`, not -g) the disk of the 'was' path is the name, so the cluster's disk
+            # name (DGsetPool updatecache old disk, the remote cache of the info) still matches it
+            if was_name and name.isdigit() and len(tok) >= 3 and tok[-2] == 'was':
+                was = tok[-1].rsplit('/', 1)[-1]
+                name = was[:-len('-part1')] if was.endswith('-part1') else was
+            entries.append((name, tok[1] if len(tok) > 1 else ''))
         break
     return entries
 
@@ -62,7 +69,7 @@ def cache_entries(pool, status=None, gstatus=None):
     if gstatus is None:
         gstatus = subprocess.run(['/sbin/zpool', 'status', '-g', pool], stdout=subprocess.PIPE,
                                  stderr=subprocess.DEVNULL).stdout.decode('utf-8', 'replace')
-    names = _cache_section(status)
+    names = _cache_section(status, was_name=True)
     guids = _cache_section(gstatus)
     res = []
     for n, (name, state) in enumerate(names):
