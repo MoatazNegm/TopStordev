@@ -41,6 +41,13 @@ then
  /sbin/zfs set ip:subnet=$ipsubnet $DG/$name
  /sbin/zfs set status:mount=$active $DG/$name
  docker rm -f NFS-$oldipaddr
+ # QSD5.351: a changed address left the old one on cmynode (and answering) until the next reboot: take it off this node
+ # (nfsremove.sh does the same on delete) and drop the old address' export files
+ if [ -n "$oldipaddr" ] && [ "$oldipaddr" != '-' ] && [ "$oldipaddr" != "$ipaddr" ]; then
+  pkill -f "nfsportmap.py $oldipaddr " 2>/dev/null
+  rm -f /TopStordata/exports.${oldipaddr}.new /TopStordata/exportip.${name}_$oldipaddr
+  /TopStor/rmvoladdr.sh $oldipaddr ${oldipsubnet:-24} $DG/$name
+ fi
  echo $older | grep -w $ipaddr/$ipsubnet
  if [ $? -ne 0 ];
  then 

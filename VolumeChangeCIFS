@@ -41,7 +41,7 @@ then
  oldipaddr=`zfs get -H ip:addr $DG/$name | awk '{print $3}'`
  oldipsubnet=`zfs get -H ip:subnet $DG/$name | awk '{print $3}'`
  halfdocname=`zfs get -H prot:kind $DG/$name | awk '{print $3}'`
- /TopStor/VolumeDockerChange.py $oldipaddr $oldipsubnet $halfdocname 
+ /TopStor/VolumeDockerChange.py $oldipaddr $oldipsubnet $halfdocname $DG/$name
  props=`/TopStor/etcdget.py $leaderip volumes/$halfdocname/$myhost/$DG/$name`
  ETCDCTL_API=3 /pace/etcddel.py $leaderip volumes $name
  ETCDCTL_API=3 /pace/etcddel.py $leaderip sync $name

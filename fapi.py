@@ -1497,38 +1497,18 @@ def dgsupdatecache(data):
         new_cache = [new_cache] if new_cache else []
 
     if not new_cache:
-        # Smart auto-selection: rather than a fixed size cutoff, look at
-        # every free disk on this pool's owner node and treat whichever
-        # ones sit at the smallest size tier - strictly smaller than the
-        # rest - as the natural cache candidates (mirrors how a real
-        # deployment usually mixes a few small fast disks in with a
-        # majority of larger ones). If every disk on the host is the same
-        # size, nothing stands out as "smaller than the rest", so there's
-        # no candidate.
-        free_disk_ids = allinfo['raids'].get('free', {}).get('disks', [])
-        local_sizes = {}
-        for did in free_disk_ids:
-            disk_info = allinfo['disks'].get(did, {})
-            if disk_info.get('host') != data['owner']:
-                continue
-            if did in old_cache_disks:
-                continue
-            try:
-                local_sizes[did] = float(disk_info.get('size', 0))
-            except (TypeError, ValueError):
-                continue
-
-        if local_sizes:
-            smallest = min(local_sizes.values())
-            largest = max(local_sizes.values())
-            if smallest < largest:
-                candidates = [d for d, s in local_sizes.items() if s == smallest]
-                new_cache = [min(candidates, key=lambda d: local_sizes[d])]
+        # QSD5.351 (QC 631 i2): the same choice as fixcachelocality.py after a take-over: a spare cache disk of the
+        # owner (etcd cachespares), else a free disk of the owner smaller than the pool's data disks, else the old
+        # rule (a free disk smaller than the rest of the owner's free disks).
+        from fixcachelocality import pick_cache_disk, spare_list
+        pick, why = pick_cache_disk(allinfo, data['owner'], pool, old_cache_disks, spare_list(leaderip))
+        if pick:
+            new_cache = [pick]
 
     if not new_cache:
         return jsonify({
             'response': 'error',
-            'message': f'No disk on {data["owner"]} is smaller than the rest to use as cache'
+            'message': f'No spare cache disk on {data["owner"]}, and no disk on {data["owner"]} is smaller than the rest (or than the pool data disks) to use as cache'
         }), 400
 
     new_cache = [d for d in new_cache if d not in old_cache_disks]

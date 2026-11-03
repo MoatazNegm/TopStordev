@@ -29,8 +29,7 @@ rm -rf /$pool/user_$vol
 rm -rf /$pool/group_$vol
 /TopStor/etcddel.py $leaderip vol $vol 
 /TopStor/etcddel.py $leaderip replivol $vol
-echo nmcli conn mod cmynode -ipv4.addresses ${volip}/$volsubnet
-nmcli conn mod cmynode -ipv4.addresses ${volip}/$volsubnet
-nmcli conn up cmynode
+# QSD5.351: any prefix, the live interface too, and only when no other volume of this node has the address
+/TopStor/rmvoladdr.sh ${volip} ${volsubnet:-24} $pool/$vol
 #/pace/VolumeCheck.py $leaderip `hostname`
 docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq

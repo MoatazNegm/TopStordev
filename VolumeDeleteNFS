@@ -30,6 +30,15 @@ then
  ipaddr=`zfs get -H ip:addr $DG/$name | awk '{print $3}'`
  ipsubnet=`zfs get -H ip:subnet $DG/$name | awk '{print $3}'`
  vtype=`zfs get -H prot:kind $DG/$name | awk '{print $3}'`
+ # QSD5.351: the address comes from the dataset (VolumeChangeNFS keeps ip:addr current); when it is not set, take it
+ # from the volume's etcd record (.../<ip>/<subnet>/<active>) so nfsremove.sh removes the address really in use
+ if [ -z "$ipaddr" ] || [ "$ipaddr" = '-' ]; then
+  rec=`/pace/etcdget.py $leaderip volumes/NFS/$myhost/$DG/$name`
+  ipaddr=`echo $rec | awk -F'/' '{print $(NF-2)}'`
+  ipsubnet=`echo $rec | awk -F'/' '{print $(NF-1)}'`
+  echo $ipaddr | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' || { ipaddr=''; ipsubnet=''; }
+ fi
+ [ -z "$vtype" ] || [ "$vtype" = '-' ] && vtype=NFS
  echo ip=$ipaddr
  stamp=`date +%s`
  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${pDG}_$name/request volumes_$stamp

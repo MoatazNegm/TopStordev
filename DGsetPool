@@ -1048,8 +1048,11 @@ else
     mode="new"
    else
     disk=`echo $arg | awk -F':' '{print $1}'`
+    diskname=$disk
     disk=`ls /dev/disk/by-id/ | grep -v part | grep $disk`
     if [[ $mode == "old" ]]; then
+     # QSD5.351: an old cache disk of a lost/other node has no by-id link here: keep its name, it is removed by GUID below
+     [ -z "$disk" ] && disk=$diskname
      old_disks+=(${disk})
     elif [[ $mode == "new" ]]; then
      new_disks+=(${disk})
@@ -1060,14 +1063,20 @@ else
   docker exec etcdclient /TopStor/logmsg.py DGst25 info $userreq ${pool} .
   /pace/diskchange.sh dgsetpool dgsetpool dgsetpool
   ok=1
+  used_spares=""
   for od in "${old_disks[@]}"; do
    /sbin/zpool remove ${pool} ${od} 2>/root/dgcreateerror
-   if [ $? -ne 0 ]; then ok=0; fi
+   if [ $? -ne 0 ]; then
+    # QSD5.351: a cache disk that is gone (UNAVAIL) is removed by its vdev GUID
+    /usr/bin/python3 /TopStor/fixcachelocality.py rmcache ${pool} ${od} >>/root/dgcreateerror 2>&1 || ok=0
+   fi
   done
   for nd in "${new_disks[@]}"; do
    /sbin/zpool add -f ${pool} cache ${nd} 2>>/root/dgcreateerror
-   if [ $? -ne 0 ]; then ok=0; fi
+   if [ $? -ne 0 ]; then ok=0; else used_spares="$used_spares $nd"; fi
   done
+  # QSD5.351: a spare cache disk that is now the pool's cache leaves the spare list (cachespares kept listing it)
+  [ -n "$used_spares" ] && (cd /TopStor; /usr/bin/python3 /TopStor/cachedisks.py del $leaderip $used_spares)
   if [ $ok -eq 1 ]; then
      docker exec etcdclient /TopStor/logmsg.py DGsu25 info $userreq ${pool} .
   else
