@@ -2,8 +2,10 @@
 import sys
 import json
 import subprocess
+from time import time as timestamp
 from etcdget import etcdget as get
 from etcdput import etcdput as put
+from etcddel import etcddel as dels
 
 
 def _normalize_current_json(current_json):
@@ -29,6 +31,33 @@ def _normalize_current_json(current_json):
         return [str(x) for x in val]
 
     return [str(val)] if val else []
+
+
+def _leadername(leader_ip):
+    try:
+        res = get(leader_ip, 'leader')
+        name = res[0] if isinstance(res, list) and res else res
+        name = str(name).replace('\n', '').strip()
+        return '' if name in ('', '_1', '-1', 'None') else name
+    except Exception:
+        return ''
+
+
+def post_sync(leader_ip, action, disks):
+    """QSD5.351: whole-etcd sync 'cachespares' (pace/checksyncs.py wholeetcd): every follower copies the leader's
+    list into its own etcd, so a node that takes over the leadership still knows the spare cache disks
+    (QC 631: the new leader's list was empty, fixcachelocality rule 1 found no spare). Same pattern as
+    fapi.apikey_sync: drop the older cachespares requests, post the request and mark the leader done."""
+    op = 'Del' if action == 'del' else 'Add'
+    tag = '::'.join(str(d).replace('_', ':::').replace('/', ':::') for d in disks)[:200] or 'list'
+    stampv = 'cachespares_' + str(timestamp())
+    req = 'sync/cachespares/' + op + '_' + tag + '/request'
+    dels(leader_ip, 'sync/cachespares', 'cachespares_')
+    put(leader_ip, req, stampv)
+    leader = _leadername(leader_ip)
+    if leader:
+        put(leader_ip, req + '/' + leader, stampv)
+    return req, stampv
 
 
 def main():
@@ -67,6 +96,7 @@ def main():
 
     if set(new_list) != set(current_list):
         put(leader_ip, etcd_key, json.dumps(new_list))
+        post_sync(leader_ip, action, disks_arg)
         subprocess.run(["/pace/putzpool.py"])
 
 
