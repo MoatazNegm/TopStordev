@@ -16,6 +16,7 @@
 #   fixcachelocality.py <leaderip> <pool> <myhost>      relocate after an import
 #   fixcachelocality.py rmcache <pool> <disk>           remove one cache vdev by name or GUID (DGsetPool updatecache,
 #                                                       when the old cache disk has no /dev/disk/by-id link any more)
+#   fixcachelocality.py rmdead <pool>                   remove every UNAVAIL/REMOVED/FAULTED cache vdev (updatecache)
 import sys
 import json
 import subprocess
@@ -173,6 +174,14 @@ def main():
         ok, how = remove_cache(sys.argv[2], sys.argv[3])
         print('fixcachelocality: ' + how)
         sys.exit(0 if ok else 1)
+    if len(sys.argv) >= 3 and sys.argv[1] == 'rmdead':
+        bad = 0
+        for name, guid, state in cache_entries(sys.argv[2]):
+            if state in DEAD_STATES:
+                ok, how = remove_cache(sys.argv[2], guid or name)
+                print('fixcachelocality: ' + how)
+                bad += (not ok)
+        sys.exit(1 if bad else 0)
     if len(sys.argv) < 4:
         return
     leaderip = sys.argv[1]

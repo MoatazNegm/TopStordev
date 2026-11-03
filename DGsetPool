@@ -1071,6 +1071,8 @@ else
     /usr/bin/python3 /TopStor/fixcachelocality.py rmcache ${pool} ${od} >>/root/dgcreateerror 2>&1 || ok=0
    fi
   done
+  # QSD5.351: a lost cache disk that the request did not name (not in the cluster info) goes too
+  /usr/bin/python3 /TopStor/fixcachelocality.py rmdead ${pool} >>/root/dgcreateerror 2>&1
   for nd in "${new_disks[@]}"; do
    /sbin/zpool add -f ${pool} cache ${nd} 2>>/root/dgcreateerror
    if [ $? -ne 0 ]; then ok=0; else used_spares="$used_spares $nd"; fi
