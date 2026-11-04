@@ -14,6 +14,11 @@ output_dir="/TopStordata"
 encrypted_filename="$output_dir/software_update_$1.zip.enc"
 zip_filename="$output_dir/software_update_$1.zip"
 encryption_password="your_password"  # Replace with your own password
+# QSD5.352 r5 (validator N3): a package uploaded through software/localFileUpdate is saved in /TopStordata/uploads, a downloaded
+# one (downloadSoftwareUpdate.sh) in /TopStordata; take the upload when /TopStordata has none (a symlink is never taken)
+if [ ! -f "$encrypted_filename" ] && [ -f "$output_dir/uploads/software_update_$1.zip.enc" ] && [ ! -L "$output_dir/uploads/software_update_$1.zip.enc" ]; then
+    encrypted_filename="$output_dir/uploads/software_update_$1.zip.enc"
+fi
 
 # Check if the encrypted file exists
 if [ ! -f "$encrypted_filename" ]; then

@@ -189,6 +189,28 @@ def upload_name(raw):
                 return None
         return name
 
+UPLOAD_DIR = '/TopStordata/uploads'
+
+def save_upload(uploaded_file, name):
+        # QSD5.352 r5 (validator N3): uploads (users/uploadUsers, software/localFileUpdate) went into /TopStordata itself, so an upload
+        # named cmdaudit.log, partners.txt, bondconfig, hostname, smb.<ip>, a pool name (zpool cache file) ... replaced a file the node
+        # uses.  They are saved in their own folder /TopStordata/uploads (created when missing).  A folder or target that is a symlink
+        # or not a plain directory / regular file is refused, and the file is opened with O_NOFOLLOW (no symlink race).
+        # Returns the full path, or None (refused).
+        try:
+                if os.path.islink(UPLOAD_DIR) or (os.path.lexists(UPLOAD_DIR) and not os.path.isdir(UPLOAD_DIR)):
+                        return None
+                os.makedirs(UPLOAD_DIR, mode=0o700, exist_ok=True)
+                path = os.path.join(UPLOAD_DIR, name)
+                if os.path.islink(path) or (os.path.lexists(path) and not os.path.isfile(path)):
+                        return None
+                fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC | os.O_NOFOLLOW, 0o600)
+                with os.fdopen(fd, 'wb') as f:
+                        uploaded_file.save(f)
+                return path
+        except OSError:
+                return None
+
 def name_in_volumes(name, volumes_text):
         # QSD5.352 (QC 709): a volume is stored as <name>_<id> (volumes/<type>/<host>/<pool>/<name>_<id>); '\b' does not split
         # 'q110v_123' ('_' is a word character), so a user or group could take a volume's name and only the scripts refused
@@ -893,16 +915,12 @@ def uploadUsers(data):
       return {'response': data.get('response'), 'error': 'noprivilege'}
     uploaded_file = request.files['file']
     if uploaded_file.filename != '':
-      dirPath = '/TopStordata'
-      isExist = os.path.exists(dirPath)
-      if not isExist:
-        os.makedirs(dirPath)
       filename = upload_name(uploaded_file.filename)
-      if filename is None:
+      # QSD5.352 r5 (validator N3): saved in /TopStordata/uploads, never over a /TopStordata file; a symlink is refused
+      filePath = save_upload(uploaded_file, filename) if filename is not None else None
+      if filePath is None:
         logmsg.sendlog('Unlin1026', 'error', data["user"])
         return {'response': data.get('response'), 'error': 'badfilename'}
-      filePath = os.path.join(dirPath, filename)
-      uploaded_file.save(filePath)
       cmdline = 'python /TopStor/UsersMassAddition.py '+ leaderip +' '+ data['user'] + ' ' + myhost + ' ' + filePath + ' '+ data['token']
       postchange(cmdline)
       logmsg.sendlog('Unlin1025', 'info', data["user"])
@@ -1812,8 +1830,15 @@ def userchange(data):
  grps = data.get('groups')
  groupstr = ''
  if 'Cluster' not in data['tenant']:
+     # QSD5.352 r5 (validator N4): the NFS tenant path (TenantChangeUser: group change + NFS container restart) had no privilege
+     # check at all (the Cluster path goes to UnixChangeUser, which checks Box_Users).  Same privilege, Priv1004 + noprivilege.
+     if not has_privilege('Box_Users', data.get('user')):
+        logmsg.sendlog('Priv1004','error','system',str(data.get('user')))
+        return {'response': data.get('response'), 'error': 'noprivilege'}
      volinfo = get('vol',data['tenant'])[0]
      data['owner'] = 'leader'
+     if 'NFS' not in str(volinfo[0]):     # r5: a tenant that is no NFS volume raised NameError (pool), HTTP 500
+        return {'response': data.get('response'), 'error': 'notnfs'}
      if 'NFS' in volinfo[0]:
         data['owner'] = volinfo[0].split('/')[2]
         pool = volinfo[0].split('/')[3]
@@ -2694,6 +2719,11 @@ def userdel(data):
  global allinfo
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
+ # QSD5.352 r5 (validator N4): no privilege check here: UnixDelUser checks Box_Users only later, but the login tokens of <name>
+ # were dropped (logged out) before, by any logged-in user; the NFS tenant path (TenantDelUser) had no check at all.
+ if not has_privilege('Box_Users', data.get('user')):
+  logmsg.sendlog('Priv1004','error','system',str(data.get('user')))
+  return {'response': data.get('response'), 'error': 'noprivilege'}
  if data['tenant'] == 'Cluster':
     cmndstring = '/TopStor/UnixDelUser '+leaderip+' '+data.get('name')+' '+data['user']
     postchange(cmndstring)
@@ -2712,7 +2742,7 @@ def userdel(data):
       if vol.get('prot') in ('HOME', 'HOMEE') and volname.rsplit('_',1)[0] == data.get('name'):
        postchange('/TopStor/VolumeDeleteHOME '+leaderip+' '+vol['pool']+' '+volname+' HOME '+data['user'], vol['host'])
  else:
-    TenantDelUser(data)
+    return TenantDelUser(data)
  return data
 
 @app.route('/api/v1/groups/UnixAddgroup', methods=['GET','POST'])
@@ -2883,8 +2913,15 @@ def TenantAddUser(data):
  global allgroups, leaderip
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
+ # QSD5.352 r5 (validator N4): no privilege check (TenantAddUser has no privthis): any logged-in user could add an NFS tenant
+ # user with any uid (0 too) and restart the NFS container.  Same privilege as users/UnixAddUser.
+ if not has_privilege('Box_Users', data.get('user')):
+  logmsg.sendlog('Priv1004','error','system',str(data.get('user')))
+  return {'response': data.get('response'), 'error': 'noprivilege'}
  volinfo = get('vol',data['tenant'])[0]
  data['owner']= 'leader' 
+ if 'NFS' not in str(volinfo[0]):     # r5: a tenant that is no NFS volume raised UnboundLocalError (cmndstring), HTTP 500
+  return {'response': data.get('response'), 'error': 'notnfs'}
  if 'NFS' in volinfo[0]:
     data['owner'] = volinfo[0].split('/')[2]
     pool = volinfo[0].split('/')[3]
@@ -2899,8 +2936,14 @@ def TenantDelUser(data):
  global allgroups, leaderip
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
+ # QSD5.352 r5 (validator N4): reached only through users/userdel (checked there); kept here too
+ if not has_privilege('Box_Users', data.get('user')):
+  logmsg.sendlog('Priv1004','error','system',str(data.get('user')))
+  return {'response': data.get('response'), 'error': 'noprivilege'}
  volinfo = get('vol',data['tenant'])[0]
  data['owner'] = 'leader'
+ if 'NFS' not in str(volinfo[0]):     # r5: a tenant that is no NFS volume raised UnboundLocalError (cmndstring), HTTP 500
+  return {'response': data.get('response'), 'error': 'notnfs'}
  if 'NFS' in volinfo[0]:
     data['owner'] = volinfo[0].split('/')[2]
     pool = volinfo[0].split('/')[3]
@@ -3296,16 +3339,12 @@ def localFileUpdate(data):
     
     uploaded_file = request.files['file']
     if uploaded_file.filename != '':
-        dirPath = '/TopStordata'
-        isExist = os.path.exists(dirPath)
-        if not isExist:
-            os.makedirs(dirPath)
         filename = upload_name(uploaded_file.filename)     # QSD5.352 r4 (validator N2): base name only, never outside /TopStordata
-        if filename is None:
+        # QSD5.352 r5 (validator N3): saved in /TopStordata/uploads, never over a /TopStordata file; a symlink is refused
+        filePath = save_upload(uploaded_file, filename) if filename is not None else None
+        if filePath is None:
             logmsg.sendlog('Unlin1026', 'error', str(data.get('user')))
             return {'response': data.get('response'), 'error': 'badfilename'}
-        filePath = os.path.join(dirPath, filename)
-        uploaded_file.save(filePath)
         return {"data": 'success'}
     return {"data": uploaded_file.filename}
 
