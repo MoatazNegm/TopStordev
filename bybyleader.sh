@@ -17,8 +17,8 @@ data1dev=$eth2
 data2dev=$eth2
 setenforce 0
 #targetcli clearconfig confirm=true
-nmcli conn mod cmynode +ipv4.addresses $myclusterip 
-nmcli conn up cmynode
+# QSD5.352 r2: cmynode changes one at a time (lock of cmynodeaddr.sh; a failed lock after 120 s goes on as before)
+( flock -w 120 9; nmcli conn mod cmynode +ipv4.addresses $myclusterip; nmcli conn up cmynode ) 9>>/TopStordata/cmynode.lock
 myclusterip=$leaderip
 pkill iscsiwatch
 pkill topstorrecvreply

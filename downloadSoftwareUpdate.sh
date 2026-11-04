@@ -16,7 +16,8 @@ download_http() {
     URL=$1
     DEST=$2
     log "Downloading update from $URL..."
-    wget -O "$DEST/update.tar.gz" "$URL" || curl -o "$DEST/update.tar.gz" "$URL" || error_exit "Failed to download from HTTP."
+    # QSD5.352 r2: the zfs node image has no wget (curl is used); curl -f so an HTTP error page is not saved as the package
+    wget -O "$DEST/update.tar.gz" "$URL" || curl -fL -o "$DEST/update.tar.gz" "$URL" || error_exit "Failed to download from HTTP."
 }
 
 download_nfs() {
@@ -49,9 +50,19 @@ download_cifs() {
     PASSWORD=$5
     MOUNT_POINT="/mnt/cifs_update"
 
-    log "Mounting CIFS share from //$SERVER..."
+    # QSD5.352 r2 (validator R5): an SMB path is //<server>/<share>[/<dir>] ("//$SERVER:/$LOCATION" was the NFS form and
+    # never mounted).  Without the mount.cifs helper (cifs-utils) the mount cannot work: the zfs node image (container
+    # flavour) has none, so the fetch stops at once with a clear reason instead of trying (no packages are installed).
+    if ! command -v mount.cifs >/dev/null 2>&1 && [ ! -x /sbin/mount.cifs ] && [ ! -x /usr/sbin/mount.cifs ]; then
+        [ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
+        if is_container 2>/dev/null; then
+            error_exit "Failed to mount CIFS: no mount.cifs (cifs-utils) in the container flavour node image; SMB fetch is not available here, use http or nfs."
+        fi
+        error_exit "Failed to mount CIFS: no mount.cifs (cifs-utils) on this node."
+    fi
+    log "Mounting CIFS share //$SERVER/$LOCATION..."
     mkdir -p "$MOUNT_POINT"
-    mount -t cifs "//$SERVER:/$LOCATION" "$MOUNT_POINT" -o username=$USERNAME,password=$PASSWORD || error_exit "Failed to mount CIFS."
+    mount -t cifs "//$SERVER/$LOCATION" "$MOUNT_POINT" -o username="$USERNAME",password="$PASSWORD" || error_exit "Failed to mount CIFS."
 
     log "Searching for update file with version $VERSION..."
     FILE=$(find "$MOUNT_POINT" -type f -name "*${VERSION}*" | head -n 1)

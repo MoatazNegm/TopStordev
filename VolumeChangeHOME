@@ -75,8 +75,14 @@ echo /pace/etcdput.py $leaderip volumes/HOMEE/$myhost/$DG/$name $DG/$name/no/yes
  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request/$leader volumes_$stamp
  echo checkkkkkkkkkkkkkkkkkkkkkkkkking
  ETCDCTL_API=3 /pace/etcdget.py $leaderip volumes $name
- sed -i "s/$oldipaddr/$ipaddr/g" /$DG/smb.$name
- sed -i "s/$oldipsubnet/$ipsubnet/g" /$DG/smb.$name
+ # QSD5.352 r2 (validator low): the two unanchored 's/old/new/g' (dots match anything, '24' everywhere) could rewrite any
+ # '24' of the share file on a subnet-only change (the Users page sends one through users/userhomechange).  Only the
+ # '/<old ip>/<subnet>/' pair of the SUMMARY line is replaced now.
+ if [ -n "$oldipaddr" ] && [ "$oldipaddr" != '-' ];
+ then
+  oldipre=$(printf '%s' "$oldipaddr" | sed 's/\./\\./g')
+  sed -i "/SUMMARY/ s#/${oldipre}/[0-9]*/#/${ipaddr}/${ipsubnet}/#" /$DG/smb.$name
+ fi
  /sbin/zfs set ip:addr=$ipaddr $DG/$name
  /sbin/zfs set ip:subnet=$ipsubnet $DG/$name
  /sbin/zfs set status:mount=$active $DG/$name

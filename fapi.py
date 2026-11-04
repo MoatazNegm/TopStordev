@@ -240,7 +240,8 @@ APIKEY_NEVER = ('/api/v1/users/uploadUsers', '/api/v1/groups/groupchange', '/api
                 '/api/v1/groups/groupdel', '/api/v1/groups/UnixAddgroup', '/api/v1/users/UnixAddUser', '/api/v1/users/usersauth',
                 '/api/v1/user/changepass', '/api/v1/tenant/adduser', '/api/v1/hosts/joincluster', '/api/v1/software/update',
                 '/api/v1/software/localFileUpdate', '/api/v1/software/setversion', '/api/v1/software/apply',
-                '/api/v1/login/renewtoken', '/api/v1/logout', '/api/v1/replication/addpartner')
+                '/api/v1/login/renewtoken', '/api/v1/logout', '/api/v1/replication/addpartner',
+                '/api/v1/users/userhomechange')   # QSD5.352 r2 (supervisor ruling): like its sibling user routes
 # QSD5.343: privileges an API key never has, also when the executor checks them (privthis.sh / privthis.py keep the same list):
 # users and groups (Box_Users, Box_users), privileges (UserPrivilegesch), software (Uploadch), node config / join (Error)
 APIKEY_DENIED_PRIVS = ('UserPrivilegesch', 'Box_Users', 'Box_users', 'Uploadch', 'Error')
@@ -2210,7 +2211,11 @@ def usersauth(data):
 def volumeconfig(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
- return volumeconfig_do(data)
+ res = volumeconfig_do(data)
+ if isinstance(res, dict):       # QSD5.352 r2: internal markers for users/userhomechange; the answer stays as it was
+  res.pop('_refused', None)
+  res.pop('_posted', None)
+ return res
 
 def volumeconfig_do(data):
  # the body of volumes/config; users/userhomechange (QSD5.352) uses it for the address of a home
@@ -2245,10 +2250,13 @@ def volumeconfig_do(data):
         else:
             if isvu < 100:
                 logmsg.sendlog('IPaddrfa','error','system',loggedusers[data['token']]['user'])
+                data['_refused'] = 'invalidip'
             elif isvu > 10 and isvu < 120: 
                 logmsg.sendlog('IPadduqfa','error','system',loggedusers[data['token']]['user'])
+                data['_refused'] = 'ipinuse'
             else:
                 logmsg.sendlog('IPnamuqfa','error','system',loggedusers[data['token']]['user'])
+                data['_refused'] = 'nameinuse'
             return data
  if data['owner'] == leader:
   ownerip = leaderip
@@ -2292,6 +2300,7 @@ def volumeconfig_do(data):
   print('33333333333333333333333333333333333333333333333#############################')
  cmndstring = '/TopStor/VolumeChange'+data['type']+' '+leaderip+' '+datastr
  postchange(cmndstring,data['owner'])
+ data['_posted'] = True          # QSD5.352 r2: users/userhomechange goes on to the quota only after this
 # z= cmndstring.split(' ')
 # msg={'req': 'Pumpthis', 'reply':z}
 # sendhost(ownerip, str(msg),'recvreply',myhost)
@@ -2361,7 +2370,14 @@ def userhomechange(data):
  if newaddr:
   cfg = {'response': data['response'], 'user': data['user'], 'token': data.get('token'), 'volume': home['name'],
          'type': 'HOME', 'ipaddress': str(addr), 'Subnet': subnet}
-  volumeconfig_do(cfg)
+  # QSD5.352 r2 (validator R3a): the result was ignored; a refused address change (novolume, noaddress, invalidgroup,
+  # an IP check, a CHAP answer) still answered HomeAddress and went on to the quota.  Only a change that was really
+  # posted counts; otherwise the refusal is the answer and the quota is NOT changed.
+  res = volumeconfig_do(cfg)
+  if not isinstance(res, dict) or not res.get('_posted'):
+   res = res if isinstance(res, dict) else {}
+   reply['error'] = res.get('error') or res.get('_refused') or res.get('message') or 'addressnotchanged'
+   return reply
   reply['HomeAddress'] = str(addr)
   reply['HomeSubnet'] = subnet
  if gb:
@@ -3194,6 +3210,11 @@ def getAllConfigFiles(data):
 def updateSoftware(data):
     if data.get('response') == 'baduser':
         return {'response': 'baduser'}
+    # QSD5.352 r2 (validator R4): no privilege check: any logged-in user (e.g. Logs only) could start a download onto the
+    # leader, also source-type=local ('cp -r <path>/* /TopStordata/').  The Updates page itself needs Uploadch.
+    if not has_privilege('Uploadch', data.get('user')):
+        logmsg.sendlog('Priv1004','error','system',str(data.get('user')))
+        return {'response': data.get('response'), 'error': 'noprivilege'}
 
     source_type = data.get('source-type')
     source = data.get('source')
