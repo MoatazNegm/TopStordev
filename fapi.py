@@ -1056,6 +1056,11 @@ def getconns(data):
 def setversion(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
+ # QSD5.352 r3 (validator N1): no privilege check: any logged-in user (e.g. Logs only) could run updateversion (set the
+ # software version). Same rule as software/update (R4): the Updates page needs Uploadch.
+ if not has_privilege('Uploadch', data.get('user')):
+  logmsg.sendlog('Priv1004','error','system',str(data.get('user')))
+  return {'response': data.get('response'), 'error': 'noprivilege'}
  versions = getversions()
  if data['version'] in versions['versions'] and data['version'] not in versions['current']:
   cmdline = '/TopStor/updateversion '+data['version']
@@ -1078,6 +1083,11 @@ def versions(data):
 def swapply(data):
  if 'baduser' in data['response']:
       return {'response': 'baduser'}
+ # QSD5.352 r3 (validator N1): no privilege check: any logged-in user (e.g. Logs only) could run systemcheckout.sh (move
+ # the cluster to another software version). Same rule as software/update (R4): the Updates page needs Uploadch.
+ if not has_privilege('Uploadch', data.get('user')):
+  logmsg.sendlog('Priv1004','error','system',str(data.get('user')))
+  return {'response': data.get('response'), 'error': 'noprivilege'}
  cmdline = '/TopStor/systemcheckout.sh '+data['version'].split(',')[0]+' '+data['response']+' '+'hi1'
  postchange(cmdline)
  versionlst = versions(data)
@@ -3260,6 +3270,11 @@ def updateSoftware(data):
 def localFileUpdate(data):
     if 'baduser' in data['response']:
       return {'response': 'baduser'}
+    # QSD5.352 r3 (validator N1): no privilege check: any logged-in user could save an uploaded file into /TopStordata.
+    # Same rule as software/update (R4): the Updates page needs Uploadch.  Checked before the upload is read.
+    if not has_privilege('Uploadch', data.get('user')):
+        logmsg.sendlog('Priv1004','error','system',str(data.get('user')))
+        return {'response': data.get('response'), 'error': 'noprivilege'}
     
     uploaded_file = request.files['file']
     if uploaded_file.filename != '':
