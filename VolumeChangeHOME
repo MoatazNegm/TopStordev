@@ -59,7 +59,14 @@ echo /pace/etcdput.py $leaderip volumes/HOMEE/$myhost/$DG/$name $DG/$name/no/yes
  oldipaddr=`zfs get -H ip:addr $DG/$name | awk '{print $3}'`
  oldipsubnet=`zfs get -H ip:subnet $DG/$name | awk '{print $3}'`
  /TopStor/VolumefixChangeCIFS $leaderip $pDG $name HOMEE $oldipaddr $userreq
- /TopStor/VolumeDockerChange.py /$DG/$name $ipaddr
+ # QSD5.352 (QC 706): the call passed '/<pool>/<name> <new ip>'; VolumeDockerChange.py wants '<old ip> <old subnet> <type>
+ # <dataset>' and stopped with an IndexError, so the old HOMEE-<old ip> container and the old address stayed on the owner.
+ # Now (as VolumeChangeCIFS) the old container and the old address go when the address changes; VolumeCheck starts the
+ # share on the new address (smb.<name> and the registry record carry it).
+ if [ -n "$oldipaddr" ] && [ "$oldipaddr" != '-' ] && [ "$oldipaddr" != "$ipaddr" ];
+ then
+  /TopStor/VolumeDockerChange.py $oldipaddr ${oldipsubnet:-24} HOMEE $DG/$name
+ fi
  ETCDCTL_API=3 /pace/etcddel.py $leaderip volumes $name
  echo ETCDCTL_API=3 /pace/etcdput.py $leaderip volumes/HOMEE/$myhost/$DG/$name $DG/$name/no/yes/$writev/administrator/yes/$ipaddr/${ipsubnet}$extraparms/$active
  ETCDCTL_API=3 /pace/etcdput.py $leaderip volumes/HOMEE/$myhost/$DG/$name $DG/$name/no/yes/$writev/administrator/yes/$ipaddr/${ipsubnet}$extraparms/$active
