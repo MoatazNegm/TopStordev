@@ -180,6 +180,15 @@ def has_privilege(priv, user):
         except Exception:
                 return False
 
+def upload_name(raw):
+        # QSD5.352 r4 (validator N2): the name an uploaded file is saved under in /TopStordata.  Werkzeug passes the client's file
+        # name raw, and os.path.join('/TopStordata', '/TopStor/x.sh') or '../../TopStor/x.sh' leaves /TopStordata.  Keep the base
+        # name only (also after a Windows '\\' path), without blanks as before; None (refused) when nothing usable is left.
+        name = os.path.basename(str(raw or '').replace('\\', '/')).replace(' ', '')
+        if name in ('', '.', '..') or '\x00' in name:
+                return None
+        return name
+
 def name_in_volumes(name, volumes_text):
         # QSD5.352 (QC 709): a volume is stored as <name>_<id> (volumes/<type>/<host>/<pool>/<name>_<id>); '\b' does not split
         # 'q110v_123' ('_' is a word character), so a user or group could take a volume's name and only the scripts refused
@@ -876,13 +885,22 @@ def uploadUsers(data):
     global allgroups, leaderip, myhost
     if 'baduser' in data['response']:
       return {'response': 'baduser'}
+    # QSD5.352 r4 (validator N2): no privilege check: any logged-in user (e.g. Logs only) could add users in bulk, and the client's
+    # file name went into the path raw ('../../TopStor/x.sh' or '/TopStor/x.sh' wrote into the code tree).  Same privilege as
+    # users/UnixAddUser (Box_Users, the Users page), checked before the upload is read; the file is saved as its base name only.
+    if not has_privilege('Box_Users', data.get('user')):
+      logmsg.sendlog('Priv1004','error','system',str(data.get('user')))
+      return {'response': data.get('response'), 'error': 'noprivilege'}
     uploaded_file = request.files['file']
     if uploaded_file.filename != '':
       dirPath = '/TopStordata'
       isExist = os.path.exists(dirPath)
       if not isExist:
         os.makedirs(dirPath)
-      filename =  uploaded_file.filename.replace(' ', '')
+      filename = upload_name(uploaded_file.filename)
+      if filename is None:
+        logmsg.sendlog('Unlin1026', 'error', data["user"])
+        return {'response': data.get('response'), 'error': 'badfilename'}
       filePath = os.path.join(dirPath, filename)
       uploaded_file.save(filePath)
       cmdline = 'python /TopStor/UsersMassAddition.py '+ leaderip +' '+ data['user'] + ' ' + myhost + ' ' + filePath + ' '+ data['token']
@@ -3282,7 +3300,10 @@ def localFileUpdate(data):
         isExist = os.path.exists(dirPath)
         if not isExist:
             os.makedirs(dirPath)
-        filename =  uploaded_file.filename.replace(' ', '')
+        filename = upload_name(uploaded_file.filename)     # QSD5.352 r4 (validator N2): base name only, never outside /TopStordata
+        if filename is None:
+            logmsg.sendlog('Unlin1026', 'error', str(data.get('user')))
+            return {'response': data.get('response'), 'error': 'badfilename'}
         filePath = os.path.join(dirPath, filename)
         uploaded_file.save(filePath)
         return {"data": 'success'}
