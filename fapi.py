@@ -3199,6 +3199,18 @@ def updateSoftware(data):
     source = data.get('source')
     location = data.get('location')
     version = data.get('version')
+    # QSD5.352 (QC 696): the Updates page now posts here (it used software/download/url|share, which do not exist).
+    # downloadSoftwareUpdate.sh reads its options by POSITION (--location must be the 7th word, the CIFS user the 9th),
+    # so a share without --version shifted --location and the script stopped; such calls are refused with a reason now.
+    if source_type not in ('http', 'nfs', 'cifs', 'local'):
+        return {'response': data.get('response'), 'error': 'invalidsource', 'message': 'source-type must be http, nfs, cifs or local'}
+    if not source or any(c.isspace() for c in str(source)):
+        return {'response': data.get('response'), 'error': 'invalidsource', 'message': 'the source is missing or has blanks'}
+    if source_type in ('nfs', 'cifs'):
+        if not location or not version:
+            return {'response': data.get('response'), 'error': 'invalidsource', 'message': source_type+' needs location and version'}
+        if source_type == 'cifs' and (not data.get('username') or not data.get('password')):
+            return {'response': data.get('response'), 'error': 'invalidsource', 'message': 'cifs needs username and password'}
 
     command = ['./downloadSoftwareUpdate.sh', f'--source-type {source_type}', f'--source {source}']
 
@@ -3219,7 +3231,7 @@ def updateSoftware(data):
     command_string = ' '.join(command)
     postchange(command_string, 'leader')
 
-    return {'data': command_string}
+    return {'data': mask_text(command_string, _request_secrets(data))}   # QSD5.352: no share password in the answer
 
 @app.route('/api/v1/software/localFileUpdate', methods=['GET','POST'])
 @login_required
