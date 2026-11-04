@@ -21,6 +21,7 @@ RESERVED = {
 
 # log message codes (msgsglobal.txt), so the rejection reaches the system log through logmsg
 CODE_NAME, CODE_RESERVED, CODE_PASSWORD, CODE_EXISTS = 'Unlin1027nm', 'Unlin1027rs', 'Unlin1027pw', 'Unlin1021uu'
+CODE_GROUPNAME = 'Unlin1027gn'   # QSD5.352: a new group name that breaks the group name rule
 
 def check_username(name):
     name = '' if name is None else str(name)
@@ -46,6 +47,23 @@ def check_group_name(name):
     if name.lower() in RESERVED or name.lower().startswith('systemd-'):
         return 'the group name is reserved for the system'
     return ''
+
+def check_new_group_name(name):
+    # QSD5.352 (QC 708): the rule for a NEW group, checked by the API before any script runs: the user name rule
+    # (3-32 letters, digits or -, starting with a letter; no '_', '.', '/', ':' or blanks: the group sync request and the
+    # etcd keys are split on them) plus the reserved names.  useradd refused names longer than 32 characters only inside
+    # UnixAddGroup (Unlin1120), and '1q109', 'q109_x', 'ab' were created.  Existing groups are not checked again
+    # (check_group_name keeps the reserved-only rule for the scripts and the sync copies of older groups).
+    name = '' if name is None else str(name)
+    if name == '':
+        return 'the group name is empty'
+    if len(name) < NAME_MIN:
+        return 'the group name is shorter than %d characters' % NAME_MIN
+    if len(name) > NAME_MAX:
+        return 'the group name is longer than %d characters' % NAME_MAX
+    if not re.match(r'^[A-Za-z][A-Za-z0-9-]*$', name):
+        return 'the group name may hold letters, digits and - only, and must start with a letter'
+    return check_group_name(name)
 
 def check_password_target(username):
     # QSD5.338: whose password may be changed through user/changepass.  root and the internal system account never;

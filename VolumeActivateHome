@@ -187,8 +187,17 @@ then
   name=`echo $l | awk -F'/' '{print $2}'`
   writev=`echo $l | awk -F'/' '{print $5}'`
   writev=`echo $writev | sed 's/\,/ /g' `;
-  volhost=`/pace/etcdget.py $etcd volumes/HOME/ $name | awk -F'/' '{print $3}'`
-  volsvalue=`/pace/etcdget.py $etcd volumes/HOME/$volhost/$pool/$name`
+  # QSD5.352 (QC 706): homes are registered as volumes/HOMEE/<host>/<pool>/<name> (VolumeCreateHOME, VolumeChangeHOME,
+  # VolumeCheck).  The lookup below asked for 'volumes/HOME/' only, found nothing, and wrote volumes/HOME/<host>/<pool>/<name>
+  # with the not-found marker _1 as its value.  That dummy key held the name, so VolumeCheck never re-created the real
+  # record after a take-over (it tested the name against the whole volumes listing): the home lost its address and subnet
+  # in volumesinfo, and volumes/config answered 'missing parameter: ipaddress'.  The real key (HOME or HOMEE) is looked up,
+  # it is moved to this host with its own type, and nothing is written when no valid record (7 or more fields) exists.
+  volkey=`/pace/etcdget.py $etcd volumes/HOME $name | grep -F "/$pool/$name'" | head -1 | awk -F"'" '{print $2}'`
+  voltype=`echo $volkey | awk -F'/' '{print $2}'`
+  volhost=`echo $volkey | awk -F'/' '{print $3}'`
+  volsvalue=''
+  [ -n "$volkey" ] && volsvalue=`/pace/etcdget.py $etcd $volkey`
   chmod 770 /$pool/$name
   sleep 1 
   setfacl -b /$pool/$name
@@ -197,10 +206,15 @@ then
   then
    for grp in $writev; do setfacl -m g:$grp:rwx /$pool/$name; done
   fi
-  /pace/etcdput.py $leaderip volumes/HOME/$myhost/$pool/$name $volsvalue
-  if [ $volhost != $myhost ];
+  if [ -n "$voltype" ] && [ `echo "$volsvalue" | awk -F'/' '{print NF}'` -ge 7 ];
   then
-   /pace/etcddel.py $leaderip volumes/HOME/$volhost/$pool/$name
+   /pace/etcdput.py $leaderip volumes/$voltype/$myhost/$pool/$name $volsvalue
+   if [ "$volhost" != "$myhost" ];
+   then
+    /pace/etcddel.py $leaderip $volkey
+   fi
+  else
+   echo no valid registry record for $pool/$name, nothing written >> /root/volactivateparamHome
   fi
  done
  stamp=`date +%s`

@@ -14,7 +14,7 @@ import re, ipaddress, traceback
 import Hostsconfig
 from Hostconfig import config
 from allphysicalinfo import getall, initallphy
-from uservalid import check_new_user_coded, logname, check_group_name, check_password_target
+from uservalid import check_new_user_coded, logname, check_group_name, check_password_target, check_new_group_name, CODE_GROUPNAME
 from UnixChkUser import setlogin
 import sqlite3
 from etcdget2 import etcdgetjson
@@ -180,14 +180,26 @@ def has_privilege(priv, user):
         except Exception:
                 return False
 
+def name_in_volumes(name, volumes_text):
+        # QSD5.352 (QC 709): a volume is stored as <name>_<id> (volumes/<type>/<host>/<pool>/<name>_<id>); '\b' does not split
+        # 'q110v_123' ('_' is a word character), so a user or group could take a volume's name and only the scripts refused
+        # it later (Unlin1021uv / Unlin1021gv).  Same pattern as UnixAddUser / UnixAddGroup.
+        pattern = r'(^|[^A-Za-z0-9_])'+re.escape(str(name))+r'(_[0-9]+)?([^A-Za-z0-9_]|$)'
+        return re.search(pattern, volumes_text) is not None
+
 def is_unique_name(name):
-        global leaderip
+        global leaderip, allinfo
         allvols = str(get('vol', '--prefix'))
+        try:
+                getalltime()
+                allvols += '/'+' '.join(str(v) for v in allinfo.get('volumes', {}))   # datasets whose record is missing
+        except Exception as e:
+                print('is_unique_name: volumes', e)
         alluser= str(get('user','--prefix'))
         allgrp= str(get('group','--prefix'))
-        allnames = allvols+'/'+alluser+'/'+allgrp
+        allnames = alluser+'/'+allgrp
         name_pattern = rf'\b{re.escape(name)}\b' 
-        if bool(re.search(name_pattern,allnames)):
+        if bool(re.search(name_pattern,allnames)) or name_in_volumes(name, allvols):
                     print("Invalid Name")
                     return 1000 
         print("Valid Name")
@@ -642,7 +654,7 @@ REQUIRED_PARAMS = {'/api/v1/'+p: v.split() for p, v in {
  'hosts/evacuate': 'name', 'users/usersauth': 'auths tochange', 'users/userauths': 'username', 'groups/UnixAddgroup': 'name users',
  'groups/groupdel': 'name', 'users/userdel': 'name tenant', 'users/UnixAddUser': 'name', 'partners/partnerdel': 'name',
  'partners/AddPartner': 'alias ip port type', 'tenant/adduser': 'name tenant', 'users/grouplist': 'tenant',
- 'hosts/getConfig': 'nodeName'}.items()}
+ 'hosts/getConfig': 'nodeName', 'users/userhomechange': 'name'}.items()}
 # snapshots/create needs a different set per snapsel (QSD5.324: Minutely/Hourly/Weekly send no name)
 SNAPSEL_REQUIRED = {'Once': 'name volume pool', 'Minutely': 'volume pool every keep', 'Hourly': 'volume pool sminute every keep',
                     'Weekly': 'volume pool stime every keep'}
@@ -2172,13 +2184,32 @@ def usersauth(data):
 @login_required
 @audit_command
 def volumeconfig(data):
- global allinfo, myhost
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
+ return volumeconfig_do(data)
+
+def volumeconfig_do(data):
+ # the body of volumes/config; users/userhomechange (QSD5.352) uses it for the address of a home
+ global allinfo, myhost
  getalltime()
+ # QSD5.352 (QC 706): an unknown volume, or one whose registry record was lost (no ipaddress / Subnet / groups), ended in
+ # a KeyError ('missing parameter: ipaddress') instead of the address checks below.
+ if data.get('volume') not in allinfo['volumes']:
+  logmsg.sendlog('VolCfa01','error',data['user'],logname(data.get('volume')))
+  return {'response': data['response'], 'volume': data.get('volume'), 'error': 'novolume'}
  volume = allinfo['volumes'][data['volume']]
+ for field in ('ipaddress', 'Subnet', 'groups'):
+  volume.setdefault(field, '')
+ # an empty word would shift every later argument of VolumeChange<type>: the home's own user / no group, subnet 24
+ if not str(volume['groups']).strip():
+  volume['groups'] = str(volume.get('name','')).rsplit('_',1)[0] if volume.get('prot') in ('HOME','HOMEE') else 'NoGroup'
+ if not str(volume['Subnet']).strip():
+  volume['Subnet'] = '24'
  data['owner'] = volume['host']
  if 'ipaddress' not in data:
+   if len(str(volume['ipaddress'])) < 7:
+    logmsg.sendlog('VolCfa01','error',data['user'],logname(data.get('volume')))
+    return {'response': data['response'], 'volume': data.get('volume'), 'error': 'noaddress'}
    data['ipaddress'] = volume['ipaddress']
  else:
     datatype = ip_context(volume['prot'])
@@ -2238,6 +2269,77 @@ def volumeconfig(data):
 # sendhost(ownerip, str(msg),'recvreply',myhost)
  #config(data)
  return data
+
+@app.route('/api/v1/users/userhomechange', methods=['GET','POST'])
+@login_required
+@audit_command
+def userhomechange(data):
+ # QSD5.352 (QC 706, QX-056 / QX-107): the Users page edits the quota and the address of a user's home folder
+ # (topstorweb api/users.js changeUserHome: name, tenant, Volsize '<GB>', HomeAddress, HomeSubnet); the route did not
+ # exist (404).  Everything is checked first, then the address goes the volumes/config way (VolumeChangeHOME) and the
+ # quota to VolumeQuotaHOME on the node that owns the pool.  Privilege: HOME (the same as the home scripts).
+ global allinfo
+ if 'baduser' in data['response']:
+  return {'response': 'baduser'}
+ name = str(data.get('name') or '')
+ reply = {'response': data['response'], 'name': name}
+ if not has_privilege('HOME', data['user']):
+  logmsg.sendlog('Priv1004','error','system',data['user'])
+  reply['error'] = 'noprivilege'
+  return reply
+ getalltime()
+ homes = [ v for k, v in allinfo.get('volumes', {}).items()
+           if v.get('prot') in ('HOME', 'HOMEE') and str(k).rsplit('_', 1)[0] == name ]
+ if not homes:
+  logmsg.sendlog('HomCfa01','error',data['user'],logname(name))
+  reply['error'] = 'nohome'
+  return reply
+ home = homes[0]
+ reply['volume'] = home['name']
+ size = data.get('Volsize')
+ gb = ''
+ if size not in (None, ''):
+  m = re.fullmatch(r'([0-9]+(\.[0-9]+)?)[Gg]?', str(size))
+  if not m or float(m.group(1)) <= 0 or float(m.group(1)) > 1000000:
+   logmsg.sendlog('HomQfa01','error',data['user'],logname(name),logname(str(size)))
+   reply['error'] = 'invalidsize'
+   return reply
+  gb = m.group(1)
+ addr = data.get('HomeAddress')
+ subnet = str(data.get('HomeSubnet') or home.get('Subnet') or '24')
+ newaddr = addr not in (None, '') and (str(addr) != str(home.get('ipaddress')) or subnet != str(home.get('Subnet')))
+ if newaddr:
+  if subnet not in ('8', '16', '24', '32') and not re.fullmatch(r'([1-9]|[12][0-9]|3[0-2])', subnet):
+   logmsg.sendlog('IPaddrfa','error','system',data['user'])
+   reply['error'] = 'invalidsubnet'
+   return reply
+  if str(addr) != str(home.get('ipaddress')):
+   isvu = int(is_valid_ip(addr))+int(is_unique_ip(addr, ip_context('HOME')))
+   if isvu != 0:
+    if isvu < 100:
+     logmsg.sendlog('IPaddrfa','error','system',data['user'])
+     reply['error'] = 'invalidip'
+    elif isvu > 10 and isvu < 120:
+     logmsg.sendlog('IPadduqfa','error','system',data['user'])
+     reply['error'] = 'ipinuse'
+    else:
+     logmsg.sendlog('IPnamuqfa','error','system',data['user'])
+     reply['error'] = 'nameinuse'
+    return reply
+ if not newaddr and not gb:
+  reply['error'] = 'nothingtochange'
+  return reply
+ owner = allinfo['hosts'][allinfo['pools'][home['pool']]['host']]['name']
+ if newaddr:
+  cfg = {'response': data['response'], 'user': data['user'], 'token': data.get('token'), 'volume': home['name'],
+         'type': 'HOME', 'ipaddress': str(addr), 'Subnet': subnet}
+  volumeconfig_do(cfg)
+  reply['HomeAddress'] = str(addr)
+  reply['HomeSubnet'] = subnet
+ if gb:
+  postchange('/TopStor/VolumeQuotaHOME '+leaderip+' '+home['pool']+' '+home['name']+' '+gb+'G '+data['user'], owner)
+  reply['Volsize'] = gb
+ return reply
 
 @app.route('/api/v1/user/changepass', methods=['GET','POST'])
 @login_required
@@ -2565,6 +2667,14 @@ def UnixAddGroup(data):
  if check_group_name(data.get('name')):     # QSD5.338: system account / group names (UnixAddGroup would groupdel them)
     logmsg.sendlog('Unlin1027rs','error',data['user'],logname(data.get('name')))
     data['error'] = 'reservedname'
+    return data
+ # QSD5.352 (QC 708): length and characters of a new group name, answered here and not by a failing script (Unlin1120).
+ # The name after login_required stripped the blanks (a group 'q104 g' stays 'q104g', QX-104).
+ why = check_new_group_name(data.get('name'))
+ if why:
+    logmsg.sendlog(CODE_GROUPNAME,'error',data['user'],logname(data.get('name')))
+    data['error'] = 'invalidname'
+    data['message'] = why
     return data
  if int(is_unique_name(data['name']))==1000:
     logmsg.sendlog('IPnamuqfa','error','system',loggedusers[data['token']]['user'])

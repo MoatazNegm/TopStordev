@@ -1,9 +1,21 @@
 #!/usr/bin/python3
-import sys, os
+import sys, os, re
 os.environ['ETCDCTL_API']= '3'
   
+# QSD5.352 (QC 712): the read cache, the log and the spare devices of a pool are listed as raids named 'cache', 'logs',
+# 'spares' (putzpool.py raid2).  They hold no data copies, so where they sit says nothing about the balance of the pool:
+# a one-disk cache on one host got hostrank -1 and the pool card read 'Highly Available, not balanced' although every
+# data raid spans both hosts.  They are ranked as balanced (0, 0) and the data raids decide.
+AUXRAID = re.compile(r'^(cache|logs?|spares?)(_|$)')
+
+def isauxraid(name):
+ return bool(AUXRAID.match(str(name or '')))
+
 def getraidrank(raid, removedisk, adddisk):
  ####raidraink = (name, location(0 is best), size (0) is best)
+ if isauxraid(raid.get('name')):
+  raid['raidrank'] = (0, 0)
+  return raid
  raidrank = (0,0) 
  raidhosts = set()
  raiddsksize = adddisk['size']

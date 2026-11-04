@@ -103,12 +103,20 @@ then
  do
   pool=`echo $l | awk -F'/' '{print $1}'`
   name=`echo $l | awk -F'/' '{print $2}'`
-  volhost=`/pace/etcdgetlocal.py volumes/HOME/ $name | awk -F'/' '{print $3}'`
-  volsvalue=`/pace/etcdgetlocal.py volumes/HOME/$volhost/$pool/$name`
-  /pace/etcdputlocal.py volumes/HOME/$myhost/$pool/$name $volsvalue
-  if [ $volhost != $myhost ];
+  # QSD5.352 (QC 706): the real record is volumes/HOMEE/...; the lookup of 'volumes/HOME/' wrote a dummy key with the
+  # value _1 that kept VolumeCheck from re-creating the record (see VolumeActivateHome).  Same fix here.
+  volkey=`/pace/etcdgetlocal.py volumes/HOME $name | grep -F "/$pool/$name'" | head -1 | awk -F"'" '{print $2}'`
+  voltype=`echo $volkey | awk -F'/' '{print $2}'`
+  volhost=`echo $volkey | awk -F'/' '{print $3}'`
+  volsvalue=''
+  [ -n "$volkey" ] && volsvalue=`/pace/etcdgetlocal.py $volkey`
+  if [ -n "$voltype" ] && [ `echo "$volsvalue" | awk -F'/' '{print NF}'` -ge 7 ];
   then
-   /pace/etcddel.py $leaderip volumes/HOME/$volhost/$pool/$name
+   /pace/etcdputlocal.py volumes/$voltype/$myhost/$pool/$name $volsvalue
+   if [ "$volhost" != "$myhost" ];
+   then
+    /pace/etcddel.py $leaderip $volkey
+   fi
   fi
  done
  stamp=`date +%s`

@@ -465,3 +465,9 @@ ApiKey1003:1: : from :: API key : deleted
 ApiKeyfa0:2: : from :: API key : refused (unknown, revoked or malformed) from : 
 ApiKeyfa1:1: : from :: Too many refused API keys, the address : is locked out for 5 minutes
 Priv1005:2: : from :: Not done, privileges cannot be set: the user : does not exist
+
+VolCfa01:1: : from :: Volume : was not changed, it is unknown or has no address
+Unlin1027gn:2: : from :: Group : cannot be created as the name must be 3 to 32 letters, digits or - and start with a letter
+HomCfa01:1: : from :: The user : has no home folder to change
+HomQsu01:1: : from :: Success changing the quota of the home folder of : to :
+HomQfa01:1: : from :: Failed changing the quota of the home folder of : to :

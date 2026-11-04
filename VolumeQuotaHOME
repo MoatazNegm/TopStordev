@@ -1,0 +1,51 @@
+#!/bin/sh
+# VolumeQuotaHOME <leaderip> <pool> <home volume> <quota, e.g. 2G> <requesting user>
+# QSD5.352 (QC 706, QX-056 / QX-107): the quota of a user's home folder, set from the Users page through
+# api/v1/users/userhomechange.  fapi.py checks the user, the home and the size and sends this line to the node that owns
+# the pool.  The quota is a property of the dataset, so it moves with the pool on a take-over; usersinfo/<user> keeps the
+# quota field (4th '/' field) for the user list and is copied to the other nodes by the priv sync (as Priv.py does).
+export ETCDCTL_API=3
+cd /TopStor/
+echo $@ > /root/volquotahome
+leaderip=`echo $@ | awk '{print $1}'`
+pool=`echo $@ | awk '{print $2}'`
+name=`echo $@ | awk '{print $3}'`
+quota=`echo $@ | awk '{print $4}'`
+userreq=`echo $@ | awk '{print $5}'`
+privilege="HOME"
+contrun=`./privthis.sh $privilege $userreq`
+if [[ $contrun == 'true' ]]
+then
+ docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq
+ shortname=`echo $name | rev | cut -d_ -f2- | rev`
+ echo $quota | grep -Eq '^[0-9]+(\.[0-9]+)?G$'
+ okq=$?
+ dstype=`/sbin/zfs get -H -o value type $pool/$name 2>/dev/null`
+ if [ $okq -ne 0 ] || [ "$dstype" != 'filesystem' ];
+ then
+  docker exec etcdclient /TopStor/logmsg.py HomQfa01 error $userreq $shortname $quota
+  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
+  exit 1
+ fi
+ /sbin/zfs set quota=$quota $pool/$name
+ if [ $? -ne 0 ];
+ then
+  docker exec etcdclient /TopStor/logmsg.py HomQfa01 error $userreq $shortname $quota
+  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
+  exit 1
+ fi
+ leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
+ info=`/pace/etcdget.py $leaderip usersinfo/$shortname`
+ nf=`echo "$info" | awk -F'/' '{print NF}'`
+ if [ "$nf" -ge 4 ];
+ then
+  newinfo=`echo "$info" | awk -F'/' -v q="$quota" '{OFS="/"; $4=q; print}'`
+  /pace/etcdput.py $leaderip usersinfo/$shortname "$newinfo"
+  stamp=`date +%s`
+  /pace/etcdput.py $leaderip sync/priv/$shortname/request priv_${shortname}_$stamp
+  /pace/etcdput.py $leaderip sync/priv/$shortname/request/$leader priv_${shortname}_$stamp
+ fi
+ /pace/putzpool.py
+ docker exec etcdclient /TopStor/logmsg.py HomQsu01 info $userreq $shortname $quota
+ docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
+fi

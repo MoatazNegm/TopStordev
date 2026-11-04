@@ -195,6 +195,18 @@ def getall(leadip, alldsks='0'):
      volumesdict[volume['name']].update(thevolume) 
     volumesdict[volume['name']]['snapshots'] = volumesnapshots
     volumesdict[volume['name']]['snapperiod'] = volumesnapperiods
+    # QSD5.352 (QC 706): a volume without a registry record (lost in a take-over / return) had no ipaddress, Subnet and
+    # groups at all: volumesinfo showed the home without an address and volumes/config died on volume['ipaddress'].
+    # The dataset's own ip:addr / ip:subnet (putzpool) fill the gap; the registry record wins whenever it exists.
+    thevol = volumesdict[volume['name']]
+    zip_, zsub = str(volume.get('zipaddress','-')), str(volume.get('zsubnet','-'))
+    if len(str(thevol.get('ipaddress',''))) < 5 or thevol.get('ipaddress') == '256.256.256.256':
+     if zip_ not in ('', '-') and volume.get('prot') != 'ISCSI':
+      thevol['ipaddress'] = zip_
+      if zsub not in ('', '-'):
+       thevol['Subnet'] = zsub
+    for field in ('ipaddress', 'Subnet', 'groups'):
+     thevol.setdefault(field, '')
  toremove=[]
  for volume in volumesdict:
   if volume not in str(poolsdict):
