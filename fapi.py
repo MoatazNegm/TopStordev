@@ -965,6 +965,26 @@ def groupnames_from(grps, allgroups):
    names.append(gname)
  return ','.join(names)
 
+def share_groups(grps):
+ # QSD5.352 (QC 698 finding 4): a share created / changed with group IDS (the 'id' of groups/grouplist, as users take
+ # them) got the digits as its write list, which no user is a member of; the share had to be made again with the name.
+ # Digit entries that are not a group name are turned into group names; an unknown id refuses the call (None).
+ toks = [ t.strip() for t in str(grps).split(',') if t.strip() ]
+ if not any(t.isdigit() for t in toks):
+  return grps
+ allg = getgroups()
+ names = set(g[0] for g in allg)
+ out = []
+ for t in toks:
+  if t in names or not t.isdigit():
+   out.append(t)
+   continue
+  n = groupnames_from(t, allg)
+  if n is None:
+   return None
+  out.append(n)
+ return ','.join(out)
+
 def getgroups():
  global leaderip
  groupslst = etcdgetjson(leaderip, 'usersigroup','--prefix') 
@@ -1954,7 +1974,11 @@ def volumecreate(data):
  ownerip = allinfo['hosts'][allinfo['pools'][data['pool']]['host']]['ipaddress']
  data['owner'] = allinfo['hosts'][allinfo['pools'][data['pool']]['host']]['name']
  if 'groups' in data:
-  data['groups'] = only_everyone(data['groups'])
+  grps = share_groups(data['groups'])
+  if grps is None:
+   data['error'] = 'invalidgroup'
+   return data
+  data['groups'] = only_everyone(grps)
  if 'ISCSI' in data['type']:
   chapuser, chapstored, why = iscsi_chap(data)
   if why:
@@ -2254,7 +2278,11 @@ def volumeconfig_do(data):
   if 'groups' in data and len(data['groups']) < 1: 
    data['groups'] = 'NoGroup'
   if 'groups' in data:
-   data['groups'] = only_everyone(data['groups'])
+   grps = share_groups(data['groups'])
+   if grps is None:
+    data['error'] = 'invalidgroup'
+    return data
+   data['groups'] = only_everyone(grps)
   for ele in data:
    volume[ele] = data[ele] 
   datastr = volume['pool']+' '+volume['name']+' '+str(volume['quota'])+' '+volume['groups']+' '+volume['ipaddress']+' '+str(volume['Subnet'])+' '+volume['statusmount']+' '+volume['host']+' '+volume['user']

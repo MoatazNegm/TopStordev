@@ -67,9 +67,7 @@ then
  # QSD5.344 (validator L6): an address change puts the new address on cmynode before the portal is made on it (as
  # iscsi.sh does when the pool is imported); the old address and its target go below, once no LUN is left on them
  if [ -n "$oldipaddr" ] && [ "$oldipaddr" != '-' ] && [ "$oldipaddr" != "$ipaddr" ]; then
-  nmcli conn mod cmynode -ipv4.addresses ${ipaddr}/$ipsubnet
-  nmcli conn mod cmynode +ipv4.addresses ${ipaddr}/$ipsubnet
-  nmcli conn up cmynode
+  /TopStor/cmynodeaddr.sh add $ipaddr $ipsubnet    # QSD5.352 (QC 698): locked, checked, retried
  fi
  /pace/delzfsvolumetarget $DG $name $userreq
  for i in $(echo $initiators | sed "s/,/ /g")
@@ -99,8 +97,10 @@ then
   if [ "$addr" != "$ipaddr" ] && targetcli ls iscsi/ 2>/dev/null | grep -q "$tiqn" \
      && ! targetcli ls /iscsi/$tiqn/tpg1/luns 2>/dev/null | grep -q 'o- lun[0-9]'; then
    targetcli /iscsi delete $tiqn
+   exec 9>>/TopStordata/cmynode.lock; flock -w 120 9   # QSD5.352: cmynode changes one at a time (cmynodeaddr.sh)
    nmcli conn mod cmynode -ipv4.addresses ${addr}/${oldipsubnet:-24}
    nmcli conn up cmynode
+   flock -u 9
   fi
  done
  targetcli saveconfig

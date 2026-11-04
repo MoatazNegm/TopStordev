@@ -16,6 +16,7 @@ if [ -n "$users" ]; then
  echo "rmvoladdr: keep $ip, still used by" $users
  exit 0
 fi
+exec 9>>/TopStordata/cmynode.lock; flock -w 120 9   # QSD5.352: cmynode changes one at a time (cmynodeaddr.sh)
 changed=0
 [ -n "$prefix" ] && nmcli conn mod cmynode -ipv4.addresses ${ip}/$prefix 2>/dev/null && changed=1
 for a in `nmcli -g ipv4.addresses conn show cmynode 2>/dev/null | tr ',' ' '`; do
@@ -24,6 +25,7 @@ for a in `nmcli -g ipv4.addresses conn show cmynode 2>/dev/null | tr ',' ' '`; d
  esac
 done
 [ $changed -eq 1 ] && nmcli conn up cmynode
+flock -u 9
 [ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
 if is_container 2>/dev/null; then
  for a in `ip -o -4 addr show | awk -v ip=$ip '{split($4,a,"/"); if (a[1]==ip) print $2"|"$4}'`; do

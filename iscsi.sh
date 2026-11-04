@@ -11,9 +11,7 @@ ipaddr=`echo $@ | awk '{print $3}'`
 ipsubnet=`echo $@ | awk '{print $4}'`
 vtype=`echo $@ | awk '{print $5}'`
 #docker rm -f $resname
-nmcli conn mod cmynode -ipv4.addresses ${ipaddr}/$ipsubnet
-nmcli conn mod cmynode +ipv4.addresses ${ipaddr}/$ipsubnet
-nmcli conn up cmynode
+/TopStor/cmynodeaddr.sh add $ipaddr $ipsubnet    # QSD5.352 (QC 698): locked, checked, retried
 enpdev='enp0s8'
 portalport=`echo $@ | awk '{print $6}'`
 targetiqn=`echo $@ | awk '{print $7}'`

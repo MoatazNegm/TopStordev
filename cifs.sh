@@ -12,9 +12,7 @@ echo name $resname >> /root/cifstmp
 echo mounts $mounts >> /root/cifstmp
 echo ip and subnet $ipaddr $ipsubnet >> /root/cifstmp
 docker rm -f $resname
-nmcli conn mod cmynode -ipv4.addresses ${ipaddr}/$ipsubnet
-nmcli conn mod cmynode +ipv4.addresses ${ipaddr}/$ipsubnet
-nmcli conn up cmynode
+/TopStor/cmynodeaddr.sh add $ipaddr $ipsubnet    # QSD5.352 (QC 698): locked, checked, retried
 echo $vtype | grep '_' 
 if [ $? -ne 0 ];
 then
@@ -62,7 +60,9 @@ else
 	echo myhost=$myhost myclusterip=$myclusterip
 	mydns=`/TopStor/etcdget.py $myclusterip dnsname/$myhost`
 	echo ll$mydns | grep '\.' 
-	if [ $? -eq 0 ];
+	isdns=$?
+	exec 9>>/TopStordata/cmynode.lock; flock -w 120 9   # QSD5.352: cmynode changes one at a time (cmynodeaddr.sh)
+	if [ $isdns -eq 0 ];
 	then
 		echo iamhere
 		nmcli conn modify cmynode ipv4.dns $domainsrvi,$mydns
@@ -73,6 +73,7 @@ else
 		echo nmcli conn modify cmynode ipv4.dns $domainsrvi
 	fi
 	nmcli conn up cmynode
+	flock -u 9
  	sync
  	adminpass=`echo $adminpass | sed 's/\@\@sep/\//g'`
  	adminpass=`/TopStor/decthis.sh $domain $adminpass | awk -F'_result' '{print $2}' `

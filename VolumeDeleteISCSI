@@ -55,8 +55,10 @@ then
    then
     targetcli /iscsi delete iqn.2016-03.com.$ipdom:data
     targetcli saveconfig
+    exec 9>>/TopStordata/cmynode.lock; flock -w 120 9   # QSD5.352: cmynode changes one at a time (cmynodeaddr.sh)
     nmcli conn mod cmynode -ipv4.addresses ${iscsiip}/${iscsisub:-24}
     nmcli conn up cmynode
+    flock -u 9
    fi
   fi
   stamp=`date +%s`

@@ -31,6 +31,7 @@ docker  rm -f $resname
 cat /TopStordata/smb.$volip | grep start | grep only
 if [ $? -ne 0 ]
 then 
+  exec 9>>/TopStordata/cmynode.lock; flock -w 120 9   # QSD5.352: cmynode changes one at a time (cmynodeaddr.sh)
   nmcli conn mod cmynode -ipv4.addresses $volip 
   # QSD5.337 (container flavour): the address is stored as <ip>/<prefix>, so the removal above did not match and the home
   # address stayed on cmynode/bond0 (answering ping for minutes): remove it with its prefix, then from the live interface
@@ -46,6 +47,7 @@ then
    done
   fi
   nmcli conn up cmynode
+  flock -u 9
   rm -rf /TopStordata/smb.$volip;
 else
  mounts=`cat /TopStordata/smb.$volip | grep '\[' | sed 's/\[//g' | sed 's/\]//g' | sed ':a;N;$!ba;s/\n/,/g'`
