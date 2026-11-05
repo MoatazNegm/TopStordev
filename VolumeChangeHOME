@@ -62,7 +62,7 @@ echo /pace/etcdput.py $leaderip volumes/HOMEE/$myhost/$DG/$name $DG/$name/no/yes
  # privilege (admin) that ran cifsremove.sh, the DELETE path of a share: 'rm -rf /<pool>/smb.<home>' (also the vol/size
  # keys, and crondelete).  getvols.sh / VolumeCheck know a home only by the SUMMARY line of that file and cifs.py waits for
  # it, so after ANY home change (address, subnet, or volumes/config with the same address) the home was never served
- # again, and the anchored edit below edited a missing file.  The share file is kept and edited now; the old container and
+ # again, and the anchored edit edited a missing file.  The share file is kept and rendered again now (r7); the old container and
  # the old address go through VolumeDockerChange.py only (QSD5.352, QC 706).  Order: the share file, the dataset
  # properties and the registry record carry the new address BEFORE the old container goes (a VolumeCheck run in between
  # starts the new address, not the old one), then the share is started on the new address here.
@@ -70,29 +70,29 @@ echo /pace/etcdput.py $leaderip volumes/HOMEE/$myhost/$DG/$name $DG/$name/no/yes
  if [ -n "$oldipaddr" ] && [ "$oldipaddr" != '-' ]; then validold=1; fi
  addrchange=0
  if [ $validold -eq 1 ] && { [ "$oldipaddr" != "$ipaddr" ] || [ "$oldipsubnet" != "$ipsubnet" ]; }; then addrchange=1; fi
- # QSD5.352 r2 (validator low): the two unanchored 's/old/new/g' (dots match anything, '24' everywhere) could rewrite any
- # '24' of the share file on a subnet-only change (the Users page sends one through users/userhomechange).  Only the
- # '/<old ip>/<subnet>/' pair of the SUMMARY line is replaced.
- if [ $validold -eq 1 ] && [ -s /$DG/smb.$name ];
- then
-  oldipre=$(printf '%s' "$oldipaddr" | sed 's/\./\\./g')
-  sed -i "/SUMMARY/ s#/${oldipre}/[0-9]*/#/${ipaddr}/${ipsubnet}/#" /$DG/smb.$name
- fi
- # r6: a missing share file (a home broken by the old flow) or one whose SUMMARY does not carry the new address is
- # written again from the template, as VolumeCreateHOME writes it
+ # QSD5.352 r7 (validator R2): the share file follows EVERY field of the change, not only the address: the groups (the
+ # Home Folders page sends volumes/config with the groups and the same address) and the status (statusmount) were written
+ # to the registry and the dataset but never to the SUMMARY line or 'write list', so the share kept the old groups, a
+ # disable was reverted by VolumeCheck (SUMMARY active, registry disable) and a take-over wrote the old groups back.  The
+ # file is rendered from the template every time, exactly as VolumeCreateHOME writes it (for a file written by
+ # VolumeCreateHOME an address/subnet change differs in the SUMMARY line only, so the r2 anchored edit is not needed any
+ # more), and installed (and the share restarted below) only when it differs from /<pool>/smb.<home>.  A missing file
+ # (a home broken by the old flow) or one rewritten as 'HOME .../ACTIVE' (VolumeActivateHome on a follower) is repaired.
+ shortname=`echo ${name} | rev | cut -d_ -f2- | rev`
+ sed -e "s/Vtype/HOMEE/g" -e "s/Rpool/$DG/g" -e "s/Rname/$name/g" -e "s/Rreadv/no/g" -e "s/Rbrows/yes/g" \
+     -e "s/Rwritev/$writev/g" -e "s/Radmin/administrator/g" -e "s/Rwritea/yes/g" -e "s/Ripadd/$ipaddr/g" \
+     -e "s/Ripsub/$ipsubnet/g" -e "s/SHORTNAME/$shortname/g" -e "s/NAMECIFS/$name/g" -e "s/POOL/$DG/g" -e "s/Yes/yes/g" \
+     -e "s/\@everyone/$writev/g" -e "s/IPADDRESS/$ipaddr/g" -e "s/IPSUBNET/$ipsubnet/g" -e "s/ACTIVE/$active/g" \
+     /TopStor/sharecifs.txt > /TopStordata/smb.${name}.new
  regen=0
- grep SUMMARY /$DG/smb.$name 2>/dev/null | grep -qF "/${ipaddr}/${ipsubnet}/" || regen=1
- if [ $regen -eq 1 ];
+ if [ -s /TopStordata/smb.${name}.new ] && ! cmp -s /TopStordata/smb.${name}.new /$DG/smb.$name;
  then
-  shortname=`echo ${name} | rev | cut -d_ -f2- | rev`
-  sed -e "s/Vtype/HOMEE/g" -e "s/Rpool/$DG/g" -e "s/Rname/$name/g" -e "s/Rreadv/no/g" -e "s/Rbrows/yes/g" \
-      -e "s/Rwritev/$writev/g" -e "s/Radmin/administrator/g" -e "s/Rwritea/yes/g" -e "s/Ripadd/$ipaddr/g" \
-      -e "s/Ripsub/$ipsubnet/g" -e "s/SHORTNAME/$shortname/g" -e "s/NAMECIFS/$name/g" -e "s/POOL/$DG/g" -e "s/Yes/yes/g" \
-      -e "s/\@everyone/$writev/g" -e "s/IPADDRESS/$ipaddr/g" -e "s/IPSUBNET/$ipsubnet/g" -e "s/ACTIVE/$active/g" \
-      /TopStor/sharecifs.txt > /TopStordata/smb.${name}
+  mv -f /TopStordata/smb.${name}.new /TopStordata/smb.${name}
   yes | cp /TopStordata/smb.$name /$DG/
-  echo "share file /$DG/smb.$name written again for $ipaddr/$ipsubnet" >> /root/volchange
+  regen=1
+  echo "share file /$DG/smb.$name written for $ipaddr/$ipsubnet groups $writev status $active" >> /root/volchange
  fi
+ rm -f /TopStordata/smb.${name}.new
  /sbin/zfs set ip:addr=$ipaddr $DG/$name
  /sbin/zfs set ip:subnet=$ipsubnet $DG/$name
  /sbin/zfs set status:mount=$active $DG/$name
@@ -110,22 +110,36 @@ echo /pace/etcdput.py $leaderip volumes/HOMEE/$myhost/$DG/$name $DG/$name/no/yes
  then
   /TopStor/VolumeDockerChange.py $oldipaddr ${oldipsubnet:-24} HOMEE $DG/$name
  fi
+ # r7 (validator R2): a disabled home is served no more.  cifs.py leaves a disabled record out but does not stop a
+ # running container, so HOMEE-<ip> (and the address, unless another dataset uses it) goes when no other ACTIVE home of
+ # this node is on the address; otherwise cifs.py below starts the share again without this home.
+ offnow=0
+ if [ "$active" != 'active' ] && ! /TopStor/getvols.sh home | grep -vF "$DG/$name/" | grep -F "/$ipaddr/" | grep -q '/active$';
+ then
+  /TopStor/VolumeDockerChange.py $ipaddr ${ipsubnet:-24} HOMEE $DG/$name
+  offnow=1
+ fi
  # r6: the share is started on the new address now (as VolumeCreateHOME does; cifs.py takes the per-address lock, a
  # VolumeCheck run for the same address waits for it); an old-address container that a VolumeCheck run started in the
  # meantime is removed again when no home of this node uses the old address any more
- if [ $addrchange -eq 1 ] || [ $regen -eq 1 ];
+ if [ $offnow -eq 0 ] && { [ $addrchange -eq 1 ] || [ $regen -eq 1 ]; };
  then
   /TopStor/cifs.py $leader $leaderip $myhost $myhostip $etcd $DG $name $ipaddr $ipsubnet HOMEE
  fi
- if [ $validold -eq 1 ] && [ "$oldipaddr" != "$ipaddr" ] && docker ps --format '{{.Names}}' | grep -qx "HOMEE-$oldipaddr";
+ if [ $validold -eq 1 ] && [ "$oldipaddr" != "$ipaddr" ] && docker ps --format '{{.Names}}' | grep -qFx "HOMEE-$oldipaddr";
  then
   /TopStor/getvols.sh home | grep -qF "/$oldipaddr/" || /TopStor/VolumeDockerChange.py $oldipaddr ${oldipsubnet:-24} HOMEE $DG/$name
  fi
 
 
- #/pace/broadcasttolocal.py volumes/HOME/$myhost/$DG/$name $DG/$name/no/yes/$writev/administrator/yes/$ipaddr/$ipsubnet 
- /TopStor/VolumeActivateHome vol=$name user=$userreq
- /pace/putzpool.py 
+ #/pace/broadcasttolocal.py volumes/HOME/$myhost/$DG/$name $DG/$name/no/yes/$writev/administrator/yes/$ipaddr/$ipsubnet
+ # QSD5.352 r7 (validator R1): 'VolumeActivateHome vol=<home> user=<user>' was called here.  It is a no-op only on the
+ # LEADER (it takes 'vol=<home>' as the leader address, the lookup fails and it exits).  On a FOLLOWER it reads its local
+ # etcd, finds the home and rewrites /<pool>/smb.<home> with type 'HOME' and the status 'ACTIVE' (never replaced); one
+ # VolumeCheck pass then took the home as dirty, removed the HOMEE-<ip> container just started and wrote '/ACTIVE' into
+ # the registry, which cifs.py ignores: the home stayed down.  This script writes the share file, the registry record and
+ # starts the share itself (above), so the call is gone.
+ /pace/putzpool.py
  /TopStor/logmsg.py VolCsu01 info $userreq $name
  echo ready ;
  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq

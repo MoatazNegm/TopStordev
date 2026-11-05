@@ -4,8 +4,16 @@ cd /TopStor
 web='/usr/local/www/apache24/data/des19/Data/status.log';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 myhost=`hostname -s`
-rm txt/cronthis.txt;
-oper1=` echo $@ | awk '{print $1}'`;
-crontab -l > txt/cronthis.txt;
-cat txt/cronthis.txt | grep -v $per1 > /TopStordata/cronthis.txt
-crontab /TopStordata/cronthis.txt 
+# crondelete <volume>: drop the snapshot schedules of one volume from this node's crontab (cifsremove.sh, nfsremove.sh).
+# QSD5.352 r7 (validator, crondelete finding): the filter used the unset '$per1' (the variable is oper1); unquoted it
+# vanished, 'grep -v' without a pattern printed its usage and nothing else, and the EMPTY file was installed: every CIFS,
+# home or NFS delete wiped every snapshot schedule of the node (all volumes, all types).  Every schedule line carries
+# '::<pool>/<volume>::' (SnapshotCreateHourly / Minutely / Weekly / Hourlytrend), so exactly that is matched, as a fixed
+# string anchored on '/' and '::' (a plain substring dropped the lines of vol_123 with those of vol_12).  No volume name,
+# or no crontab to read: the crontab is not touched.
+oper1=`echo $@ | awk '{print $1}'`
+[ -n "$oper1" ] || exit 0
+mkdir -p txt; rm -f txt/cronthis.txt
+crontab -l > txt/cronthis.txt 2>/dev/null || exit 0
+grep -vF -- "/${oper1}::" txt/cronthis.txt > /TopStordata/cronthis.txt
+crontab /TopStordata/cronthis.txt
