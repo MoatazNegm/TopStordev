@@ -58,15 +58,44 @@ then
 echo /pace/etcdput.py $leaderip volumes/HOMEE/$myhost/$DG/$name $DG/$name/no/yes/$writev/administrator/yes/$oldipaddr/${oldipsubnet}$extraparms/$active >> /root/volchange
  oldipaddr=`zfs get -H ip:addr $DG/$name | awk '{print $3}'`
  oldipsubnet=`zfs get -H ip:subnet $DG/$name | awk '{print $3}'`
- /TopStor/VolumefixChangeCIFS $leaderip $pDG $name HOMEE $oldipaddr $userreq
- # QSD5.352 (QC 706): the call passed '/<pool>/<name> <new ip>'; VolumeDockerChange.py wants '<old ip> <old subnet> <type>
- # <dataset>' and stopped with an IndexError, so the old HOMEE-<old ip> container and the old address stayed on the owner.
- # Now (as VolumeChangeCIFS) the old container and the old address go when the address changes; VolumeCheck starts the
- # share on the new address (smb.<name> and the registry record carry it).
- if [ -n "$oldipaddr" ] && [ "$oldipaddr" != '-' ] && [ "$oldipaddr" != "$ipaddr" ];
+ # QSD5.352 r6 (prover D1): this script called 'VolumefixChangeCIFS ... HOMEE <old ip>' first.  For a user with the HOMEE
+ # privilege (admin) that ran cifsremove.sh, the DELETE path of a share: 'rm -rf /<pool>/smb.<home>' (also the vol/size
+ # keys, and crondelete).  getvols.sh / VolumeCheck know a home only by the SUMMARY line of that file and cifs.py waits for
+ # it, so after ANY home change (address, subnet, or volumes/config with the same address) the home was never served
+ # again, and the anchored edit below edited a missing file.  The share file is kept and edited now; the old container and
+ # the old address go through VolumeDockerChange.py only (QSD5.352, QC 706).  Order: the share file, the dataset
+ # properties and the registry record carry the new address BEFORE the old container goes (a VolumeCheck run in between
+ # starts the new address, not the old one), then the share is started on the new address here.
+ validold=0
+ if [ -n "$oldipaddr" ] && [ "$oldipaddr" != '-' ]; then validold=1; fi
+ addrchange=0
+ if [ $validold -eq 1 ] && { [ "$oldipaddr" != "$ipaddr" ] || [ "$oldipsubnet" != "$ipsubnet" ]; }; then addrchange=1; fi
+ # QSD5.352 r2 (validator low): the two unanchored 's/old/new/g' (dots match anything, '24' everywhere) could rewrite any
+ # '24' of the share file on a subnet-only change (the Users page sends one through users/userhomechange).  Only the
+ # '/<old ip>/<subnet>/' pair of the SUMMARY line is replaced.
+ if [ $validold -eq 1 ] && [ -s /$DG/smb.$name ];
  then
-  /TopStor/VolumeDockerChange.py $oldipaddr ${oldipsubnet:-24} HOMEE $DG/$name
+  oldipre=$(printf '%s' "$oldipaddr" | sed 's/\./\\./g')
+  sed -i "/SUMMARY/ s#/${oldipre}/[0-9]*/#/${ipaddr}/${ipsubnet}/#" /$DG/smb.$name
  fi
+ # r6: a missing share file (a home broken by the old flow) or one whose SUMMARY does not carry the new address is
+ # written again from the template, as VolumeCreateHOME writes it
+ regen=0
+ grep SUMMARY /$DG/smb.$name 2>/dev/null | grep -qF "/${ipaddr}/${ipsubnet}/" || regen=1
+ if [ $regen -eq 1 ];
+ then
+  shortname=`echo ${name} | rev | cut -d_ -f2- | rev`
+  sed -e "s/Vtype/HOMEE/g" -e "s/Rpool/$DG/g" -e "s/Rname/$name/g" -e "s/Rreadv/no/g" -e "s/Rbrows/yes/g" \
+      -e "s/Rwritev/$writev/g" -e "s/Radmin/administrator/g" -e "s/Rwritea/yes/g" -e "s/Ripadd/$ipaddr/g" \
+      -e "s/Ripsub/$ipsubnet/g" -e "s/SHORTNAME/$shortname/g" -e "s/NAMECIFS/$name/g" -e "s/POOL/$DG/g" -e "s/Yes/yes/g" \
+      -e "s/\@everyone/$writev/g" -e "s/IPADDRESS/$ipaddr/g" -e "s/IPSUBNET/$ipsubnet/g" -e "s/ACTIVE/$active/g" \
+      /TopStor/sharecifs.txt > /TopStordata/smb.${name}
+  yes | cp /TopStordata/smb.$name /$DG/
+  echo "share file /$DG/smb.$name written again for $ipaddr/$ipsubnet" >> /root/volchange
+ fi
+ /sbin/zfs set ip:addr=$ipaddr $DG/$name
+ /sbin/zfs set ip:subnet=$ipsubnet $DG/$name
+ /sbin/zfs set status:mount=$active $DG/$name
  ETCDCTL_API=3 /pace/etcddel.py $leaderip volumes $name
  echo ETCDCTL_API=3 /pace/etcdput.py $leaderip volumes/HOMEE/$myhost/$DG/$name $DG/$name/no/yes/$writev/administrator/yes/$ipaddr/${ipsubnet}$extraparms/$active
  ETCDCTL_API=3 /pace/etcdput.py $leaderip volumes/HOMEE/$myhost/$DG/$name $DG/$name/no/yes/$writev/administrator/yes/$ipaddr/${ipsubnet}$extraparms/$active
@@ -75,17 +104,23 @@ echo /pace/etcdput.py $leaderip volumes/HOMEE/$myhost/$DG/$name $DG/$name/no/yes
  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request/$leader volumes_$stamp
  echo checkkkkkkkkkkkkkkkkkkkkkkkkking
  ETCDCTL_API=3 /pace/etcdget.py $leaderip volumes $name
- # QSD5.352 r2 (validator low): the two unanchored 's/old/new/g' (dots match anything, '24' everywhere) could rewrite any
- # '24' of the share file on a subnet-only change (the Users page sends one through users/userhomechange).  Only the
- # '/<old ip>/<subnet>/' pair of the SUMMARY line is replaced now.
- if [ -n "$oldipaddr" ] && [ "$oldipaddr" != '-' ];
+ # QSD5.352 (QC 706): the old HOMEE-<old ip> container and the old address go when the address or the subnet changes
+ # (VolumeDockerChange.py '<old ip> <old subnet> <type> <dataset>'; the address stays while another dataset uses it)
+ if [ $addrchange -eq 1 ];
  then
-  oldipre=$(printf '%s' "$oldipaddr" | sed 's/\./\\./g')
-  sed -i "/SUMMARY/ s#/${oldipre}/[0-9]*/#/${ipaddr}/${ipsubnet}/#" /$DG/smb.$name
+  /TopStor/VolumeDockerChange.py $oldipaddr ${oldipsubnet:-24} HOMEE $DG/$name
  fi
- /sbin/zfs set ip:addr=$ipaddr $DG/$name
- /sbin/zfs set ip:subnet=$ipsubnet $DG/$name
- /sbin/zfs set status:mount=$active $DG/$name
+ # r6: the share is started on the new address now (as VolumeCreateHOME does; cifs.py takes the per-address lock, a
+ # VolumeCheck run for the same address waits for it); an old-address container that a VolumeCheck run started in the
+ # meantime is removed again when no home of this node uses the old address any more
+ if [ $addrchange -eq 1 ] || [ $regen -eq 1 ];
+ then
+  /TopStor/cifs.py $leader $leaderip $myhost $myhostip $etcd $DG $name $ipaddr $ipsubnet HOMEE
+ fi
+ if [ $validold -eq 1 ] && [ "$oldipaddr" != "$ipaddr" ] && docker ps --format '{{.Names}}' | grep -qx "HOMEE-$oldipaddr";
+ then
+  /TopStor/getvols.sh home | grep -qF "/$oldipaddr/" || /TopStor/VolumeDockerChange.py $oldipaddr ${oldipsubnet:-24} HOMEE $DG/$name
+ fi
 
 
  #/pace/broadcasttolocal.py volumes/HOME/$myhost/$DG/$name $DG/$name/no/yes/$writev/administrator/yes/$ipaddr/$ipsubnet 
