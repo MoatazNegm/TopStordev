@@ -28,6 +28,9 @@ def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsub
         print(' the ip address is in use ')
         return
     resname = vtype+'-'+ipaddr
+    # QSD5.352 r9b (validator r9 V1): the active records of this address and type that this run starts (stale records
+    # included: they are skipped below, but they do not change while the share starts)
+    startkeys = sorted(str(x[0]) for x in volsip if x not in notsametype)
     cmdline='rm -rf /TopStordata/tempsmb.'+ipaddr
     subprocess.run(cmdline.split(),stdout=subprocess.PIPE)  
     cmdline='rm -rf /TopStordata/smb.'+ipaddr
@@ -90,6 +93,19 @@ def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsub
     # this script) could not repair anything.  Start it again until it stays up; keep the output of every try.
     running = False
     for attempt in range(5):
+        if attempt > 0:
+            # r9b (validator r9 V1): the container is gone: removed by a delete or change of this address (cifsremove.sh,
+            # volbusyfree.sh, VolumeChangeHOME; they do not take this address's lock) or it died.  The mount list above was
+            # read at the start: a home deleted in between came back in a new container (docker made an empty directory
+            # /<pool>/<home> after the destroy, the address went up again).  Started again only while the address still
+            # has the volumes this run read; otherwise the caller / the next VolumeCheck pass decides.  An unreadable
+            # registry ('_1') also stops here (VolumeCheck starts the share later).
+            nowv = [ x for x in get(etcdip,'volume','/'+ipaddr+'/') if 'active' in str(x) and vtype in str(x) ]
+            if sorted(str(x[0]) for x in nowv) != startkeys:
+                print('the volumes of', ipaddr, 'changed while the share was starting: left to VolumeCheck')
+                with open('/root/cifsrun.log','a') as flog:
+                    flog.write(str(datetime.datetime.now())+' '+resname+' stopped: the volumes of '+ipaddr+' changed while the share was starting\n')
+                return
         res = subprocess.run(cmdline.split(),stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         with open('/root/cifsrun.log','a') as flog:
             flog.write(str(datetime.datetime.now())+' '+resname+' try '+str(attempt)+'\n'+res.stdout.decode()[-1500:]+'\n')

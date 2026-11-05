@@ -233,12 +233,22 @@ def is_unique_name(name, home=False):
                         print('is_unique_name: users', e)
                         isuser = False
                 if isuser:
-                        allvols = str(get('vol', '--prefix'))
+                        # r9b (validator r9 V4): volume NAMES only (the last element of each vol... KEY, plus the datasets
+                        # of allinfo): the whole 'vol' text also has the record VALUES, so a user named in another share's
+                        # write list (groups=<user>) was refused its own home (IPnamuqfa)
+                        names = []
+                        try:
+                                for v in get('vol', '--prefix'):
+                                        if isinstance(v, (list, tuple)) and len(v) > 1:
+                                                names.append(str(v[0]).split('/')[-1])
+                        except Exception as e:
+                                print('is_unique_name: volume keys', e)
                         try:
                                 getalltime()
-                                allvols += '/'+' '.join(str(v) for v in allinfo.get('volumes', {}))
+                                names += [ str(v).split('/')[-1] for v in allinfo.get('volumes', {}) ]
                         except Exception as e:
                                 print('is_unique_name: volumes', e)
+                        allvols = ' '.join(names)
                         grps = get('usersigroup', '--prefix')
                         isgroup = any(isinstance(g, (list, tuple)) and str(g[0]) == 'usersigroup/'+str(name) for g in grps)
                         if isgroup or name_in_volumes(name, allvols):

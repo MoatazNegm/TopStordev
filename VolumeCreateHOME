@@ -82,7 +82,10 @@ then
  echo $pullrepli | grep repli
  if [ $? -ne 0 ];
  then
- 	/pace/etcdget.py $etcd volumes --prefix | grep $shortname
+ 	# r9b (validator r9 V4): volume NAMES only (the last element of each volumes/... key, <name> or <name>_<id>): a plain
+ 	# grep of the whole output also matched the record VALUES, so a user named in another share's write list (and any user
+ 	# whose name is part of another volume's name) was refused its home (Unlin1021vv)
+ 	/pace/etcdget.py $etcd volumes --prefix | grep -o "^('volumes/[^']*'" | sed "s/'\$//" | awk -F/ '{print $NF}' | grep -Ex "${shortname}(_[0-9]+)?"
  	if [ $? -eq 0 ];
  	then
   		docker exec etcdclient /TopStor/logmsg.py Unlin1021vv warning $userreq $shortname
@@ -91,9 +94,17 @@ then
  	fi
  fi
  if [ $fromadduser -eq 1 ]; then
-  for try in `seq 1 60`; do getent passwd "$shortname" > /dev/null && break; sleep 2; done
-  if ! getent passwd "$shortname" > /dev/null; then
-   echo "user $shortname not on this node after 120 s: home not created" >> /root/volcreate
+  # r9b (validator r9 V3): a stale user of the same name on this node (it was down when that name was deleted) made
+  # getent succeed at once and the home was given the stale uid; the user sync then re-created the user with the
+  # leader's uid.  The wait is for the uid of the leader's record (usersinfo/<user> = <uid>:<gid>:...); a record
+  # without a uid: any user of that name, as before.
+  wantuid=`echo "$current_userinfo" | grep -E '^[0-9]+:' | cut -d: -f1`
+  haveuser() {
+   if [ -n "$wantuid" ]; then [ "$(getent passwd "$shortname" | cut -d: -f3)" = "$wantuid" ]; else getent passwd "$shortname" > /dev/null; fi
+  }
+  for try in `seq 1 60`; do haveuser && break; sleep 2; done
+  if ! haveuser; then
+   echo "user $shortname (uid ${wantuid:-any}) not on this node after 120 s: home not created" >> /root/volcreate
    docker exec etcdclient /TopStor/logmsg.py NFS1006 error $userreq $DG/$shortname
    docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
    exit

@@ -232,8 +232,14 @@ then
 	ownerip=`/pace/etcdget.py $leaderip ready/$homeowner 2>/dev/null`
 	if echo "$ownerip" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'; then
 		msg="{'req': 'Pumpthis', 'reply': ['/TopStor/VolumeCreateHOME', '$leaderip', '$homePool', '$username', '$size', '$username', '$HomeAddr', '$HomeSubnet', 'active', '$userreq', '$homeowner', '$userreq', 'fromadduser=1']}"
-		docker exec etcdclient /TopStor/sendhost.py $ownerip "$msg" recvreply $myhost
-		echo "home of $username on $homePool posted to the pool owner $homeowner ($ownerip)" >> /root/unixadduser
+		# r9b (validator r9 V2): a failed post (rabbit on the owner down, a pika error) was silent: the user existed with a
+		# usersinfo record naming the pool, no home anywhere and no row.  It is logged (NFS1006); no local create (that is D2).
+		if docker exec etcdclient /TopStor/sendhost.py $ownerip "$msg" recvreply $myhost; then
+			echo "home of $username on $homePool posted to the pool owner $homeowner ($ownerip)" >> /root/unixadduser
+		else
+			echo "home of $username on $homePool: post to $homeowner ($ownerip) failed" >> /root/unixadduser
+			docker exec etcdclient /TopStor/logmsg.py NFS1006 error $userreq $homePool/$username
+		fi
 	else
 		echo "home of $username on $homePool: owner $homeowner has no address, created here" >> /root/unixadduser
 		/TopStor/VolumeCreateHOME $leaderip $homePool $username $size $username $HomeAddr $HomeSubnet active $userreq $myhost $userreq

@@ -26,7 +26,9 @@ pat="/${oper1}::"
 # r9 (validator r8 R5): 'exec 8>>file 2>/dev/null' sent the rest of the script's stderr to /dev/null, and a lock file that
 # cannot be opened made sh (bash in POSIX mode: a redirection error of the special builtin exec) EXIT.  The file is tried
 # first with a regular builtin (an error there does not end the script), then opened for the lock.
-if true 8>>/TopStordata/cronfile.lock 2>/dev/null; then
+# r9b (validator r9 V6): stderr is redirected FIRST (redirections apply left to right), so a lock file that cannot be
+# opened prints nothing.
+if true 2>/dev/null 8>>/TopStordata/cronfile.lock; then
  exec 8>>/TopStordata/cronfile.lock
  flock -w 60 8 2>/dev/null
 fi
