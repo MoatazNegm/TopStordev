@@ -16,6 +16,10 @@ size=`echo $@ | awk '{print $6}'`;
 HomeAddr=`echo $@  | awk '{print $7}' `;
 HomeSubnet=`echo $@  | awk '{print $8}'`;
 pullsync=`echo $@  | awk '{print $9}'`;
+# QSD5.352 r9 (prover D2): fapi users/UnixAddUser adds homeowner=<host of the home pool's owner> (a key=value word at the
+# end, after the positional arguments)
+homeowner=`echo "$@" | grep -o 'homeowner=[^ ]*' | head -n 1 | cut -d= -f2`
+homeremote=0
 echo $pullsync | grep pull
 if [ $? -eq 0 ]
 then
@@ -139,8 +143,17 @@ then
  	then
 		docker exec etcdclient docker exec etcdclient /TopStor/logmsg.py Unlin1024 info  $userreq $username $homedir
   		echo hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
+		# QSD5.352 r9 (prover D2): the home was always created HERE (the leader), also on a pool owned by another node:
+		# HOMEE-<ip> ran on the leader, the dataset was mounted in the leader's mount namespace and the registry record
+		# named the leader, so a later change or delete on the real owner found a busy dataset (NFS1001) and a stale
+		# container.  A pool of another node: the home is created by that node (posted below, after the user exists and
+		# its hash is stored); a pool of this node (or no owner given): here, as before.
+		if [ -n "$homeowner" ] && [ "$homeowner" != "$myhost" ]; then
+			homeremote=1
+		else
   		echo /TopStor/VolumeCreateHOME $leaderip $homePool $username $size $username $HomeAddr $HomeSubnet active $userreq $myhost $userreq 
   		/TopStor/VolumeCreateHOME $leaderip $homePool $username $size $username $HomeAddr $HomeSubnet active $userreq $myhost $userreq 
+		fi
   		echo hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
 	fi
  fi
@@ -212,6 +225,25 @@ then
 	# the UsrChange request of this user (its groups) is filed by the UnixChangeUser call above, with the arguments of UnixChangeUser;
 	# the copy that used to be filed here carried the arguments of UnixAddUser ($@), so followers ran UnixChangeUser with
 	# 'NoHome' as the groups and 'groups...' as the requester
+ fi
+ # r9 (prover D2): the home on another node's pool, posted to that node (as fapi volumes/create posts to the pool owner).
+ # VolumeCreateHOME there waits until the user sync has created the user (fromadduser=1).  Owner address unknown: here.
+ if [ $homeremote -eq 1 ] && [ -n "$userline" ]; then
+	ownerip=`/pace/etcdget.py $leaderip ready/$homeowner 2>/dev/null`
+	if echo "$ownerip" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'; then
+		msg="{'req': 'Pumpthis', 'reply': ['/TopStor/VolumeCreateHOME', '$leaderip', '$homePool', '$username', '$size', '$username', '$HomeAddr', '$HomeSubnet', 'active', '$userreq', '$homeowner', '$userreq', 'fromadduser=1']}"
+		# r9b (validator r9 V2): a failed post (rabbit on the owner down, a pika error) was silent: the user existed with a
+		# usersinfo record naming the pool, no home anywhere and no row.  It is logged (NFS1006); no local create (that is D2).
+		if docker exec etcdclient /TopStor/sendhost.py $ownerip "$msg" recvreply $myhost; then
+			echo "home of $username on $homePool posted to the pool owner $homeowner ($ownerip)" >> /root/unixadduser
+		else
+			echo "home of $username on $homePool: post to $homeowner ($ownerip) failed" >> /root/unixadduser
+			docker exec etcdclient /TopStor/logmsg.py NFS1006 error $userreq $homePool/$username
+		fi
+	else
+		echo "home of $username on $homePool: owner $homeowner has no address, created here" >> /root/unixadduser
+		/TopStor/VolumeCreateHOME $leaderip $homePool $username $size $username $HomeAddr $HomeSubnet active $userreq $myhost $userreq
+	fi
  fi
  echo hi3
  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq 

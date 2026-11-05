@@ -29,6 +29,18 @@ zcomp=`echo "$@" | grep -o 'compression=[a-z0-9]*' | head -1 | cut -d= -f2`
 [ "$zcomp" = "off" ] || zcomp=lz4
 zdedup=`echo "$@" | grep -o 'dedup=[a-z]*' | head -1 | cut -d= -f2`
 [ "$zdedup" = "off" ] || zdedup=on
+# QSD5.352 r9 (prover D2): UnixAddUser posts this script to the pool's OWNER with the word fromadduser=1 when the home pool
+# is owned by another node (it ran here, on the leader, for every pool: the share container, the mount and the registry
+# record of a home on a follower-owned pool were the leader's).  The user is created by the leader and copied to this node
+# by the user sync, so this run waits for it; its usersinfo record may already be written (no 'already has a home').
+fromadduser=0
+echo "$@" | grep -qw 'fromadduser=1' && fromadduser=1
+# r9 (prover D4): the Home Folders page sent active=Yes, which was written as the status ('Yes' is no 'active': the home
+# was never served).  yes / active (any case) = active, anything else = disabled (the words VolumeChangeHOME writes).
+case `echo "$active" | tr 'A-Z' 'a-z'` in
+ active|yes) active='active' ;;
+ *) active='disabled' ;;
+esac
 DG=$pDG;
 hi=`whoami`
 echo start $hi $userreq > /root/volcreate
@@ -56,7 +68,7 @@ then
  # etcdget answers "_1" for a key that does not exist: that is "no such user yet" (UnixAddUser calls this script BEFORE it
  # writes usersinfo/<user>), not an existing user.  Taking "_1" for a user made every new user with a home pool
  # look like one that already has a home folder, and no home folder was ever created (QSD5.237, found by the QC test users_2nodes).
- if [ ! -z "$current_userinfo" ] && [ "$current_userinfo" != "_1" ]; then
+ if [ $fromadduser -eq 0 ] && [ ! -z "$current_userinfo" ] && [ "$current_userinfo" != "_1" ]; then
   current_pool=$(echo "$current_userinfo" | awk -F'/' '{print $2}')
   
   # Check if user already has a home folder (pool is not "NoHome")
@@ -70,13 +82,33 @@ then
  echo $pullrepli | grep repli
  if [ $? -ne 0 ];
  then
- 	/pace/etcdget.py $etcd volumes --prefix | grep $shortname
+ 	# r9b (validator r9 V4): volume NAMES only (the last element of each volumes/... key, <name> or <name>_<id>): a plain
+ 	# grep of the whole output also matched the record VALUES, so a user named in another share's write list (and any user
+ 	# whose name is part of another volume's name) was refused its home (Unlin1021vv)
+ 	/pace/etcdget.py $etcd volumes --prefix | grep -o "^('volumes/[^']*'" | sed "s/'\$//" | awk -F/ '{print $NF}' | grep -Ex "${shortname}(_[0-9]+)?"
  	if [ $? -eq 0 ];
  	then
   		docker exec etcdclient /TopStor/logmsg.py Unlin1021vv warning $userreq $shortname
   		docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
   		exit
  	fi
+ fi
+ if [ $fromadduser -eq 1 ]; then
+  # r9b (validator r9 V3): a stale user of the same name on this node (it was down when that name was deleted) made
+  # getent succeed at once and the home was given the stale uid; the user sync then re-created the user with the
+  # leader's uid.  The wait is for the uid of the leader's record (usersinfo/<user> = <uid>:<gid>:...); a record
+  # without a uid: any user of that name, as before.
+  wantuid=`echo "$current_userinfo" | grep -E '^[0-9]+:' | cut -d: -f1`
+  haveuser() {
+   if [ -n "$wantuid" ]; then [ "$(getent passwd "$shortname" | cut -d: -f3)" = "$wantuid" ]; else getent passwd "$shortname" > /dev/null; fi
+  }
+  for try in `seq 1 60`; do haveuser && break; sleep 2; done
+  if ! haveuser; then
+   echo "user $shortname (uid ${wantuid:-any}) not on this node after 120 s: home not created" >> /root/volcreate
+   docker exec etcdclient /TopStor/logmsg.py NFS1006 error $userreq $DG/$shortname
+   docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
+   exit
+  fi
  fi
  usermod -d /$DG/$name $shortname
  echo privileged $name >> /root/volcreate
@@ -142,13 +174,18 @@ then
  # Update user's home pool information in etcd
  current_userinfo=$(/pace/etcdget.py $leaderip usersinfo/$shortname 2>/dev/null)
 
- if [ ! -z "$current_userinfo" ]; then
+ # r9 (prover D4): only a real user record (uid:gid:...) is updated.  For a name without a record etcdget answers '_1',
+ # which was rewritten as '_1///<size>' and stored: the key stayed after the home was deleted and blocked the name.
+ if echo "$current_userinfo" | grep -Eq '^[0-9]+:[0-9]+:'; then
   # Replace /NoHome/ with the actual pool /$DG/ and update quota
   updated_userinfo=$(echo "$current_userinfo" | sed "s|/NoHome/|/$DG/|g" | awk -F'/' -v quota="$quota" '{OFS="/"; $4=quota; print}')
   ETCDCTL_API=3 /pace/etcdput.py $leaderip usersinfo/$shortname "$updated_userinfo"
  fi
 
- /TopStor/cifs.py $leader $leaderip $myhost $myhostip $etcd $DG $name $ipaddr $ipsubnet HOMEE 
+ # r9 (prover D2, as VolumeChangeHOME since r8): the home records and the user hashes are read from the LEADER, where the
+ # record was just written; a follower's own copy is refreshed by the sync loop seconds later (the share started without
+ # the new home, and without the new user's samba password when the user was created a moment ago)
+ /TopStor/cifs.py $leader $leaderip $myhost $myhostip $leaderip $DG $name $ipaddr $ipsubnet HOMEE 
  /pace/putzpool.py $leaderip  
  /TopStor/SnapshotCreateHourlytrend $leaderip $DG $name 0 24 7 system
  docker exec etcdclient /TopStor/logmsg.py NFS1007 info $userreq $DG/$name

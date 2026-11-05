@@ -27,18 +27,39 @@ then
  echo etcd=$etcd
  docker exec etcdclient /TopStor/logmsg.py NFS1000 info $userreq $pDG/$volname
  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq
- ipaddr=`/TopStor/etcdget.py $etcd volume $volname | awk -F'administrator' '{ print $2}' | awk -F'/' '{print $3}'`
- vtype=`/TopStor/etcdget.py $etcd volume $volname | awk -F'/' '{print $2}'`
+ # r9b (validator r9 V5): the record is read from the LEADER, as in VolumeDeleteHOME (prover D5): a follower's own copy
+ # still had the OLD address for a few seconds after an address change, cifsremove.sh then removed the old-address
+ # container and left CIFS-<new ip> holding the dataset.  No answer from the leader in 3 tries: this node's copy.
+ recetcd=$etcd
+ for try in 1 2 3; do
+  [ -n "`/TopStor/etcdget.py $leaderip volume $volname | grep administrator`" ] && { recetcd=$leaderip; break; }
+  sleep 2
+ done
+ ipaddr=`/TopStor/etcdget.py $recetcd volume $volname | awk -F'administrator' '{ print $2}' | awk -F'/' '{print $3}'`
+ vtype=`/TopStor/etcdget.py $recetcd volume $volname | awk -F'/' '{print $2}'`
  echo ip=$ipaddr
  stamp=`date +%s`
  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${pDG}_$name/request volumes_$stamp
  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${pDG}_$name/request/$leader volumes_$stamp
  /TopStor/cifsremove.sh $leaderip $pDG $volname $ipaddr $vtype 2>/root/errcifsremove
- /TopStor/SnapShotPeriodDelete $leaderip $volname $userreq
- echo /sbin/zfs destroy -rf $pDG/$volname 
- /sbin/zfs unmount -f $pDG/$volname 
- /sbin/zfs destroy -rf $pDG/$volname 
- if [ $? -ne 0  ]; then
+ # QSD5.352 r9 (validator r8 R1): no SnapShotPeriodDelete call here any more: snapperioddel.sh + crondelete (in the remove
+ # script above) delete this volume's records, call keys and lines, anchored on /<pool>/<volume>/; its substring match took
+ # the records and lines of every volume whose full name contains this one (vol_123, xvol_12 when vol_12 goes).
+ echo /sbin/zfs destroy -rf $pDG/$volname
+ # QSD5.352 r9 (prover D6): a share container of this node that still mounts the dataset (the other home of a shared
+ # address started again in between, an old-address container) made the destroy fail at once (NFS1001): such a container
+ # is removed (volbusyfree.sh, the other shares of the address are started again without this volume) and the destroy
+ # is tried again, up to 12 times, 5 s apart (a share start still running, cifs.py tries up to 5 x 8 s).
+ destroyrc=1
+ for try in `seq 1 12`; do
+  /sbin/zfs unmount -f $pDG/$volname 2>/dev/null
+  /sbin/zfs destroy -rf $pDG/$volname && { destroyrc=0; break; }
+  echo "`date +%T` destroy of $pDG/$volname failed (try $try)" >> /root/volbusyfree
+  [ $try -eq 12 ] && break
+  /TopStor/volbusyfree.sh $leader $leaderip $myhost $myhostip $pDG $volname
+  sleep 5
+ done
+ if [ $destroyrc -ne 0  ]; then
    ETCDCTL_API=3 /pace/etcdput.py $leaderip cVolToDelete/$myhost "$pDG|$volname|$userreq|$(basename "$0")"
    docker exec etcdclient /TopStor/logmsg.py NFS1001 error $userreq $volname
    echo /sbin/zfs destroy -rf $pDG/$volname >/root/errorVolumeDeleteCIFS

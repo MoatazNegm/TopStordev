@@ -4,7 +4,7 @@ cd /TopStor
 web='/usr/local/www/apache24/data/des19/Data/status.log';
 logging='/usr/local/www/apache24/data/des19/Data/currentinfo2.log'
 myhost=`hostname -s`
-# crondelete <volume>: drop the snapshot schedules of one volume from this node's crontab (cifsremove.sh, nfsremove.sh).
+# crondelete <volume> [<pool>]: drop the snapshot schedules of one volume from this node's crontab (cifsremove.sh, nfsremove.sh).
 # QSD5.352 r7 (validator, crondelete finding): the filter used the unset '$per1' (the variable is oper1); unquoted it
 # vanished, 'grep -v' without a pattern printed its usage and nothing else, and the EMPTY file was installed: every CIFS,
 # home or NFS delete wiped every snapshot schedule of the node (all volumes, all types).  Every schedule line carries
@@ -12,13 +12,27 @@ myhost=`hostname -s`
 # string anchored on '/' and '::' (a plain substring dropped the lines of vol_123 with those of vol_12).  No volume name,
 # or no crontab to read: the crontab is not touched.
 oper1=`echo $@ | awk '{print $1}'`
+pool=`echo $@ | awk '{print $2}'`
 [ -n "$oper1" ] || exit 0
+# QSD5.352 r9 (validator r8 R2): cifsremove.sh / nfsremove.sh pass the pool too (crondelete <volume> <pool>): the filter is
+# then '::<pool>/<volume>::', the exact text every schedule writer puts on the line (::$DG/$FileS::), so a volume with the
+# same name on another pool (an import, a replica) keeps its lines on this node.  Without a pool: '/<volume>::' as before.
+pat="/${oper1}::"
+[ -n "$pool" ] && pat="::${pool}/${oper1}::"
 # QSD5.352 r8 (validator r7 N1): cifsremove.sh / nfsremove.sh delete the volume's Snapperiod records (snapperioddel.sh)
 # BEFORE this runs.  The table is read, filtered and installed under the lock pace/etctocron.py and DGdestroyPool take: an
 # etctocron that read the records before their delete installs before this filter (which drops what it wrote back); one
 # that starts after the delete no longer sees them.  Not taken in 60 s (or no lock file): it runs without it, as etctocron.
-exec 8>>/TopStordata/cronfile.lock 2>/dev/null && flock -w 60 8 2>/dev/null
+# r9 (validator r8 R5): 'exec 8>>file 2>/dev/null' sent the rest of the script's stderr to /dev/null, and a lock file that
+# cannot be opened made sh (bash in POSIX mode: a redirection error of the special builtin exec) EXIT.  The file is tried
+# first with a regular builtin (an error there does not end the script), then opened for the lock.
+# r9b (validator r9 V6): stderr is redirected FIRST (redirections apply left to right), so a lock file that cannot be
+# opened prints nothing.
+if true 2>/dev/null 8>>/TopStordata/cronfile.lock; then
+ exec 8>>/TopStordata/cronfile.lock
+ flock -w 60 8 2>/dev/null
+fi
 mkdir -p txt; rm -f txt/cronthis.txt
 crontab -l > txt/cronthis.txt 2>/dev/null || exit 0
-grep -vF -- "/${oper1}::" txt/cronthis.txt > /TopStordata/cronthis.txt
+grep -vF -- "$pat" txt/cronthis.txt > /TopStordata/cronthis.txt
 crontab /TopStordata/cronthis.txt

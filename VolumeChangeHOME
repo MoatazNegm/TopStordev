@@ -164,7 +164,9 @@ echo /pace/etcdput.py $leaderip volumes/HOMEE/$myhost/$DG/$name $DG/$name/no/yes
  # the registry, which cifs.py ignores: the home stayed down.  This script writes the share file, the registry record and
  # starts the share itself (above), so the call is gone.
  /pace/putzpool.py
- /TopStor/logmsg.py VolCsu01 info $userreq $name
+ # QSD5.352 r9 (prover D3): through etcdclient like every other script; the node's own logmsg.py cannot reach the message
+ # bus (rabbit host name not resolved: socket.gaierror), so no VolCsu01 row was ever written after a home change
+ docker exec etcdclient /TopStor/logmsg.py VolCsu01 info $userreq $name
  echo ready ;
  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
 fi

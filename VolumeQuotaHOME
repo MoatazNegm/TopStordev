@@ -37,7 +37,9 @@ then
  leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
  info=`/pace/etcdget.py $leaderip usersinfo/$shortname`
  nf=`echo "$info" | awk -F'/' '{print NF}'`
- if [ "$nf" -ge 4 ];
+ # r9c (prover r4 D8): only a real user record (<uid>:<gid>:/<pool>/<name>/<size>...) gets the new quota: a junk value
+ # '_1///<size>' (4 fields) was rewritten and kept, and such a value stopped the user sync of every joining node
+ if [ "$nf" -ge 4 ] && echo "$info" | grep -Eq '^[0-9]+:[0-9]+:/';
  then
   newinfo=`echo "$info" | awk -F'/' -v q="$quota" '{OFS="/"; $4=q; print}'`
   /pace/etcdput.py $leaderip usersinfo/$shortname "$newinfo"

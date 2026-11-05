@@ -17,7 +17,7 @@ docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq
 #/TopStor/deltolocal.py vol $vol 
 # QSD5.352 r8 (validator r7 N1): the volume's schedule records first (and a Snapperiod sync), then this node's lines
 /TopStor/snapperioddel.sh $leaderip $pool $vol
-/TopStor/crondelete $vol
+/TopStor/crondelete $vol $pool    # r9 (validator r8 R2): pool-anchored
 rm -rf /TopStordata/smb.${volip}.new
 echo vol = $vol
 /TopStor/delblock.py start${vol}_only stop${vol}_only /TopStordata/smb.$volip  ;
@@ -28,8 +28,9 @@ rm -rf /TopStordata/smb.$volip
 cat /TopStordata/smb.${volip}.new
 cat /TopStordata/smb.${volip}.new > /TopStordata/smb.${volip}
 resname=$vtype'-'$volip
-resname=`docker ps | grep $volip | awk '{print $NF}'`
-docker  rm -f $resname 
+# r9: the container of exactly this address (a plain 'grep <ip>' took HOMEE-10.11.11.169 for 10.11.11.16)
+resname=`docker ps --format '{{.Names}}' | awk -v s="-$volip" 'length($0) > length(s) && substr($0, length($0)-length(s)+1) == s'`
+[ -n "$resname" ] && docker  rm -f $resname 
 cat /TopStordata/smb.$volip | grep start | grep only
 if [ $? -ne 0 ]
 then 
@@ -52,34 +53,27 @@ then
   flock -u 9
   rm -rf /TopStordata/smb.$volip;
 else
- mounts=`cat /TopStordata/smb.$volip | grep '\[' | sed 's/\[//g' | sed 's/\]//g' | sed ':a;N;$!ba;s/\n/,/g'`
- echo mounts=$mounts
- mount=''
- for x in $mounts; 
- do
-  mount=$mount'-v /'$pool'/'$x':/'$pool'/'$x':rw '
- done
- cp /TopStor/VolumeCIFSupdate.sh /etc/
- dockers=`docker ps -a`
- echo $dockers | grep $resname
- if [ $? -eq 0 ];
- then
-  docker stop $resname 
-  docker rm -f $resname
+ # QSD5.352 r9 (prover D6): another share is still on the address.  This branch started the container again with
+ # 'docker run' of an image that is not there (10.11.11.124:5000/smb) and without the address ($ipaddr was never set), so
+ # the remaining share stayed down until a VolumeCheck pass started it, and that start raced the next delete: two homes on
+ # one address deleted 1 s apart, the second 'zfs destroy' found the dataset held by the new container (NFS1001).  The
+ # share is started again through cifs.py now (per-address lock, records from the LEADER: this volume's record is already
+ # gone, so the new container does not mount it), in the background; a domain share (CIFS_<domain>) is left to VolumeCheck.
+ case $vtype in
+  HOMEE|HOME) kind=home; ctype=HOMEE ;;
+  CIFS) kind=cifs; ctype=CIFS ;;
+  *) kind='' ;;
+ esac
+ other=''
+ [ -n "$kind" ] && other=`/TopStor/getvols.sh $kind | grep -vF "$pool/$vol/" | grep -F "/$volip/" | grep '/active$' | head -n 1`
+ if [ -n "$other" ]; then
+  opool=`echo $other | cut -d/ -f1`; oname=`echo $other | cut -d/ -f2`; osub=`echo $other | cut -d/ -f9`
+  leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
+  myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
+  myhostip=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`
+  echo "`date +%T` $opool/$oname still on $volip: share started again" >> /root/cifsremove.restart
+  ( /TopStor/cifs.py $leader $leaderip $myhost $myhostip $leaderip $opool $oname $volip ${osub:-24} $ctype > /dev/null 2>&1 & )
  fi
- docker run -d $mount --privileged \
-  -e "HOSTIP=$ipaddr"  \
-  -p $ipaddr:135:135 \
-  -p $ipaddr:137-138:137-138/udp \
-  -p $ipaddr:139:139 \
-  -p $ipaddr:445:445 \
-  -v /etc/localtime:/etc/localtime:ro \
-  -v /TopStordata/smb.${ipaddr}:/config/smb.conf:rw \
-  -v /etc/:/hostetc/   \
-  -v /var/lib/samba/private:/var/lib/samba/private:rw \
-  --name $resname 10.11.11.124:5000/smb
-  sleep 3
-  docker exec $resname sh /hostetc/VolumeCIFSupdate.sh
 fi
 /TopStor/etcddel.py $leaderip vol $vol
 /TopStor/etcddel.py $leaderip replivol $vol
