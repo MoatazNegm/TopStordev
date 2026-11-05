@@ -19,7 +19,7 @@ docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq
 #/TopStor/deltolocal.py vol $vol 
 # QSD5.352 r8 (validator r7 N1): the volume's schedule records first (and a Snapperiod sync), then this node's lines
 /TopStor/snapperioddel.sh $leaderip $pool $vol
-/TopStor/crondelete $vol
+/TopStor/crondelete $vol $pool    # r9 (validator r8 R2): pool-anchored
 rm -rf /TopStordata/exports.${volip}.new
 rm -rf /TopStor/exports.${vol}
 rm -rf /$pool/exports.${vol}

@@ -218,8 +218,34 @@ def name_in_volumes(name, volumes_text):
         pattern = r'(^|[^A-Za-z0-9_])'+re.escape(str(name))+r'(_[0-9]+)?([^A-Za-z0-9_]|$)'
         return re.search(pattern, volumes_text) is not None
 
-def is_unique_name(name):
+def is_unique_name(name, home=False):
         global leaderip, allinfo
+        # QSD5.352 r9 (prover D4): a HOME volume is named after its user (the Home Folders page sends name=<user name>), so the
+        # user's own name was always 'already used' (IPnamuqfa) and a home could be made only through users/UnixAddUser.  For
+        # home=True an existing user of exactly that name does not count; a group of that name or a volume (an existing home
+        # <name>_<id>) still does.  The user's own keys (usersinfo/, usershash/) are left out, group records (usersigroup/)
+        # are compared by their key only (their values list the members).
+        if home:
+                try:
+                        users = get('usersinfo', '--prefix')
+                        isuser = any(isinstance(u, (list, tuple)) and str(u[0]) == 'usersinfo/'+str(name) for u in users)
+                except Exception as e:
+                        print('is_unique_name: users', e)
+                        isuser = False
+                if isuser:
+                        allvols = str(get('vol', '--prefix'))
+                        try:
+                                getalltime()
+                                allvols += '/'+' '.join(str(v) for v in allinfo.get('volumes', {}))
+                        except Exception as e:
+                                print('is_unique_name: volumes', e)
+                        grps = get('usersigroup', '--prefix')
+                        isgroup = any(isinstance(g, (list, tuple)) and str(g[0]) == 'usersigroup/'+str(name) for g in grps)
+                        if isgroup or name_in_volumes(name, allvols):
+                                print("Invalid Name")
+                                return 1000
+                        print("Valid Name (the user's own home)")
+                        return 0
         allvols = str(get('vol', '--prefix'))
         try:
                 getalltime()
@@ -2008,7 +2034,18 @@ def volumecreate(data):
   return {'response': 'baduser'}
  datastr = ''
  datatype = ip_context(data['type'], data.get('domname',''))
- isvu =  int(is_valid_ip(data['ipaddress']))+int(is_unique_ip(data['ipaddress'],datatype))+int(is_unique_name(data['name']))
+ ishome = 'HOME' in str(data.get('type', ''))
+ if ishome:
+  # QSD5.352 r9 (prover D4): the Home Folders page sent active=Yes; VolumeCreateHOME wrote 'Yes' as the share's status and
+  # the home was never served.  A home is created 'active' (also for yes / no value) or 'disabled'; other words: refused.
+  act = str(data.get('active', 'active')).strip().lower()
+  if act in ('', 'active', 'yes'):
+   data['active'] = 'active'
+  elif act in ('disabled', 'disable', 'no'):
+   data['active'] = 'disabled'
+  else:
+   return {'response': data.get('response'), 'error': 'invalidstatus'}
+ isvu =  int(is_valid_ip(data['ipaddress']))+int(is_unique_ip(data['ipaddress'],datatype))+int(is_unique_name(data['name'], home=ishome))
  if isvu == 0:
     print('ip is valid')
  else:
@@ -3029,6 +3066,14 @@ def UnixAddUser(data):
  groupstr = with_everyone(groupstr)
  cmndstring = '/TopStor/UnixAddUser '+leaderip+' '+data.get('name')+' '+pool+' groups'+groupstr+' ' \
      +data.get('Password')+' '+data.get('Volsize')+'G '+data.get('HomeAddress')+' '+data.get('HomeSubnet')+' hoststub'+' '+data['user']
+ # QSD5.352 r9 (prover D2): the host that owns the home pool; UnixAddUser (on the leader) creates the home there, not on
+ # itself (as volumes/create posts to the pool owner)
+ if pool != 'NoHome':
+  try:
+   getalltime()
+   cmndstring += ' homeowner='+allinfo['hosts'][allinfo['pools'][pool]['host']]['name']
+  except Exception as e:
+   print('UnixAddUser: no owner for the home pool', pool, e)
  print('UnixAddUser', mask_text(cmndstring, _request_secrets(data)))
  postchange(cmndstring)
  data['adduser'] = 'accepted'

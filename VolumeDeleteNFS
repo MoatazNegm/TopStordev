@@ -44,7 +44,9 @@ then
  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${pDG}_$name/request volumes_$stamp
  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${pDG}_$name/request/$leader volumes_$stamp
  /TopStor/nfsremove.sh $leaderip $pDG $volname $ipaddr $ipsubnet $vtype 2>/root/errcifsremove
- /TopStor/SnapShotPeriodDelete $leaderip $volname $userreq
+ # QSD5.352 r9 (validator r8 R1): no SnapShotPeriodDelete call here any more: snapperioddel.sh + crondelete (in the remove
+ # script above) delete this volume's records, call keys and lines, anchored on /<pool>/<volume>/; its substring match took
+ # the records and lines of every volume whose full name contains this one (vol_123, xvol_12 when vol_12 goes).
  echo /sbin/zfs destroy -rf $pDG/$volname 
  /sbin/zfs unmount -f $pDG/$volname 
  /sbin/zfs destroy -rf $pDG/$volname 

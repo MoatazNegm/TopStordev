@@ -20,7 +20,9 @@ if /pace/etcdget.py $leaderip Snapperiod --prefix 2>/dev/null | grep -qF "/$pool
  /pace/etcddel.py $leaderip Snapperiod "/$pool/$vol/"
  me=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode 2>/dev/null`
  [ -n "$me" ] || me=`hostname -s`
- stamp=`date +%s`
+ # r9 (validator r8 R4): nanoseconds, as DGdestroyPool / UnixAddUser: two such requests from two nodes in one second had
+ # the same value, counted as one (done marks and pruning match on the value)
+ stamp=`date +%s%N`
  /pace/etcdput.py $leaderip sync/Snapperiod/Del_${vol}/request/$me Snapperiod_$stamp
  /pace/etcdput.py $leaderip sync/Snapperiod/Del_${vol}/request Snapperiod_$stamp
  echo "snapshot schedule records of $pool/$vol deleted, Snapperiod sync sent" >> /root/snapperioddel
