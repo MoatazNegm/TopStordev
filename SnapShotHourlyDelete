@@ -8,10 +8,15 @@ rm txt/cronthis.txt;
 oper1=` echo $@ | awk '{print $1}'`;
 userreq=` echo $@ | awk '{print $2}'`;
  /TopStor/logmsg.py Snap1043 info $userreq $oper1
-crontab -l > txt/cronthis.txt;
 snapsched=`echo $oper1 | awk -F@ '{print $2}'`;
-cat txt/cronthis.txt | grep -v $snapsched > txt/cronthis.txt
-crontab txt/cronthis.txt 2>txt/${0:2}$userreq.txt;
+# QSD5.352 r8 (validator r7, point 4): 'cat txt/cronthis.txt | grep -v $snapsched > txt/cronthis.txt' truncated the file
+# before cat read it (499 of 500 runs ended EMPTY) and the next line installed it: the whole crontab was wiped; an empty
+# name (no '@' in the argument) did the same.  Filtered into a second file now (fixed string); no name or no crontab:
+# nothing is installed.  No caller in TopStor, pace or topstorweb (the API uses SnapShotPeriodDelete).
+[ -n "$snapsched" ] || { /TopStor/logmsg.py Snap1044 error $userreq $oper1; exit 0; }
+crontab -l > txt/cronthis.txt 2>/dev/null || exit 0
+grep -vF -- "$snapsched" txt/cronthis.txt > txt/cronthis.new
+crontab txt/cronthis.new 2>txt/${0:2}$userreq.txt;
 err=`wc -c  txt/${0:2}$userreq.txt | awk '{print $1}'`;
 if [[ $err -ge  4  ]]; then
  /TopStor/logmsg.py Snap1044 error $userreq $oper1

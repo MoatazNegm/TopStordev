@@ -2287,6 +2287,15 @@ def volumeconfig_do(data):
   volume['groups'] = str(volume.get('name','')).rsplit('_',1)[0] if volume.get('prot') in ('HOME','HOMEE') else 'NoGroup'
  if not str(volume['Subnet']).strip():
   volume['Subnet'] = '24'
+ # QSD5.352 r8 (validator r7, statusmount): a home is 'active' or 'disabled' (the canonical off value; 'disable' is taken
+ # as it, any case).  Any other word was passed on: 'inactive' contains 'active', so VolumeChangeHOME took the home down
+ # and VolumeCheck / cifs.py served it again in every cycle; a '/' broke the registry record.  Refused: invalidstatus.
+ if volume.get('prot') in ('HOME', 'HOMEE') and 'statusmount' in data:
+  sm = str(data['statusmount']).strip().lower()
+  sm = 'disabled' if sm == 'disable' else sm
+  if sm not in ('active', 'disabled'):
+   return {'response': data['response'], 'volume': data.get('volume'), 'error': 'invalidstatus'}
+  data['statusmount'] = sm
  data['owner'] = volume['host']
  if 'ipaddress' not in data:
    if len(str(volume['ipaddress'])) < 7:

@@ -13,6 +13,11 @@ myhost=`hostname -s`
 # or no crontab to read: the crontab is not touched.
 oper1=`echo $@ | awk '{print $1}'`
 [ -n "$oper1" ] || exit 0
+# QSD5.352 r8 (validator r7 N1): cifsremove.sh / nfsremove.sh delete the volume's Snapperiod records (snapperioddel.sh)
+# BEFORE this runs.  The table is read, filtered and installed under the lock pace/etctocron.py and DGdestroyPool take: an
+# etctocron that read the records before their delete installs before this filter (which drops what it wrote back); one
+# that starts after the delete no longer sees them.  Not taken in 60 s (or no lock file): it runs without it, as etctocron.
+exec 8>>/TopStordata/cronfile.lock 2>/dev/null && flock -w 60 8 2>/dev/null
 mkdir -p txt; rm -f txt/cronthis.txt
 crontab -l > txt/cronthis.txt 2>/dev/null || exit 0
 grep -vF -- "/${oper1}::" txt/cronthis.txt > /TopStordata/cronthis.txt

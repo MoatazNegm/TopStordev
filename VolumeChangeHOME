@@ -37,6 +37,15 @@ then
  then
   writev=`echo $writev | sed 's/nogroup//g'`
  fi
+ # QSD5.352 r8 (validator r7, statusmount): only 'active' and 'disabled' (the canonical off value, Volumeactivesh.sh,
+ # targetcreatevol.sh) are written.  Any other word was written as it came: 'inactive' contains 'active', so this script
+ # took the home down, VolumeCheck (getdirtyvols) found the registry 'active' and cifs.py served it again, every cycle; a
+ # '/' broke the registry record and the sed below.  'active' in any case stays on, anything else is off = 'disabled'
+ # (fapi volumes/config refuses other words from a request; this covers a stored value and other callers).
+ case `echo "$active" | tr 'A-Z' 'a-z'` in
+  active) active='active' ;;
+  *) [ "$active" = 'disabled' ] || echo "statusmount '$active' written as disabled" >> /root/volchange; active='disabled' ;;
+ esac
  echo $pDG $name $quota $writev $ipaddr $ipsubnet $myhost $userreq $extraparms>> /root/volchange
  docker exec etcdclient /TopStor/logmsg.py VolCst01 info $userreq $name
  echo name=$name
@@ -109,6 +118,17 @@ echo /pace/etcdput.py $leaderip volumes/HOMEE/$myhost/$DG/$name $DG/$name/no/yes
  if [ $addrchange -eq 1 ];
  then
   /TopStor/VolumeDockerChange.py $oldipaddr ${oldipsubnet:-24} HOMEE $DG/$name
+  # r8 (validator r7, point 3): HOMEE-<old ip> served every home of the old address; another ACTIVE home of this node
+  # still there is started again now (cifs.py, records from the leader: this home's record already has the new
+  # address), not one VolumeCheck cycle (~60 s) later
+  if [ "$oldipaddr" != "$ipaddr" ]; then
+   other=`/TopStor/getvols.sh home | grep -vF "$DG/$name/" | grep -F "/$oldipaddr/" | grep '/active$' | head -n 1`
+   if [ -n "$other" ]; then
+    opool=`echo $other | cut -d/ -f1`; oname=`echo $other | cut -d/ -f2`; osub=`echo $other | cut -d/ -f9`
+    echo "home $opool/$oname still on $oldipaddr: share restarted" >> /root/volchange
+    /TopStor/cifs.py $leader $leaderip $myhost $myhostip $leaderip $opool $oname $oldipaddr ${osub:-24} HOMEE
+   fi
+  fi
  fi
  # r7 (validator R2): a disabled home is served no more.  cifs.py leaves a disabled record out but does not stop a
  # running container, so HOMEE-<ip> (and the address, unless another dataset uses it) goes when no other ACTIVE home of
@@ -124,7 +144,11 @@ echo /pace/etcdput.py $leaderip volumes/HOMEE/$myhost/$DG/$name $DG/$name/no/yes
  # meantime is removed again when no home of this node uses the old address any more
  if [ $offnow -eq 0 ] && { [ $addrchange -eq 1 ] || [ $regen -eq 1 ]; };
  then
-  /TopStor/cifs.py $leader $leaderip $myhost $myhostip $etcd $DG $name $ipaddr $ipsubnet HOMEE
+  # r8 (validator r7 N2): cifs.py reads the homes of the address from the LEADER's etcd, where the record was just
+  # written.  On a follower $etcd is its own copy, refreshed by the sync loop seconds later: a home disabled on an address
+  # shared with another home was still 'active' there and the share was restarted WITH it (nothing corrected that:
+  # VolumeCheck checks only active homes); an address change or an enable waited a VolumeCheck cycle.
+  /TopStor/cifs.py $leader $leaderip $myhost $myhostip $leaderip $DG $name $ipaddr $ipsubnet HOMEE
  fi
  if [ $validold -eq 1 ] && [ "$oldipaddr" != "$ipaddr" ] && docker ps --format '{{.Names}}' | grep -qFx "HOMEE-$oldipaddr";
  then
