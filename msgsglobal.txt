@@ -472,3 +472,4 @@ HomQsu01:1: : from :: Success changing the quota of the home folder of : to :
 HomQfa01:1: : from :: Failed changing the quota of the home folder of : to :
 VolQsu01:1: : from :: Success changing the size of volume : to :
 VolQfa01:2: : from :: Failed changing the size of volume : to : (not a size, or below the space already used)
+ISCSIfa04:1: : from :: Not done, the portal port of the iSCSI volume : must be a number from 1024 to 65535, not :

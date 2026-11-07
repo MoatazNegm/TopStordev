@@ -2081,6 +2081,8 @@ def volumecreate(data):
    return data
   data['groups'] = only_everyone(grps)
  if 'ISCSI' in data['type']:
+  if portalport_bad(data.get('portalport')):
+   return portalport_refuse(data, data.get('name'))
   chapuser, chapstored, why = iscsi_chap(data)
   if why:
    logmsg.sendlog('ISCSIfa02','error',data['user'],logname(data.get('name')))
@@ -2386,6 +2388,8 @@ def volumeconfig_do(data):
  datastr = ''
  data['owner'] = allinfo['hosts'][allinfo['pools'][volume['pool']]['host']]['name']
  if 'ISCSI' in data['type']:
+  if 'portalport' in data and portalport_bad(data.get('portalport')):
+   return portalport_refuse(data, data.get('volume'))
   chapuser, chapstored, why = iscsi_chap(data, volume)
   if why:
    logmsg.sendlog('ISCSIfa02','error',data['user'],logname(data.get('volume')))
@@ -2856,6 +2860,23 @@ def UnixAddGroup(data):
  cmndstring = '/TopStor/UnixAddGroup '+leaderip+' '+data['name']+' '+' users'+usrstr+' '+data['user']
  postchange(cmndstring)
  return data
+
+# QSD5.352 r10 (QC 651): the iSCSI portal port of volumes/create ISCSI and volumes/config was checked for digits only:
+# 80 made a portal on port 80, 70000 was stored and the target listened nowhere.  The UI form has min/max only.
+PORTALPORT_MIN = 1024
+PORTALPORT_MAX = 65535
+
+def portalport_bad(value):
+ try:
+  port = int(str(value).strip())
+ except (TypeError, ValueError):
+  return True
+ return not (PORTALPORT_MIN <= port <= PORTALPORT_MAX)
+
+def portalport_refuse(data, name):
+ logmsg.sendlog('ISCSIfa04','error',data.get('user'),logname(name),logname(str(data.get('portalport'))))
+ return {'response': 'error', 'error': 'invalidport',
+         'message': 'portalport must be a number from %d to %d' % (PORTALPORT_MIN, PORTALPORT_MAX)}
 
 PARTNER_PORT_MIN = 3001
 PARTNER_PORT_MAX = 8000
