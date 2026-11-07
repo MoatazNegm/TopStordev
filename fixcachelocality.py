@@ -14,12 +14,18 @@
 # (`zpool status -g`), and the log says what really happened.
 #
 #   fixcachelocality.py <leaderip> <pool> <myhost>      relocate after an import
+#   fixcachelocality.py <leaderip> <pool> <myhost> wait (QSD5.352 r10, zpooltoimport.py) the same, but the cluster info
+#                                                       is read again every 15 s (3 min at most) until it lists the pool
 #   fixcachelocality.py rmcache <pool> <disk>           remove one cache vdev by name or GUID (DGsetPool updatecache,
 #                                                       when the old cache disk has no /dev/disk/by-id link any more)
 #   fixcachelocality.py rmdead <pool>                   remove every UNAVAIL/REMOVED/FAULTED cache vdev (updatecache)
 import sys
 import json
 import subprocess
+import time
+
+WAIT_TRIES = 12           # QSD5.352 r10 (QC 631): wait mode, 12 x 15 s = 3 minutes at most
+WAIT_STEP = 15
 
 sys.path.insert(0, '/TopStor')
 
@@ -196,12 +202,23 @@ def main():
     myhost = sys.argv[3]
 
     from allphysicalinfo import getall, initallphy
-    initallphy(leaderip)
-    info = getall(leaderip)
-
-    pool_data = info['pools'].get(pool)
+    # QSD5.352 r10 (QC 631): right after a take-over import the cluster info still listed the pool under its old owner
+    # only (or not at all): 'not found in the cluster info, nothing done' and the cache stayed UNAVAIL for good.  With
+    # 'wait' (zpooltoimport.py, run in the background) the info is read again every WAIT_STEP s until the pool shows up,
+    # WAIT_TRIES times at most.
+    wait = len(sys.argv) >= 5 and sys.argv[4] == 'wait'
+    tries = WAIT_TRIES if wait else 1
+    pool_data, info = None, {}
+    for n in range(tries):
+        if n:
+            time.sleep(WAIT_STEP)
+        initallphy(leaderip)
+        info = getall(leaderip)
+        pool_data = info['pools'].get(pool)
+        if pool_data:
+            break
     if not pool_data:
-        print(f"fixcachelocality: pool {pool} not found in the cluster info, nothing done")
+        print(f"fixcachelocality: pool {pool} not found in the cluster info, nothing done" + (f" (after {tries} tries)" if wait else ''))
         return
 
     cache_disks = []
