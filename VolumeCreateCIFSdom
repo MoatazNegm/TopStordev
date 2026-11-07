@@ -72,6 +72,8 @@ then
  ETCDCTL_API=3 /pace/etcdput.py $leaderip volumes/CIFS_$domname/$myhost/$DG/$name $DG/$name/no/yes/DOMAIN/administrator/yes/$ipaddr/$ipsubnet/$domname/$domsrvn/$domsrvi/$domadmin/$dompass/$active 
  #/pace/broadcasttolocal.py volumes/CIFS/$myhost/$DG/$name $DG/$name/no/yes/DOMAIN/administrator/yes/$ipaddr/$ipsubnet/$domname/$domsrvn/$domsrvi/$domadmin/$dompass/$active
  ./VolumeActivateCIFSdom $leaderip vol=$name user=$userreq
+ # QSD5.352 r10 (QC 649): tell the user when the share container cannot join the domain (in the background, 2 min)
+ ( /TopStor/cifsdomjoincheck.sh $ipaddr $DG/$name $domname $userreq ) >/dev/null 2>&1 </dev/null &
  /pace/putzpool.py $leaderip 
  /TopStor/SnapshotCreateHourlytrend $leaderip $DG $name 0 24 7 system 
  docker exec etcdclient /TopStor/logmsg.py NFS1007 info $userreq $DG/$name
