@@ -631,16 +631,15 @@ do
 	fi
 	echo initializaing volume pool leader clsuternode data
 	myalias=`docker exec etcdclient /pace/etcdgetlocal.py $aliast/$myhost`
-	# QSD5.352 r10 (QC 678/679 alias '_1'): a node whose own etcd has no alias (a return, a renewed local etcd) read '_1'
-	# here and wrote it over the leader's alias below (and posted it as a sync to every node): the alias set in Node Config
-	# was lost for good.  An unset local value now takes the leader's; when the leader has none either, the host name (what
-	# the node card shows for a node without an alias) is written instead of '_1'.
-	case "$myalias" in ''|_1|-1|None)
-		myalias=`/pace/etcdget.py $myclusterip $aliast/$myhost 2>/dev/null | tail -1`
-		case "$myalias" in ''|_1|-1|None|*' '*) myalias=$myhost ;; esac
-		echo alias of $myhost taken as $myalias >> /root/dockerlogs.txt
-		;;
-	esac
+	# QSD5.352 r10 (QC 678/679 alias '_1'): this node's own etcd copy was written over the leader's alias below (and posted
+	# as a sync to every node): an unset copy ('_1', a return with a renewed local etcd) erased the alias set in Node Config,
+	# a stale one (the alias was changed while this node was down) brought the old alias back.  The leader's value now wins
+	# when it is set; else this node's own; else the host name (what the node card shows for a node without an alias),
+	# never '_1'.  /root/newalias (a join with an alias) still wins over all.
+	leaderalias=`/pace/etcdget.py $myclusterip $aliast/$myhost 2>/dev/null | tail -1`
+	case "$leaderalias" in ''|_1|-1|None|*' '*) ;; *) myalias=$leaderalias ;; esac
+	case "$myalias" in ''|_1|-1|None|*' '*) myalias=$myhost ;; esac
+	echo alias of $myhost taken as $myalias >> /root/dockerlogs.txt
 	if [ -n "$newalias" ]; then myalias=$newalias; fi
 	leader=`/pace/etcdget.py $myclusterip leader`
 	docker exec etcdclient /pace/etcdputlocal.py leader $leader 
