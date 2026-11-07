@@ -30,6 +30,9 @@ then
  /bin/crontab -l | grep -v "$periodel" > /TopStordata/thiscron
  /bin/crontab /TopStordata/thiscron
  /pace/etcddel.py $leaderip Snapperiod $periodel 
+ # QSD5.352 r10 (QC 661, 662): and this node's own copy (a node that is not the leader keeps its own etcd; it posts the Del
+ # request with its own done mark, so the sync never removed the key here)
+ [ "$etcd" != "$leaderip" ] && /pace/etcddel.py $etcd Snapperiod $periodel
  /pace/etcddel.py $leaderip call $periodel 
  stamp=`date +%s`;
  /pace/etcdput.py $leaderip sync/Snapperiod/Del_$periodel/request/$myhost Snapperiod_$stamp
