@@ -45,6 +45,10 @@ else
   docker exec etcdclient /TopStor/logmsg.py Snap1036 info $userreq $Minutely.$keep.$every.na.na.$stamp $DG/$FileS
   echo /pace/etcdput.py $etcd Snapperiod/Minutely/$DG/$FileS/$stamp/$receiver  */$every%*%*%*%*%/TopStor/Snapshotnowhost%$DG/$FileS%Minutely.$keep.$every.na.na%$stamp%$receiver
   /pace/etcdput.py $leaderip Snapperiod/Minutely/$DG/$FileS/$stamp/$receiver  */$every%*%*%*%*%/TopStor/Snapshotnowhost%$DG/$FileS%Minutely.$keep.$every.na.na%$stamp%$receiver
+  # QSD5.352 r10b (validator L-1): a node that is not the leader also keeps the key in its own etcd: that etcd becomes
+  # the cluster etcd when this node (the pool owner) takes over, the sync request carries this node's done mark so no
+  # sync brings it here; without the copy the schedule was lost in that take-over (SnapShotPeriodDelete deletes it)
+  [ "$etcd" != "$leaderip" ] && /pace/etcdput.py $etcd Snapperiod/Minutely/$DG/$FileS/$stamp/$receiver  */$every%*%*%*%*%/TopStor/Snapshotnowhost%$DG/$FileS%Minutely.$keep.$every.na.na%$stamp%$receiver
    # QSD5.352 r10 (QC 662): this node's done mark (it has its cron line already): with the leader's mark the leader took
    # the request as done and never made the cron line whose putcron.sh runs, the schedule of a follower never fired
    /pace/etcdput.py $leaderip sync/Snapperiod/____/request/$myhost Snapperiod_$stamp
