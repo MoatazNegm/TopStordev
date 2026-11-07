@@ -23,6 +23,16 @@ say() {
 if [ -f $LOG ] && [ `stat -c %s $LOG 2>/dev/null || echo 0` -gt 1048576 ]; then mv -f $LOG $LOG.1 2>/dev/null; fi
 addr=$2
 prefix=${3:-24}
+# QSD5.352 r10 (QC 680): a volume address that moved here (take-over, return, address change) was not announced: a
+# client that had talked to the old node kept the address on the old MAC until its ARP entry aged (SMB IO_TIMEOUT for
+# minutes).  As docker_primary.sh does for the cluster address: a gratuitous ARP on every interface with a connected
+# route to the address, a few times, in the background, without the cmynode lock (fd 9 closed).
+announce() {
+ for dev in `ip -o -4 route show to match $addr 2>/dev/null | grep -v '^default' | sed -n 's/.* dev \([^ ]*\).*/\1/p' | sort -u`
+ do
+  arping -U -c 1 -I $dev -s $addr $addr >/dev/null 2>&1
+ done
+}
 case $mode in
 add)
  echo "$addr" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' || { say "cmynodeaddr: no address ($addr)"; exit 1; }
@@ -36,6 +46,7 @@ add)
   if nmcli -g ipv4.addresses conn show cmynode 2>/dev/null | tr ',' '\n' | tr -d ' ' | grep -qx "${addr}/$prefix" \
      && ip -o -4 addr show 2>/dev/null | awk '{print $4}' | grep -qx "${addr}/$prefix"; then
    say "cmynodeaddr: ${addr}/$prefix is on cmynode (try $try)"
+   ( announce; sleep 1; announce; sleep 2; announce ) 9>&- >/dev/null 2>&1 </dev/null &
    exit 0
   fi
   say "cmynodeaddr: ${addr}/$prefix missing after try $try"
