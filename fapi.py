@@ -1821,6 +1821,32 @@ def poolsinfo(data):
  allpools.append({'id':len(allpools), 'text':'-------'})
  return jsonify({'results':allpools})
 
+def member_names(usrs):
+ # QSD5.352 r10 (QC 642, 680, 682; 609): the members of groups/UnixAddgroup and groups/groupchange were looked up in the
+ # global 'allusers', the list the LAST users/userlist or groups/userlist call of any browser built: empty on a new leader
+ # (no list asked since its fapi started: a group made after a take-over got NoUser), cleared while a list is being rebuilt
+ # (the 5 s poll of every open page: the group was emptied), or the users of an NFS tenant.  UnixAddgroup also took ids
+ # only, so users=<name> gave NoUser.  Now: a fresh read of usersinfo from the leader (the order users/userlist numbers
+ # its ids by), each entry an id or a user name; unknown entries are left out; none left = NoUser.
+ try:
+  names = [u['name'].replace('usersinfo/', '') for u in etcdgetjson(leaderip, 'usersinfo', '--prefix')]
+ except Exception:
+  names = []
+ out = []
+ for usr in str(usrs).split(','):
+  usr = usr.strip()
+  if not usr:
+   continue
+  if usr in names:
+   name = usr
+  elif usr.isdigit() and int(usr) < len(names):
+   name = names[int(usr)]
+  else:
+   continue
+  if name not in out:
+   out.append(name)
+ return ','.join(out) if out else 'NoUser'
+
 @app.route('/api/v1/groups/groupchange', methods=['GET','POST'])
 @login_required
 @audit_command
@@ -1831,18 +1857,7 @@ def pgroupchange(data):
  if data.get('name') == EVERYONE:
   data['error'] = 'everyonefixed'     # all users are always members of Everyone: nobody changes it
   return data
- usrs = data.get('users') or ''
- usrstr = ''
- if len(usrs) < 1:
-  usrstr = 'NoUser'
- else:
-  for usr in usrs.split(','):
-   for suser in allusers:
-    if (str(suser['id']) == str(usr) or suser['name'] == str(usr)) and suser['name'] not in usrstr.split(','):
-     usrstr += suser['name']+','
-  usrstr = usrstr[:-1]
-  if usrstr == '':
-   usrstr = 'NoUser'
+ usrstr = member_names(data.get('users') or '')
  cmndstring = '/TopStor/UnixChangeGroup '+leaderip+' '+' '+data.get('name')+' users'+usrstr+' '+data['user']+' '+'change'
  postchange(cmndstring)
  return data
@@ -2831,16 +2846,7 @@ def UnixAddGroup(data):
  if data.get('name') == EVERYONE:
   data['error'] = 'everyonefixed'
   return data
- usrstr = ''
- usrs = data['users']
- if len(usrs) < 1:
-  usrstr = 'NoUser'
- else:
-  for usr in usrs.split(','):
-   for suser in allusers:
-    if str(suser['id']) == str(usr):
-     usrstr += suser['name']+',' 
-  usrstr = usrstr[:-1]
+ usrstr = member_names(data.get('users') or '')
 
  if check_group_name(data.get('name')):     # QSD5.338: system account / group names (UnixAddGroup would groupdel them)
     logmsg.sendlog('Unlin1027rs','error',data['user'],logname(data.get('name')))
