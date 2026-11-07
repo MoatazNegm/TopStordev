@@ -98,6 +98,9 @@ then
   /pace/etcddel.py $etcd usersinfo/$username
   /pace/etcddel.py $etcd users /$username/
   /pace/etcddel.py $etcd usershash/$username
+  # QSD5.352 r10 (QC 678): and the login token record (exact key) in this node's etcd: users/userdel deleted it in the
+  # leader's etcd only, a follower kept login/<user> and served it again after a take-over
+  ETCDCTL_API=3 etcdctl --endpoints=http://$etcd:2379 del login/$username >/dev/null 2>&1
   echo s$pullsync | grep pull
   if [ $? -ne 0 ];
   then
