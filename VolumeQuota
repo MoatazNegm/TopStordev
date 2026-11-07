@@ -1,0 +1,43 @@
+#!/bin/sh
+# VolumeQuota <leaderip> <pool> <volume> <quota, e.g. 2G> <requesting user> <NFS|CIFS>
+# QSD5.352 r10 (QC 645): the size (zfs quota) of an NFS or CIFS volume, changed with volumes/config quota=<size>.
+# fapi.py (volumeconfig_do) checks the volume and the size and sends this line to the node that owns the pool, after the
+# VolumeChange<type> line.  The quota is a property of the dataset (it moves with the pool on a take-over); the volume
+# lists read it from zfs (putzpool), so no registry record changes.  zfs refuses a quota below the space already used:
+# that is VolQfa01 and the old quota stays.
+export ETCDCTL_API=3
+cd /TopStor/
+echo $@ > /root/volquota
+leaderip=`echo $@ | awk '{print $1}'`
+pool=`echo $@ | awk '{print $2}'`
+name=`echo $@ | awk '{print $3}'`
+quota=`echo $@ | awk '{print $4}'`
+userreq=`echo $@ | awk '{print $5}'`
+prot=`echo $@ | awk '{print $6}'`
+case "$prot" in NFS|CIFS) ;; *) exit 1 ;; esac
+privilege=$prot
+contrun=`./privthis.sh $privilege $userreq`
+if [[ $contrun == 'true' ]]
+then
+ docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq
+ shortname=`echo $name | rev | cut -d_ -f2- | rev`
+ echo $quota | grep -Eq '^[0-9]+(\.[0-9]+)?G$'
+ okq=$?
+ dstype=`/sbin/zfs get -H -o value type $pool/$name 2>/dev/null`
+ if [ $okq -eq 0 ] && [ "$dstype" = 'filesystem' ];
+ then
+  /sbin/zfs set quota=$quota $pool/$name 2>>/root/volquota
+  okq=$?
+ else
+  okq=1
+ fi
+ if [ $okq -ne 0 ];
+ then
+  docker exec etcdclient /TopStor/logmsg.py VolQfa01 error $userreq $shortname $quota
+ else
+  /pace/putzpool.py >/dev/null 2>&1
+  docker exec etcdclient /TopStor/logmsg.py VolQsu01 info $userreq $shortname $quota
+ fi
+ docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
+ exit $okq
+fi

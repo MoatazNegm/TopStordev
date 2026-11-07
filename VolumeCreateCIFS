@@ -121,7 +121,10 @@ then
  if [ $? -ne 0 ];
  then
   writevtemp=`echo $writev | sed 's/\,/ /g'`
-  for grp in $writevtemp ;do  setfacl -R -m g:$grp:rwx /$DG/$name; done
+  # QSD5.352 r10 (QC 642): a default ACL entry for each share group, so a file a member creates is readable by the other
+  # members (it was <owner>:root 640, the group entry was on the directory only; Samba's create mask keeps it read-only
+  # for them, the sticky bit keeps it from being deleted or renamed by them)
+  for grp in $writevtemp ;do  setfacl -R -m g:$grp:rwx /$DG/$name; setfacl -d -m g:$grp:rwx /$DG/$name; done
  fi
  setfacl -d -m o::--- /$DG/$name
 

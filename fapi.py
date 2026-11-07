@@ -2344,6 +2344,18 @@ def volumeconfig_do(data):
    return {'response': data['response'], 'volume': data.get('volume'), 'error': 'invalidstatus'}
   data['statusmount'] = sm
  data['owner'] = volume['host']
+ # QSD5.352 r10 (QC 645): volumes/config quota=<size> on an NFS or CIFS volume answered with the quota but nothing changed
+ # it (VolumeChangeNFS / VolumeChangeCIFS read the argument and never ran 'zfs set quota').  The size ('2G', '2', '1.5g';
+ # GB, as the home quota of users/userhomechange) is checked here and VolumeQuota sets it on the node that owns the pool.
+ newquota = ''
+ qreq = data.get('quota', data.get('size'))
+ if volume.get('prot') in ('NFS', 'CIFS') and data.get('type') == volume.get('prot') and qreq not in (None, ''):
+  m = re.fullmatch(r'([0-9]+(\.[0-9]+)?)[Gg]?', str(qreq).strip())
+  if not m or float(m.group(1)) <= 0 or float(m.group(1)) > 1000000:
+   logmsg.sendlog('VolQfa01','error',data['user'],logname(data.get('volume')),logname(str(qreq)))
+   return {'response': data['response'], 'volume': data.get('volume'), 'error': 'invalidsize'}
+  newquota = m.group(1)+'G'
+ data.pop('size', None)
  if 'ipaddress' not in data:
    if len(str(volume['ipaddress'])) < 7:
     logmsg.sendlog('VolCfa01','error',data['user'],logname(data.get('volume')))
@@ -2410,6 +2422,10 @@ def volumeconfig_do(data):
  cmndstring = '/TopStor/VolumeChange'+data['type']+' '+leaderip+' '+datastr
  postchange(cmndstring,data['owner'])
  data['_posted'] = True          # QSD5.352 r2: users/userhomechange goes on to the quota only after this
+ if newquota:
+  postchange('/TopStor/VolumeQuota '+leaderip+' '+volume['pool']+' '+volume['name']+' '+newquota+' '+data['user']+' '+data['type'],
+             data['owner'])
+  data['quota'] = newquota
 # z= cmndstring.split(' ')
 # msg={'req': 'Pumpthis', 'reply':z}
 # sendhost(ownerip, str(msg),'recvreply',myhost)

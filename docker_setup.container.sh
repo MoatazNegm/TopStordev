@@ -631,6 +631,16 @@ do
 	fi
 	echo initializaing volume pool leader clsuternode data
 	myalias=`docker exec etcdclient /pace/etcdgetlocal.py $aliast/$myhost`
+	# QSD5.352 r10 (QC 678/679 alias '_1'): a node whose own etcd has no alias (a return, a renewed local etcd) read '_1'
+	# here and wrote it over the leader's alias below (and posted it as a sync to every node): the alias set in Node Config
+	# was lost for good.  An unset local value now takes the leader's; when the leader has none either, the host name (what
+	# the node card shows for a node without an alias) is written instead of '_1'.
+	case "$myalias" in ''|_1|-1|None)
+		myalias=`/pace/etcdget.py $myclusterip $aliast/$myhost 2>/dev/null | tail -1`
+		case "$myalias" in ''|_1|-1|None|*' '*) myalias=$myhost ;; esac
+		echo alias of $myhost taken as $myalias >> /root/dockerlogs.txt
+		;;
+	esac
 	if [ -n "$newalias" ]; then myalias=$newalias; fi
 	leader=`/pace/etcdget.py $myclusterip leader`
 	docker exec etcdclient /pace/etcdputlocal.py leader $leader 
