@@ -35,13 +35,11 @@ then
 
 
    docker exec etcdclient /TopStor/logmsg.py Snap1031 info $userreq Weekly.$hr.$min.$every.$keep $DG/$FileS
-echo $leader | grep $myhost
-if [ $? -eq 0 ];
-then
- stamp=`date +%s`;
-else
- stamp=` echo $@ | awk '{print $7}'`;
-fi
+# QSD5.352 r10 (QC 661, 662): the schedule id is a time stamp on every node.  A node that is not the leader took
+# argument 7 (the receiver 'NoReceiver' or, for Minutely, the requesting user): the cron line called call/NoReceiver,
+# two schedules shared one id, and the sync request 'Snapperiod_<that word>' looked already done to the leader, which
+# then never made its own cron line (the one whose putcron.sh runs), so the schedule never fired.
+stamp=`date +%s`;
 crontab -l > $cronthis
 echo $min  $hr "*" "*" $every  /TopStor/putcron.sh /TopStor/etcdput.py $leaderip call/$stamp /TopStor/Snapshotnowhost::$DG/$FileS::Weekly.$keep.$hr.$min.$every::$stamp::$receiver 2>txt/SnapshotnowSystem.txt >> $cronthis
 crontab $cronthis
@@ -50,7 +48,13 @@ if [ $? -ne  0 ]; then
 else 
   docker exec etcdclient /TopStor/logmsg.py Snap1033 info $userreq Weekly.$keep.$hr.$min.$every.$stamp $DG/$FileS
   /pace/etcdput.py $leaderip Snapperiod/Weekly/$DG/$FileS/$stamp/$receiver  $min%$hr%*%*%$every%/TopStor/Snapshotnowhost%$DG/$FileS%Weekly.$keep.$hr.$min.$every%$stamp/$receiver
-  /pace/etcdput.py $leaderip sync/Snapperiod/______/request/$leader Snapperiod_$stamp
+  # QSD5.352 r10b (validator L-1): a node that is not the leader also keeps the key in its own etcd: that etcd becomes
+  # the cluster etcd when this node (the pool owner) takes over, the sync request carries this node's done mark so no
+  # sync brings it here; without the copy the schedule was lost in that take-over (SnapShotPeriodDelete deletes it)
+  [ "$etcd" != "$leaderip" ] && /pace/etcdput.py $etcd Snapperiod/Weekly/$DG/$FileS/$stamp/$receiver  $min%$hr%*%*%$every%/TopStor/Snapshotnowhost%$DG/$FileS%Weekly.$keep.$hr.$min.$every%$stamp/$receiver
+  # QSD5.352 r10 (QC 661): the done mark is this node's (it has its cron line already), on the same key as the request:
+  # the leader's mark (on another key) made the leader take the request as done, it never made its own cron line
+  /pace/etcdput.py $leaderip sync/Snapperiod/_____/request/$myhost Snapperiod_$stamp
   /pace/etcdput.py $leaderip sync/Snapperiod/_____/request Snapperiod_$stamp
 fi;
 fi

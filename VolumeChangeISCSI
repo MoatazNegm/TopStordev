@@ -39,6 +39,7 @@ then
  oldipaddr=`zfs get -H ip:addr $DG/$name | awk '{print $3}'`
  echo got ip $ipaddr
  oldipsubnet=`zfs get -H ip:subnet $DG/$name | awk '{print $3}'`
+ oldport=`zfs get -H ip:portalport $DG/$name | awk '{print $3}'`
  sed -i "s/$oldipaddr/$ipaddr/g" /$DG/iscsi.$name
  sed -i "s/$oldipsubnet/$ipsubnet/g" /$DG/iscsi.$name
  /sbin/zfs set ip:addr=$ipaddr $DG/$name
@@ -103,6 +104,17 @@ then
    flock -u 9
   fi
  done
+ # QSD5.352 r10 (QC 650): a new portal port added the portal <address>:<new port> and kept <address>:<old port> (the
+ # target listened on both).  The old portal of the (unchanged) address is deleted unless another iSCSI volume on the
+ # address still uses that port (one target, one portal list per address).
+ if echo "$oldport" | grep -Eq '^[0-9]+$' && [ "$oldport" != "$portalport" ] && [ "$oldipaddr" = "$ipaddr" ]; then
+  others=`/pace/etcdget.py $leaderip volumes/ISCSI --prefix 2>/dev/null | grep -v "/$name'" | awk -F"'" '{print $4}' \
+          | awk -F'/' -v a="$ipaddr" -v p="$oldport" '$3 == a && $5 == p' | grep -c .`
+  if [ "$others" -eq 0 ]; then
+   ipdom=`echo $ipaddr | sed 's/\.//g'`
+   targetcli iscsi/iqn.2016-03.com.$ipdom:data/tpg1/portals delete $ipaddr $oldport
+  fi
+ fi
  targetcli saveconfig
  /pace/putzpool.py 
  docker exec etcdclient /TopStor/logmsg.py VolCsu01 info $userreq $name

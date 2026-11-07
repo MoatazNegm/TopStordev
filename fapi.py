@@ -1821,6 +1821,32 @@ def poolsinfo(data):
  allpools.append({'id':len(allpools), 'text':'-------'})
  return jsonify({'results':allpools})
 
+def member_names(usrs):
+ # QSD5.352 r10 (QC 642, 680, 682; 609): the members of groups/UnixAddgroup and groups/groupchange were looked up in the
+ # global 'allusers', the list the LAST users/userlist or groups/userlist call of any browser built: empty on a new leader
+ # (no list asked since its fapi started: a group made after a take-over got NoUser), cleared while a list is being rebuilt
+ # (the 5 s poll of every open page: the group was emptied), or the users of an NFS tenant.  UnixAddgroup also took ids
+ # only, so users=<name> gave NoUser.  Now: a fresh read of usersinfo from the leader (the order users/userlist numbers
+ # its ids by), each entry an id or a user name; unknown entries are left out; none left = NoUser.
+ try:
+  names = [u['name'].replace('usersinfo/', '') for u in etcdgetjson(leaderip, 'usersinfo', '--prefix')]
+ except Exception:
+  names = []
+ out = []
+ for usr in str(usrs).split(','):
+  usr = usr.strip()
+  if not usr:
+   continue
+  if usr in names:
+   name = usr
+  elif usr.isdigit() and int(usr) < len(names):
+   name = names[int(usr)]
+  else:
+   continue
+  if name not in out:
+   out.append(name)
+ return ','.join(out) if out else 'NoUser'
+
 @app.route('/api/v1/groups/groupchange', methods=['GET','POST'])
 @login_required
 @audit_command
@@ -1831,18 +1857,7 @@ def pgroupchange(data):
  if data.get('name') == EVERYONE:
   data['error'] = 'everyonefixed'     # all users are always members of Everyone: nobody changes it
   return data
- usrs = data.get('users') or ''
- usrstr = ''
- if len(usrs) < 1:
-  usrstr = 'NoUser'
- else:
-  for usr in usrs.split(','):
-   for suser in allusers:
-    if (str(suser['id']) == str(usr) or suser['name'] == str(usr)) and suser['name'] not in usrstr.split(','):
-     usrstr += suser['name']+','
-  usrstr = usrstr[:-1]
-  if usrstr == '':
-   usrstr = 'NoUser'
+ usrstr = member_names(data.get('users') or '')
  cmndstring = '/TopStor/UnixChangeGroup '+leaderip+' '+' '+data.get('name')+' users'+usrstr+' '+data['user']+' '+'change'
  postchange(cmndstring)
  return data
@@ -2081,6 +2096,8 @@ def volumecreate(data):
    return data
   data['groups'] = only_everyone(grps)
  if 'ISCSI' in data['type']:
+  if portalport_bad(data.get('portalport')):
+   return portalport_refuse(data, data.get('name'))
   chapuser, chapstored, why = iscsi_chap(data)
   if why:
    logmsg.sendlog('ISCSIfa02','error',data['user'],logname(data.get('name')))
@@ -2344,6 +2361,18 @@ def volumeconfig_do(data):
    return {'response': data['response'], 'volume': data.get('volume'), 'error': 'invalidstatus'}
   data['statusmount'] = sm
  data['owner'] = volume['host']
+ # QSD5.352 r10 (QC 645): volumes/config quota=<size> on an NFS or CIFS volume answered with the quota but nothing changed
+ # it (VolumeChangeNFS / VolumeChangeCIFS read the argument and never ran 'zfs set quota').  The size ('2G', '2', '1.5g';
+ # GB, as the home quota of users/userhomechange) is checked here and VolumeQuota sets it on the node that owns the pool.
+ newquota = ''
+ qreq = data.get('quota', data.get('size'))
+ if volume.get('prot') in ('NFS', 'CIFS') and data.get('type') == volume.get('prot') and qreq not in (None, ''):
+  m = re.fullmatch(r'([0-9]+(\.[0-9]+)?)[Gg]?', str(qreq).strip())
+  if not m or float(m.group(1)) <= 0 or float(m.group(1)) > 1000000:
+   logmsg.sendlog('VolQfa01','error',data['user'],logname(data.get('volume')),logname(str(qreq)))
+   return {'response': data['response'], 'volume': data.get('volume'), 'error': 'invalidsize'}
+  newquota = m.group(1)+'G'
+ data.pop('size', None)
  if 'ipaddress' not in data:
    if len(str(volume['ipaddress'])) < 7:
     logmsg.sendlog('VolCfa01','error',data['user'],logname(data.get('volume')))
@@ -2374,6 +2403,8 @@ def volumeconfig_do(data):
  datastr = ''
  data['owner'] = allinfo['hosts'][allinfo['pools'][volume['pool']]['host']]['name']
  if 'ISCSI' in data['type']:
+  if 'portalport' in data and portalport_bad(data.get('portalport')):
+   return portalport_refuse(data, data.get('volume'))
   chapuser, chapstored, why = iscsi_chap(data, volume)
   if why:
    logmsg.sendlog('ISCSIfa02','error',data['user'],logname(data.get('volume')))
@@ -2410,6 +2441,10 @@ def volumeconfig_do(data):
  cmndstring = '/TopStor/VolumeChange'+data['type']+' '+leaderip+' '+datastr
  postchange(cmndstring,data['owner'])
  data['_posted'] = True          # QSD5.352 r2: users/userhomechange goes on to the quota only after this
+ if newquota:
+  postchange('/TopStor/VolumeQuota '+leaderip+' '+volume['pool']+' '+volume['name']+' '+newquota+' '+data['user']+' '+data['type'],
+             data['owner'])
+  data['quota'] = newquota
 # z= cmndstring.split(' ')
 # msg={'req': 'Pumpthis', 'reply':z}
 # sendhost(ownerip, str(msg),'recvreply',myhost)
@@ -2811,16 +2846,7 @@ def UnixAddGroup(data):
  if data.get('name') == EVERYONE:
   data['error'] = 'everyonefixed'
   return data
- usrstr = ''
- usrs = data['users']
- if len(usrs) < 1:
-  usrstr = 'NoUser'
- else:
-  for usr in usrs.split(','):
-   for suser in allusers:
-    if str(suser['id']) == str(usr):
-     usrstr += suser['name']+',' 
-  usrstr = usrstr[:-1]
+ usrstr = member_names(data.get('users') or '')
 
  if check_group_name(data.get('name')):     # QSD5.338: system account / group names (UnixAddGroup would groupdel them)
     logmsg.sendlog('Unlin1027rs','error',data['user'],logname(data.get('name')))
@@ -2840,6 +2866,23 @@ def UnixAddGroup(data):
  cmndstring = '/TopStor/UnixAddGroup '+leaderip+' '+data['name']+' '+' users'+usrstr+' '+data['user']
  postchange(cmndstring)
  return data
+
+# QSD5.352 r10 (QC 651): the iSCSI portal port of volumes/create ISCSI and volumes/config was checked for digits only:
+# 80 made a portal on port 80, 70000 was stored and the target listened nowhere.  The UI form has min/max only.
+PORTALPORT_MIN = 1024
+PORTALPORT_MAX = 65535
+
+def portalport_bad(value):
+ try:
+  port = int(str(value).strip())
+ except (TypeError, ValueError):
+  return True
+ return not (PORTALPORT_MIN <= port <= PORTALPORT_MAX)
+
+def portalport_refuse(data, name):
+ logmsg.sendlog('ISCSIfa04','error',data.get('user'),logname(name),logname(str(data.get('portalport'))))
+ return {'response': 'error', 'error': 'invalidport',
+         'message': 'portalport must be a number from %d to %d' % (PORTALPORT_MIN, PORTALPORT_MAX)}
 
 PARTNER_PORT_MIN = 3001
 PARTNER_PORT_MAX = 8000

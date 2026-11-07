@@ -99,14 +99,17 @@ then
 	 ETCDCTL_API=3 /pace/etcdput.py $leaderip volumes/CIFS/$myhost/$DG/$name $DG/$name/no/yes/$writev/administrator/yes/$ipaddr/$ipsubnet/$active
 	 ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request volumes_$stamp
 	 ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request/$leader volumes_$stamp
-	 chmod 2770 /$DG/$name
+	 # QSD5.352 r10 (QC 642): 2770 dropped the sticky bit that VolumeCreateCIFS (3770) and VolumeActivateCIFS (1770) set
+	 # (DEVELOPMENT.md section 76): after any volumes/config of a share one member could delete another member's file.
+	 chmod 3770 /$DG/$name
 	 setfacl -b -R /$DG/$name
 	 echo $writev | grep -w nogroup
 	 if [ $? -ne 0 ];
 	 then
 	  writevtemp=`echo $writev | sed 's/\,/ /g'`
-	  for grp in $writevtemp ;do  setfacl -R -m g:$grp:rwx /$DG/$name; done
+	  for grp in $writevtemp ;do  setfacl -R -m g:$grp:rwx /$DG/$name; setfacl -d -m g:$grp:rwx /$DG/$name; done
 	 fi
+	 setfacl -d -m o::--- /$DG/$name
 
  fi
 

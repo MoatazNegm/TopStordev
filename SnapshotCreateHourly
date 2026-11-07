@@ -33,13 +33,11 @@ then
  	fi
 
 
-echo $leader | grep $myhost
-if [ $? -eq 0 ];
-then
- stamp=`date +%s`;
-else
- stamp=` echo $@ | awk '{print $7}'`;
-fi
+# QSD5.352 r10 (QC 661, 662): the schedule id is a time stamp on every node.  A node that is not the leader took
+# argument 7 (the receiver 'NoReceiver' or, for Minutely, the requesting user): the cron line called call/NoReceiver,
+# two schedules shared one id, and the sync request 'Snapperiod_<that word>' looked already done to the leader, which
+# then never made its own cron line (the one whose putcron.sh runs), so the schedule never fired.
+stamp=`date +%s`;
 crontab -l > $cronthis
 echo $min  "*"/$every "*" "*" "*" /TopStor/putcron.sh /TopStor/etcdput.py $leaderip call/$stamp /TopStor/Snapshotnowhost::$DG/$FileS::Hourly.$keep.$min.$every.na::$stamp::$receiver 2> txt/err.txt >> $cronthis
 crontab $cronthis 2>> $txtres
@@ -49,7 +47,13 @@ if [[ $err -ge  4  ]]; then
   docker exec etcdclient /TopStor/logmsg.py Snap1038 error $userreq $DG/$FileS 
 else 
   docker exec etcdclient /TopStor/logmsg.py Snap1039 info $userreq  Hourly.$keep.$min.$every.$stamp $DG/$FileS
-  /pace/etcdput.py $etcd Snapperiod/Hourly/$DG/$FileS/$stamp/$receiver  $min%*/$every%*%*%*%/TopStor/Snapshotnowhost%$DG/$FileS%Hourly.$keep.$min.$every.na%$stamp/$receiver
+  # QSD5.352 r10 (QC 661): in the leader's etcd (as Weekly and Minutely): the owner's own etcd lost the key at the next
+  # Snapperiod sync (the copy of the leader's keys) and the schedule vanished
+  /pace/etcdput.py $leaderip Snapperiod/Hourly/$DG/$FileS/$stamp/$receiver  $min%*/$every%*%*%*%/TopStor/Snapshotnowhost%$DG/$FileS%Hourly.$keep.$min.$every.na%$stamp/$receiver
+  # QSD5.352 r10b (validator L-1): a node that is not the leader also keeps the key in its own etcd: that etcd becomes
+  # the cluster etcd when this node (the pool owner) takes over, the sync request carries this node's done mark so no
+  # sync brings it here; without the copy the schedule was lost in that take-over (SnapShotPeriodDelete deletes it)
+  [ "$etcd" != "$leaderip" ] && /pace/etcdput.py $etcd Snapperiod/Hourly/$DG/$FileS/$stamp/$receiver  $min%*/$every%*%*%*%/TopStor/Snapshotnowhost%$DG/$FileS%Hourly.$keep.$min.$every.na%$stamp/$receiver
   /pace/etcdput.py $leaderip sync/Snapperiod/_____/request/$myhost Snapperiod_$stamp
   /pace/etcdput.py $leaderip sync/Snapperiod/_____/request Snapperiod_$stamp
 
