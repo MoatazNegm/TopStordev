@@ -14,7 +14,8 @@
 # Rules (one tick):
 #   1. A node starts iscsid only when the socket is free AND the node is not unfit.
 #   2. A node that wants iscsid (not unfit, socket held by another container) says so: it holds an abstract unix socket
-#      @TOPSTOR_ISCSID_WANT_<host> in the host network namespace (a small listener, pid in /run/iscsidwant.pid).
+#      @TOPSTOR_ISCSID_WANT_<host> in the host network namespace (a small listener, pid in /run/iscsidwant.pid; r10e: the
+#      listener is found by that name, the pid file is only a copy).
 #   3. The holder releases iscsid (SIGTERM: sessions stay in the kernel, the next iscsid takes them over) only when it is
 #      unfit AND another node wants it.  An unfit holder with nobody waiting keeps it (an iscsid with no logins of its own
 #      still recovers the existing sessions).  A fit holder never releases.
@@ -53,7 +54,16 @@ otherwants() { unixsockets | grep -o '@TOPSTOR_ISCSID_WANT_[^ ]*' | grep -v "@$W
 # may then belong to ANY process (pids start again from 1): kill -0 alone made a holder kill an unrelated process and a
 # fit node never ask.  The pid counts only while its command line holds this node's want-socket name.  (The entrypoint
 # also removes /run/iscsidwant.pid and /run/iscsidpolicy.* before it starts the guardian.)
-wanting() { wp=`cat $WANTPID 2>/dev/null`; [ -n "$wp" ] && tr '\0' ' ' < /proc/$wp/cmdline 2>/dev/null | grep -q "$WANTNAME"; }
+# r10e (validator 10d D7): the listener is found by its socket name, not only through the pid file.  When the file was
+# lost while the listener lived (the entrypoint's rm after a guardian that cron started early, or two guardians at once),
+# want_off could not kill it and want_on could not bind a new one: an UNFIT node still "asked", and an unfit holder then
+# released iscsid to it (nobody held iscsid).  The pid file is rewritten from the live listener (kept for people/sheets).
+wanting() {
+	wp=`pgrep -f "$WANTNAME\$" 2>/dev/null | head -1`
+	[ -n "$wp" ] || return 1
+	[ "`cat $WANTPID 2>/dev/null`" = "$wp" ] || echo $wp > $WANTPID
+	return 0
+}
 want_on() {
 	wanting && return 0
 	( setsid $NSE python3 -c 'import socket,sys,time
@@ -61,7 +71,7 @@ s=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
 s.bind("\0"+sys.argv[1]); s.listen(1)
 while True: time.sleep(3600)' "$WANTNAME" </dev/null >/dev/null 2>&1 & echo $! > $WANTPID )
 }
-want_off() { wanting && kill "`cat $WANTPID`" 2>/dev/null; rm -f $WANTPID; }
+want_off() { pkill -f "$WANTNAME\$" 2>/dev/null; rm -f $WANTPID; }   # r10e D7: every listener of this node, by name
 etimes() { ps -o etimes= -p $1 2>/dev/null | tr -d ' '; }
 
 state() {   # prints "<fit|booting|unfit> <reason>"
