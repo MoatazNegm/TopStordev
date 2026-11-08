@@ -27,6 +27,8 @@ rm -rf /TopStordata/etcd.sh
 cp /TopStor/discovery.sh /TopStordata/etcd.sh
 sed -i 's/SLEEP/sleep 10/g' /TopStordata/etcd.sh
 echo starting etcd
+# QSD5.352 r10d (D2): the container node etcd runs without --rm; a stopped one is removed here (no -f: a running one stays)
+docker rm etcd >/dev/null 2>&1
 docker run -itd --rm --name etcd --hostname etcd -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $etcd:2379:2379 -v /TopStor/:/TopStor -v /root/etcddata:/default.etcd  -v /TopStordata/etcd.sh:/runme.sh --net ${DOCKER_NET:-bridge0} moataznegm/quickstor:etcd
 newip=`docker exec intdns nslookup etcd | grep Address | grep -v 127 | awk '{print $2}'`
 echo newip=$newip

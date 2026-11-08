@@ -22,7 +22,8 @@
 # A node is UNFIT when its docker_setup failed (/root/dockersetup.failed, written when etcd does not start), or when it
 # has no etcd container running and no docker_setup / image preload running (or the docker_setup runs for more than
 # 30 min without etcd), once the container has been up for 5 min.  BOOTING (counts as fit): the first 5 min, an image
-# preload, or a docker_setup run (up to 30 min).  FIT: etcd runs.
+# preload, or a docker_setup run (up to 30 min).  FIT: etcd runs (r10d: and a heartbeat / zfsping looper lives; etcd
+# without loopers and without a docker_setup is UNFIT).
 [ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
 is_container 2>/dev/null || exit 0
 HNS=/host-ns/net
@@ -37,6 +38,7 @@ SETUPMAX=${ISCSIDPOLICY_SETUPMAX:-1800}
 UNFITMIN=${ISCSIDPOLICY_UNFITMIN:-60}    # a holder releases only after being unfit this long (an etcd restart of a take-over
                                          # by docker_primary.sh leaves a few seconds without an etcd container)
 UNFITF=/run/iscsidpolicy.unfitsince
+LOOPERS=${ISCSIDPOLICY_LOOPERS:-'/pace/(heartbeatlooper\.sh|heartbeat\.py|zfsping\.py)'}
 
 say() {   # log a line only when it differs from the last one (the guardian runs every 3 s)
 	[ "`cat $STATEF 2>/dev/null`" = "$*" ] && return 0
@@ -47,7 +49,11 @@ unixsockets() { $NSE cat /proc/net/unix 2>/dev/null; }
 sockettaken() { unixsockets | grep -q '@ISCSIADM_ABSTRACT_NAMESPACE'; }
 mine() { pgrep -x iscsid >/dev/null 2>&1; }
 otherwants() { unixsockets | grep -o '@TOPSTOR_ISCSID_WANT_[^ ]*' | grep -v "@$WANTNAME\$" | head -1; }
-wanting() { [ -f $WANTPID ] && kill -0 "`cat $WANTPID`" 2>/dev/null; }
+# r10d (validator 10c D4): the container's /run is no tmpfs, so the pid file survives a container restart and its pid
+# may then belong to ANY process (pids start again from 1): kill -0 alone made a holder kill an unrelated process and a
+# fit node never ask.  The pid counts only while its command line holds this node's want-socket name.  (The entrypoint
+# also removes /run/iscsidwant.pid and /run/iscsidpolicy.* before it starts the guardian.)
+wanting() { wp=`cat $WANTPID 2>/dev/null`; [ -n "$wp" ] && tr '\0' ' ' < /proc/$wp/cmdline 2>/dev/null | grep -q "$WANTNAME"; }
 want_on() {
 	wanting && return 0
 	( setsid $NSE python3 -c 'import socket,sys,time
@@ -62,8 +68,14 @@ state() {   # prints "<fit|booting|unfit> <reason>"
 	if [ -f /root/dockersetup.failed ]; then
 		echo "unfit docker_setup failed: `head -c 200 /root/dockersetup.failed`"; return
 	fi
-	if timeout 10 docker ps -q -f name=^etcd$ 2>/dev/null | grep -q .; then
-		echo "fit etcd runs"; return
+	# r10d (validator 10c G1): fit = an etcd container runs AND the node's loopers live.  With etcd alone a holder whose
+	# stack stopped after etcd (loopers gone; a docker_setup stuck in the join loop counts below) kept iscsid for ever,
+	# and its iscsirefresh.sh is the only one that logs in.  Loopers: heartbeatlooper.sh (started once, loops for ever),
+	# heartbeat.py, zfsping.py (refreshdisown.sh restarts it, so any one of them counts; UNFITMIN covers short gaps).
+	etcdup=0; timeout 10 docker ps -q -f name=^etcd$ 2>/dev/null | grep -q . && etcdup=1
+	loopers=0; pgrep -f "$LOOPERS" >/dev/null 2>&1 && loopers=1
+	if [ $etcdup -eq 1 ] && [ $loopers -eq 1 ]; then
+		echo "fit etcd and loopers run"; return
 	fi
 	up=`etimes 1`
 	if [ -n "$up" ] && [ "$up" -lt "$GRACE" ]; then
@@ -72,14 +84,17 @@ state() {   # prints "<fit|booting|unfit> <reason>"
 	if pgrep -f docker-preload.sh >/dev/null 2>&1; then
 		echo "booting image preload runs"; return
 	fi
+	[ $etcdup -eq 1 ] && what="no loopers" || what="no etcd"
 	sp=`pgrep -f 'docker_setup[.a-z]*\.sh' | head -1`
 	if [ -n "$sp" ]; then
 		st=`etimes $sp`
 		if [ -z "$st" ] || [ "$st" -lt "$SETUPMAX" ]; then
-			echo "booting docker_setup runs (${st:-?}s), no etcd yet"; return
+			echo "booting docker_setup runs (${st:-?}s), $what yet"; return
 		fi
-		echo "unfit docker_setup runs for ${st}s without an etcd"; return
+		[ $etcdup -eq 1 ] && echo "unfit docker_setup runs for ${st}s, etcd but no loopers" || echo "unfit docker_setup runs for ${st}s without an etcd"
+		return
 	fi
+	[ $etcdup -eq 1 ] && { echo "unfit etcd runs but no heartbeat/zfsping looper and no docker_setup"; return; }
 	echo "unfit no etcd and no docker_setup"
 }
 

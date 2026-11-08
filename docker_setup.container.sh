@@ -544,7 +544,18 @@ echo nameserver 10.11.12.7 >  /root/gitrepo/resolv.conf
 # with --rm, so its log vanished with it when etcd exited at start (the QC proof could not tell why zfs1's etcd died
 # 23 s after its start on 2026-11-08); the log of every start is kept in /root/etcdlogs/ (start.log, the previous one
 # start.log.1; a docker logs -f follower ends when the container goes, at most after 15 min).
+# r10d (validator 10c D2): without --rm.  With it, an etcd that exited at once (a bad data folder, a bad flag, a port in
+# use) was removed before the follower attached ('can not get logs from container which is dead or marked for removal'):
+# 9 of 10 such start logs were empty.  The stopped container now stays until the next start (etcd_start, docker_primary.sh
+# and bybyleader.sh remove it first), and its whole log is saved (etcdsavelog) before every restart.
 etcdlog() { echo "`date '+%F %T'` $*" | tee -a /root/etcdlogs/etcdstart.log; }
+etcdsavelog() {   # the full log of the current etcd container into start.log (a new file: a running follower keeps the old one)
+	if docker logs etcd > /root/etcdlogs/start.log.tmp 2>&1; then
+		mv -f /root/etcdlogs/start.log.tmp /root/etcdlogs/start.log
+	else
+		rm -f /root/etcdlogs/start.log.tmp
+	fi
+}
 etcd_start() {   # etcd_start [restart]
 	mkdir -p /root/etcdlogs
 	# a re-run of docker_setup.sh without a container restart finds its etcd running: kept, as before (the docker run
@@ -560,7 +571,7 @@ etcd_start() {   # etcd_start [restart]
 	# the 2026-11-08 exit: the host root disk was full, the WAL tail was cut to the last record and not extended again)
 	[ -n "$freekb" ] && [ "$freekb" -lt 262144 ] && etcdlog "WARNING: less than 256 MB free for /root/etcddata"
 	docker rm -f etcd >/dev/null 2>&1
-	docker run -itd --rm --name etcd --hostname etcd -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $etcd:2379:2379 -v /TopStor/:/TopStor -v /root/etcddata:/default.etcd --net intdns-net moataznegm/quickstor:etcd
+	docker run -itd --name etcd --hostname etcd -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $etcd:2379:2379 -v /TopStor/:/TopStor -v /root/etcddata:/default.etcd --net intdns-net moataznegm/quickstor:etcd
 	( timeout 900 docker logs -f etcd > /root/etcdlogs/start.log 2>&1 & )
 }
 etcdrenewed=0
@@ -629,7 +640,12 @@ do
 		continue
 	fi
 	[ "$etcdstate" = running ] && why="did not settle in ${ETCD_WAIT}s" || why="exited (state '${etcdstate:-gone}')"
-	etcdlog "etcd $why, start $etcdtry of $ETCD_TRIES; its log: `grep -E 'level.:.(fatal|panic|error)|panic:' /root/etcdlogs/start.log 2>/dev/null | tail -2 | cut -c1-400`"
+	etcdsavelog   # r10d (D2): before the restart, also for an etcd that exited at once
+	# r10d (D2): an etcd that ends at once on a bad flag/address logs its reason at level warn ('failed to verify flags'):
+	# without a fatal/panic/error line the last two lines of its log are shown
+	etcderr=`grep -E 'level.:.(fatal|panic|error)|panic:' /root/etcdlogs/start.log 2>/dev/null | tail -2 | cut -c1-400`
+	[ -z "$etcderr" ] && etcderr=`tail -2 /root/etcdlogs/start.log 2>/dev/null | cut -c1-400`
+	etcdlog "etcd $why, start $etcdtry of $ETCD_TRIES; its log: `echo $etcderr`"
 	if [ $etcdtry -lt $ETCD_TRIES ];
 	then
 		etcdtry=$((etcdtry+1))
@@ -764,7 +780,8 @@ do
 done
 #############################3
 # r10c (E-1): tell the cluster that this node's etcd was started empty (logmsg goes to the leader via the local leaderip)
-[ "$etcdrenewed" = 1 ] && docker exec etcdclient /TopStor/logmsg.py Partst06 warning system $myhost
+# r10d (validator 10c D3): code Partst07 (Partst06 was already taken by 'started checking and syncing ...')
+[ "$etcdrenewed" = 1 ] && docker exec etcdclient /TopStor/logmsg.py Partst07 warning system $myhost
 /TopStor/etcddel.py $etcd pools --prefix 
 /TopStor/etcddel.py $etcd sync/pools --prefix 
 /TopStor/etcddel.py $etcd volume --prefix 
