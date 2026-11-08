@@ -115,6 +115,10 @@ then
    targetcli iscsi/iqn.2016-03.com.$ipdom:data/tpg1/portals delete $ipaddr $oldport
   fi
  fi
+ # QSD5.352 r10c (QC proof S-1, suspected): the whole ACL tree of the address after the change, for the next proof run
+ # (542.1: 0 ACLs 60 s after initiators=<a>,<b>); the per-initiator steps are in the same log (addzfsvolumeastarget.sh)
+ ipdom=`echo $ipaddr | sed 's/\.//g'`
+ echo "`date '+%F %T'` $DG/$name volumes/config initiators '$initiators': ACLs now: `targetcli ls iscsi/iqn.2016-03.com.$ipdom:data/tpg1/acls 2>&1 | grep -oE 'o- (iqn[^ ]*|mapped_lun[0-9]+ [^]]*)' | tr '\n' ';'`" >> /root/iscsitarget.log
  targetcli saveconfig
  /pace/putzpool.py 
  docker exec etcdclient /TopStor/logmsg.py VolCsu01 info $userreq $name

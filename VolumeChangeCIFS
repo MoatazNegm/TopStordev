@@ -101,15 +101,8 @@ then
 	 ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request/$leader volumes_$stamp
 	 # QSD5.352 r10 (QC 642): 2770 dropped the sticky bit that VolumeCreateCIFS (3770) and VolumeActivateCIFS (1770) set
 	 # (DEVELOPMENT.md section 76): after any volumes/config of a share one member could delete another member's file.
-	 chmod 3770 /$DG/$name
-	 setfacl -b -R /$DG/$name
-	 echo $writev | grep -w nogroup
-	 if [ $? -ne 0 ];
-	 then
-	  writevtemp=`echo $writev | sed 's/\,/ /g'`
-	  for grp in $writevtemp ;do  setfacl -R -m g:$grp:rwx /$DG/$name; setfacl -d -m g:$grp:rwx /$DG/$name; done
-	 fi
-	 setfacl -d -m o::--- /$DG/$name
+	 # r10c (QC proof C-1/C-2): the same rights as VolumeCreateCIFS, from the same helper (semantics in cifsacl.sh)
+	 /TopStor/cifsacl.sh /$DG/$name $writev
 
  fi
 
@@ -143,13 +136,9 @@ then
  sed -i "s/IPSUBNET/$ipsubnet/g" /TopStordata/smb.${name}
  sed -i "s/ACTIVE/$active/g" /TopStordata/smb.${name}
  yes | cp /TopStordata/smb.$name /$DG/
- echo $writev | egrep -w 'nogroup|DOMAIN'
- if [ $? -ne 0 ];
- then
-  setfacl -b -R /$DG/$name
-  writevtemp=`echo $writev | sed 's/\,/ /g'`
-  for grp in $writevtemp ;do  setfacl -R -m g:$grp:rwx /$DG/$name; done
- fi
+ # r10c (QC proof C-1, 530.2/533.1): the old ACL tail that was here (setfacl -b -R, then only g:<grp>:rwx) ran after the
+ # block above for every non-DOMAIN, non-nogroup share and wiped its default entries and o::---; removed.  The DOMAIN
+ # branch never ran it (egrep -w 'nogroup|DOMAIN').
  echo ETCDCTL_API=3 /pace/etcdput.py $leaderip volumes/CIFS/$myhost/$DG/$name $DG/$name/no/yes/$writev/administrator/yes/$ipaddr/${ipsubnet}$extraparms/$active
  ETCDCTL_API=3 /pace/etcdput.py $leaderip volumes/CIFS/$myhost/$DG/$name $DG/$name/no/yes/$writev/administrator/yes/$ipaddr/${ipsubnet}$extraparms/$active
  stamp=`date +%s`

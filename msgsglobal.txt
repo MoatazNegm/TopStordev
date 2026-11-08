@@ -477,3 +477,4 @@ CIFS1041:2: : from :: The domain share : could not join the domain : because the
 CIFS1042:2: : from :: The domain share : could not join the domain : because the AD server cannot be reached. Correct the domain data or delete the share
 CIFS1043:2: : from :: The domain share : could not join the domain : because the AD name is not right. Correct the domain data or delete the share
 CIFS1044:2: : from :: The domain share : could not join the domain : because the clock differs from the AD clock. Correct the domain data or delete the share
+Partst06:2: : from :: Node : could not start its etcd on its old data (kept as etcddata.bad in its root folder), it was started empty and the cluster sync refills it

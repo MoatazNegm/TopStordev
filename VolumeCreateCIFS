@@ -115,18 +115,10 @@ then
  ETCDCTL_API=3 /pace/etcdput.py $leaderip volumes/CIFS/$myhost/$DG/$name $DG/$name/no/yes/$writev/administrator/yes/$ipaddr/$ipsubnet/$active
  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request volumes_$stamp
  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request/$leader volumes_$stamp
- chmod 3770 /$DG/$name
- setfacl -b -R /$DG/$name
- echo $writev | grep -w nogroup
- if [ $? -ne 0 ];
- then
-  writevtemp=`echo $writev | sed 's/\,/ /g'`
-  # QSD5.352 r10 (QC 642): a default ACL entry for each share group, so a file a member creates is readable by the other
-  # members (it was <owner>:root 640, the group entry was on the directory only; Samba's create mask keeps it read-only
-  # for them, the sticky bit keeps it from being deleted or renamed by them)
-  for grp in $writevtemp ;do  setfacl -R -m g:$grp:rwx /$DG/$name; setfacl -d -m g:$grp:rwx /$DG/$name; done
- fi
- setfacl -d -m o::--- /$DG/$name
+ # QSD5.352 r10 (QC 642) / r10c (QC proof C-2): 3770 + a default group entry so members read each other's files; r10c:
+ # the default group entry is r-x, not rwx (Samba 4.8 sets the mask of a new file to rwx whatever the create mask is, so
+ # rwx let one member overwrite another member's file).  One helper for create and change (cifsacl.sh, semantics there).
+ /TopStor/cifsacl.sh /$DG/$name $writev
 
  /TopStor/cifs.py $leader $leaderip $myhost $myhostip $etcd $DG $name $ipaddr $ipsubnet CIFS
     #/TopStor/cifs.sh $leaderip $pool $name $ipaddr $ipsubnet cifs

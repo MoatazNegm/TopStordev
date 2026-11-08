@@ -122,6 +122,9 @@ then
 	echo GatewayPorts yes >> /etc/ssh/sshd_config
 fi
 cmdline=$@
+# QSD5.352 r10c (QC proof E-1/E-2): a new run clears the mark of a failed one (/root/dockersetup.failed: the etcd of this
+# node could not be started; /TopStor/iscsidpolicy.sh does not let a failed node hold the shared iscsid)
+rm -f /root/dockersetup.failed
 order=`cat /root/nodeconfigured`
 echo l$order | grep  reset
 if [ $? -eq 0 ];
@@ -537,8 +540,32 @@ else
 fi
 
 echo nameserver 10.11.12.7 >  /root/gitrepo/resolv.conf
+# QSD5.352 r10c (QC proof E-1): the node etcd is started by etcd_start (also for the retries below).  The container runs
+# with --rm, so its log vanished with it when etcd exited at start (the QC proof could not tell why zfs1's etcd died
+# 23 s after its start on 2026-11-08); the log of every start is kept in /root/etcdlogs/ (start.log, the previous one
+# start.log.1; a docker logs -f follower ends when the container goes, at most after 15 min).
+etcdlog() { echo "`date '+%F %T'` $*" | tee -a /root/etcdlogs/etcdstart.log; }
+etcd_start() {   # etcd_start [restart]
+	mkdir -p /root/etcdlogs
+	# a re-run of docker_setup.sh without a container restart finds its etcd running: kept, as before (the docker run
+	# failed on the name and the running one was used); only a retry ('restart') replaces it
+	if [ "$1" != restart ] && [ "`docker inspect -f '{{.State.Status}}' etcd 2>/dev/null`" = running ]; then
+		etcdlog "etcd already runs: kept"
+		return 0
+	fi
+	[ -f /root/etcdlogs/start.log ] && mv -f /root/etcdlogs/start.log /root/etcdlogs/start.log.1
+	freekb=`df -Pk /root/etcddata 2>/dev/null | awk 'NR==2{print $4}'`
+	etcdlog "starting etcd on $etcd (data /root/etcddata, `du -sm /root/etcddata 2>/dev/null | awk '{print $1}'` MB, ${freekb:-?} kB free)"
+	# etcd re-extends its WAL tail at every start: on a nearly full disk that fails and etcd exits (the likely cause of
+	# the 2026-11-08 exit: the host root disk was full, the WAL tail was cut to the last record and not extended again)
+	[ -n "$freekb" ] && [ "$freekb" -lt 262144 ] && etcdlog "WARNING: less than 256 MB free for /root/etcddata"
+	docker rm -f etcd >/dev/null 2>&1
+	docker run -itd --rm --name etcd --hostname etcd -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $etcd:2379:2379 -v /TopStor/:/TopStor -v /root/etcddata:/default.etcd --net intdns-net moataznegm/quickstor:etcd
+	( timeout 900 docker logs -f etcd > /root/etcdlogs/start.log 2>&1 & )
+}
+etcdrenewed=0
 echo starting etcd 
-docker run -itd --rm --name etcd --hostname etcd -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $etcd:2379:2379 -v /TopStor/:/TopStor -v /root/etcddata:/default.etcd --net intdns-net moataznegm/quickstor:etcd
+etcd_start
 
 echo starting etcdclient
 docker run -itd --rm --name etcdclient --hostname etcdclient -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf --net intdns-net -v /TopStor/:/TopStor -v /pace/:/pace moataznegm/quickstor:etcdclient
@@ -572,17 +599,62 @@ do
 done
 rabbitmqctl add_user rabb_Mezo YousefNadody 2>/dev/null
 rabbitmqctl set_permissions -p / rabb_Mezo ".*" ".*" ".*" 2>/dev/null
+# QSD5.352 r10c (QC proof E-1, high): this loop waited for ever ('waiting etcd to settle' / 'No such container: etcd',
+# 40,000 lines, no loopers, no heartbeat) when etcd had exited at start.  Now: an etcd that exited, or that did not
+# settle in ETCD_WAIT s, is started again (ETCD_TRIES starts in all).  If it still does not come up, a node that is not
+# the primary moves its data aside (/root/etcddata.bad, only the newest kept) and starts an EMPTY node etcd once: the
+# full cluster sync below (syncall) refills it from the leader (a node etcd is a copy).  The primary's etcd IS the
+# cluster's data: it is never moved; then (and when the empty start fails too) the run stops with a clear error and
+# the mark /root/dockersetup.failed (the iSCSI policy does not let such a node hold the shared iscsid).
+ETCD_TRIES=${ETCD_TRIES:-3}
+ETCD_WAIT=${ETCD_WAIT:-180}
+etcdtry=1
+etcdwaited=0
 started=0
 while [ $started -eq 0 ];
 do
 	echo waiting etcd to settle 
-	docker logs etcd | grep 'successfully notified init daemon' 
+	docker logs etcd 2>&1 | grep 'successfully notified init daemon' 
 	if [ $? -eq 0 ];
 	then
 		started=1
-	else
-		sleep 1
+		etcdlog "etcd settled (start $etcdtry, ${etcdwaited}s)"
+		continue
 	fi
+	etcdstate=`docker inspect -f '{{.State.Status}}' etcd 2>/dev/null`
+	if [ "$etcdstate" = running ] && [ $etcdwaited -lt $ETCD_WAIT ];
+	then
+		sleep 1
+		etcdwaited=$((etcdwaited+1))
+		continue
+	fi
+	[ "$etcdstate" = running ] && why="did not settle in ${ETCD_WAIT}s" || why="exited (state '${etcdstate:-gone}')"
+	etcdlog "etcd $why, start $etcdtry of $ETCD_TRIES; its log: `grep -E 'level.:.(fatal|panic|error)|panic:' /root/etcdlogs/start.log 2>/dev/null | tail -2 | cut -c1-400`"
+	if [ $etcdtry -lt $ETCD_TRIES ];
+	then
+		etcdtry=$((etcdtry+1))
+		sleep 5
+		etcd_start restart
+		etcdwaited=0
+		continue
+	fi
+	if [ $isprimary -ne 1 ] && [ $etcdrenewed -eq 0 ];
+	then
+		etcdlog "etcd does not start on its data: moved to /root/etcddata.bad, starting an empty node etcd (the cluster sync refills it)"
+		docker rm -f etcd >/dev/null 2>&1
+		rm -rf /root/etcddata.bad
+		mv /root/etcddata /root/etcddata.bad
+		mkdir -p /root/etcddata
+		etcdrenewed=1
+		etcdtry=$ETCD_TRIES
+		etcd_start restart
+		etcdwaited=0
+		continue
+	fi
+	etcdlog "FATAL: etcd does not start (primary=$isprimary renewed=$etcdrenewed); docker_setup stops here, see /root/etcdlogs/"
+	echo "`date '+%F %T'` etcd does not start: $why (primary=$isprimary renewed=$etcdrenewed)" > /root/dockersetup.failed
+	echo "`date` docker_setup: etcd does not start ($why), setup stopped, see /root/etcdlogs/" >> /root/heartproblem
+	exit 1
 done
 /TopStor/rabbitnodefix.sh
 echo starting > /root/dockerlogs.txt
@@ -653,6 +725,9 @@ do
 	docker exec etcdclient /pace/etcddellocal.py sync/volume Add_ 2>/dev/null
 	docker exec etcdclient /pace/etcddellocal.py sync/volume Del_ 2>/dev/null
 	/pace/etcdput.py $myclusterip $aliast/$myhost $myalias
+	# r10c (QC proof B-1, 525.2/528.2): the sync below is marked done for this node (request/$myhost), so its own etcd copy
+	# was never written and kept '_1' or the old alias; write it here (on the primary this is the cluster etcd: same value)
+	docker exec etcdclient /pace/etcdputlocal.py $aliast/$myhost $myalias
 	#/TopStor/syncq.py $myclusterip $myhost 2>/root/syncqerror
 	stamp=`date +%s%N`
 	myalias=`echo $myalias | sed 's/\_/\:\:\:/g'`
@@ -671,7 +746,8 @@ do
 	/pace/etcdput.py $myclusterip sync/$aliast/Add_${myhost}_$myalias/request/$leader ${aliast}_$stamp.
 	issync=`/pace/etcdget.py $myclusterip sync initial`initial
 	/pace/checksyncs.py restetcd $myclusterip $myhost >/dev/null
-	echo $issync | grep $myhost
+	# r10c (E-1): a node etcd started empty (etcdrenewed=1) needs the full copy, not only the pending requests
+	echo $issync | grep $myhost && [ "$etcdrenewed" != 1 ]
 	if [ $? -eq 0 ];
 	then
 		echo syncrequests only
@@ -687,6 +763,8 @@ do
 	echo hihi$checkcluster | grep $myclusterip
 done
 #############################3
+# r10c (E-1): tell the cluster that this node's etcd was started empty (logmsg goes to the leader via the local leaderip)
+[ "$etcdrenewed" = 1 ] && docker exec etcdclient /TopStor/logmsg.py Partst06 warning system $myhost
 /TopStor/etcddel.py $etcd pools --prefix 
 /TopStor/etcddel.py $etcd sync/pools --prefix 
 /TopStor/etcddel.py $etcd volume --prefix 
