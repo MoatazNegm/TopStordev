@@ -1058,6 +1058,21 @@ def share_groups(grps):
   out.append(n)
  return ','.join(out)
 
+# QSD5.352 r10f (QC proof 10e D13): a CIFS share given a group NAME that is no group (deleted, or never made) was accepted:
+# its record and smb.conf named the group, cifsacl.sh could not set an ACL entry for it (setfacl knows no such group), so
+# the share had no named group entry at all and every member was refused (QX-533 after its qg2 was gone).  A name that is
+# no group refuses the call ('invalidgroup', 'group': <name>) as an unknown id already did.  Not groups by design:
+# NoGroup / nogroup, Everyone, and the domain forms (DOMAIN..., DOMAIN\name, name@domain) of a domain share.
+SHARE_NOT_GROUPS = ('nogroup', 'everyone')
+def cifs_unknown_group(grps):
+ known = set(g[0] for g in getgroups())
+ for t in [ t.strip() for t in str(grps).split(',') if t.strip() ]:
+  if t.lower() in SHARE_NOT_GROUPS or 'DOMAIN' in t.upper() or '\\' in t or '@' in t:
+   continue
+  if t not in known:
+   return t
+ return None
+
 def getgroups():
  global leaderip
  groupslst = etcdgetjson(leaderip, 'usersigroup','--prefix') 
@@ -2094,6 +2109,11 @@ def volumecreate(data):
   if grps is None:
    data['error'] = 'invalidgroup'
    return data
+  bad = cifs_unknown_group(grps) if data.get('type') == 'CIFS' else None    # r10f (D13)
+  if bad is not None:
+   data['error'] = 'invalidgroup'
+   data['group'] = bad
+   return data
   data['groups'] = only_everyone(grps)
  if 'ISCSI' in data['type']:
   if portalport_bad(data.get('portalport')):
@@ -2429,6 +2449,11 @@ def volumeconfig_do(data):
    grps = share_groups(data['groups'])
    if grps is None:
     data['error'] = 'invalidgroup'
+    return data
+   bad = cifs_unknown_group(grps) if data.get('type') == 'CIFS' else None    # r10f (D13)
+   if bad is not None:
+    data['error'] = 'invalidgroup'
+    data['group'] = bad
     return data
    data['groups'] = only_everyone(grps)
   for ele in data:

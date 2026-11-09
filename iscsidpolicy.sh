@@ -23,7 +23,7 @@
 # A node is UNFIT when its docker_setup failed (/root/dockersetup.failed, written when etcd does not start), or when it
 # has no etcd container running and no docker_setup / image preload running (or the docker_setup runs for more than
 # 30 min without etcd), once the container has been up for 5 min.  BOOTING (counts as fit): the first 5 min, an image
-# preload, or a docker_setup run (up to 30 min).  FIT: etcd runs (r10d: and a heartbeat / zfsping looper lives; etcd
+# preload, an inner dockerd that does not answer yet (r10f, up to 30 min of uptime), or a docker_setup run (up to 30 min).  FIT: etcd runs (r10d: and a heartbeat / zfsping looper lives; etcd
 # without loopers and without a docker_setup is UNFIT).
 [ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
 is_container 2>/dev/null || exit 0
@@ -71,7 +71,24 @@ s=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
 s.bind("\0"+sys.argv[1]); s.listen(1)
 while True: time.sleep(3600)' "$WANTNAME" </dev/null >/dev/null 2>&1 & echo $! > $WANTPID )
 }
-want_off() { pkill -f "$WANTNAME\$" 2>/dev/null; rm -f $WANTPID; }   # r10e D7: every listener of this node, by name
+# r10f (QC proof 10e D8, high): a listener is named after the host name of the moment it was started.  The guardian starts at
+# container boot, while the host name is still the container's (zfs1 / zfs2); docker_setup then sets dhcp<nnn>, and the
+# listener of the boot name was never withdrawn (want_off and wanting match only the CURRENT name).  The sockets live in
+# the host network namespace, so every other node's otherwants() saw that ghost as a node asking for iscsid, and an unfit
+# holder released iscsid to it (QX-656.4: nobody held iscsid).  Every want listener of THIS container is found by the
+# name pattern (the node containers have their own pid namespace, so pgrep/pkill never reach another node): want_off
+# withdraws all of them, and every tick ends the ones whose name is not the current one (logged once each).  The pattern
+# is the listener's own command line (python3 -c 'import socket...' <name>, the name last): a shell, pgrep or grep that
+# only mentions a name is never matched.
+WANTPAT='^python3 -c import socket.*TOPSTOR_ISCSID_WANT_[A-Za-z0-9_.-]+$'
+want_off() { pkill -f "$WANTPAT" 2>/dev/null; rm -f $WANTPID; }   # r10f D8: every listener of this node, any name
+ghosts_off() {
+	for gp in `pgrep -f "$WANTPAT" 2>/dev/null`; do
+		gn=`tr '\0' ' ' < /proc/$gp/cmdline 2>/dev/null`; gn=${gn% }; gn=${gn##* }
+		[ -n "$gn" ] && [ "$gn" != "$WANTNAME" ] || continue
+		kill $gp 2>/dev/null && echo "`date '+%F %T'` iscsidpolicy $ME: want listener $gn (pid $gp, an old host name) withdrawn" >> $LOG
+	done
+}
 etimes() { ps -o etimes= -p $1 2>/dev/null | tr -d ' '; }
 
 state() {   # prints "<fit|booting|unfit> <reason>"
@@ -94,6 +111,13 @@ state() {   # prints "<fit|booting|unfit> <reason>"
 	if pgrep -f docker-preload.sh >/dev/null 2>&1; then
 		echo "booting image preload runs"; return
 	fi
+	# r10f (QC proof 10e D10): the entrypoint waits for the node's inner dockerd (3 tries of 90 s) before it starts
+	# docker_setup; under host load that wait passed the 5 min GRACE and the node was 'unfit no etcd and no docker_setup'
+	# for a few seconds (QX-647.2: it dropped its request).  A dockerd that does not answer yet counts as booting, within
+	# the docker_setup limit (SETUPMAX) of the container's uptime.
+	if [ $etcdup -eq 0 ] && [ -n "$up" ] && [ "$up" -lt "$SETUPMAX" ] && ! timeout 5 docker info >/dev/null 2>&1; then
+		echo "booting dockerd not ready yet (container up ${up}s)"; return
+	fi
 	[ $etcdup -eq 1 ] && what="no loopers" || what="no etcd"
 	sp=`pgrep -f 'docker_setup[.a-z]*\.sh' | head -1`
 	if [ -n "$sp" ]; then
@@ -109,6 +133,7 @@ state() {   # prints "<fit|booting|unfit> <reason>"
 }
 
 tick() {
+	ghosts_off
 	st=`state`; kind=${st%% *}
 	now=`date +%s`
 	if [ "$kind" = unfit ]; then

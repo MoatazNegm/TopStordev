@@ -1,7 +1,13 @@
 #!/usr/bin/sh
 [ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
+# r10f (QC proof 10e F591): the full copy a node makes when its etcd was started empty or when it joins
+# ('checksyncs.py syncall', started in the background by docker_setup a moment before it asks for this refresh) matched
+# the job 'checksyncs' and was killed (-9) half way: the kinds after the point it had reached were never copied
+# (usersinfo 0 of 4, a group missing; the leader keeps the node's old done marks, so no later pass copied them).
+# It is spared, in the kill and in the "still alive" check; it ends on its own.
+SPARE='checksyncs.py syncall'
 fnkillall () {
-process=(`ps -ef | grep $1 | grep -v color | grep -v grep | awk '{print $2}'`)
+process=(`ps -ef | grep $1 | grep -v color | grep -v grep | grep -vF "$SPARE" | awk '{print $2}'`)
 for proc in "${process[@]}"; do
  echo proc $proc
  kill -9 $proc 2>/dev/null
@@ -37,7 +43,7 @@ cmdcjobs['selectimportlooper']="/pace/selectimportlooper.sh"
 cmdcjobs['zfstelemetrylooper']="/pace/zfstelemetrylooper.sh"
 
 # alive <name>: processes whose command line holds <name>, zombies and this check itself left out
-alive() { ps -eo stat=,args= | awk -v j="$1" '$1 !~ /^Z/ && index($0, j) && $0 !~ /awk -v j=/' | wc -l; }
+alive() { ps -eo stat=,args= | awk -v j="$1" -v s="$SPARE" '$1 !~ /^Z/ && index($0, j) && !index($0, s) && $0 !~ /awk -v j=/' | wc -l; }
 
 while true;
 do

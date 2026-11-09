@@ -23,6 +23,11 @@ setfacl -b -R "$d"
 echo " $groups " | grep -qw nogroup && groups=''
 for grp in $groups
 do
+	# r10f (QC proof 10e D13): a group this node does not know gets no entry (setfacl refuses it); that is said now
+	if ! getent group "$grp" >/dev/null 2>&1; then
+		echo "`date '+%F %T'` cifsacl.sh $d: group $grp unknown on this node, no ACL entry for it" >> /root/cifsacl.log
+		continue
+	fi
 	setfacl -R -m g:$grp:r-X "$d"                                        # existing content: members read
 	setfacl -m g:$grp:rwx "$d"                                           # share root: members create
 	setfacl -d -m g:$grp:r-x "$d"                                        # new content: members read
