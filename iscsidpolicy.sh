@@ -22,7 +22,8 @@
 #   4. After it owns iscsid, a node drops its own want listener.
 # A node is UNFIT when its docker_setup failed (/root/dockersetup.failed, written when etcd does not start), or when it
 # has no etcd container running and no docker_setup / image preload running (or the docker_setup runs for more than
-# 30 min without etcd), once the container has been up for 5 min.  BOOTING (counts as fit): the first 5 min, an image
+# 30 min without etcd), once the container has been up for 5 min.  BOOTING (counts as fit): the first 5 min, the
+# entrypoint's stretch before docker_setup starts (r10g: /run/iscsidboot.mark, up to 30 min of uptime), an image
 # preload, an inner dockerd that does not answer yet (r10f, up to 30 min of uptime), or a docker_setup run (up to 30 min).  FIT: etcd runs (r10d: and a heartbeat / zfsping looper lives; etcd
 # without loopers and without a docker_setup is UNFIT).
 [ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
@@ -39,6 +40,7 @@ SETUPMAX=${ISCSIDPOLICY_SETUPMAX:-1800}
 UNFITMIN=${ISCSIDPOLICY_UNFITMIN:-60}    # a holder releases only after being unfit this long (an etcd restart of a take-over
                                          # by docker_primary.sh leaves a few seconds without an etcd container)
 UNFITF=/run/iscsidpolicy.unfitsince
+BOOTMARK=${ISCSIDPOLICY_BOOTMARK:-/run/iscsidboot.mark}   # r10g: written by the entrypoint, see state()
 LOOPERS=${ISCSIDPOLICY_LOOPERS:-'/pace/(heartbeatlooper\.sh|heartbeat\.py|zfsping\.py)'}
 
 say() {   # log a line only when it differs from the last one (the guardian runs every 3 s)
@@ -107,6 +109,19 @@ state() {   # prints "<fit|booting|unfit> <reason>"
 	up=`etimes 1`
 	if [ -n "$up" ] && [ "$up" -lt "$GRACE" ]; then
 		echo "booting container up ${up}s"; return
+	fi
+	# r10g (validator 10f V1, D10): the entrypoint starts this guardian only AFTER its dockerd wait, and then runs
+	# NetworkManager, the bond0 wait (up to 30 s), six nmcli-down rounds and the image preload before it starts
+	# docker_setup.  Under host load the 5 min GRACE ended in that stretch while dockerd already answered, and the node
+	# was 'unfit no etcd and no docker_setup' (proof 10e samples: +301 s and +305 s).  The entrypoint writes
+	# /run/iscsidboot.mark before it launches the guardian and removes it once docker_setup starts (or is not started:
+	# dockerd failed, auto-run disabled).  While the mark is there, it is from THIS container run (not older than the
+	# container's start: /run is no tmpfs here) and the uptime is below SETUPMAX, the node is booting.
+	if [ -f "$BOOTMARK" ] && [ -n "$up" ] && [ "$up" -lt "$SETUPMAX" ]; then
+		bm=`stat -c %Y "$BOOTMARK" 2>/dev/null || echo 0`
+		if [ $(( bm + 5 )) -ge $(( `date +%s` - up )) ]; then
+			echo "booting entrypoint has not started docker_setup yet (container up ${up}s)"; return
+		fi
 	fi
 	if pgrep -f docker-preload.sh >/dev/null 2>&1; then
 		echo "booting image preload runs"; return
