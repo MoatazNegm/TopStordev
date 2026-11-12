@@ -742,7 +742,18 @@ def _err(msg, **kw):
 
 def _token_ok(token):
     if token.startswith('qsk.'):
-        return True
+        # QC 604 step 1: a forged qsk.* value used to count as 'logged in' here, so the parameter checks below answered
+        # 'missing parameter: x' (an unauthenticated caller learned the parameter names of 28 routes) instead of baduser.
+        # Only a key that really authenticates passes; every other value falls through to login_required, which refuses
+        # it (and counts the attempt, ApiKeyfa0).  Read only: no lock/counter side effects here.
+        try:
+            parts = token.split('.', 2)
+            if len(parts) != 3 or not APIKEY_NAME_RE.match(parts[1]) or len(parts[2]) < 32:
+                return False
+            rec = apikeys_all().get(parts[1])
+            return bool(rec) and rec['status'] == 'active' and _hmac.compare_digest(_apikey_hash(rec['salt'], parts[2]), rec['hash'])
+        except Exception:
+            return False
     try:
         return token in loggedusers and loggedusers[token]['timestamp'] > timestamp()
     except Exception:
