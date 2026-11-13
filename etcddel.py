@@ -3,6 +3,17 @@ import subprocess,sys, os
 import json
 from time import sleep
 
+def _run(cmdline):
+ # QC 612: one try with a 2 s limit skipped a read or a delete silently on a busy node (a deleted user's usersinfo key stayed on the
+ # leader).  Three tries (4 s each, 0.5 s apart); the last failure is raised to the caller's existing 'no reachable' branch.
+ for attempt in range(3):
+  try:
+   return subprocess.run(cmdline,stdout=subprocess.PIPE, timeout=4)
+  except Exception:
+   if attempt == 2:
+    raise
+   sleep(0.5)
+
 def etcddel(etcd, *args):
  os.environ['ETCDCTL_API']= '3'
  endpoints='http://'+etcd+':2379'
@@ -18,7 +29,7 @@ def etcddel(etcd, *args):
   cmdline=['etcdctl','--user=root:YN-Password_123','--endpoints='+endpoints,'get',args[0]]
   cmdline=['etcdctl','--endpoints='+endpoints,'get',args[0]]
  try:
-    result=subprocess.run(cmdline,stdout=subprocess.PIPE, timeout=2)
+    result=_run(cmdline)
  except:
     print('no reachable')
     return
