@@ -192,7 +192,23 @@ def excelParser(filePath):
 
 # Takes in leaderip, user and Excel file. Creates a list of goodusers and addes them using UnixAddUser script.
 def addUsers(*argv):
-    users, newGroups = excelParser(argv[3])
+    # QC 616: a file that is not a user sheet (a PNG renamed .csv, an empty file) made excelParser raise: the admin had been told
+    # 'File uploaded successfully! Adding users started' (Unlin1025) and then nothing, and the file stayed in the upload folder.
+    # Now the failure is reported with the existing 'Failed uploading file' notice (Unlin1026) and the file is removed.
+    try:
+        users, newGroups = excelParser(argv[3])
+    except Exception as e:
+        print('UsersMassAddition: the file is not a readable user sheet:', repr(e)[:200])
+        try:
+            initlog(argv[0], argv[2])
+            sendlog('Unlin1026', 'error', argv[1])
+        except Exception as e2:
+            print('UsersMassAddition: the refusal could not be sent:', repr(e2)[:200])
+        try:
+            os.remove(argv[3])
+        except Exception:
+            pass
+        return
     pools = poolsinfo()['results']
     groups = api_groups_userlist()['results']
     poolNames = [pool['text'].lower() for pool in pools]
