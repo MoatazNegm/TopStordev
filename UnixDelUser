@@ -67,7 +67,15 @@ then
  else
   #/TopStor/broadcast.py UserDel /TopStor/pump.sh UnixDelUser_sync -d$myhost $username $userreq
   echo usename=$username
-  cgrps=`/pace/etcdget.py $etcd usersigroup $username`
+  # QC 615: every user is listed in Everyone, so an empty answer is a failed read (the 2 s limit of etcdget.py on a busy node), not
+  # 'no groups': the removal below was skipped silently and the name stayed in the group records (Everyone), which then refused
+  # the same name for a new user.  Read again (up to 5 times, 2 s apart).
+  cgrps=''
+  for try in 1 2 3 4 5; do
+   cgrps=`/pace/etcdget.py $etcd usersigroup $username`
+   [ ${#cgrps} -gt 4 ] && break
+   sleep 2
+  done
   echo cgrps $cgrps
   cgrpsl=${#cgrps}
   while [ $cgrpsl  -gt 4 ];
@@ -77,7 +85,13 @@ then
    cgrps=`echo "${cgrps[@]}" | sed '$d'`
    cgrpsl=${#cgrps}
    cgrp=`echo $l | sed "s/('usersigroup\///g" | awk -F"'" '{print $1}' `  
-   usersall=`/pace/etcdget.py $etcd usersigroup/$cgrp`
+   # QC 615: a failed read gave '' or '_1' and the record was written back without its members; read again, never write from a failed read
+   usersall=''
+   for try in 1 2 3 4 5; do
+    usersall=`/pace/etcdget.py $etcd usersigroup/$cgrp`
+    case "$usersall" in ''|_1) sleep 2;; *) break;; esac
+   done
+   case "$usersall" in ''|_1) echo "UnixDelUser: could not read usersigroup/$cgrp, record left as it is"; continue;; esac
    cusers='/'`echo $usersall | awk -F'/' '{print $3}'`'/'
    cusersleft=`echo $usersall | cut -d/ -f1-2`
    cusersright=`echo $usersall | cut -d/ -f4-`
