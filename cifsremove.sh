@@ -51,6 +51,10 @@ then
   fi
   nmcli conn up cmynode
   flock -u 9
+  # QC 615: the block above only runs on the container flavour; on a physical node the address (stored as <ip>/<prefix>) stayed in
+  # the cmynode profile and on bond0 after the home / CIFS share was deleted and kept answering ping.  rmvoladdr.sh (already used by
+  # nfsremove.sh) removes every <ip>/<any prefix> entry, re-applies cmynode and keeps the address if another volume still uses it.
+  [ -n "$volip" ] && [ -x /TopStor/rmvoladdr.sh ] && /TopStor/rmvoladdr.sh $volip "" "$pool/$vol"
   rm -rf /TopStordata/smb.$volip;
 else
  # QSD5.352 r9 (prover D6): another share is still on the address.  This branch started the container again with
