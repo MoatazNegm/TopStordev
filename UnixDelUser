@@ -99,6 +99,16 @@ then
    newop=${cusersleft}${newusers}$cusersright
    echo newop $newop
    /pace/etcdput.py $etcd usersigroup/$cgrp $newop 
+   # QC 615: the leader's usersigroup/Everyone kept the deleted name although the same delete cleaned the follower's copy (a put that
+   # did not land, nothing reported): read the record back and write it again while the name is still a member (up to 3 more times)
+   for try in 1 2 3; do
+    chk=`/pace/etcdget.py $etcd usersigroup/$cgrp`
+    case "$chk" in ''|_1) sleep 2; continue;; esac
+    echo "$chk" | awk -F'/' '{print $3}' | tr ',' '
+' | grep -qxF -- "$username" || break
+    sleep 2
+    /pace/etcdput.py $etcd usersigroup/$cgrp $newop
+   done
   done
   pool=`ETCDCTL_API=3 /pace/etcdget.py $etcd usersinfo/$username | awk -F'/' '{print $2}'`
   echo Home=$pool
