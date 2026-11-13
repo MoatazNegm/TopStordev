@@ -28,9 +28,19 @@ def sendlog(*args):
   knowns.append(k[1])
  msg={'req': 'msg2', 'reply':z}
  put(leaderip, 'notification',' '.join(z))
- sendhost(leaderip, str(msg),'recvreply',myhost)
+ # QC 613: a failed bus publish (pika connection error on a busy node) raised out of sendlog and aborted the caller after the
+ # success notification was already shown: Hostconfig logged Unlin1012 here BEFORE encrypting and storing the new password,
+ # so the user saw 'Changing password' and an internal error and the password stayed unchanged.  A notification that cannot
+ # be sent must not abort the operation: the failure is reported on stdout and the work (and the log keys below) go on.
+ try:
+  sendhost(leaderip, str(msg),'recvreply',myhost)
+ except Exception as e:
+  print('sendlog: bus publish to the leader failed:', repr(e)[:120])
  for k in knowninfo:
-  sendhost(k[1], str(msg),'recvreply',myhost)
+  try:
+   sendhost(k[1], str(msg),'recvreply',myhost)
+  except Exception as e:
+   print('sendlog: bus publish to', k[1], 'failed:', repr(e)[:120])
   knowns.append(k[1])
 
  stamp=datetime.datetime.now().strftime("%s%f")
