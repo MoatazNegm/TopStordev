@@ -3200,7 +3200,10 @@ def api_users_userslist(data):
  if 'tenant' not in data:
     data['tenant'] = 'Cluster'
  alldict = dict()
- allusers = []
+ # QC 609: build the list locally and publish it at the end.  The module global used to be emptied here and refilled
+ # while the slow etcd/zfs reads ran (seconds to minutes under load); a groups/groupchange, UnixAddgroup or grouplist arriving
+ # in that window mapped the user ids against an empty or partial list and wrote the group back with NO members.
+ _newusers = []
  if 'Cluster' not in data['tenant']:
     userlst = get('tenant',data['tenant']+'/users')[0][1].split('/')
     grplst = get('tenant',data['tenant']+'/group')[0][1].split('/')[1]
@@ -3216,9 +3219,9 @@ def api_users_userslist(data):
             grp = [0] 
         else:
             grp = 'NoGroup'
-        allusers.append({"name":username, 'id':uid, 'userid':userid, "pool":'na', "size":'na', "groups":grp, 'priv':'na'})
+        _newusers.append({"name":username, 'id':uid, 'userid':userid, "pool":'na', "size":'na', "groups":grp, 'priv':'na'})
         uid += 1
-    alldict['allusers'] = allusers
+    allusers = _newusers; alldict['allusers'] = _newusers
     alldict['allgroups'] = [[group,0,grpusrs]]
     alldict['usersnohome'] = [] 
     return jsonify(alldict)
@@ -3231,7 +3234,8 @@ def api_users_userslist(data):
   for grpuser in grpusers:
    if grpuser not in userdict:
     userdict[grpuser] = []
-   userdict[grpuser].append(str(groupid))
+   if str(groupid) not in userdict[grpuser]:      # QC 609: a user listed twice in a group record (Everyone) gave a duplicated id
+    userdict[grpuser].append(str(groupid))
  usersnohome = []
  nohomeid = 0
  uid = 0
@@ -3250,12 +3254,12 @@ def api_users_userslist(data):
   else:
    groups = userdict[username]
   homeaddr, homesub = ('', '') if 'NoHome' in userpool else userhomeinfo(homevols, username)
-  allusers.append({"name":username, 'id':uid, "pool":userpool, "size":usersize, "groups":groups, 'priv':priv, 'HomeAddress':homeaddr, 'HomeSubnet':homesub})
+  _newusers.append({"name":username, 'id':uid, "pool":userpool, "size":usersize, "groups":groups, 'priv':priv, 'HomeAddress':homeaddr, 'HomeSubnet':homesub})
   uid += 1
   if 'NoHome' in userpool:
    usersnohome.append({ 'id':nohomeid, 'text': username })
    nohomeid += 1 
- alldict['allusers'] = allusers
+ allusers = _newusers; alldict['allusers'] = _newusers
  alldict['allgroups'] = allgroups
  alldict['usersnohome'] = usersnohome
  return jsonify(alldict)
