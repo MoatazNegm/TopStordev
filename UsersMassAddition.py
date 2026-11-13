@@ -225,6 +225,16 @@ def addUsers(*argv):
         if (not (user['Volsize'] == '')):
             size = user['Volsize']
         cmdline = '/TopStor/UnixAddUser {} {} {} groups{} {} {}G {} {} hoststub {}'.format(argv[0], user['name'], pool, groups, user['Password'],size, address, subnet, argv[1],'newuser')
+        # QC 616: the home must be created on the node that owns the pool (fapi users/UnixAddUser adds homeowner=<owner> for the
+        # same reason).  Without it UnixAddUser, running on the leader, tried 'zfs create' on a node that does not hold the pool
+        # (NFS1006 error, the user stayed without a home) whenever the pool belonged to the other node.
+        if pool != 'NoHome':
+            owner = ''
+            for p in pools:
+                if str(p.get('text', '')).lower() == pool.lower():
+                    owner = str(p.get('owner', '') or '')
+            if owner:
+                cmdline += ' homeowner=' + owner
         subprocess.run(cmdline.split(' '))
     initlog(argv[0], argv[2])
     sendlog('Unlin1027', 'info', argv[1])
