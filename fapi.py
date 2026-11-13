@@ -1832,6 +1832,16 @@ def poolsinfo(data):
  allpools.append({'id':len(allpools), 'text':'-------'})
  return jsonify({'results':allpools})
 
+def _users_for_ids():
+ # QC 609: the user ids a client sends (the 'id' of users/userlist = position in usersinfo) were resolved against the module
+ # global allusers, which only a previous users/userlist call fills (empty after a restart, stale after a change).  Read the
+ # users again: same order as users/userlist, so the ids mean the same.  Falls back to the global when etcd does not answer.
+ try:
+  names = [u['name'].replace('usersinfo/','') for u in etcdgetjson(leaderip,'usersinfo','--prefix')]
+  return [{'id': i, 'name': n} for i, n in enumerate(names)]
+ except Exception:
+  return allusers
+
 @app.route('/api/v1/groups/groupchange', methods=['GET','POST'])
 @login_required
 @audit_command
@@ -1847,8 +1857,9 @@ def pgroupchange(data):
  if len(usrs) < 1:
   usrstr = 'NoUser'
  else:
+  _ulist = _users_for_ids()
   for usr in usrs.split(','):
-   for suser in allusers:
+   for suser in _ulist:
     if (str(suser['id']) == str(usr) or suser['name'] == str(usr)) and suser['name'] not in usrstr.split(','):
      usrstr += suser['name']+','
   usrstr = usrstr[:-1]
@@ -2827,8 +2838,9 @@ def UnixAddGroup(data):
  if len(usrs) < 1:
   usrstr = 'NoUser'
  else:
+  _ulist = _users_for_ids()
   for usr in usrs.split(','):
-   for suser in allusers:
+   for suser in _ulist:
     if str(suser['id']) == str(usr):
      usrstr += suser['name']+',' 
   usrstr = usrstr[:-1]
