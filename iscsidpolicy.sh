@@ -117,6 +117,9 @@ state() {   # prints "<fit|booting|unfit> <reason>"
 	# /run/iscsidboot.mark before it launches the guardian and removes it once docker_setup starts (or is not started:
 	# dockerd failed, auto-run disabled).  While the mark is there, it is from THIS container run (not older than the
 	# container's start: /run is no tmpfs here) and the uptime is below SETUPMAX, the node is booting.
+	# r10h (QC proof 10g finding 9): the staged entrypoint now writes the mark BEFORE its dockerd wait (r10g: after it, so
+	# for ~2 s between 'dockerd answers' and the touch a slow boot read unfit); the dockerd case below is a fallback for
+	# an older entrypoint.
 	if [ -f "$BOOTMARK" ] && [ -n "$up" ] && [ "$up" -lt "$SETUPMAX" ]; then
 		bm=`stat -c %Y "$BOOTMARK" 2>/dev/null || echo 0`
 		if [ $(( bm + 5 )) -ge $(( `date +%s` - up )) ]; then

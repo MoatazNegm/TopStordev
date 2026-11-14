@@ -26,6 +26,8 @@ import time
 
 WAIT_TRIES = 12           # QSD5.352 r10 (QC 631): wait mode, 12 x 15 s = 3 minutes at most
 WAIT_STEP = 15
+ADD_TRIES = 3            # QSD5.352 r10h: zpool add of the local cache, 'udevadm settle' + ADD_WAIT s between tries
+ADD_WAIT = 5
 
 sys.path.insert(0, '/TopStor')
 
@@ -243,8 +245,15 @@ def main():
         return
 
     print(f"fixcachelocality: pool {pool}'s cache {[(n, s) for n, g, s in bad]} is not local to {myhost}, relocating")
+    # QSD5.352 r10h (QC proof 10g s3:q 584.1): the remote cache used to be removed FIRST; the add of the local disk then
+    # failed ('cannot label sdd: failed to detect device': a disk whose iSCSI session had just been logged in again) and
+    # the pool was left WITHOUT a cache.  Now: a lost cache (UNAVAIL / REMOVED / FAULTED) serves nothing and is removed
+    # first; a remote cache that still works (ONLINE) is removed only AFTER the local one was added (add first); the add
+    # is tried up to ADD_TRIES times with 'udevadm settle' in between; no local disk, or a failed add, keeps it.
     left = []
-    for name, guid, state in bad:
+    dead = [(n, g, st) for n, g, st in bad if st in DEAD_STATES]
+    working = [(n, g, st) for n, g, st in bad if st not in DEAD_STATES]
+    for name, guid, state in dead:
         ok, how = remove_cache(pool, guid or name, entries)
         print('fixcachelocality: ' + how)
         if not ok:
@@ -262,27 +271,45 @@ def main():
     if new:
         resolved = resolve_by_id(new)
         if resolved:
-            r = subprocess.run(['/sbin/zpool', 'add', '-f', pool, 'cache', resolved],
-                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            if r.returncode == 0:
-                added = resolved
-                print(f"fixcachelocality: added local disk {resolved} ({why}) as new cache for {pool}")
+            err = ''
+            for n in range(ADD_TRIES):
+                if n:
+                    try:
+                        subprocess.run(['udevadm', 'settle', '--timeout=30'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    except Exception:
+                        pass                       # no udevadm: the wait alone
+                    time.sleep(ADD_WAIT)
+                r = subprocess.run(['/sbin/zpool', 'add', '-f', pool, 'cache', resolved],
+                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                if r.returncode == 0:
+                    added = resolved
+                    break
+                err = r.stderr.decode('utf-8', 'replace').strip()
+                print(f"fixcachelocality: zpool add {pool} cache {resolved} failed (try {n + 1} of {ADD_TRIES}): {err}")
+            if added:
+                print(f"fixcachelocality: added local disk {resolved} ({why}) as new cache for {pool} (add first)")
                 if any(_same_disk(s, new) for s in spares):    # a spare in use is no spare any more
                     subprocess.run(['/usr/bin/python3', '/TopStor/cachedisks.py', 'del', leaderip]
                                    + [s for s in spares if _same_disk(s, new)], cwd='/TopStor')
-            else:
-                print(f"fixcachelocality: zpool add {pool} cache {resolved} failed: "
-                      + r.stderr.decode('utf-8', 'replace').strip())
         else:
             print(f"fixcachelocality: chosen disk {new} has no /dev/disk/by-id link on {myhost}, not added")
     else:
         print(f"fixcachelocality: {why}")
+    for name, guid, state in working:
+        if added or keep:
+            ok, how = remove_cache(pool, guid or name, entries)
+            print('fixcachelocality: ' + how)
+            if not ok:
+                left.append(name)
+        else:
+            print(f"fixcachelocality: the remote cache {name} ({state}) of {pool} is kept: no local cache could be added")
+            left.append(name)
 
     still = [n for n, g, s in cache_entries(pool)]
     if added:
         print(f"fixcachelocality: pool {pool} cache now {still}")
     elif left:
-        print(f"fixcachelocality: pool {pool} keeps cache {still} (the not-local one(s) {left} could not be removed)")
+        print(f"fixcachelocality: pool {pool} keeps cache {still} (the not-local one(s) {left} kept or not removable)")
     elif still:
         print(f"fixcachelocality: pool {pool} cache now {still}")
     else:
