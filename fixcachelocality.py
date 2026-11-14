@@ -19,6 +19,8 @@
 #   fixcachelocality.py rmcache <pool> <disk>           remove one cache vdev by name or GUID (DGsetPool updatecache,
 #                                                       when the old cache disk has no /dev/disk/by-id link any more)
 #   fixcachelocality.py rmdead <pool>                   remove every UNAVAIL/REMOVED/FAULTED cache vdev (updatecache)
+import os
+import re
 import sys
 import json
 import subprocess
@@ -134,6 +136,89 @@ def spare_list(leaderip):
         return [str(x) for x in val] if isinstance(val, list) else []
     except Exception:
         return []
+
+
+SCSIRE = re.compile(r'scsi-[0-9A-Za-z]+')
+SDRE = re.compile(r'\b(sd[a-z]+)[0-9]*\b')
+
+
+def iscontainer():
+    # the same test as flavor.sh
+    return os.path.exists('/.dockerenv') or os.path.exists('/run/.containerenv') or os.path.isdir('/sys/class/net/eth10')
+
+
+def _zout(args, t=60):
+    """stdout of a zpool command, None when it failed or timed out ('no pools available' is an empty answer)."""
+    try:
+        r = subprocess.run(['timeout', str(t)] + args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except Exception:
+        return None
+    out = (r.stdout or b'').decode('utf-8', 'replace')
+    err = (r.stderr or b'').decode('utf-8', 'replace')
+    if r.returncode == 0 or (out.strip() == '' and 'no pools available' in err):
+        return out
+    return None
+
+
+def _named(did, d, text):
+    ids = set(m.group(0) for m in SCSIRE.finditer(text))
+    sds = set(m.group(1) for m in SDRE.finditer(text))
+    return did in ids or str(d.get('actualdisk', '')) in ids or str(d.get('devname', '-')) in sds
+
+
+def reserved_disks(leaderip, info, owner):
+    """QSD5.352 r10h pass 2 (validator G6, same class as QC proof 10g finding 7): {disk: why} of the disks of `owner` that
+    the cluster info lists as free but that must not become a cache: a disk 'zpool status' names (any pool, also the
+    'was /dev/disk/by-id/<disk>-part1' of a REMOVED / UNAVAIL leg that came back), or a member, in 'zpool import', of a
+    pool this cluster expects (ActPool/ or poolnxt/) that is not imported.  'zpool add -f' overrides ZFS's own "is part
+    of exported pool" refusal, so such a leg became a cache disk and its pool lost it.  A failed or timed-out zpool read
+    holds every candidate (fail closed: the remote cache is then kept).  Container flavour only (physical: {})."""
+    if not iscontainer():
+        return {}
+    cands = dict((did, d) for did, d in info.get('disks', {}).items()
+                 if d.get('host') == owner and str(d.get('pool', '')) in ('pree', ''))
+    if not cands:
+        return {}
+    status = _zout(['/sbin/zpool', 'status'], 60)
+    if status is None:
+        return dict((did, 'unknown: zpool status gave no answer') for did in cands)
+    why = {}
+    for did, d in cands.items():
+        if _named(did, d, status):
+            why[did] = 'named in zpool status'
+    known = set()
+    try:
+        from etcdget import etcdget as get
+        for pfx in ('ActPool/', 'poolnxt/'):
+            for row in get(leaderip, pfx, '--prefix'):
+                if isinstance(row, (list, tuple)) and len(row) > 1 and str(row[0]).startswith(pfx):
+                    known.add(str(row[0])[len(pfx):])
+    except Exception:
+        pass
+    imported = set((_zout(['/sbin/zpool', 'list', '-H', '-o', 'name'], 30) or '').split()) | set(info.get('pools', {}).keys())
+    pending = set(p for p in known if p and p not in imported)
+    if not pending:
+        return why
+    scan = _zout(['/sbin/zpool', 'import'], 90)
+    if scan is None:
+        for did in cands:
+            why.setdefault(did, 'unknown: zpool import gave no answer (pending ' + ','.join(sorted(pending)) + ')')
+        return why
+    secs = []
+    for line in scan.split('\n'):
+        w = line.split()
+        if len(w) >= 2 and w[0] == 'pool:':
+            secs.append([w[1], ''])
+        elif secs:
+            secs[-1][1] += line + '\n'
+    for did, d in cands.items():
+        if did in why:
+            continue
+        for name, sec in secs:
+            if name in pending and _named(did, d, sec):
+                why[did] = 'member of ' + name + ' waiting to import'
+                break
+    return why
 
 
 def pick_cache_disk(info, owner, pool, exclude=(), spares=()):
@@ -266,6 +351,10 @@ def main():
     if keep:                                       # a healthy local cache is left: no second one
         new, why = None, f"pool {pool} keeps its local cache {keep}, no disk added"
     else:
+        held = reserved_disks(leaderip, info, myhost)      # r10h pass 2 (G6)
+        if held:
+            print(f"fixcachelocality: not used as cache (reserved): {sorted(held.items())}")
+            exclude = exclude | set(held)
         new, why = pick_cache_disk(info, myhost, pool, exclude, spares)
     added = None
     if new:
