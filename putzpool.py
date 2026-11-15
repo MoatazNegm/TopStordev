@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import subprocess, json,sys
+import os
 from os import listdir
 from logqueue import queuethis, initqueue
 from etcdput import etcdput as put
@@ -63,6 +64,13 @@ def putzpool():
  lists={'pools':lpools,'disks':ldisks,'defdisks':ldefdisks,'inusedisks':linusedisks,'freedisks':lfreedisks,'sparedisks':lsparedisks,'raids':lraids,'volumes':lvolumes,'snapshots':lsnapshots, 'hosts':list(lhosts), 'phosts':list(phosts)}
  silvering = 'no'
  silveringflag = 'no'
+ # r10k (validator 10j G3): /TopStor/repliSelection.py imports THIS copy (its own dir comes first on the path), not
+ # /pace/putzpool.py.  Container flavour, as /pace/putzpool.py since r10j: a 'zpool status' line is a pool line only when its
+ # first word is a pool named by a 'pool:' header of the same output and is not digits only (a leg listed by its guid with the
+ # pool name in its old path, '<guid> UNAVAIL ... was /tmp/impdir-pdhcp.../...', ran 'zpool list <guid> -H', which zpool reads
+ # as an interval and never ends); 'zpool list' has a 30 s timeout (placeholder sizes).  Physical flavour: unchanged.
+ iscont = os.path.exists('/.dockerenv') or os.path.exists('/run/.containerenv') or os.path.isdir('/sys/class/net/eth10')
+ statuspools = set(w[1] for w in (x.split() for x in sty) if len(w) >= 2 and w[0] == 'pool:')
  for a in sty:
   b=a.split()
   if len(b) > 0:
@@ -74,7 +82,11 @@ def putzpool():
      if any('/dev/'+b[0] in lss for drive in drives):
       b[0]='scsi-'+lss.split()[6]
    
-  if "pdhc" in str(b) and  'pool' not in str(b):
+  if iscont:
+   poolline = len(b) > 0 and zname in statuspools and not zname.isdigit()
+  else:
+   poolline = "pdhc" in str(b) and  'pool' not in str(b)
+  if poolline:
    raidlist=[]
    volumelist=[]
    zdict={}
@@ -88,8 +100,17 @@ def putzpool():
    except:
     availtype='suspended'
    cmdline=['/sbin/zpool','list',b[0],'-H']
-   result=subprocess.run(cmdline,stdout=subprocess.PIPE)
-   zlist=str(result.stdout)[2:][:-3].split('\\t')
+   if iscont:
+    try:
+     result=subprocess.run(cmdline,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,timeout=30)
+     zlist=str(result.stdout)[2:][:-3].split('\\t')
+    except subprocess.TimeoutExpired:
+     zlist=[]
+    if len(zlist) < 8:
+     zlist=[b[0],'0','0','0','-','-','-','-','-','-']      # r10k (G3): no answer in 30 s / a short answer
+   else:
+    result=subprocess.run(cmdline,stdout=subprocess.PIPE)
+    zlist=str(result.stdout)[2:][:-3].split('\\t')
    cmdline=['/sbin/zfs','get','compressratio','-H']
    result=subprocess.run(cmdline,stdout=subprocess.PIPE)
    zlist2=str(result.stdout)[2:][:-3].split('\\t')
