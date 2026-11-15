@@ -83,7 +83,9 @@ def putzpool():
       b[0]='scsi-'+lss.split()[6]
    
   if iscont:
-   poolline = len(b) > 0 and zname in statuspools and not zname.isdigit()
+   # r10l (validator 10k K6): and a TopStor pool (pdhcp...), as pace poolstoimport (G4): the plain 'zpool status' lists every
+   # pool of the shared kernel, a non-TopStor pool got zfs get / zpool list and went into hosts/<me>/current
+   poolline = len(b) > 0 and zname in statuspools and not zname.isdigit() and zname.startswith('pdhcp')
   else:
    poolline = "pdhc" in str(b) and  'pool' not in str(b)
   if poolline:
