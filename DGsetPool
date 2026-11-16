@@ -25,6 +25,16 @@ zpoolcreate() {
             sleep 5
             continue
         fi
+        # QSD5.352 r10m (QC proof 10l N4): a pool made right after a node return failed at once with "one or more devices is
+        # currently unavailable" (the returned disk's by-id -part1 link was not there yet: kernel 'open error=2'), and a
+        # create made no pool in 400 s.  Container flavour: that error and its twins ("missing link ... was partitioned",
+        # "failed to detect device") are retried too, after udev settles, every 10 s, 8 tries at most (about 2 min).
+        if [ -n "$POOLFM" ] && echo "$zc_err" | grep -q "currently unavailable\|missing link\|failed to detect device" && [ $zc_try -lt 8 ]; then
+            echo "`date '+%F %T'` zpool create: device not ready (`echo "$zc_err" | head -1 | cut -c1-160`), retry $zc_try" >> /root/dgcreateretry
+            udevadm settle --timeout=30 2>/dev/null
+            sleep ${ZC_LATEWAIT:-10}
+            continue
+        fi
         echo "$zc_err" >&2
         return $zc_rc
     done

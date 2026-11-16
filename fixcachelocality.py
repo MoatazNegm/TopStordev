@@ -44,6 +44,57 @@ def resolve_by_id(disk_substr):
     return None
 
 
+# QSD5.352 r10m (QC proof 10l N5, 763.2): after a take-over the 3 adds of the local cache failed within 15 s with
+# 'missing link: sdj was partitioned but /dev/disk/by-id/<disk>-part1 is missing' (udev 7 min late at host load 15) and
+# nothing tried again: the pool stayed without a cache.  In wait mode (the background run after a take-over import) a
+# failed add whose error is a late or missing device link now waits for the disk's -part1 link (every LATE_STEP s, at most
+# LATE_WAIT s), then adds the whole disk again and, if that still misses the link, the -part1 partition itself.  It stops
+# when the pool is no longer imported here or has got a working cache meanwhile.  Every step is logged.
+LATE_WAIT = 900
+LATE_STEP = 30
+LATE_ERRORS = ('missing link', 'failed to detect device', 'is currently unavailable', 'no such device', 'resource busy')
+
+
+def late_link_error(err):
+    return any(e in str(err) for e in LATE_ERRORS)
+
+
+def _imported_here(pool):
+    return os.path.exists('/proc/spl/kstat/zfs/' + pool)
+
+
+def late_add(pool, disk, err):
+    # the device added (by-id whole disk or its -part1) or None
+    part = '/dev/disk/by-id/' + disk + '-part1'
+    print(f"fixcachelocality: {pool}: the add of {disk} failed on a device link ({str(err)[:160]}); waiting for {part} (at most {LATE_WAIT} s)")
+    t0 = time.time()
+    while time.time() - t0 <= LATE_WAIT:
+        if not _imported_here(pool):
+            print(f"fixcachelocality: {pool} is no longer imported here, no late add")
+            return None
+        live = [(n, s) for n, g, s in cache_entries(pool) if s not in DEAD_STATES]
+        if live:
+            print(f"fixcachelocality: {pool} has a working cache {live} meanwhile, no late add")
+            return None
+        if os.path.exists(part):
+            try:
+                subprocess.run(['udevadm', 'settle', '--timeout=30'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            except Exception:
+                pass
+            for dev in (disk, part):
+                r = subprocess.run(['/sbin/zpool', 'add', '-f', pool, 'cache', dev], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                if r.returncode == 0:
+                    print(f"fixcachelocality: late add of {dev} to {pool} worked after {int(time.time() - t0)} s")
+                    return dev
+                err = r.stderr.decode('utf-8', 'replace').strip()
+                print(f"fixcachelocality: late add of {dev} to {pool} failed after {int(time.time() - t0)} s: {err[:200]}")
+                if not late_link_error(err):
+                    return None                    # a real refusal: not retried
+        time.sleep(LATE_STEP)
+    print(f"fixcachelocality: {pool}: {part} did not come (or the add kept failing) within {LATE_WAIT} s, no cache added")
+    return None
+
+
 def _cache_section(text, was_name=False):
     """The device lines under the 'cache' header of `zpool status` as [(name, state)]."""
     entries = []
@@ -375,8 +426,10 @@ def main():
                     break
                 err = r.stderr.decode('utf-8', 'replace').strip()
                 print(f"fixcachelocality: zpool add {pool} cache {resolved} failed (try {n + 1} of {ADD_TRIES}): {err}")
+            if not added and wait and late_link_error(err):
+                added = late_add(pool, resolved, err)          # r10m (N5)
             if added:
-                print(f"fixcachelocality: added local disk {resolved} ({why}) as new cache for {pool} (add first)")
+                print(f"fixcachelocality: added local disk {added} ({why}) as new cache for {pool} (add first)")
                 if any(_same_disk(s, new) for s in spares):    # a spare in use is no spare any more
                     subprocess.run(['/usr/bin/python3', '/TopStor/cachedisks.py', 'del', leaderip]
                                    + [s for s in spares if _same_disk(s, new)], cwd='/TopStor')
