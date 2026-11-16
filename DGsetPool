@@ -14,6 +14,7 @@ is_container 2>/dev/null && POOLFM="-o failmode=continue"
 # and on its twin "one or more vdevs refer to the same device" (the old partitions still being removed, test 10 round 13, QSD5.310).
 zpoolcreate() {
     zc_try=0
+    zc_t0=""
     while :; do
         zc_err=`/sbin/zpool create "$@" 2>&1 >/dev/null`
         zc_rc=$?
@@ -28,12 +29,23 @@ zpoolcreate() {
         # QSD5.352 r10m (QC proof 10l N4): a pool made right after a node return failed at once with "one or more devices is
         # currently unavailable" (the returned disk's by-id -part1 link was not there yet: kernel 'open error=2'), and a
         # create made no pool in 400 s.  Container flavour: that error and its twins ("missing link ... was partitioned",
-        # "failed to detect device") are retried too, after udev settles, every 10 s, 8 tries at most (about 2 min).
-        if [ -n "$POOLFM" ] && echo "$zc_err" | grep -q "currently unavailable\|missing link\|failed to detect device" && [ $zc_try -lt 8 ]; then
-            echo "`date '+%F %T'` zpool create: device not ready (`echo "$zc_err" | head -1 | cut -c1-160`), retry $zc_try" >> /root/dgcreateretry
-            udevadm settle --timeout=30 2>/dev/null
-            sleep ${ZC_LATEWAIT:-10}
-            continue
+        # "failed to detect device") are retried too, every 10 s (r10n: for up to ZC_LATEMAX wall seconds, below).
+        # r10n (validator 10m V-4): the container's /dev is a tmpfs whose by-id links only /pace/cdiskids.sh makes (sysfs only,
+        # cheap; iscsiwatchdog.sh runs it once per loop, minutes apart under load) -- there is no udev in the container, so
+        # 'udevadm settle' did nothing.  Each retry now runs cdiskids.sh first.  The kernel half of the error (it opens the
+        # HOST's by-id link, made by host udev) needs time: the evidence shows lags of ~7 min (proof 10l: no pool in 400 s at
+        # 07:06, the same call fine at 07:13), so the retries run for up to ZC_LATEMAX (480) WALL seconds (round 10m: 8 tries,
+        # ~80-110 s), each one logged with its elapsed time; the give-up is logged too.
+        if [ -n "$POOLFM" ] && echo "$zc_err" | grep -q "currently unavailable\|missing link\|failed to detect device"; then
+            [ -n "$zc_t0" ] || zc_t0=`date +%s`
+            zc_el=$(( `date +%s` - zc_t0 ))
+            if [ $zc_el -lt ${ZC_LATEMAX:-480} ]; then
+                echo "`date '+%F %T'` zpool create: device not ready (`echo "$zc_err" | head -1 | cut -c1-160`), retry $zc_try after $zc_el s (at most ${ZC_LATEMAX:-480} s)" >> /root/dgcreateretry
+                timeout 20 /pace/cdiskids.sh >/dev/null 2>&1
+                sleep ${ZC_LATEWAIT:-10}
+                continue
+            fi
+            echo "`date '+%F %T'` zpool create: device still not ready after $zc_el s, given up (`echo "$zc_err" | head -1 | cut -c1-160`)" >> /root/dgcreateretry
         fi
         echo "$zc_err" >&2
         return $zc_rc

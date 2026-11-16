@@ -45,7 +45,8 @@ def resolve_by_id(disk_substr):
 
 
 # QSD5.352 r10m (QC proof 10l N5, 763.2): after a take-over the 3 adds of the local cache failed within 15 s with
-# 'missing link: sdj was partitioned but /dev/disk/by-id/<disk>-part1 is missing' (udev 7 min late at host load 15) and
+# 'missing link: sdj was partitioned but /dev/disk/by-id/<disk>-part1 is missing' (the link 7 min late at host load 15; r10n
+# V-4: in the container the link is made by cdiskids.sh, not udev) and
 # nothing tried again: the pool stayed without a cache.  In wait mode (the background run after a take-over import) a
 # failed add whose error is a late or missing device link now waits for the disk's -part1 link (every LATE_STEP s, at most
 # LATE_WAIT s), then adds the whole disk again and, if that still misses the link, the -part1 partition itself.  It stops
@@ -63,8 +64,31 @@ def _imported_here(pool):
     return os.path.exists('/proc/spl/kstat/zfs/' + pool)
 
 
-def late_add(pool, disk, err):
-    # the device added (by-id whole disk or its -part1) or None
+# r10n (validator 10m V-3, MEDIUM): in the container flavour every node shares one kernel, so the kstat above exists
+# whichever node imported the pool: a take-back by the returning owner within the 15 min was not seen and this node could
+# add ITS disk as the cache of a pool it no longer owns (a remote cache again).  Each round now also reads the owner
+# written on the pool (/pace/cpoolowner.sh of <pool>, as zpooltoimport's poolishere()): it must name this node.
+def _owner(pool):
+    """The owner written on the pool ('' when it cannot be read: the pool is not ONLINE/DEGRADED, or the call failed)."""
+    try:
+        r = subprocess.run(['/pace/cpoolowner.sh', 'of', pool], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=30)
+        return r.stdout.decode('utf-8', 'replace').strip()
+    except Exception:
+        return ''
+
+
+# r10n (validator 10m V-4, MEDIUM): the container's /dev is a tmpfs whose by-id links only /pace/cdiskids.sh makes (sysfs
+# only, cheap), once per iscsiwatchdog loop -- minutes apart under load; 'udevadm settle' does nothing there (no udev in
+# the container).  The container flavour runs cdiskids.sh before each add try and each late-add round.
+def _links():
+    try:
+        subprocess.run(['timeout', '20', '/pace/cdiskids.sh'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception:
+        pass
+
+
+def late_add(pool, disk, err, owner=None):
+    # the device added (by-id whole disk or its -part1) or None; container flavour only (r10n V-2)
     part = '/dev/disk/by-id/' + disk + '-part1'
     print(f"fixcachelocality: {pool}: the add of {disk} failed on a device link ({str(err)[:160]}); waiting for {part} (at most {LATE_WAIT} s)")
     t0 = time.time()
@@ -72,15 +96,21 @@ def late_add(pool, disk, err):
         if not _imported_here(pool):
             print(f"fixcachelocality: {pool} is no longer imported here, no late add")
             return None
+        if owner:
+            who = _owner(pool)
+            if who and who not in (owner, '-'):
+                print(f"fixcachelocality: {pool} is owned by {who} now, not by {owner}: no late add")
+                return None
+            if who != owner:
+                print(f"fixcachelocality: {pool}: owner not readable as {owner} [{who}], no add in this round")
+                time.sleep(LATE_STEP)
+                continue
         live = [(n, s) for n, g, s in cache_entries(pool) if s not in DEAD_STATES]
         if live:
             print(f"fixcachelocality: {pool} has a working cache {live} meanwhile, no late add")
             return None
+        _links()                                   # r10n (V-4): the links from sysfs now
         if os.path.exists(part):
-            try:
-                subprocess.run(['udevadm', 'settle', '--timeout=30'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            except Exception:
-                pass
             for dev in (disk, part):
                 r = subprocess.run(['/sbin/zpool', 'add', '-f', pool, 'cache', dev], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 if r.returncode == 0:
@@ -419,6 +449,8 @@ def main():
                     except Exception:
                         pass                       # no udevadm: the wait alone
                     time.sleep(ADD_WAIT)
+                    if iscontainer():
+                        _links()                   # r10n (V-4): container: no udev, the links come from cdiskids.sh
                 r = subprocess.run(['/sbin/zpool', 'add', '-f', pool, 'cache', resolved],
                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 if r.returncode == 0:
@@ -426,8 +458,9 @@ def main():
                     break
                 err = r.stderr.decode('utf-8', 'replace').strip()
                 print(f"fixcachelocality: zpool add {pool} cache {resolved} failed (try {n + 1} of {ADD_TRIES}): {err}")
-            if not added and wait and late_link_error(err):
-                added = late_add(pool, resolved, err)          # r10m (N5)
+            # r10n (validator 10m V-2): the late wait is container flavour only (the physical path is as before round 10m)
+            if not added and wait and iscontainer() and late_link_error(err):
+                added = late_add(pool, resolved, err, myhost)  # r10m (N5), r10n (V-3: owner checked each round)
             if added:
                 print(f"fixcachelocality: added local disk {added} ({why}) as new cache for {pool} (add first)")
                 if any(_same_disk(s, new) for s in spares):    # a spare in use is no spare any more
