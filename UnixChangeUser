@@ -26,11 +26,23 @@ stablegrp=""
 # busy node, nothing reported) silently dropped the user from the group record (leader etcd had q018u1,q018u3 without q018u2 after a
 # multi-row submit).  putgrp writes the record and reads it back; while the user is not (add) or still is (del) a member it writes
 # again (3 more times, 2 s apart).  Reads that fail ('' or _1) are retried and never trusted.
+# QC 617 (fix15): etcdget.py prints 'not reachable' and '_1' when a read fails or times out; the record built from that string
+# ('not/,q018u3/not') was written to the leader's etcd, and the read-back of putgrp took it for good.  getgrp returns a group record
+# only when it has the shape of one (<gid>:<gid>:<home>/<size>/<users>/...), retrying the read (5 x 3 s); '' when it never does.
+getgrp() {
+ local r
+ for t in 1 2 3 4 5; do
+  r=`/pace/etcdget.py $etcd usersigroup/$1 | tail -1`
+  echo "$r" | grep -qE '^[0-9]+:[0-9]+:[^/]*/[^/]*/[^/]*/' && { echo "$r"; return 0; }
+  sleep 3
+ done
+ return 1
+}
 putgrp() {
+ echo "$2" | grep -qE '^[0-9]+:[0-9]+:[^/]*/[^/]*/[^/]*/' || { echo "putgrp: refused to write a malformed record for $1: $2"; return 1; }
  /pace/etcdput.py $etcd usersigroup/$1 $2
  for try in 1 2 3; do
-  chk=`/pace/etcdget.py $etcd usersigroup/$1`
-  case "$chk" in ''|_1) sleep 2; continue;; esac
+  chk=`getgrp $1` || { sleep 2; continue; }
   ismember=0
   echo "$chk" | awk -F'/' '{print $3}' | tr ',' '
 ' | grep -qxF -- "$username" && ismember=1
@@ -95,7 +107,7 @@ then
    echo $usergroups | grep -w $cgrp  &>/dev/null
    if [ $? -ne 0 ];
    then
-    usersall=`/pace/etcdget.py $etcd usersigroup/$cgrp`
+    usersall=`getgrp $cgrp` || { echo "group record $cgrp unreadable, not changed"; continue; }
     cusers=`echo $usersall | awk -F'/' '{print $3}'`
     cusersleft=`echo $usersall | cut -d/ -f1-2`
     cusersright=`echo $usersall | cut -d/ -f4-`
@@ -140,7 +152,7 @@ then
     echo 'kdsl' $stablegrp | grep -w $l >/dev/null
     if [ $? -ne 0 ];
     then
-     usersall=`/pace/etcdget.py $etcd usersigroup/$l`
+     usersall=`getgrp $l` || { echo "group record $l unreadable, not changed"; continue; }
      cusers=`echo $usersall | awk -F'/' '{print $3}'`
      cusersleft=`echo $usersall | cut -d/ -f1-2`
      cusersright=`echo $usersall | cut -d/ -f4-`
