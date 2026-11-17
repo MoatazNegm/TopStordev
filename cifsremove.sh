@@ -49,7 +49,8 @@ then
     ip addr del ${a#*|} dev ${a%|*}
    done
   fi
-  nmcli conn up cmynode
+  # r10o (O3): in place, not a bond0 re-activation that takes every address away for seconds (cmynodeapply.sh)
+  /TopStor/cmynodeapply.sh cifsremove.sh
   flock -u 9
   rm -rf /TopStordata/smb.$volip;
 else

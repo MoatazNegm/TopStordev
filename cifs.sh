@@ -72,7 +72,8 @@ else
 		nmcli conn modify cmynode ipv4.dns $domainsrvi
 		echo nmcli conn modify cmynode ipv4.dns $domainsrvi
 	fi
-	nmcli conn up cmynode
+	# r10o (O3): in place, not a bond0 re-activation that takes every address away for seconds (cmynodeapply.sh)
+	/TopStor/cmynodeapply.sh cifs.sh
 	flock -u 9
  	sync
  	adminpass=`echo $adminpass | sed 's/\@\@sep/\//g'`

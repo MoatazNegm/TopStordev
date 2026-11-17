@@ -24,7 +24,8 @@ for a in `nmcli -g ipv4.addresses conn show cmynode 2>/dev/null | tr ',' ' '`; d
   $ip/*) nmcli conn mod cmynode -ipv4.addresses $a && changed=1 ;;
  esac
 done
-[ $changed -eq 1 ] && nmcli conn up cmynode
+# r10o (O3): in place, not a bond0 re-activation that takes every address away for seconds (cmynodeapply.sh)
+[ $changed -eq 1 ] && /TopStor/cmynodeapply.sh rmvoladdr.sh
 flock -u 9
 [ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
 if is_container 2>/dev/null; then

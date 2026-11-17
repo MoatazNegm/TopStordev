@@ -100,7 +100,8 @@ then
    targetcli /iscsi delete $tiqn
    exec 9>>/TopStordata/cmynode.lock; flock -w 120 9   # QSD5.352: cmynode changes one at a time (cmynodeaddr.sh)
    nmcli conn mod cmynode -ipv4.addresses ${addr}/${oldipsubnet:-24}
-   nmcli conn up cmynode
+   # r10o (O3): in place, not a bond0 re-activation that takes every address away for seconds (cmynodeapply.sh)
+   /TopStor/cmynodeapply.sh VolumeChangeISCSI
    flock -u 9
   fi
  done

@@ -122,7 +122,7 @@ do
 		stamp=`date +%s`
 		stamp=$((stamp+300))
 		# QSD5.352 r2: cmynode changes one at a time (lock of cmynodeaddr.sh)
-		( flock -w 120 9; nmcli conn mod cmynode +ipv4.addresses 10.11.11.254/24; nmcli conn up cmynode ) 9>>/TopStordata/cmynode.lock
+		( flock -w 120 9; nmcli conn mod cmynode +ipv4.addresses 10.11.11.254/24; /TopStor/cmynodeapply.sh iscsiwatchdog.sh ) 9>>/TopStordata/cmynode.lock
 		/TopStor/httpdflask.sh $leaderip yes
 		initip=2
 	fi
@@ -132,7 +132,7 @@ do
 		if [ $stamp2 -ge $stamp ];
 		then
 			docker rm -f httpd_local
-			( flock -w 120 9; nmcli conn mod cmynode -ipv4.addresses 10.11.11.254/24; nmcli conn up cmynode ) 9>>/TopStordata/cmynode.lock
+			( flock -w 120 9; nmcli conn mod cmynode -ipv4.addresses 10.11.11.254/24; /TopStor/cmynodeapply.sh iscsiwatchdog.sh ) 9>>/TopStordata/cmynode.lock
 			initip=3
 		fi
 	fi

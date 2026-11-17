@@ -24,7 +24,8 @@ docker rm -f $resname
 exec 9>>/TopStordata/cmynode.lock; flock -w 120 9   # QSD5.352: cmynode changes one at a time (cmynodeaddr.sh)
 nmcli conn mod cmynode -ipv4.addresses ${ipaddr}/$ipsubnet
 echo nmcli conn mod cmynode -ipv4.addresses ${ipaddr}/$ipsubnet
-nmcli conn up cmynode
+# r10o (O3): in place, not a bond0 re-activation that takes every address away for seconds (cmynodeapply.sh)
+/TopStor/cmynodeapply.sh nfsnew.sh
 flock -u 9
 counter=20
 while [ $counter -gt 1 ];
