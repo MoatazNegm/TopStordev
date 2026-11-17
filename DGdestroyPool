@@ -25,6 +25,35 @@ importpool() {
  done
  return 1
 }
+# QSD5.352 r10o (QC proof 10n N2): the monitoring container promcadvisor (its /rootfs is a PRIVATE copy of this node's
+# mounts, taken when it started) keeps a dataset of the pool mounted in ITS mount namespace after this node unmounted it:
+# 'zpool export -f' and 'zpool destroy -f' then end 'pool is busy' (pdhcp158833031: 10 import retries 'a pool with that
+# name already exists', destroy busy).  releaseholders <pool>: every OTHER mount namespace that has a zfs mount of the pool
+# (or of one of its datasets) gets it unmounted there (umount, else a lazy umount), deepest first, each one logged.
+# Container flavour only (the physical path is unchanged).
+[ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
+iscontainerflavour() { type is_container >/dev/null 2>&1 && is_container; }
+releaseholders() {
+ pr=${PROCROOT:-/proc}       # PROCROOT: stub tests only
+ me=`readlink $pr/self/ns/mnt 2>/dev/null`
+ seen=' '
+ for d in $pr/[0-9]*; do
+  ns=`readlink $d/ns/mnt 2>/dev/null` || continue
+  { [ -z "$ns" ] || [ "$ns" = "$me" ]; } && continue
+  case "$seen" in *" $ns "*) continue ;; esac
+  seen="$seen$ns "
+  mnts=`awk -v p="$1" '{ for (i = 7; i <= NF; i++) if ($i == "-") break; if ($(i+1) == "zfs" && ($(i+2) == p || index($(i+2), p "/") == 1)) print $5 }' $d/mountinfo 2>/dev/null | sort -r`
+  for m in $mnts; do
+   pid=${d#$pr/}
+   if nsenter -t $pid -m umount "$m" 2>/dev/null; then how='unmounted'
+   elif nsenter -t $pid -m umount -l "$m" 2>/dev/null; then how='lazily unmounted'
+   else how='NOT unmounted'; fi
+   echo "pool $1: $m held in the mount namespace of pid $pid (`cat $d/comm 2>/dev/null`): $how" >> /root/dgdestroyretry
+  done
+ done
+}
+# 0 when the pool is imported (in the container flavour: in the kernel, whichever node imported it)
+poolimported() { /sbin/zpool list -H -o name "$1" >/dev/null 2>&1; }
 echo hi=$privilege > /root/tmp2
 contrun=`./privthis.sh $privilege $userreq`;
 echo hi=$contrun >> /root/tmp2
@@ -174,6 +203,7 @@ echo iam in >> /root/tmp2
  sleep 2
  # QSD5.346: the pool's own guid, so the import below takes this pool and not a stale copy of the same name
  poolguid=`/sbin/zpool get -H -o value guid $pool 2>/dev/null`
+ iscontainerflavour && releaseholders $pool        # r10o (N2)
  /sbin/zpool export -f $pool
  sleep 1
  # the import right after the export sometimes finds no pool ("cannot import: no such pool available") while the
@@ -190,13 +220,45 @@ echo iam in >> /root/tmp2
  sleep 1
  /sbin/zpool destroy -f $pool 2>/root/dgdestroyerror
  destroyrc=$?
+ if [ $destroyrc -ne 0 ] && iscontainerflavour && poolimported $pool; then
+  # r10o (N2): busy: release the holders once more (a monitoring process may have mounted it again) and try once more
+  echo "zpool destroy $pool failed: `cat /root/dgdestroyerror`; holders released again, one more try" >> /root/dgdestroyretry
+  releaseholders $pool
+  sleep 2
+  /sbin/zpool destroy -f $pool 2>/root/dgdestroyerror
+  destroyrc=$?
+ fi
  fi   # skipdestroy
+ # r10o (N2): a destroy that failed while the pool is still IMPORTED (busy) must not drop the pool's keys: with ActPool
+ # deleted and the tombstone written, the live pool was an orphan (imported, no ActPool, never taken over, never listed
+ # again by the import loop).  keepreg=1: ActPool/<pool> and pools/<pool> are put back (live guid, owner) and no tombstone
+ # is written; the user deletes it again.  A pool that is NOT imported (export done, or not importable here) keeps the
+ # QSD5.346 clean-up and tombstone below.  Container flavour only.
+ keepreg=''
+ if [ $destroyrc -ne 0 ] && iscontainerflavour && poolimported $pool; then
+  keepreg=1
+ fi
  if [ $destroyrc -ne 0 ]; then
    docker exec etcdclient /TopStor/logmsg.py DGfa5 error $userreq $pool
    echo "zpool destroy $pool failed: `cat /root/dgdestroyerror`" >> /root/dgdestroyretry
  else
-   docker exec etcdclient /TopStor/logmsg.py DGsu5 info $userreq $pool 
+   docker exec etcdclient /TopStor/logmsg.py DGsu5 info $userreq $pool
  fi
+ if [ -n "$keepreg" ]; then
+   liveguid=`/sbin/zpool get -H -o value guid $pool 2>/dev/null`
+   owner=`/pace/cpoolowner.sh of $pool 2>/dev/null`
+   { [ -z "$owner" ] || [ "$owner" = '-' ]; } && owner=$myhost
+   stamp=`date +%s`
+   if echo "$liveguid" | grep -qx '[0-9][0-9]*'; then
+    ETCDCTL_API=3 /pace/etcdput.py $leaderip ActPool/$pool $liveguid
+    ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/ActPool/Add_${pool}_$liveguid/request actpools_$stamp
+    ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/ActPool/Add_${pool}_$liveguid/request/$leader actpools_$stamp
+   fi
+   ETCDCTL_API=3 /pace/etcdput.py $leaderip pools/$pool $owner
+   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/pools/Add_${pool}_$owner/request pools_$stamp
+   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/pools/Add_${pool}_$owner/request/$leader pools_$stamp
+   echo "pool $pool NOT deleted: the destroy failed while it is still imported (busy); ActPool/$pool ${liveguid:-?} and pools/$pool $owner put back, no tombstone; delete it again" >> /root/dgdestroyretry
+ else
  # QSD5.346: the clean-up and the tombstone follow the delete REQUEST, not only a successful destroy: a failed destroy
  # (ambiguous or failed import) left poolnxt/<pool> and no tombstone, and the exported pool was imported again when the
  # other node returned (QSD5.345 proof).  The user asked for the pool to go; 'DGsetPool import' clears the tombstone.
@@ -227,6 +289,7 @@ echo iam in >> /root/tmp2
    ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/pools/Del_pools_${pool}/request pools_$stamp
    ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/pools/Del_pools_${pool}/request/$leader pools_$stamp
  }
+ fi   # keepreg (r10o N2)
 /pace/etcddel.py $leaderip destroying/$pool
 /pace/etcddel.py $leaderip requests/DGdestroypool/$myhost $myhost/$userreq
 #systemctl restart zfs-zed
