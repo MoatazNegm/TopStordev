@@ -50,7 +50,7 @@ then
    done
   fi
   # r10o (O3): in place, not a bond0 re-activation that takes every address away for seconds (cmynodeapply.sh)
-  /TopStor/cmynodeapply.sh cifsremove.sh
+  if [ -x /TopStor/cmynodeapply.sh ]; then /TopStor/cmynodeapply.sh cifsremove.sh; else nmcli conn up cmynode; fi
   flock -u 9
   rm -rf /TopStordata/smb.$volip;
 else

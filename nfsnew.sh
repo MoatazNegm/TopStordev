@@ -25,7 +25,7 @@ exec 9>>/TopStordata/cmynode.lock; flock -w 120 9   # QSD5.352: cmynode changes 
 nmcli conn mod cmynode -ipv4.addresses ${ipaddr}/$ipsubnet
 echo nmcli conn mod cmynode -ipv4.addresses ${ipaddr}/$ipsubnet
 # r10o (O3): in place, not a bond0 re-activation that takes every address away for seconds (cmynodeapply.sh)
-/TopStor/cmynodeapply.sh nfsnew.sh
+if [ -x /TopStor/cmynodeapply.sh ]; then /TopStor/cmynodeapply.sh nfsnew.sh; else nmcli conn up cmynode; fi
 flock -u 9
 counter=20
 while [ $counter -gt 1 ];

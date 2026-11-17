@@ -44,7 +44,7 @@ add)
   nmcli conn mod cmynode +ipv4.addresses ${addr}/$prefix
   # r10o (O3): tries 1 and 2 apply it in place (cmynodeapply.sh: no bond0 re-activation that takes the cluster ip away
   # for seconds); the last try re-activates as before
-  if [ $try -lt 3 ]; then /TopStor/cmynodeapply.sh cmynodeaddr.sh >/dev/null 2>&1; else nmcli conn up cmynode >/dev/null 2>&1; fi
+  if [ $try -lt 3 ] && [ -x /TopStor/cmynodeapply.sh ]; then /TopStor/cmynodeapply.sh cmynodeaddr.sh >/dev/null 2>&1; else nmcli conn up cmynode >/dev/null 2>&1; fi
   if nmcli -g ipv4.addresses conn show cmynode 2>/dev/null | tr ',' '\n' | tr -d ' ' | grep -qx "${addr}/$prefix" \
      && ip -o -4 addr show 2>/dev/null | awk '{print $4}' | grep -qx "${addr}/$prefix"; then
    say "cmynodeaddr: ${addr}/$prefix is on cmynode (try $try)"

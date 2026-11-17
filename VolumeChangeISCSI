@@ -101,7 +101,7 @@ then
    exec 9>>/TopStordata/cmynode.lock; flock -w 120 9   # QSD5.352: cmynode changes one at a time (cmynodeaddr.sh)
    nmcli conn mod cmynode -ipv4.addresses ${addr}/${oldipsubnet:-24}
    # r10o (O3): in place, not a bond0 re-activation that takes every address away for seconds (cmynodeapply.sh)
-   /TopStor/cmynodeapply.sh VolumeChangeISCSI
+   if [ -x /TopStor/cmynodeapply.sh ]; then /TopStor/cmynodeapply.sh VolumeChangeISCSI; else nmcli conn up cmynode; fi
    flock -u 9
   fi
  done

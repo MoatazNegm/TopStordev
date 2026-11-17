@@ -25,7 +25,7 @@ for a in `nmcli -g ipv4.addresses conn show cmynode 2>/dev/null | tr ',' ' '`; d
  esac
 done
 # r10o (O3): in place, not a bond0 re-activation that takes every address away for seconds (cmynodeapply.sh)
-[ $changed -eq 1 ] && /TopStor/cmynodeapply.sh rmvoladdr.sh
+if [ $changed -eq 1 ]; then if [ -x /TopStor/cmynodeapply.sh ]; then /TopStor/cmynodeapply.sh rmvoladdr.sh; else nmcli conn up cmynode; fi; fi
 flock -u 9
 [ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
 if is_container 2>/dev/null; then
