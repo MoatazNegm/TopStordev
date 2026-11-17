@@ -249,6 +249,9 @@ echo iam in >> /root/tmp2
    owner=`/pace/cpoolowner.sh of $pool 2>/dev/null`
    { [ -z "$owner" ] || [ "$owner" = '-' ]; } && owner=$myhost
    stamp=`date +%s`
+   # the Del requests of the clean-up above must not reach a follower after (or instead of) these Add requests
+   ETCDCTL_API=3 /pace/etcddel.py $leaderip sync/ActPool/ ${pool}
+   ETCDCTL_API=3 /pace/etcddel.py $leaderip sync/pools/ ${pool}
    if echo "$liveguid" | grep -qx '[0-9][0-9]*'; then
     ETCDCTL_API=3 /pace/etcdput.py $leaderip ActPool/$pool $liveguid
     ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/ActPool/Add_${pool}_$liveguid/request actpools_$stamp
