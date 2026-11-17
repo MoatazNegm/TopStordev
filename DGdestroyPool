@@ -42,15 +42,33 @@ releaseholders() {
   { [ -z "$ns" ] || [ "$ns" = "$me" ]; } && continue
   case "$seen" in *" $ns "*) continue ;; esac
   seen="$seen$ns "
-  mnts=`awk -v p="$1" '{ for (i = 7; i <= NF; i++) if ($i == "-") break; if ($(i+1) == "zfs" && ($(i+2) == p || index($(i+2), p "/") == 1)) print $5 }' $d/mountinfo 2>/dev/null | sort -r`
-  for m in $mnts; do
-   pid=${d#$pr/}
+  # r10o (validator G-5): a mount point with a space is '\040' in mountinfo; one mount point per line (never split on spaces)
+  mnts=$(awk -v p="$1" '{ for (i = 7; i <= NF; i++) if ($i == "-") break; if ($(i+1) == "zfs" && ($(i+2) == p || index($(i+2), p "/") == 1)) { m = $5; gsub(/\\040/, " ", m); print m } }' $d/mountinfo 2>/dev/null | sort -r)
+  [ -z "$mnts" ] && continue
+  pid=${d#$pr/}
+  echo "$mnts" | while IFS= read -r m; do
    if nsenter -t $pid -m umount "$m" 2>/dev/null; then how='unmounted'
    elif nsenter -t $pid -m umount -l "$m" 2>/dev/null; then how='lazily unmounted'
+   elif nsumount $pid "$m"; then how='lazily unmounted (setns: no umount in that image)'
    else how='NOT unmounted'; fi
    echo "pool $1: $m held in the mount namespace of pid $pid (`cat $d/comm 2>/dev/null`): $how" >> /root/dgdestroyretry
   done
  done
+}
+# nsumount <pid> <mount point>: a lazy umount2() inside the mount namespace of <pid> by this node's own python3 / libc (setns),
+# for a holder whose image has no umount (validator G-5); 0 when it worked
+nsumount() {
+ python3 - "${PROCROOT:-/proc}" "$1" "$2" <<'PY' 2>/dev/null
+import ctypes, os, sys
+libc = ctypes.CDLL(None, use_errno=True)
+try:
+    fd = os.open(sys.argv[1] + '/' + sys.argv[2] + '/ns/mnt', os.O_RDONLY)
+except OSError:
+    sys.exit(2)
+if libc.setns(fd, 0x00020000) != 0:
+    sys.exit(2)
+sys.exit(0 if libc.umount2(sys.argv[3].encode(), 2) == 0 else 1)
+PY
 }
 # 0 when the pool is imported (in the container flavour: in the kernel, whichever node imported it)
 poolimported() { /sbin/zpool list -H -o name "$1" >/dev/null 2>&1; }
@@ -250,8 +268,9 @@ echo iam in >> /root/tmp2
    { [ -z "$owner" ] || [ "$owner" = '-' ]; } && owner=$myhost
    stamp=`date +%s`
    # the Del requests of the clean-up above must not reach a follower after (or instead of) these Add requests
-   ETCDCTL_API=3 /pace/etcddel.py $leaderip sync/ActPool/ ${pool}
-   ETCDCTL_API=3 /pace/etcddel.py $leaderip sync/pools/ ${pool}
+   # (validator G-5: only THIS pool's Del requests and their acks, by key prefix; a substring match also hit pdhcpN0 for pdhcpN)
+   ETCDCTL_API=3 /pace/etcddel.py $leaderip sync/ActPool/Del_ActPool_${pool}/request --prefix
+   ETCDCTL_API=3 /pace/etcddel.py $leaderip sync/pools/Del_pools_${pool}/request --prefix
    if echo "$liveguid" | grep -qx '[0-9][0-9]*'; then
     ETCDCTL_API=3 /pace/etcdput.py $leaderip ActPool/$pool $liveguid
     ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/ActPool/Add_${pool}_$liveguid/request actpools_$stamp
