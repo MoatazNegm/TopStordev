@@ -14,14 +14,70 @@ vol=$2
 domname=$3
 userreq=$4
 TRIES=${CIFSDOMJOIN_TRIES:-24}
+[ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
+GETST=${CIFSDOMJOIN_GETST:-/TopStor/getdomvolstatus.sh}
 n=0
 res=''
+# QSD5.352 r10p (QC proof 10o F5, 586.2 / 587.1 / 588.3), container flavour: the share image (membersmb) runs realm
+# discover, realm join (by the server address, so it joins the server's real realm whatever name was typed), sssd
+# ('sssd is running'), then kinit / net ads join with the TYPED name.  The first poll that saw one final word decided:
+# a wrong AD name (NOSUCHDOM) was polled between 'sssd is running' and the failed net ads join and passed as serviceok
+# (no code), while a right join was polled after net ads join had printed NT_STATUS_NO_LOGON_SERVERS and was logged
+# ADnameerror CIFS1043.  Now (container flavour): (1) the check waits until the entrypoint has ENDED (its last line
+# 'Restarting Samba using supervisord', CIFSDOMJOIN_ENDTRIES polls of 5 s at most; a 'Preauthentication failed' or
+# 'skew' is final at once); (2) the AD name is judged against what realm discover found: the typed name must be the
+# realm, the DNS domain, the first label of either, or the NetBIOS workgroup of the domain; a name that matches none
+# of them is ADnameerror (CIFS1043) even when the realm join worked; a matching name with only the
+# NT_STATUS_NO_LOGON_SERVERS of the second join is serviceok (no code).  The physical flavour is unchanged.
+ctrof() {
+ # the share container of exactly this address (its port map '<ip>:445->'; a plain grep of .16 also matched .165)
+ docker ps --format '{{.Names}} {{.Ports}}' 2>/dev/null | grep -F "$1:445->" | awk '{print $1}' | head -1
+}
+namejudge() {
+ # $1 = container: prints 'right', 'wrong' or 'unknown' for the typed domain name $domname
+ logs=`docker logs $1 2>&1`
+ rn=`echo "$logs" | grep -i 'realm-name:' | tail -1 | awk -F': *' '{print $2}' | tr -d ' \r' | tr 'A-Z' 'a-z'`
+ dn=`echo "$logs" | grep -i 'domain-name:' | tail -1 | awk -F': *' '{print $2}' | tr -d ' \r' | tr 'A-Z' 'a-z'`
+ typed=`echo "$domname" | tr 'A-Z' 'a-z'`
+ [ -z "$rn$dn" ] && { echo unknown; return; }
+ for c in "$rn" "$dn" "${rn%%.*}" "${dn%%.*}"; do
+  [ -n "$c" ] && [ "$c" = "$typed" ] && { echo right; return; }
+ done
+ wg=`timeout 20 docker exec $1 net ads workgroup -S "${CIFSDOMJOIN_SERVER:-$dn}" 2>/dev/null | grep -i 'workgroup:' | awk -F': *' '{print $2}' | tr -d ' \r' | tr 'A-Z' 'a-z'`
+ [ -n "$wg" ] && [ "$wg" = "$typed" ] && { echo right; return; }
+ echo wrong
+}
+if is_container 2>/dev/null; then
+ ENDTRIES=${CIFSDOMJOIN_ENDTRIES:-90}
+ ended=0
+ while [ $n -lt $ENDTRIES ]; do
+  res=`$GETST $ipaddr CIFS 2>/dev/null | grep -o '_result[^_]*_result' | tail -1 | sed 's/_result//g'`
+  case "$res" in adminpasserror|timeerror) ended=1; break ;; esac
+  ctr=`ctrof $ipaddr`
+  # a server that was not even discovered is final at once (586.1 unreachable DC); with a discovered one it waits
+  if [ "$res" = ADservererror ] && [ -n "$ctr" ] && ! docker logs $ctr 2>&1 | grep -q 'Successfully discovered'; then ended=1; break; fi
+  if [ -n "$ctr" ] && docker logs $ctr 2>&1 | grep -q 'Restarting Samba using supervisord'; then ended=1; break; fi
+  sleep 5
+  n=$((n+1))
+ done
+ if [ -n "$ctr" ]; then
+  case "$res" in
+   serviceok|ADnameerror)
+    nj=`namejudge $ctr`
+    echo "`date '+%F %T'` $vol $ipaddr $domname: status $res, entrypoint ended $ended, name $nj" >> /root/cifsdomjoin.trace
+    if [ "$nj" = wrong ]; then res=ADnameerror
+    elif [ "$nj" = right ]; then res=serviceok
+    fi ;;
+  esac
+ fi
+else
 while [ $n -lt $TRIES ]; do
  res=`/TopStor/getdomvolstatus.sh $ipaddr CIFS 2>/dev/null | grep -o '_result[^_]*_result' | tail -1 | sed 's/_result//g'`
  case "$res" in serviceok|adminpasserror|ADservererror|ADnameerror|timeerror) break ;; esac
  sleep 5
  n=$((n+1))
 done
+fi
 case "$res" in
  adminpasserror) code=CIFS1041 ;;
  ADservererror) code=CIFS1042 ;;
