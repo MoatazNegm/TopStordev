@@ -65,9 +65,14 @@ if is_container 2>/dev/null; then
    serviceok|ADnameerror)
     nj=`namejudge $ctr`
     echo "`date '+%F %T'` $vol $ipaddr $domname: status $res, entrypoint ended $ended, name $nj" >> /root/cifsdomjoin.trace
+    # r10p1 (validator G-1): a right name is serviceok only when the realm join itself worked; the entrypoint goes on
+    # after a failed 'realm join' and its second join prints NO_LOGON_SERVERS, so without this check a share that
+    # never joined got no code.  A failed realm join with a right name is ADservererror (CIFS1042).
     if [ "$nj" = wrong ]; then res=ADnameerror
-    elif [ "$nj" = right ]; then res=serviceok
-    fi ;;
+    elif [ "$nj" = right ]; then
+     if docker logs $ctr 2>&1 | grep -q "Couldn't join realm"; then res=ADservererror; else res=serviceok; fi
+    fi
+    echo "`date '+%F %T'` $vol $ipaddr $domname: judged $res (realm join `docker logs $ctr 2>&1 | grep -c 'Successfully enrolled'` enrolled)" >> /root/cifsdomjoin.trace ;;
   esac
  fi
 else

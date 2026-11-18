@@ -1,4 +1,9 @@
 #!/usr/bin/sh
+# QSD5.352 r10p1 (validator G-3 of QC proof 10o F4): dsphase() is defined first, so the ~25 min before the etcd run
+# (node / cluster address waits, primary election) can be placed: every run marks its start (with the container's start
+# time, PID 1) and each wait.  /root/dockersetup.phases keeps the last 2000 lines.
+dsphase() { echo "`date '+%F %T'` $$ $*" >> /root/dockersetup.phases; [ `wc -l < /root/dockersetup.phases` -gt 4000 ] && tail -2000 /root/dockersetup.phases > /root/dockersetup.phases.tmp && mv -f /root/dockersetup.phases.tmp /root/dockersetup.phases; }
+dsphase "docker_setup start (args: $*), container up since `ps -o lstart= -p 1 2>/dev/null`"
 # --- NO-ARG FALLBACK ---
 # If docker_setup.sh is invoked without any arguments, reset the
 # network to its baked-in image state by running /TopStor/cleannw.sh
@@ -416,19 +421,22 @@ else
 	mynodeip=`echo $mynode | awk -F'/' '{print $1}'`
 
 	# Wait for node to be up
+	dsphase "waiting for the node address $mynodeip (first configuration)"
 	ping -w 3 $mynodeip
 	while [ $? -ne 0 ];
 	do
 		sleep 1
 		ping -w 3 $mynodeip
-	done 
+	done
+	dsphase "node address $mynodeip answers (first configuration)"
 	# now the port should be up--- or other wise comment out all the above block and uncomment the below sleep
 	#sleep 20
 
 	isconf_prim='yesno'
 	isprimary=0
 	enslave_eth10_to_bond0
-	ping -w 3 $myclusterip 
+	dsphase "probing the cluster address $myclusterip (primary election)"
+	ping -w 3 $myclusterip
 	counter=`echo $RANDOM | cut -c -1`
 	counter=$((counter+5))
 	while [ $counter -ne 0 ];
@@ -446,7 +454,8 @@ else
 				isprimary=1
 			fi
 		fi
-	done		
+	done
+	dsphase "cluster address probe done (isconf_prim $isconf_prim, isprimary $isprimary)"
 fi
 myclusterip=`echo $mycluster | awk -F'/' '{print $1}'`
 mynodeip=`echo $mynode | awk -F'/' '{print $1}'`
@@ -501,12 +510,14 @@ echo adding cmynode
 nmcli conn up cmynode
 enslave_eth10_to_bond0
 # Wait for node to be up
+dsphase "waiting for the node address $mynodeip (cmynode up)"
 ping -w 3 $mynodeip
 while [ $? -ne 0 ];
 do
 	sleep 1
 	ping -w 3 $mynodeip
-done 
+done
+dsphase "node address $mynodeip answers"
 
 if [[ $isconf == 'yes' ]];
 then
@@ -517,8 +528,8 @@ then
 fi
 # QSD5.352 r10p (QC proof 10o F4): /var/log/docker_setup.log is written over by the next run and has no times; the old
 # leader's return after a fall-back took ~33 min (etcd docker run 85 s, settle check 6 min after it) and nobody could
-# tell where.  The phases of every run are kept with their times in /root/dockersetup.phases (the last 2000 lines).
-dsphase() { echo "`date '+%F %T'` $$ $*" >> /root/dockersetup.phases; [ `wc -l < /root/dockersetup.phases` -gt 4000 ] && tail -2000 /root/dockersetup.phases > /root/dockersetup.phases.tmp && mv -f /root/dockersetup.phases.tmp /root/dockersetup.phases; }
+# tell where.  The phases of every run are kept with their times in /root/dockersetup.phases (dsphase(), defined at
+# the top of this file since r10p1).
 dsphase "starting docker containers (isprimary ${isprimary:-?})"
 echo starting docker containers
 #systemctl start docker
