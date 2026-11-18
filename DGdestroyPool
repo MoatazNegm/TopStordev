@@ -228,6 +228,14 @@ echo iam in >> /root/tmp2
  # devices are rescanned: the destroy then failed, the pool stayed exported and a node re-imported it later (QSD5.286)
  imptry=0
  while :; do
+  # r10p (QC proof 10o F6, 886.2): an export that failed (busy) leaves the pool IMPORTED; 'zpool import <pool>' then
+  # only answers 'a pool with that name already exists', and the retries (10 x 3 s and more under load) delayed the
+  # destroy try and the put-back past the harness window ('NOT deleted ... put back' and DGfa5 missing).  Container
+  # flavour: a pool that is still imported here goes straight to the destroy try (and on 'busy' to the put-back).
+  if iscontainerflavour && poolimported $pool; then
+   [ $imptry -eq 0 ] && echo "zpool export $pool did not take (still imported here): no import, straight to the destroy" >> /root/dgdestroyretry
+   break
+  fi
   importpool $pool $poolguid && break
   imptry=$((imptry+1))
   echo "zpool import $pool retry $imptry: `cat /root/dgdestroyerror`" >> /root/dgdestroyretry
