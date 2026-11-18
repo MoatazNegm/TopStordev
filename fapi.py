@@ -2774,9 +2774,38 @@ def groupdel(data):
  if data.get('name') == EVERYONE:
   data['error'] = 'everyonefixed'
   return data
- cmndstring = '/TopStor/UnixDelGroup '+leaderip+' '+data.get('name')+' '+data['user'] 
+ cmndstring = '/TopStor/UnixDelGroup '+leaderip+' '+data.get('name')+' '+data['user']
  postchange(cmndstring)
+ unshare_group(data.get('name'), data)
  return data
+
+def unshare_group(name, data):
+ # QSD5.352 fix16 (QC 627, QX-028 step 4): UnixDelGroup removed the group's ACL entries and the group, but every CIFS / NFS
+ # share kept the deleted name in its registry record (groups field) and in its share file (write list = <group>).  A new
+ # group of the same name then matched that share by name (silent inheritance), and is_unique_name refused the name meanwhile
+ # (IPnamuqfa).  Each share that names the group is changed the volumes/config way (VolumeChange<type> on the owner node
+ # rebuilds record and share file) with the group left out; no group left = NoGroup.
+ global allinfo
+ try:
+  getalltime()
+  vols = list(allinfo.get('volumes', {}).items())
+ except Exception as e:
+  print('unshare_group: volumes', e)
+  return
+ for vname, vol in vols:
+  if vol.get('prot') not in ('CIFS', 'NFS'):
+   continue
+  grps = [ g.strip() for g in str(vol.get('groups', '')).split(',') if g.strip() ]
+  if name not in grps:
+   continue
+  rest = [ g for g in grps if g != name ]
+  req = {'response': data['response'], 'user': data['user'], 'token': data.get('token'), 'type': vol['prot'],
+         'volume': vname, 'groups': ','.join(rest) if rest else 'NoGroup'}
+  try:
+   res = volumeconfig_do(req)
+   print('unshare_group:', vname, 'groups', req['groups'], 'error' in res if isinstance(res, dict) else res)
+  except Exception as e:
+   print('unshare_group:', vname, e)
 
 @app.route('/api/v1/partners/partnerdel', methods=['GET','POST'])
 @login_required
@@ -2859,6 +2888,7 @@ def UnixAddGroup(data):
     return data
  if int(is_unique_name(data['name']))==1000:
     logmsg.sendlog('IPnamuqfa','error','system',loggedusers[data['token']]['user'])
+    data['error'] = 'nameinuse'     # QSD5.352 fix16 (QC 627): the refusal was only in the log, the reply looked accepted
     return data
  cmndstring = '/TopStor/UnixAddGroup '+leaderip+' '+data['name']+' '+' users'+usrstr+' '+data['user']
  postchange(cmndstring)
