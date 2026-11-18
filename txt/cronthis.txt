@@ -1,1 +1,4 @@
 * * * * * pgrep -f '^/bin/bash /usr/local/sbin/iscsi-guardian.sh' >/dev/null 2>&1 || (setsid /usr/local/sbin/iscsi-guardian.sh </dev/null >>/var/log/iscsid.log 2>&1 &)
+7 */1 * * *  /TopStor/putcron.sh /TopStor/etcdput.py 10.11.11.200 call/1794978636 /TopStor/Snapshotnowhost::pdhcp262061815/q579v_302783150::Hourly.3.7.1.na::1794978636/NoReceiver
+*/2 * * * *  /TopStor/putcron.sh /TopStor/etcdput.py 10.11.11.200 call/1794978642 /TopStor/Snapshotnowhost::pdhcp262061815/q579v_302783150::Minutely.3.2.na.na::1794978642::NoReceiver
+00 03 * * 1  /TopStor/putcron.sh /TopStor/etcdput.py 10.11.11.200 call/1794978639 /TopStor/Snapshotnowhost::pdhcp262061815/q579v_302783150::Weekly.3.03.00.1::1794978639/NoReceiver
