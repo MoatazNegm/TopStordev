@@ -515,6 +515,11 @@ then
 	echo starting iscsid
 	systemctl start iscsid 
 fi
+# QSD5.352 r10p (QC proof 10o F4): /var/log/docker_setup.log is written over by the next run and has no times; the old
+# leader's return after a fall-back took ~33 min (etcd docker run 85 s, settle check 6 min after it) and nobody could
+# tell where.  The phases of every run are kept with their times in /root/dockersetup.phases (the last 2000 lines).
+dsphase() { echo "`date '+%F %T'` $$ $*" >> /root/dockersetup.phases; [ `wc -l < /root/dockersetup.phases` -gt 4000 ] && tail -2000 /root/dockersetup.phases > /root/dockersetup.phases.tmp && mv -f /root/dockersetup.phases.tmp /root/dockersetup.phases; }
+dsphase "starting docker containers (isprimary ${isprimary:-?})"
 echo starting docker containers
 #systemctl start docker
 newalias=`cat /root/newalias 2>/dev/null`
@@ -588,6 +593,7 @@ fi
 echo /TopStor/setipports.sh $myclusterip $leader $myhost sync
 /TopStor/setipports.sh $myclusterip $leader $myhost sync
 
+dsphase 'starting intstub'
 echo starting intstub 
 docker run -itd --rm --privileged \
 	-v /TopStor/smb.conf:/etc/samba/smb.conf:rw \
@@ -599,6 +605,7 @@ docker run -itd --rm --privileged \
 	--name intsmb --hostname intsmb moataznegm/quickstor:smb
 docker exec intsmb sh /hostetc/VolumeCIFSupdate.sh
 #docker run -d --rm --name rmq --hostname rmq  -v /root/gitrepo/resolv.conf:/etc/resolv.conf --net intdns-net -p $etcd:5672:5672 -v /TopStor/:/TopStor -v /pace/:/pace moataznegm/quickstor:rabbitmq 
+dsphase 'starting rabbitmq'
 echo starting rabbitmq 
 systemctl start rabbitmq-server &
 systemctl is-active rabbitmq-server
@@ -617,6 +624,7 @@ rabbitmqctl set_permissions -p / rabb_Mezo ".*" ".*" ".*" 2>/dev/null
 # full cluster sync below (syncall) refills it from the leader (a node etcd is a copy).  The primary's etcd IS the
 # cluster's data: it is never moved; then (and when the empty start fails too) the run stops with a clear error and
 # the mark /root/dockersetup.failed (the iSCSI policy does not let such a node hold the shared iscsid).
+dsphase 'waiting for etcd'
 ETCD_TRIES=${ETCD_TRIES:-3}
 ETCD_WAIT=${ETCD_WAIT:-180}
 etcdtry=1
@@ -875,6 +883,7 @@ else
 	BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)  # Get the current branch name
 	/TopStor/cmyrepopush.sh $BRANCH_NAME & disown
 fi
+dsphase 'sync requests and loopers next'
 echo I a hhhhhhhhhhhhhhhhhhhhhhhhere
 #if [ $isprimary -ne 0 ];
 #then
@@ -958,3 +967,5 @@ docker run --rm -d -p $mynodeip:9100:9100 -v /proc:/proc -v /sys:/sys --name pro
 docker rm -f promcadvisor
 docker run   --rm   --volume=/:/rootfs:ro   --volume=/var/run:/var/run:ro   --volume=/sys:/sys:ro   --volume=/var/lib/docker/:/var/lib/docker:ro   --volume=/dev/disk/:/dev/disk:ro   --publish=$mynodeip:9101:8080   --detach=true   --name=promcadvisor   --privileged   --device=/dev/kmsg   gcr.io/cadvisor/cadvisor
 
+
+dsphase "end of docker_setup"
