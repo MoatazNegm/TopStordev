@@ -839,7 +839,9 @@ stamp=`date +%s%N`
 /pace/etcddel.py $myclusterip sync/ActivePartners/Add_${myhost} --prefix
 /TopStor/etcdput.py $myclusterip sync/ready/Add_${myhost}_$mynodeip/request ready_$stamp
 /TopStor/etcdput.py $myclusterip sync/ready/Add_${myhost}_$mynodeip/request/$leader ready_$stamp
-/TopStor/etcdput.py $myclusterip sync/ActivePartners/Add_${myhost}_$mynodeip/request/$leader ready_$stamp
+# r10p (F1): the leader's done mark carried the value of the ready request (ready_$stamp), so it was counted in the ready
+# group (pruned before this node acknowledged it) and the ActivePartners request had no leader mark at all
+/TopStor/etcdput.py $myclusterip sync/ActivePartners/Add_${myhost}_$mynodeip/request/$leader ActivePartners_$stamp
 /TopStor/etcdput.py $myclusterip sync/ActivePartners/Add_${myhost}_$mynodeip/request ActivePartners_$stamp
 echo running iscsi watchdog daemon
 /TopStor/etcddel.py $myclusterip rebootme $myhost
