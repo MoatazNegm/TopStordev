@@ -27,7 +27,7 @@ def getraidrank(raid, removedisk, adddisk):
  for disk in raidlist:
   if disk['name'] == removedisk['name'] and disk['name'] != adddisk['name']:
    continue
-  if ('F' or 'moved') in disk['changeop'] :
+  if 'F' in disk['changeop'] or 'moved' in disk['changeop']:
    continue
   if disk['host'] not in hostdic:
    hostdic[disk['host']] = 0
