@@ -926,6 +926,7 @@ fi
 /TopStor/etcdput.py $myclusterip sync/ready/Add_${myhost}_$mynodeip/request ready_$stamp 
 /TopStor/etcdput.py $myclusterip sync/ready/Add_${myhost}_$mynodeip/request/$leader ready_$stamp 
 #/pace/diskchange.sh add initial disk >/dev/null  & disown
+dsphase 'ready published (sync/ready requests put)'
 rm -rf /promgraf/grafana.db
 mkdir /promgraf
 cp -p /TopStor/grafana.db /promgraf/
@@ -942,6 +943,9 @@ then
 	# marker file in /TopStordata is named after the last 10 chars of the commit.
 	# The repo's src is mounted over the image's baked-in one so pulled changes
 	# are what gets built.
+	# QSD5.352 r10q (QC proof 10p F4): zfs2 spent > 13 min between 'sync requests and loopers next' and the end with no
+	# mark; every step of the primary block (UI build, httpd, flask, promserver.sh) and the tail now has its own mark.
+	dsphase 'primary block: React UI build check'
 	reactcommit=`git -C /TopStor rev-parse HEAD 2>/dev/null`
 	reactmark=${reactcommit: -10}
 	if [ -n "uibuilt_$reactmark" ] && [ -e /TopStordata/uibuilt_$reactmark ] && [ -s /topstorweb/build_react/index.html ]; then
@@ -955,10 +959,14 @@ then
 	# it httpd exits at start (and --rm removes it). Provide the repo's cert.
 	mkdir -p /root/topstorwebetc
 	[ -s /root/topstorwebetc/TopStor.crt ] || cp -p /TopStor/topstorwebetc/TopStor.crt /TopStor/topstorwebetc/TopStor.key /root/topstorwebetc/
+	dsphase 'React UI build check done; starting httpd'
 	echo running httpd
 	docker run --rm --name httpd --hostname shttpd --net intdns-net -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $myclusterip:19999:19999 -p $myclusterip:81:81 -p 443:443 -v $shttpdf:/usr/local/apache2/conf/httpd.conf -v /root/topstorwebetc:/usr/local/apache2/topstorwebetc -v /topstorweb:/usr/local/apache2/htdocs/ -itd moataznegm/quickstor:git
+	dsphase 'httpd started; starting flask'
 	docker run -itd --rm --name flask --hostname apisrv -v /etc/localtime:/etc/localtime:ro -v /pace/:/pace -v /pacedata/:/pacedata/ -v /root/gitrepo/resolv.conf:/etc/resolv.conf --net intdns-net -p $myclusterip:5001:5001 -v /TopStor/:/TopStor -v /TopStordata/:/TopStordata moataznegm/quickstor:flask3
+	dsphase 'flask started; starting promserver.sh'
 	/TopStor/promserver.sh $myclusterip
+	dsphase 'promserver.sh done'
 fi
 mydns=`/TopStor/etcdget.py $myclusterip dnsname/$myhost`
 if [ -n "$mydns" ] && [ "$mydns" != "_1" ]; then
@@ -969,10 +977,12 @@ fi
 
 enslave_eth10_to_bond0
 
+dsphase 'dns and bond0 done; registerports.sh'
 /TopStor/registerports.sh $myclusterip
 setsid nohup /pace/fapilooper.sh >/dev/null 2>&1 </dev/null &
 #nmcli con modify cmynode bond.options "mode=active-backup,miimon=100,fail_over_mac=1"
 #nmcli conn down cmynode && nmcli conn up cmynode
+dsphase 'starting promexport and promcadvisor'
 docker rm -f promexport
 docker run --rm -d -p $mynodeip:9100:9100 -v /proc:/proc -v /sys:/sys --name promexport prom/node-exporter
 docker rm -f promcadvisor

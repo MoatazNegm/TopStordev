@@ -33,9 +33,26 @@ ctrof() {
  # the share container of exactly this address (its port map '<ip>:445->'; a plain grep of .16 also matched .165)
  docker ps --format '{{.Names}} {{.Ports}}' 2>/dev/null | grep -F "$1:445->" | awk '{print $1}' | head -1
 }
+# QSD5.352 r10q (QC proof 10p F5 remainder, 586.2 in r10n/r10o/r10p): the wrong-name share gave no code and no JOINLOG
+# line at all.  zfs2 /root/cifsrun.log 2026-11-18 22:13:46: the NOSUCHDOM share container was started; 4 min later no
+# container with '<ip>:445->' existed on either node (the harness SHR at 22:18:02): it had died and docker --rm removed it
+# with its logs.  The check then saw only 'servicedown', ran out its polls and ended without a word (exit 0).  Now
+# (container flavour): (1) the share's logs are copied to /root/cifsdomjoin.snap/<ip>.log at every poll, so a container
+# that dies can still be judged from its last logs; (2) a container that vanished (CIFSDOMJOIN_GONETRIES polls) or was
+# never seen (CIFSDOMJOIN_NEVERTRIES polls) while the volume still exists is judged at once: a wrong name in the last
+# logs = ADnameerror (CIFS1043), otherwise ADservererror (CIFS1042, the share could not join); a deleted volume = no code;
+# (3) a name that is definitely wrong (realm discovered, the domain's workgroup read and different) is final at once,
+# without waiting for the entrypoint end (the code came after the 200 s window); (4) every run writes a start line and
+# an end line (also 'no code') to /root/cifsdomjoin.trace.  /root/cifsdomjoin.log (JOINLOG) gets only coded lines.
+SNAPDIR=${CIFSDOMJOIN_SNAPDIR:-/root/cifsdomjoin.snap}
+TRACE=${CIFSDOMJOIN_TRACE:-/root/cifsdomjoin.trace}
+JOINLOGF=${CIFSDOMJOIN_LOG:-/root/cifsdomjoin.log}
+ZFSCMD=${CIFSDOMJOIN_ZFS:-/sbin/zfs}
+trc() { echo "`date '+%F %T'` $vol $ipaddr $domname: $*" >> $TRACE; }
 namejudge() {
- # $1 = container: prints 'right', 'wrong' or 'unknown' for the typed domain name $domname
- logs=`docker logs $1 2>&1`
+ # $1 = container ('' when it is gone), $2 = file with its last logs; prints 'right', 'wrong' (workgroup read and
+ # different: definite), 'wrongnowg' (none of the realm names, workgroup not readable) or 'unknown' (nothing discovered)
+ logs=`cat "$2" 2>/dev/null`
  rn=`echo "$logs" | grep -i 'realm-name:' | tail -1 | awk -F': *' '{print $2}' | tr -d ' \r' | tr 'A-Z' 'a-z'`
  dn=`echo "$logs" | grep -i 'domain-name:' | tail -1 | awk -F': *' '{print $2}' | tr -d ' \r' | tr 'A-Z' 'a-z'`
  typed=`echo "$domname" | tr 'A-Z' 'a-z'`
@@ -43,38 +60,67 @@ namejudge() {
  for c in "$rn" "$dn" "${rn%%.*}" "${dn%%.*}"; do
   [ -n "$c" ] && [ "$c" = "$typed" ] && { echo right; return; }
  done
- wg=`timeout 20 docker exec $1 net ads workgroup -S "${CIFSDOMJOIN_SERVER:-$dn}" 2>/dev/null | grep -i 'workgroup:' | awk -F': *' '{print $2}' | tr -d ' \r' | tr 'A-Z' 'a-z'`
+ wg=''
+ [ -n "$1" ] && wg=`timeout 20 docker exec $1 net ads workgroup -S "${CIFSDOMJOIN_SERVER:-$dn}" 2>/dev/null | grep -i 'workgroup:' | awk -F': *' '{print $2}' | tr -d ' \r' | tr 'A-Z' 'a-z'`
  [ -n "$wg" ] && [ "$wg" = "$typed" ] && { echo right; return; }
- echo wrong
+ [ -n "$wg" ] && { echo wrong; return; }
+ echo wrongnowg
 }
 if is_container 2>/dev/null; then
  ENDTRIES=${CIFSDOMJOIN_ENDTRIES:-90}
- ended=0
+ GONETRIES=${CIFSDOMJOIN_GONETRIES:-3}
+ NEVERTRIES=${CIFSDOMJOIN_NEVERTRIES:-12}
+ EARLYTRIES=${CIFSDOMJOIN_EARLYTRIES:-3}
+ mkdir -p $SNAPDIR 2>/dev/null; snap=$SNAPDIR/$ipaddr.log; rm -f $snap $snap.new
+ trc "check started (pid $$)"
+ ended=0; seen=0; gone=0; early=0; why=''; ctr=''
  while [ $n -lt $ENDTRIES ]; do
   res=`$GETST $ipaddr CIFS 2>/dev/null | grep -o '_result[^_]*_result' | tail -1 | sed 's/_result//g'`
-  case "$res" in adminpasserror|timeerror) ended=1; break ;; esac
+  case "$res" in adminpasserror|timeerror) ended=1; why=status; break ;; esac
   ctr=`ctrof $ipaddr`
-  # a server that was not even discovered is final at once (586.1 unreachable DC); with a discovered one it waits
-  if [ "$res" = ADservererror ] && [ -n "$ctr" ] && ! docker logs $ctr 2>&1 | grep -q 'Successfully discovered'; then ended=1; break; fi
-  if [ -n "$ctr" ] && docker logs $ctr 2>&1 | grep -q 'Restarting Samba using supervisord'; then ended=1; break; fi
+  if [ -n "$ctr" ]; then
+   seen=1; gone=0
+   docker logs $ctr > $snap.new 2>&1; [ -s $snap.new ] && mv -f $snap.new $snap
+   # a server that was not even discovered is final at once (586.1 unreachable DC); with a discovered one it waits
+   if [ "$res" = ADservererror ] && ! grep -q 'Successfully discovered' $snap 2>/dev/null; then ended=1; why=nodiscovery; break; fi
+   if grep -q 'Restarting Samba using supervisord' $snap 2>/dev/null; then ended=1; why=entrypoint; break; fi
+   if [ $early -lt $EARLYTRIES ] && grep -qi 'realm-name:' $snap 2>/dev/null; then
+    early=$((early+1))
+    nj=`namejudge $ctr $snap`
+    [ "$nj" = wrong ] && { ended=1; why=earlyname; res=ADnameerror; break; }
+   fi
+  else
+   gone=$((gone+1))
+   [ $seen -eq 1 ] && [ $gone -ge $GONETRIES ] && { why=vanished; break; }
+   [ $seen -eq 0 ] && [ $gone -ge $NEVERTRIES ] && { why=neverseen; break; }
+  fi
   sleep 5
   n=$((n+1))
  done
- if [ -n "$ctr" ]; then
+ [ -z "$why" ] && why=polls
+ if [ "$why" = vanished ] || [ "$why" = neverseen ]; then
+  if ! timeout 20 $ZFSCMD list -H -o name $vol >/dev/null 2>&1; then trc "share container $why and the volume is gone (deleted): no code"; exit 0; fi
+  nj=`namejudge '' $snap`
+  case "$nj" in wrong*) res=ADnameerror ;; *) res=ADservererror ;; esac
+  trc "share container $why (last status '$res', logs kept `grep -c . $snap 2>/dev/null || echo 0` lines), name $nj: judged $res"
+ elif [ "$why" = earlyname ]; then
+  trc "name $nj (realm discovered, workgroup differs) before the entrypoint end: judged $res"
+ elif [ -n "$ctr" ]; then
   case "$res" in
    serviceok|ADnameerror)
-    nj=`namejudge $ctr`
-    echo "`date '+%F %T'` $vol $ipaddr $domname: status $res, entrypoint ended $ended, name $nj" >> /root/cifsdomjoin.trace
+    nj=`namejudge $ctr $snap`
+    trc "status $res, entrypoint ended $ended ($why), name $nj"
     # r10p1 (validator G-1): a right name is serviceok only when the realm join itself worked; the entrypoint goes on
     # after a failed 'realm join' and its second join prints NO_LOGON_SERVERS, so without this check a share that
     # never joined got no code.  A failed realm join with a right name is ADservererror (CIFS1042).
-    if [ "$nj" = wrong ]; then res=ADnameerror
-    elif [ "$nj" = right ]; then
-     if docker logs $ctr 2>&1 | grep -q "Couldn't join realm"; then res=ADservererror; else res=serviceok; fi
-    fi
-    echo "`date '+%F %T'` $vol $ipaddr $domname: judged $res (realm join `docker logs $ctr 2>&1 | grep -c 'Successfully enrolled'` enrolled)" >> /root/cifsdomjoin.trace ;;
+    case "$nj" in
+     wrong*) res=ADnameerror ;;
+     right) if grep -q "Couldn't join realm" $snap 2>/dev/null; then res=ADservererror; else res=serviceok; fi ;;
+    esac
+    trc "judged $res (realm join `grep -c 'Successfully enrolled' $snap 2>/dev/null` enrolled)" ;;
   esac
  fi
+ case "$res" in adminpasserror|ADservererror|ADnameerror|timeerror) ;; *) trc "end ($why): status '$res', no code"; exit 0 ;; esac
 else
 while [ $n -lt $TRIES ]; do
  res=`/TopStor/getdomvolstatus.sh $ipaddr CIFS 2>/dev/null | grep -o '_result[^_]*_result' | tail -1 | sed 's/_result//g'`
@@ -90,6 +136,6 @@ case "$res" in
  timeerror) code=CIFS1044 ;;
  *) exit 0 ;;
 esac
-echo "`date '+%F %T'` $vol $ipaddr $domname: $res $code" >> /root/cifsdomjoin.log
+echo "`date '+%F %T'` $vol $ipaddr $domname: $res $code" >> ${JOINLOGF:-/root/cifsdomjoin.log}
 docker exec etcdclient /TopStor/logmsg.py $code error $userreq $vol $domname
 exit 1

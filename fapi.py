@@ -1477,7 +1477,16 @@ def dgsnewpool(data):
     excluded_disks = ','.join(manual_cache)
 
     if data.get('disks'):
-        selecteddisks = data['disks']
+        # QSD5.352 r10q (QC proof 10p, pl newpool): an empty or unknown disk name in disks[] answered
+        # 'missing parameter: ' (KeyError('') of allinfo['disks'][''] below). Refuse it with a clear message.
+        selecteddisks = data['disks'] if isinstance(data['disks'], list) else [data['disks']]
+        selecteddisks = [str(d).strip() for d in selecteddisks]
+        if '' in selecteddisks:
+            return _err('invalid disk selection: '+str(selecteddisks.count(''))+' of '+str(len(selecteddisks))
+                        +' disk names are empty; choose free disks by name')
+        unknown = [d for d in selecteddisks if d not in allinfo['disks']]
+        if unknown:
+            return _err('invalid disk selection: unknown disk(s) '+','.join(unknown))
     else:
         keys = []
         dgsinfo = {'raids':allinfo['raids'], 'pools':allinfo['pools'], 'disks':allinfo['disks']}

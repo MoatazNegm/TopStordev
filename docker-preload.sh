@@ -60,6 +60,8 @@ fi
 N=$(echo "$TARBALLS" | wc -l)
 log "loading up to $N tarball(s) from $SRC_DIR into $GRAPH_ROOT"
 
+STAMPD="$GRAPH_ROOT/.preload-stamps"   # r10q: one stamp per tarball, kept with the image store it describes
+mkdir -p "$STAMPD" 2>/dev/null
 LOADED=0
 SKIPPED=0
 FAILED=0
@@ -68,8 +70,25 @@ for tar in $TARBALLS; do
     fname=$(basename "$tar")
     # Each tarball may contain multiple images/repos. Pull repo:tag out
     # of the filename for logging (moataznegm_quickstor_git.tar → moataznegm/quickstor:git).
-    pretty=$(echo "$fname" | sed -E 's/\.tar$//; s/_/__/g; s|__|/|; s|_|:|')
+    # QSD5.352 r10q (QC proof 10p F4, return 20-26 min): 's|_|:|' after the doubling left a '_' in the tag
+    # (moataznegm_aiwork_wetty-patched.tar -> 'moataznegm/aiwork:_wetty-patched'), so the check below never matched and
+    # cadvisor, wetty, dns ... were loaded again at EVERY start (zfs2 2026-11-18 23:18:34 -> 23:21:10, ~2.5 min of the
+    # 10 min between the container start and docker_setup).  Now the second '__' is the ':' and the rest are '_' again,
+    # and a stamp per tarball (size + mtime, then the 'Loaded image:' names) skips a tarball loaded before whose images
+    # are all still there, whatever its file name says.
+    pretty=$(echo "$fname" | sed -E 's/\.tar$//; s/_/__/g; s|__|/|; s|__|:|; s|__|_|g')
     [ "${pretty%%:*}" = "${pretty}" ] && pretty="${pretty}:latest"
+    sig=$(stat -c '%s %Y' "$tar" 2>/dev/null)
+    st="$STAMPD/$fname.stamp"
+    if [ -n "$sig" ] && [ -s "$st" ] && [ "$(head -1 "$st")" = "$sig" ] && [ "$(wc -l < "$st")" -ge 2 ]; then
+        allok=1
+        for img in $(tail -n +2 "$st"); do timeout 10 docker image inspect "$img" >/dev/null 2>&1 || { allok=0; break; }; done
+        if [ $allok = 1 ]; then
+            log "  [=] $(tail -n +2 "$st" | tr '\n' ' ')- loaded before from this $fname (same size and time); skipped"
+            SKIPPED=$((SKIPPED+1))
+            continue
+        fi
+    fi
 
     # Try to short-circuit by checking if any image matching the expected
     # repo:tag is already present in DinD. This is best-effort: the loader
@@ -86,6 +105,7 @@ for tar in $TARBALLS; do
         LOADED=$((LOADED+1))
         # docker load prints "Loaded image: <repo>:<tag>" lines; surface them.
         grep -E 'Loaded image|already exists' /tmp/docker-preload.out | sed "s|^|$LOG_PREFIX   |"
+        { echo "$sig"; sed -n 's/^Loaded image: //p' /tmp/docker-preload.out; } > "$st.tmp" 2>/dev/null && mv -f "$st.tmp" "$st" 2>/dev/null
     else
         FAILED=$((FAILED+1))
         log "  [!] load FAILED for $(basename "$tar"):"
