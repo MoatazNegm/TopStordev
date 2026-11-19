@@ -30,9 +30,12 @@ res=''
 # of them is ADnameerror (CIFS1043) even when the realm join worked; a matching name with only the
 # NT_STATUS_NO_LOGON_SERVERS of the second join is serviceok (no code).  The physical flavour is unchanged.
 remaking() {
- # a cifsmember.sh run for exactly this address (its 4th argument) is going on in this node: the share container of the
- # address is being made again (stop, rm -f, run)
- ps -eo args 2>/dev/null | grep 'cifsmember.sh' | grep -v grep | grep -qF " $1 "
+ # a cifs.py or cifs.sh run for exactly this address is going on in this node: the share container of the address is
+ # being made again (cifs.py -> cifs.sh: 'docker rm -f' then 'docker run', up to 5 tries).  Callers: VolumeActivateCIFSdom
+ # (a second domain volume on the same address), VolumeCheck.py (repair of a dirty share), cifsremove.sh (restart after a
+ # neighbour volume's delete).  In both command lines the address is followed by its subnet, so ' <ip> ' keeps .16 apart
+ # from .164.  (r10q fix pass G-2b: was cifsmember.sh, whose only call is commented out: the wait never ran.)
+ ps -eo args 2>/dev/null | grep -E '/TopStor/cifs\.(py|sh) ' | grep -v grep | grep -qF " $1 "
 }
 ctrof() {
  # the share container of exactly this address (its port map '<ip>:445->'; a plain grep of .16 also matched .165)
@@ -49,8 +52,8 @@ ctrof() {
 # (3) a name that is definitely wrong (realm discovered, the domain's workgroup read and different) is final at once,
 # without waiting for the entrypoint end (the code came after the 200 s window); (4) every run writes a start line and
 # an end line (also 'no code') to /root/cifsdomjoin.trace.  /root/cifsdomjoin.log (JOINLOG) gets only coded lines.
-# QSD5.352 r10q fix pass (validator G-2): (1) a share container that vanished (or is not there yet) while cifsmember.sh re-creates the share
-# container of this address (a second domain volume on the same address: 'docker rm -f' then 'docker run', 1-2 min under
+# QSD5.352 r10q fix pass (validator G-2, G-2b): (1) a share container that vanished (or is not there yet) while cifs.py/cifs.sh re-create
+# the share container of this address (a second domain volume on the same address: 'docker rm -f' then 'docker run', 1-2 min under
 # load) is waited for up to CIFSDOMJOIN_REMAKETRIES polls (36 = 180 s) instead of being judged from the old container's
 # logs after 15 s; when a container of the address is back, judging starts again from ITS logs (trace 'is back');
 # with no re-create running the quick rule stays (CIFSDOMJOIN_GONETRIES 3 polls, so the 200 s window of a wrong name
@@ -112,7 +115,7 @@ if is_container 2>/dev/null; then
   else
    gone=$((gone+1))
    if [ $gone -lt $REMAKETRIES ] && remaking $ipaddr; then
-    [ $remk -eq 0 ] && trc "share container gone while cifsmember.sh makes it again: waiting up to $REMAKETRIES polls"
+    [ $remk -eq 0 ] && trc "share container gone while cifs.py/cifs.sh makes it again: waiting up to $REMAKETRIES polls"
     remk=1
    else
     [ $seen -eq 1 ] && [ $gone -ge $GONETRIES ] && { why=vanished; break; }
