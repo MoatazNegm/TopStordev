@@ -29,6 +29,11 @@ res=''
 # realm, the DNS domain, the first label of either, or the NetBIOS workgroup of the domain; a name that matches none
 # of them is ADnameerror (CIFS1043) even when the realm join worked; a matching name with only the
 # NT_STATUS_NO_LOGON_SERVERS of the second join is serviceok (no code).  The physical flavour is unchanged.
+remaking() {
+ # a cifsmember.sh run for exactly this address (its 4th argument) is going on in this node: the share container of the
+ # address is being made again (stop, rm -f, run)
+ ps -eo args 2>/dev/null | grep 'cifsmember.sh' | grep -v grep | grep -qF " $1 "
+}
 ctrof() {
  # the share container of exactly this address (its port map '<ip>:445->'; a plain grep of .16 also matched .165)
  docker ps --format '{{.Names}} {{.Ports}}' 2>/dev/null | grep -F "$1:445->" | awk '{print $1}' | head -1
@@ -44,6 +49,14 @@ ctrof() {
 # (3) a name that is definitely wrong (realm discovered, the domain's workgroup read and different) is final at once,
 # without waiting for the entrypoint end (the code came after the 200 s window); (4) every run writes a start line and
 # an end line (also 'no code') to /root/cifsdomjoin.trace.  /root/cifsdomjoin.log (JOINLOG) gets only coded lines.
+# QSD5.352 r10q fix pass (validator G-2): (1) a share container that vanished (or is not there yet) while cifsmember.sh re-creates the share
+# container of this address (a second domain volume on the same address: 'docker rm -f' then 'docker run', 1-2 min under
+# load) is waited for up to CIFSDOMJOIN_REMAKETRIES polls (36 = 180 s) instead of being judged from the old container's
+# logs after 15 s; when a container of the address is back, judging starts again from ITS logs (trace 'is back');
+# with no re-create running the quick rule stays (CIFSDOMJOIN_GONETRIES 3 polls, so the 200 s window of a wrong name
+# whose container died is kept); (2) the log copy is one file per check (<ip>.<pool_volume>.<pid>.log, copies older
+# than one day are removed), two checks of one address no longer delete each other's copy; (3) a container still gone
+# when the polls run out is judged as vanished (was: silent end).
 SNAPDIR=${CIFSDOMJOIN_SNAPDIR:-/root/cifsdomjoin.snap}
 TRACE=${CIFSDOMJOIN_TRACE:-/root/cifsdomjoin.trace}
 JOINLOGF=${CIFSDOMJOIN_LOG:-/root/cifsdomjoin.log}
@@ -71,15 +84,22 @@ if is_container 2>/dev/null; then
  GONETRIES=${CIFSDOMJOIN_GONETRIES:-3}
  NEVERTRIES=${CIFSDOMJOIN_NEVERTRIES:-12}
  EARLYTRIES=${CIFSDOMJOIN_EARLYTRIES:-3}
- mkdir -p $SNAPDIR 2>/dev/null; snap=$SNAPDIR/$ipaddr.log; rm -f $snap $snap.new
- trc "check started (pid $$)"
- ended=0; seen=0; gone=0; early=0; why=''; ctr=''
+ REMAKETRIES=${CIFSDOMJOIN_REMAKETRIES:-36}
+ mkdir -p $SNAPDIR 2>/dev/null; find $SNAPDIR -name '*.log' -mmin +1440 -delete 2>/dev/null
+ snap=$SNAPDIR/$ipaddr.`echo $vol | tr '/' '_'`.$$.log; rm -f $snap $snap.new
+ trc "check started (pid $$, log copy $snap)"
+ ended=0; seen=0; gone=0; early=0; why=''; ctr=''; remk=0
  while [ $n -lt $ENDTRIES ]; do
   res=`$GETST $ipaddr CIFS 2>/dev/null | grep -o '_result[^_]*_result' | tail -1 | sed 's/_result//g'`
   case "$res" in adminpasserror|timeerror) ended=1; why=status; break ;; esac
   ctr=`ctrof $ipaddr`
   if [ -n "$ctr" ]; then
-   seen=1; gone=0
+   if [ $gone -gt 0 ] && { [ $seen -eq 1 ] || [ $remk -eq 1 ]; }; then
+    # the address has a share container again (re-created): judge from its own logs, not the old container's
+    trc "share container of the address is back after $gone polls ($ctr): judging its logs"
+    rm -f $snap; early=0
+   fi
+   seen=1; gone=0; remk=0
    docker logs $ctr > $snap.new 2>&1; [ -s $snap.new ] && mv -f $snap.new $snap
    # a server that was not even discovered is final at once (586.1 unreachable DC); with a discovered one it waits
    if [ "$res" = ADservererror ] && ! grep -q 'Successfully discovered' $snap 2>/dev/null; then ended=1; why=nodiscovery; break; fi
@@ -91,12 +111,18 @@ if is_container 2>/dev/null; then
    fi
   else
    gone=$((gone+1))
-   [ $seen -eq 1 ] && [ $gone -ge $GONETRIES ] && { why=vanished; break; }
-   [ $seen -eq 0 ] && [ $gone -ge $NEVERTRIES ] && { why=neverseen; break; }
+   if [ $gone -lt $REMAKETRIES ] && remaking $ipaddr; then
+    [ $remk -eq 0 ] && trc "share container gone while cifsmember.sh makes it again: waiting up to $REMAKETRIES polls"
+    remk=1
+   else
+    [ $seen -eq 1 ] && [ $gone -ge $GONETRIES ] && { why=vanished; break; }
+    [ $seen -eq 0 ] && [ $gone -ge $NEVERTRIES ] && { why=neverseen; break; }
+   fi
   fi
   sleep 5
   n=$((n+1))
  done
+ [ -z "$why" ] && [ $gone -gt 0 ] && { [ $seen -eq 1 ] && why=vanished || why=neverseen; }
  [ -z "$why" ] && why=polls
  if [ "$why" = vanished ] || [ "$why" = neverseen ]; then
   if ! timeout 20 $ZFSCMD list -H -o name $vol >/dev/null 2>&1; then trc "share container $why and the volume is gone (deleted): no code"; exit 0; fi
