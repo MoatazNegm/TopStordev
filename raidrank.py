@@ -44,7 +44,7 @@ def getraidrank(raid, removedisk, adddisk):
  hostrank = 0  
  for host in hostdic:
   hostset.add(hostdic[host])
- balance = len(raid['disklist'])%len(hostdic) 
+ balance = len(raid['disklist'])%len(hostdic) if len(hostdic) > 0 else 1 # no counted leg: hostrank -1, no division by zero
  print('balance',balance)
  if balance == 0 and len(hostset) == 1 and len(hostdic) > 1:
   hostrank = 0
