@@ -38,10 +38,31 @@ else
 	adminpass=`echo $@ | awk '{print $10}'`
  	wrkgrp=`echo $domain | awk -F'.' '{print $1}'`  
 	membername=${wrkgrp}-$RANDOM
+	# QSD5.352 r10r (QC 587.1, r10p and r10q), container flavour: the AD name typed may be the short (NetBIOS) name
+	# ('QC'); the share image (membersmb) and smb.conf need the DNS domain ('qc.local'): with DOMAIN_NAME=QC the image
+	# wrote krb5 default_realm QC and smb.conf 'realm = QC', 'kinit' and 'net ads join' failed
+	# (NT_STATUS_NO_LOGON_SERVERS) and every domain user was refused by the share although 'realm join' (by the
+	# server address) had worked.  addom = the DNS domain read from the AD (anonymous LDAP root DSE, addnsdomain.py)
+	# when the typed name has no dot and is that domain's first label; otherwise the typed name (a wrong name stays
+	# wrong, cifsdomjoincheck.sh still judges the TYPED name).  The typed name keeps its other uses (decthis.sh key,
+	# workgroup, etcd).  The physical flavour is unchanged (addom = domain).
+	addom=$domain
+	[ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
+	if is_container 2>/dev/null; then
+		case "$domain" in
+		*.*) ;;
+		*)	adfound=`timeout ${ADDNS_TIMEOUT:-12} ${ADDNS_TOOL:-/TopStor/addnsdomain.py} $domainsrvi 5 2>/dev/null | head -1`
+			if [ -n "$adfound" ] && [ "`echo ${adfound%%.*} | tr 'A-Z' 'a-z'`" = "`echo $domain | tr 'A-Z' 'a-z'`" ]; then
+				addom=$adfound
+			fi
+			echo "`date '+%F %T'` cifs.sh $resname: typed AD name '$domain', AD $domainsrvi answers '${adfound:-nothing}', share realm '${addom^^}'" >> ${ADDNS_LOG:-/root/cifsrealm.log}
+			;;
+		esac
+	fi
 	cp /TopStor/smbmember.conf /etc/smbmember.conf_$membername
 	sed -i "s/WRKGRP/$wrkgrp/g" /etc/smbmember.conf_$membername
 	sed -i "s/DOMAINIP/$domainsrvi/g" /etc/smbmember.conf_$membername
-	sed -i "s/DOMAIN/${domain^^}/g" /etc/smbmember.conf_$membername
+	sed -i "s/DOMAIN/${addom^^}/g" /etc/smbmember.conf_$membername
   	cat /TopStordata/smb.${ipaddr} >> /etc/smbmember.conf_$membername
 	echo nameserver $domainsrvi > /TopStordata/resolv_$wrkgrp
 	#cp /TopStordata/smbmember.conf_$membername /etc/smbmember.conf_$membername
@@ -78,13 +99,13 @@ else
  	sync
  	adminpass=`echo $adminpass | sed 's/\@\@sep/\//g'`
  	adminpass=`/TopStor/decthis.sh $domain $adminpass | awk -F'_result' '{print $2}' `
- 	docker run -d  $mounts --privileged --rm --add-host "${membername}.$domain ${membername}":$ipaddr  \
+ 	docker run -d  $mounts --privileged --rm --add-host "${membername}.$addom ${membername}":$ipaddr  \
   		--hostname ${membername} \
   		-v /etc/localtime:/etc/localtime:ro \
   		-v /etc/:/hostetc/   \
   		-v /TopStordata/smb.${ipaddr}:/etc/smb.conf:rw \
 		-v /TopStordata/resolv_$wrkgrp:/etc/resolv.conf \
-  		-e DOMAIN_NAME=$domain \
+  		-e DOMAIN_NAME=$addom \
   		-e ADMIN_SERVER=$domainsrvi \
   		-e WORKGROUP=$wrkgrp  \
   		-e AD_USERNAME=$domadmin \

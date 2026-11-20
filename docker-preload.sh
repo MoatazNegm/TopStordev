@@ -100,16 +100,26 @@ for tar in $TARBALLS; do
         continue
     fi
 
-    log "  [+] loading $(basename "$tar") (expected repo:tag: $pretty)…"
-    if timeout 120 docker load -i "$tar" >/tmp/docker-preload.out 2>&1; then
+    # QSD5.352 r10r (O1): a fixed 120 s per tar was too short for grafana's 1.4 GB tar under load (zfs1 21:30:10 -> 21:32:13
+    # 'load FAILED', the daemon finished the load anyway): the limit is now 120 s + 120 s per started GB of the tar (at
+    # most PRELOAD_MAXT, 900 s), and a load that timed out or failed but whose expected image is there afterwards counts
+    # as loaded (stamp written), so it is not reported FAILED nor loaded again at the next start.
+    gb=$(( ( $(stat -c %s "$tar" 2>/dev/null || echo 0) + 1073741823 ) / 1073741824 ))
+    lt=$(( 120 + 120 * gb )); [ $lt -gt ${PRELOAD_MAXT:-900} ] && lt=${PRELOAD_MAXT:-900}
+    log "  [+] loading $(basename "$tar") (expected repo:tag: $pretty, limit ${lt}s)…"
+    if timeout $lt docker load -i "$tar" >/tmp/docker-preload.out 2>&1; then
         LOADED=$((LOADED+1))
         # docker load prints "Loaded image: <repo>:<tag>" lines; surface them.
         grep -E 'Loaded image|already exists' /tmp/docker-preload.out | sed "s|^|$LOG_PREFIX   |"
         { echo "$sig"; sed -n 's/^Loaded image: //p' /tmp/docker-preload.out; } > "$st.tmp" 2>/dev/null && mv -f "$st.tmp" "$st" 2>/dev/null
+    elif timeout 10 docker image inspect "$pretty" >/dev/null 2>&1; then
+        LOADED=$((LOADED+1))
+        log "  [~] the load of $(basename "$tar") ended with an error or its time limit, but $pretty is there: counted as loaded"
+        { echo "$sig"; echo "$pretty"; } > "$st.tmp" 2>/dev/null && mv -f "$st.tmp" "$st" 2>/dev/null
     else
         FAILED=$((FAILED+1))
         log "  [!] load FAILED for $(basename "$tar"):"
-        tail -3 /tmp/docker-preload.out | sed "s|^|$LOG_PREFIX       |"
+        tail -3 /tmp/docker-preload.out | grep -v setlocale | sed "s|^|$LOG_PREFIX       |"
     fi
 done
 

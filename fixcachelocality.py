@@ -30,6 +30,14 @@ WAIT_TRIES = 12           # QSD5.352 r10 (QC 631): wait mode, 12 x 15 s = 3 minu
 WAIT_STEP = 15
 ADD_TRIES = 3            # QSD5.352 r10h: zpool add of the local cache, 'udevadm settle' + ADD_WAIT s between tries
 ADD_WAIT = 5
+# QSD5.352 r10r (QC 580.1, r10q x1 twice): right after the take-over import the cluster info listed P1 but no free disk
+# of the new owner yet (zfs2 /root/fixcachelocality.log 17:38: five 'pools {}' reads, then 'no free or spare cache
+# disk on dhcp178871'), so the wait-mode run kept the remote cache (on the stopped node's disk) and ended; nothing ran
+# again until the next take-over two hours later, when the same disk was found at once.  Wait mode (container flavour)
+# now reads the info again up to PICK_TRIES times, PICK_STEP s apart, while no local disk can be picked, as long as the
+# pool is still imported here, owned by this node and has no working local cache.
+PICK_TRIES = int(os.environ.get('FCL_PICK_TRIES', '12'))
+PICK_STEP = int(os.environ.get('FCL_PICK_STEP', '15'))
 
 sys.path.insert(0, '/TopStor')
 
@@ -350,6 +358,50 @@ def pick_cache_disk(info, owner, pool, exclude=(), spares=()):
                   ' or than the rest')
 
 
+def repick(leaderip, pool, myhost, why):
+    """r10r (580.1): wait mode, container flavour: (disk, reason, info) once the cluster info offers a local cache disk
+    for `pool` on `myhost`; (None, reason, None) after PICK_TRIES rounds or when the pool left this node / got a working
+    local cache meanwhile."""
+    from allphysicalinfo import getall, initallphy
+    for n in range(PICK_TRIES):
+        print(f"fixcachelocality: {pool}: {why}; reading the cluster info again in {PICK_STEP} s (round {n + 1} of {PICK_TRIES})")
+        time.sleep(PICK_STEP)
+        if not _imported_here(pool):
+            return None, f"pool {pool} is no longer imported here, no cache added", None
+        who = _owner(pool)
+        if who and who not in (myhost, '-'):
+            return None, f"pool {pool} is owned by {who} now, not by {myhost}: no cache added", None
+        entries = cache_entries(pool)
+        try:
+            initallphy(leaderip)
+            info = getall(leaderip)
+        except Exception as e:
+            why = f"cluster info not readable ({str(e)[:80]})"
+            continue
+        pool_data = info.get('pools', {}).get(pool)
+        if not pool_data:
+            why = f"pool {pool} not in the cluster info"
+            continue
+        cache_disks = []
+        for raid_id in pool_data.get('raids', []):
+            if raid_id.split('_')[0] == 'cache':
+                cache_disks.extend(info.get('raids', {}).get(raid_id, {}).get('disks', []))
+        remote = [d for d in cache_disks if info.get('disks', {}).get(d, {}).get('host') != myhost]
+        live_local = [nm for nm, g, st in entries if st not in DEAD_STATES and not any(_same_disk(d, nm) for d in remote)]
+        if live_local:
+            return None, f"pool {pool} has a working local cache {live_local} meanwhile, no disk added", None
+        exclude = set(cache_disks) | set(nm for nm, g, st in entries)
+        held = reserved_disks(leaderip, info, myhost)
+        if held:
+            print(f"fixcachelocality: not used as cache (reserved): {sorted(held.items())}")
+            exclude = exclude | set(held)
+        new, why = pick_cache_disk(info, myhost, pool, exclude, spare_list(leaderip))
+        if new:
+            print(f"fixcachelocality: {pool}: local cache disk {new} found in round {n + 1} ({why})")
+            return new, why, info
+    return None, f"{why} (after {PICK_TRIES} more reads of the cluster info)", None
+
+
 def main():
     if len(sys.argv) >= 4 and sys.argv[1] == 'rmcache':
         ok, how = remove_cache(sys.argv[2], sys.argv[3])
@@ -437,6 +489,11 @@ def main():
             print(f"fixcachelocality: not used as cache (reserved): {sorted(held.items())}")
             exclude = exclude | set(held)
         new, why = pick_cache_disk(info, myhost, pool, exclude, spares)
+        if not new and wait and iscontainer() and PICK_TRIES > 0:   # r10r (580.1): the info may not list the disk yet
+            new, why, info2 = repick(leaderip, pool, myhost, why)
+            if new:
+                info = info2
+                spares = spare_list(leaderip)
     added = None
     if new:
         resolved = resolve_by_id(new)
