@@ -358,7 +358,7 @@ def pick_cache_disk(info, owner, pool, exclude=(), spares=()):
                   ' or than the rest')
 
 
-def repick(leaderip, pool, myhost, why):
+def repick(leaderip, pool, myhost, why, notlocal=()):
     """r10r (580.1): wait mode, container flavour: (disk, reason, info) once the cluster info offers a local cache disk
     for `pool` on `myhost`; (None, reason, None) after PICK_TRIES rounds or when the pool left this node / got a working
     local cache meanwhile."""
@@ -387,7 +387,10 @@ def repick(leaderip, pool, myhost, why):
             if raid_id.split('_')[0] == 'cache':
                 cache_disks.extend(info.get('raids', {}).get(raid_id, {}).get('disks', []))
         remote = [d for d in cache_disks if info.get('disks', {}).get(d, {}).get('host') != myhost]
-        live_local = [nm for nm, g, st in entries if st not in DEAD_STATES and not any(_same_disk(d, nm) for d in remote)]
+        # r10r (validator G-6): the caches main() found remote (notlocal) never count as local, also when the re-read info
+        # lacks the pool's cache raid (info being rebuilt) and so does not list them as remote
+        live_local = [nm for nm, g, st in entries if st not in DEAD_STATES and nm not in notlocal
+                      and not any(_same_disk(d, nm) for d in remote)]
         if live_local:
             return None, f"pool {pool} has a working local cache {live_local} meanwhile, no disk added", None
         exclude = set(cache_disks) | set(nm for nm, g, st in entries)
@@ -490,7 +493,7 @@ def main():
             exclude = exclude | set(held)
         new, why = pick_cache_disk(info, myhost, pool, exclude, spares)
         if not new and wait and iscontainer() and PICK_TRIES > 0:   # r10r (580.1): the info may not list the disk yet
-            new, why, info2 = repick(leaderip, pool, myhost, why)
+            new, why, info2 = repick(leaderip, pool, myhost, why, badnames)
             if new:
                 info = info2
                 spares = spare_list(leaderip)

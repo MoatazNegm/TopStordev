@@ -67,6 +67,25 @@ def dnsdomain(data):
     return '.'.join(p.strip() for p in parts).lower()
 
 
+def complete(data):
+    # True when the reply holds a whole SearchResultDone message (protocolOp tag 0x65), read message by message with
+    # the BER lengths; False while a message is still cut short (r10r validator G-7: the loop ended when the first TCP
+    # piece happened to end near an ASCII 'e' = 0x65 of the reply, then the name was not read and the typed name was kept)
+    i = 0
+    while i < len(data):
+        if data[i] != 0x30:
+            return True                      # not LDAP: stop reading, dnsdomain() decides
+        n, j = length(data, i + 1)
+        if n < 0 or j + n > len(data):
+            return False
+        if j < len(data) and data[j] == 0x02:
+            m, k = length(data, j + 1)
+            if m >= 0 and k + m < j + n and data[k + m] == 0x65:
+                return True
+        i = j + n
+    return False
+
+
 def main():
     if len(sys.argv) < 2:
         return 1
@@ -77,7 +96,7 @@ def main():
         s.settimeout(tmo)
         s.sendall(request())
         data = b''
-        while b'\x65' not in data[-20:] and len(data) < 65536:
+        while not complete(data) and len(data) < 65536:
             chunk = s.recv(4096)
             if not chunk:
                 break

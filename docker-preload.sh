@@ -65,9 +65,22 @@ mkdir -p "$STAMPD" 2>/dev/null
 LOADED=0
 SKIPPED=0
 FAILED=0
+# QSD5.352 r10r (validator G-5): with a hung inner daemon every tar waited its own limit (13 tars: 3240 s before
+# docker_setup).  Now (1) a total budget PRELOAD_TOTAL (default 1200 s) for the whole preload: a tar is loaded only with
+# at least 30 s of it left and its limit is cut to what is left; (2) after a failed load 'docker info' must answer within
+# 10 s, else the preload stops.  Tars not tried are named and counted (not_tried=), the next start tries them again.
+PT0=$SECONDS
+PBUDGET=${PRELOAD_TOTAL:-1200}
+NOTTRIED=0
+PSTOP=''
 
 for tar in $TARBALLS; do
     fname=$(basename "$tar")
+    if [ -n "$PSTOP" ]; then
+        NOTTRIED=$((NOTTRIED+1))
+        log "  [-] $fname not tried ($PSTOP); the next start tries it again"
+        continue
+    fi
     # Each tarball may contain multiple images/repos. Pull repo:tag out
     # of the filename for logging (moataznegm_quickstor_git.tar → moataznegm/quickstor:git).
     # QSD5.352 r10q (QC proof 10p F4, return 20-26 min): 's|_|:|' after the doubling left a '_' in the tag
@@ -106,6 +119,14 @@ for tar in $TARBALLS; do
     # as loaded (stamp written), so it is not reported FAILED nor loaded again at the next start.
     gb=$(( ( $(stat -c %s "$tar" 2>/dev/null || echo 0) + 1073741823 ) / 1073741824 ))
     lt=$(( 120 + 120 * gb )); [ $lt -gt ${PRELOAD_MAXT:-900} ] && lt=${PRELOAD_MAXT:-900}
+    pleft=$(( PBUDGET - (SECONDS - PT0) ))
+    if [ $pleft -lt 30 ]; then
+        PSTOP="total preload budget ${PBUDGET}s used up"
+        NOTTRIED=$((NOTTRIED+1))
+        log "  [-] $fname not tried ($PSTOP); the next start tries it again"
+        continue
+    fi
+    [ $lt -gt $pleft ] && lt=$pleft
     log "  [+] loading $(basename "$tar") (expected repo:tag: $pretty, limit ${lt}s)…"
     if timeout $lt docker load -i "$tar" >/tmp/docker-preload.out 2>&1; then
         LOADED=$((LOADED+1))
@@ -120,10 +141,14 @@ for tar in $TARBALLS; do
         FAILED=$((FAILED+1))
         log "  [!] load FAILED for $(basename "$tar"):"
         tail -3 /tmp/docker-preload.out | grep -v setlocale | sed "s|^|$LOG_PREFIX       |"
+        if ! timeout 10 docker info >/dev/null 2>&1; then
+            PSTOP="dockerd does not answer after the failed load of $fname"
+            log "  [!] $PSTOP: preload stopped"
+        fi
     fi
 done
 
-log "summary: loaded=$LOADED  skipped=$SKIPPED  failed=$FAILED (total $N tarball(s))"
+log "summary: loaded=$LOADED  skipped=$SKIPPED  failed=$FAILED (total $N tarball(s)) not_tried=$NOTTRIED"
 
 # Trim to keep image list visible for quick sanity-check
 echo "$LOG_PREFIX images visible in DinD after preload:"
