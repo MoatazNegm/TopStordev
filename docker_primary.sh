@@ -52,7 +52,15 @@ rm -rf /TopStordata/etcd.sh
 cp /TopStor/discovery.sh /TopStordata/etcd.sh
 sed -i 's/SLEEP//g' /TopStordata/etcd.sh
 sed -i "s/ETCDIP/$newip/g" /TopStordata/etcd.sh
-docker run -itd --rm --name etcd --hostname etcd -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $myclusterip:2379:2379 -v /TopStor/:/TopStor -v /root/etcddata:/default.etcd  -v /TopStordata/etcd.sh:/runme.sh --net ${DOCKER_NET:-bridge0} moataznegm/quickstor:etcd
+# QSD5.352 r10r2 (QC proof r10r, candidate A), container flavour: the take-over etcd is published on the node ip AND the
+# cluster ip.  It was published on the cluster ip only, so this node's own reads at its node ip (heartbeat 'ready', the
+# 'leader' put of heartbeat.py, checksyncs) timed out after every take-over: the heartbeat took the (live) old leader for
+# lost again and again (r10r: 32 take-overs).  Physical: unchanged (cluster ip only).
+etcdpub="-p $myclusterip:2379:2379"
+if is_container 2>/dev/null && [ -n "$myhostip" ] && [ "$myhostip" != "$myclusterip" ]; then
+	etcdpub="-p $myhostip:2379:2379 -p $myclusterip:2379:2379"
+fi
+docker run -itd --rm --name etcd --hostname etcd -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf $etcdpub -v /TopStor/:/TopStor -v /root/etcddata:/default.etcd  -v /TopStordata/etcd.sh:/runme.sh --net ${DOCKER_NET:-bridge0} moataznegm/quickstor:etcd
 started=0
 waited=0
 while [ $started -eq 0 ];
@@ -103,6 +111,19 @@ docker run -itd --rm --name flask --hostname apisrv -v /etc/localtime:/etc/local
 #/pace/fapilooper.sh & disown
 #/pace/zfsping.py $leaderip $myhost & disown
 #/pace/rebootmeplslooper.sh $leaderip $myhost & disown 
+# QSD5.352 r10r2 (candidate A), container flavour: the 'leader' key names this node on both addresses (put, read back, 3
+# tries); the result is logged in /root/heartproblem (r10r: the put went nowhere and the old leader stayed in the key).
+if is_container 2>/dev/null; then
+	lkn=''; lkc=''
+	for lktry in 1 2 3; do
+		/pace/etcdput.py $myclusterip leader $myhost >/dev/null 2>&1
+		lkn=`ETCDCTL_API=3 timeout 10 etcdctl --endpoints=http://$myhostip:2379 get leader --print-value-only 2>/dev/null`
+		lkc=`ETCDCTL_API=3 timeout 10 etcdctl --endpoints=http://$myclusterip:2379 get leader --print-value-only 2>/dev/null`
+		[ "$lkn" = "$myhost" ] && [ "$lkc" = "$myhost" ] && break
+		sleep 2
+	done
+	echo "`date` docker_primary.sh: leader key after the take-over: node ip $myhostip '$lkn', cluster ip $myclusterip '$lkc' (want $myhost, try $lktry)" >> ${DPRIM_LOG:-/root/heartproblem}
+fi
 echo hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
 isbybyleader=`/TopStor/etcdget.py $leaderip bybyleader --prefix`
 echo 'hihi'$isbybyleader | grep 'dhcp'
