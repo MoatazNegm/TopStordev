@@ -8,8 +8,9 @@
 # The volume address changes of cmynode run under the lock /TopStordata/cmynode.lock (also rmvoladdr.sh, cifsremove.sh,
 # nfsnew.sh, cifs.sh DNS, VolumeChangeISCSI, VolumeDeleteISCSI, docker_primary.sh, bybyleader.sh, iscsiwatchdog.sh), and
 # the address is checked on the connection and on the interface after 'conn up'; it is written again up to three times.
-# Not under the lock (node setup / DNS paths that do not run beside volume starts): docker_setup*.sh, getdiscovery.sh,
-# HostManualconfigDNS, VolumeDeleteNFS_non_container.
+# Not under the lock (node setup / DNS paths that do not run beside volume starts): docker_setup*.sh,
+# HostManualconfigDNS, VolumeDeleteNFS_non_container.  getdiscovery.sh takes the lock in the container flavour since r10s2
+# (its scan ends 30 min - 2 h after the start, at any time); physical unchanged.
 # QSD5.352 r2 (validator R2): the callers drop stdout (iscsi.py reads a PIPE), so every result line is also appended to
 # /TopStordata/cmynodeaddr.log with the time, the caller and the try number (kept below ~1 MB: one old copy .1).
 mode=$1

@@ -42,8 +42,23 @@ if [ -z "$node_device" ]; then
 	echo "cmynode has no active device"
 	exit 1
 fi
-nmcli connection modify cmynode +ipv4.addresses $etcd/24
-nmcli device reapply $node_device
+# QSD5.352 r10s2 (validator r10s G7), container flavour: the .253 changes of cmynode run under /TopStordata/cmynode.lock like
+# every other cmynode address change (cmynodeaddr.sh): a scan now ends 30 min - 2 h after its start, at any time, beside volume
+# address adds or a take-over, and an unlocked 'conn modify' + 'reapply' could drop an address another script had just added.
+# Physical: the same nmcli commands as before, no lock.
+cmy253() {
+	if is_container 2>/dev/null; then
+		exec 9>>/TopStordata/cmynode.lock
+		flock -w 120 9 || echo "`date '+%F %T'` getdiscovery.sh: no cmynode lock after 120 s, going on (r10s2)" >> /root/getdiscovery.log
+	fi
+	nmcli connection modify cmynode ${1}ipv4.addresses $etcd/24
+	if [ "$1" = "+" ]; then nmcli device reapply $node_device; else nmcli device reapply $node_device 2>/dev/null; fi
+	if is_container 2>/dev/null; then
+		flock -u 9
+		exec 9>&-
+	fi
+}
+cmy253 +
 rm -rf /TopStordata/discovery.sh
 cp /TopStor/discovery.sh /TopStordata/
 sed -i 's/SLEEP/sleep 10/g' /TopStordata/discovery.sh
@@ -64,8 +79,7 @@ echo newip=$newip
 if [ -z "$newip" ]; then
 	echo "discovery container did not get an address in the internal DNS after 60 s, scan not started"
 	docker rm -f discovery
-	nmcli connection modify cmynode -ipv4.addresses $etcd/24
-	nmcli device reapply $node_device 2>/dev/null
+	cmy253 -
 	exit 1
 fi
 docker rm -f discovery
@@ -87,6 +101,7 @@ scan_end=$((scan_t0+dsecs))
 scan_max=$((scan_t0+${DISCOVERY_MAX:-7200}))
 rm -f /TopStordata/discovery.extend
 ext_seen=
+scan_why=
 if is_container 2>/dev/null; then
 	echo "`date '+%F %T'` getdiscovery.sh: scan started (PID $$), ends at the latest after $dsecs s without a new discover request, $((scan_max-scan_t0)) s in all (r10s)" >> /root/getdiscovery.log
 fi
@@ -104,6 +119,7 @@ while true
 do
 	if [ -z "`docker ps -q -f name=^discovery$`" ]; then
 		echo "discovery container is not running, scan stopped"
+		scan_why="the discovery container is gone"
 		break
 	fi
 	lines=`/TopStor/etcdget.py $etcd possible --prefix`
@@ -115,6 +131,7 @@ do
 	echo $lines | grep yes
 	if [ $? -eq 0 ];
 	then
+		scan_why="tostop yes"
 		break
 	fi
 	if is_container 2>/dev/null; then
@@ -142,8 +159,20 @@ do
 
 done
 
+# QSD5.352 r10s2 (validator r10s G11), container flavour: the tostop and container-gone ends are logged too (only the time end
+# was), and a discover request that came in after the last round read discovery.extend (the tail below runs seconds, longer
+# under load) is not lost: it was answered 'the scan is extended' and exit 1, so this scan starts a new one after its cleanup.
+if is_container 2>/dev/null && [ -n "$scan_why" ]; then
+	echo "`date '+%F %T'` getdiscovery.sh: scan ended after $((`date +%s`-scan_t0)) s ($counter rounds): $scan_why (r10s2)" >> /root/getdiscovery.log
+fi
 ./etcdput.py $etcd tostop yes 
 docker rm -f discovery
-nmcli connection modify cmynode -ipv4.addresses $etcd/24
-nmcli device reapply $node_device 2>/dev/null
+cmy253 -
+if is_container 2>/dev/null; then
+	ext=`cat /TopStordata/discovery.extend 2>/dev/null`
+	if [ -n "$ext" ] && [ "$ext" != "$ext_seen" ]; then
+		echo "`date '+%F %T'` getdiscovery.sh: discover was asked again while the scan ended ($ext): a new scan starts (r10s2)" >> /root/getdiscovery.log
+		GETDISCOVERY_BG=1 setsid nohup /TopStor/getdiscovery.sh "$@" >/dev/null 2>&1 </dev/null &
+	fi
+fi
 
