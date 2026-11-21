@@ -3,10 +3,23 @@
 cd /TopStor/
 echo hihi>/root/tmpgetdiscovery
 etcd='10.11.11.253'
+# QSD5.352 r10s (QC proof r10r3: QX-1018 tail and the first join of build 3549), container flavour: a discover request while a
+# scan runs used to do nothing (and first deleted the possible/ keys of the running scan).  It now only extends the running
+# scan (/TopStordata/discovery.extend, read by the loop below) and leaves its keys alone.  Physical: unchanged.
+if [ -z "$GETDISCOVERY_BG" ] && is_container 2>/dev/null; then
+	for pid in $(pidof -x getdiscovery.sh); do
+		if [ $pid != $$ ]; then
+			echo "`date +%s` $$" > /TopStordata/discovery.extend
+			echo "`date '+%F %T'` getdiscovery.sh: a scan is running (PID $pid): discover asked again, the scan is extended (r10s)" >> /root/getdiscovery.log
+			echo "[$(date)] : discovery.sh : Process is already running with PID $pid (scan extended)"
+			exit 1
+		fi
+	done
+fi
 /TopStor/etcddel.py $etcd possible --prefix
 leaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip`
 /TopStor/etcddel.py $leaderip possible --prefix
-# The scan below runs until it is told to stop (or 600 rounds).  It is started through the node's command queue
+# The scan below runs until it is told to stop (or 600 rounds; container flavour, r10s: a wall-clock time instead, see the loop).  It is started through the node's command queue
 # (topstorrecvreply.py runs one command at a time), so in the foreground it held every later command -- adding a
 # user, for one -- until the scan ended.  The script therefore starts itself again detached and returns at once.
 if [ -z "$GETDISCOVERY_BG" ]; then
@@ -62,6 +75,21 @@ sed -i 's/SLEEP//g' /TopStordata/discovery.sh
 sed -i "s/ETCDIP/$newip/g" /TopStordata/discovery.sh
 docker run  -itd --rm --name discovery --hostname discovery -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $etcd:2379:2379 -v /TopStor/:/TopStor -v /TopStordata/discovery:/default.etcd -v /TopStordata/discovery.sh:/runme.sh --net ${DOCKER_NET:-bridge0} moataznegm/quickstor:etcd
 counter=0
+# QSD5.352 r10s, container flavour: the scan ended after 600 rounds whatever the load; a node whose docker_setup ran 21 min
+# under load (r10r3 QX-1018: announcing from 05:21, scan of 05:06 already over) announced itself to nobody (12277 'not
+# reachable' lines) and the join failed.  The scan now runs DISCOVERY_SECS (default 1800 s) of wall-clock time from its start
+# or from the last discover request (discovery.extend), at least 300 s more while a node is announcing (possible/ key), never
+# longer than DISCOVERY_MAX (default 7200 s) in all.  Physical: the 600 rounds as before.
+dsecs=${DISCOVERY_SECS:-1800}
+aseconds=${DISCOVERY_ANNOUNCE_SECS:-300}
+scan_t0=`date +%s`
+scan_end=$((scan_t0+dsecs))
+scan_max=$((scan_t0+${DISCOVERY_MAX:-7200}))
+rm -f /TopStordata/discovery.extend
+ext_seen=
+if is_container 2>/dev/null; then
+	echo "`date '+%F %T'` getdiscovery.sh: scan started (PID $$), ends at the latest after $dsecs s without a new discover request, $((scan_max-scan_t0)) s in all (r10s)" >> /root/getdiscovery.log
+fi
 # the discovery database is kept between scans, so tostop still says yes from the last one: reset it
 # and make sure etcd (just started) took it, or the loop below would stop at once
 for tries in `seq 1 30`
@@ -79,6 +107,7 @@ do
 		break
 	fi
 	lines=`/TopStor/etcdget.py $etcd possible --prefix`
+	plines=$lines
 	counter=$((counter+1))
 	echo $lines
 	lines=`/TopStor/etcdget.py $etcd tostop`'s'
@@ -88,7 +117,24 @@ do
 	then
 		break
 	fi
-	if [ $counter -ge 600  ];
+	if is_container 2>/dev/null; then
+		now=`date +%s`
+		ext=`cat /TopStordata/discovery.extend 2>/dev/null`
+		if [ -n "$ext" ] && [ "$ext" != "$ext_seen" ]; then
+			ext_seen=$ext
+			scan_end=$((now+dsecs))
+			[ $scan_end -gt $scan_max ] && scan_end=$scan_max
+			echo "`date '+%F %T'` getdiscovery.sh: discover asked again after $((now-scan_t0)) s: the scan runs until +$((scan_end-scan_t0)) s (r10s)" >> /root/getdiscovery.log
+		fi
+		if echo "$plines" | grep -q "possible/" && [ $((now+aseconds)) -gt $scan_end ]; then
+			scan_end=$((now+aseconds))
+			[ $scan_end -gt $scan_max ] && scan_end=$scan_max
+		fi
+		if [ $now -ge $scan_end ]; then
+			echo "`date '+%F %T'` getdiscovery.sh: scan ended after $((now-scan_t0)) s ($counter rounds; possible: `echo $plines | cut -c1-120`) (r10s)" >> /root/getdiscovery.log
+			break
+		fi
+	elif [ $counter -ge 600  ];
 	then
 		break
 	fi

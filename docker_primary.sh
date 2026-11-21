@@ -2,6 +2,9 @@
 [ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
 myclusterf='/topstorwebetc/mycluster'
 mynodef='/topstorwebetc/mynode'
+# QSD5.352 r10s (QC proof r10r3 522.1/522.2, 520.2/081 under load): stage times of the take-over, logged with the leader key
+# line (container flavour) so the prover can tell this script's share of the take-over time from the stop's and the probe's
+dp_t0=`date +%s`
 myhost=`echo $@ | awk '{print $1}'`
 myhostip=`echo $@ | awk '{print $2}'`
 leaderip=`echo $@ | awk '{print $3}'`
@@ -21,6 +24,7 @@ exec 9>>/TopStordata/cmynode.lock; flock -w 120 9   # QSD5.352: cmynode changes 
 nmcli conn mod cmynode +ipv4.addresses $myclusterip 
 nmcli conn up cmynode
 flock -u 9
+dp_ip=$((`date +%s`-dp_t0))
 # Tell the network that the cluster ip lives here now (gratuitous ARP).  Without it a client that talked to the
 # old leader keeps the cluster ip on the dead node's MAC until its own ARP entry ages (measured: 34-47 s, although
 # this node served the UI and the API after ~19 s).  NetworkManager's own announcement is not enough: it goes out on
@@ -83,6 +87,7 @@ do
 	 	fi
 done
 
+dp_etcd=$((`date +%s`-dp_t0))
 echo /pace/etcddel.py $leaderip sync/leader/Add_ --prefix
 
 stamp=`date +%s%N`
@@ -113,6 +118,7 @@ docker run -itd --rm --name flask --hostname apisrv -v /etc/localtime:/etc/local
 #/pace/rebootmeplslooper.sh $leaderip $myhost & disown 
 # QSD5.352 r10r2 (candidate A), container flavour: the 'leader' key names this node on both addresses (put, read back, 3
 # tries); the result is logged in /root/heartproblem (r10r: the put went nowhere and the old leader stayed in the key).
+dp_web=$((`date +%s`-dp_t0))
 if is_container 2>/dev/null; then
 	lkn=''; lkc=''
 	for lktry in 1 2 3; do
@@ -122,7 +128,7 @@ if is_container 2>/dev/null; then
 		[ "$lkn" = "$myhost" ] && [ "$lkc" = "$myhost" ] && break
 		sleep 2
 	done
-	echo "`date` docker_primary.sh: leader key after the take-over: node ip $myhostip '$lkn', cluster ip $myclusterip '$lkc' (want $myhost, try $lktry)" >> ${DPRIM_LOG:-/root/heartproblem}
+	echo "`date` docker_primary.sh: leader key after the take-over: node ip $myhostip '$lkn', cluster ip $myclusterip '$lkc' (want $myhost, try $lktry; stages r10s: cluster ip +${dp_ip}s, etcd settled +${dp_etcd}s, httpd/flask started +${dp_web}s, leader key +$((`date +%s`-dp_t0))s, load `cut -d' ' -f1 /proc/loadavg`)" >> ${DPRIM_LOG:-/root/heartproblem}
 fi
 echo hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
 isbybyleader=`/TopStor/etcdget.py $leaderip bybyleader --prefix`
