@@ -1531,6 +1531,17 @@ def dgsnewpool(data):
             'message': 'No eligible data disks are available for this configuration'
         }), 400
 
+    # QC 637 (QX-038 step 4, verdict-6155): every disk of a new pool must be known and FREE (pool 'pree') in the fresh allinfo.
+    # DGsetPool runs "zpool create -f", and a disk that is a live leg of a pool imported on ANOTHER node is not seen as in use by
+    # the owner's local zpool, so without this check the create overwrote that leg (data loss). Also refuse a disk named twice.
+    for dsk in selecteddisks:
+        if dsk not in allinfo['disks']:
+            return _err('disk not found: '+str(dsk)[-12:])
+        if allinfo['disks'][dsk].get('pool', 'pree') != 'pree':
+            return _err('disk is not free: '+str(dsk)[-12:]+' is in pool '+str(allinfo['disks'][dsk].get('pool')))
+    if len(set(selecteddisks)) != len(selecteddisks):
+        return _err('a disk is listed more than once')
+
     diskstring = ''
     for dsk in selecteddisks:
         diskstring += dsk+":"+dsk[-5:]+" "
