@@ -5,7 +5,6 @@ cronthis='/TopStordata/cronthis.txt'
 rm -rf $cronthis 2>/dev/null
 stime=`echo $@ | awk '{print $4}'`;
 hr=`echo $stime | awk -F':' '{print $1}'`;
-10.11.11.251 pdhcp200401425 newes_192441148 10:50 Sun 2 NoReceiver admi
 leaderip=`echo $@ | awk '{print $1}'`;
 min=`echo $stime | awk -F':' '{print $2}'`;
 every=`echo $@ | awk '{print $5}'` ;
@@ -35,13 +34,9 @@ then
 
 
    docker exec etcdclient /TopStor/logmsg.py Snap1031 info $userreq Weekly.$hr.$min.$every.$keep $DG/$FileS
-echo $leader | grep $myhost
-if [ $? -eq 0 ];
-then
- stamp=`date +%s`;
-else
- stamp=` echo $@ | awk '{print $7}'`;
-fi
+# QSD5.346 (test 661 QX-062 step 1): the period id is always a fresh epoch. On a follower (the owner of the pool) it was $7,
+# the receiver ("NoReceiver"): every follower period had the same id, so one delete removed all of them.
+stamp=`date +%s`;
 crontab -l > $cronthis
 echo $min  $hr "*" "*" $every  /TopStor/putcron.sh /TopStor/etcdput.py $leaderip call/$stamp /TopStor/Snapshotnowhost::$DG/$FileS::Weekly.$keep.$hr.$min.$every::$stamp::$receiver 2>txt/SnapshotnowSystem.txt >> $cronthis
 crontab $cronthis
@@ -49,8 +44,12 @@ if [ $? -ne  0 ]; then
    docker exec etcdclient /TopStor/logmsg.py Snap1032 error $userreq  $DG/$FileS
 else 
   docker exec etcdclient /TopStor/logmsg.py Snap1033 info $userreq Weekly.$keep.$hr.$min.$every.$stamp $DG/$FileS
-  /pace/etcdput.py $leaderip Snapperiod/Weekly/$DG/$FileS/$stamp/$receiver  $min%$hr%*%*%$every%/TopStor/Snapshotnowhost%$DG/$FileS%Weekly.$keep.$hr.$min.$every%$stamp/$receiver
-  /pace/etcdput.py $leaderip sync/Snapperiod/______/request/$leader Snapperiod_$stamp
+  # QSD5.346: done for this node only when it is the leader; request/$leader kept the leader (the only node whose cron line
+  # fires) from building the line of a period created on a follower (SnapshotCreateHourly)
+  /pace/etcdput.py $leaderip Snapperiod/Weekly/$DG/$FileS/$stamp/$receiver  $min%$hr%*%*%$every%/TopStor/Snapshotnowhost%$DG/$FileS%Weekly.$keep.$hr.$min.$every%$stamp%$receiver
+  if [ "$etcd" == "$leaderip" ]; then
+   /pace/etcdput.py $leaderip sync/Snapperiod/_____/request/$myhost Snapperiod_$stamp
+  fi
   /pace/etcdput.py $leaderip sync/Snapperiod/_____/request Snapperiod_$stamp
 fi;
 fi

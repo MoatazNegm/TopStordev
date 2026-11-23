@@ -7,10 +7,14 @@ from levelthis import levelthis
 vollisting = ['used', 'quota', 'usedbysnapshots' ]
 
 def volumes(voldict):
+ # QSD5.344 (test 658 QX-059 step 4): allphysicalinfo.getall already gives numbers -- used and quota in GB, usedbysnapshots in
+ # MB, the units of volumesinfo and the UI. Running levelthis on them again divided by 2^30 a second time (1 GB read as
+ # 9.3e-10). Only a value that is still a raw zfs string is converted (to the same units).
  global vollisting
  for vol in voldict:
   for vollist in vollisting:
-   voldict[vol][vollist] = levelthis(voldict[vol][vollist])
+   val = voldict[vol].get(vollist, 0)
+   voldict[vol][vollist] = val if isinstance(val, (int, float)) else levelthis(val, 'M' if vollist == 'usedbysnapshots' else 'G')
  return voldict
 
 def cpuperf(leaderip):

@@ -55,5 +55,6 @@ if __name__=='__main__':
  vtype = sys.argv[10]
  initqueue(leaderip, myhost)
  with open('/root/cifspytmp','w') as f:
-  f.write(str(sys.argv))
+  # the trace without the CHAP secret (the last argument; QSD5.341 test 653)
+  f.write(str(sys.argv[:-1]+['***'] if len(sys.argv) > 14 else sys.argv))
  create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsubnet, vtype,*sys.argv[11:])

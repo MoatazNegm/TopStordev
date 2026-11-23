@@ -4243,3 +4243,340 @@ Requested by the front-end developer (UI side built in QSD5.307). Released on to
 - **Round 9b (validator report `agent-briefs/qc-validation-352-r9.md` V1 required, V2-V7 recommended, 2026-11-05).** (V1) `cifs.py`'s start loop (up to 5 tries, 8 s apart, until the share container stays up) started the container again with the mount list it read at its start: the second of two back-to-back deletes on one address (its `cifsremove.sh` / `volbusyfree.sh` take no address lock) removed the record and the container that the first delete's `cifsremove.sh` had just started through `cifs.py`, and `cifs.py` brought it back with the deleted home in its mounts and the address up; after the destroy docker made an empty directory `/<pool>/<home>` in the pool root (kept for good; the D5 sweep removed the container only 30 s+ later). Fix: before each re-start (tries 1-4) `cifs.py` re-reads the address's active records of its type and stops when the set differs from the one the run started with (stale records included, so a skipped stale record does not stop a legitimate re-start; an unreadable registry also stops: VolumeCheck starts the share later); a line `<type>-<ip> stopped: the volumes of <ip> changed while the share was starting` in `/root/cifsrun.log`; a container that died by itself with the records unchanged is still started again. Locking the address in the delete scripts was rejected (`cifs.py` holds that lock through its password loop). (V2) `UnixAddUser`: a failed post of a follower-pool home (`sendhost.py` exits non-zero: the owner's rabbit down, a pika error) was silent; now `NFS1006` for `<pool>/<user>` and `home of <user> on <pool>: post to <owner> (<ip>) failed` in `/root/unixadduser` (no local create: that is D2). (V3) `VolumeCreateHOME fromadduser=1` waits for the uid of the leader's `usersinfo/<user>` record (`getent passwd <user>` field 3), not for any user of that name: a stale same-name user on the owner (down at an earlier delete) got the home and lost it when the user sync re-created the user with the leader's uid; a record without a uid: any user, as before. (V4) a home for a user is refused only by a volume NAME: fapi `is_unique_name(name, home=True)` compares the last element of every `vol...` key plus the datasets of `allinfo` (it took the whole `vol` text, so a user named in another share's write list, `groups=<user>`, got `IPnamuqfa`); `VolumeCreateHOME`'s `Unlin1021vv` check matches the key names `<user>` / `<user>_<id>` exactly (its plain `grep <user>` also matched record values and longer names such as `x<user>_<id>`). (V5) `VolumeDeleteCIFS` reads the share's address and type from the leader's record (3 tries, 2 s apart; the node's own copy when the leader does not answer), as `VolumeDeleteHOME` (D5): a follower's copy still had the old address right after an address change. (V6) `crondelete`'s lock probe redirects stderr first (`true 2>/dev/null 8>>file`): silent when the file cannot be opened. (V7) pace `VolumeCheck.homesweep`: `docker ps`, `docker inspect` and `zfs list` through `_runto()` (10 s; the child is killed and not waited for, a zfs stuck in the kernel never ends): a timeout = unknown, the container is left alone, the pass goes on. Not done (backlog): V8 (`VolumeDeleteISCSI` still calls `SnapShotPeriodDelete`), V9 (homes made before r9 by the leader on a follower pool). Branch `QSD5.352-r9` (new commits) in TopStor and pace; topstorweb unchanged. Stub tests: the validator's `t352/validator-r9/tcifsrace.sh` (real `cifs.py`) 3/3 in 3 runs, V1.1 FAIL on the round 9 copy `t352/old9/cifs.py`; new `t22.sh` (V2-V7, zfs image, the `t21.sh` harness) 17/17, 9 FAIL on the round 9 copies `t352/old9/`; new `t22f.py` (fapi `is_unique_name`) 6/6, 1 FAIL on the round 9 `fapi.py`; `runall.sh` (t1-t22, t20f-t22f, `t3.mjs`, the must-FAIL runs) passes and `flavor-test.sh` 33/33. Sheets QX-496 .. QX-507 (`qc-scenarios/QX-496-507.md`; QX-486/487/489 point at the after-120 s checks of QX-496/497/498).
 - **Round 9c (prover report `agent-briefs/qc-proof-352-r4.md` D8 high, D7 low, 2026-11-05).** (D8, predates the batch) a `usersinfo/<name>` value that is no user record, such as the `_1///1G` that a HOME create for a name without a user stored before round 9 (D4), has 4 `/` fields, so pace `usersyncall.thread_add` took it and `usergd=userinfo[1]` raised `IndexError`: the whole user sync of a joining or returning node (`checksyncs.doinitsync -> usersyncall`) died there on every loop, `isinsync` stayed `no`, the users sorting after the record were never created and users deleted on the leader were never removed (the delete loop runs after the add loop). Fix: `thread_add` copies only a record whose first `/` field is `<uid>:<gid>:` (digits, `userrecord()`), so `usersyncall` and `oneusersync` (the `user` sync) skip any other value; the skip is logged once per name and value in `/root/usersyncskip.log` of the node that runs the sync (`<date> <time> usersinfo/<name> = '<value>' skipped: no user record (<uid>:<gid>:/<pool>/<name>/<size>)`, the file is checked before a line is added, so a new process does not repeat it); a non-pair entry of the node's own list is passed over in the delete loop. The code does not delete existing junk records (the leader's `VolumeDeleteHOME` removes its own since r9; older ones, e.g. the five `q452h` .. `q465uh` keys on the dev cluster, are removed by hand: `etcdctl del usersinfo/<name>` on the leader etcd and on each node's copy). Writers checked: `UnixAddUser` writes `usersinfo` only after `getent` found the user (uid:gid from `getent`); `VolumeCreateHOME` (r9) only over a real record; `Priv.py` (`users/usersauth`) kept a junk value and extended it (`_1///1G/<priv>`): now `Priv1005`, nothing written; `VolumeQuotaHOME` (`users/userhomechange` quota) rewrote its quota field: now only a real record (the dataset quota is still set, no `sync/priv` request for a junk name). Backlog (not changed): fapi `users/userlist` / `getusers` still list such a key as a user without a pool. (D7, introduced by round 2) `pace/Evacuatelocal.py` `KEEP_PREFIXES` kept the whole `sync/evacuatehost/` prefix, so the removed node's initial-sync mark `sync/evacuatehost/initial/request/<host>` stayed for good (the leader's pruning skips `initial` keys) and survived the rejoin (QX-382.1, 382.1b / 392.2, 392.3). Fix: keep only `sync/evacuatehost/syncfn_` (what round 2 needed: the request in both forms, `TopStor/Evacuate.py` `syncfn_setall_<host>_<user>` and `pace/Evacuateleader.py` `syncfn_setall_<host>_<ip>_<user>`, and its acknowledgements `.../request/<node>`); every other key naming the host by whole word is deleted again, `initial` marks of other nodes and look-alike names stay. Branch `QSD5.352-r9c` (from `QSD5.352-r9`) in TopStor (`Priv.py`, `VolumeQuotaHOME`, C-/P-DEVELOPMENT.md) and pace (`usersyncall.py`, `Evacuatelocal.py`); topstorweb unchanged. Stub tests: new `t23.py` (D8, real `usersyncall` / `Priv.py`, etcd and subprocess stubbed in memory: the prover's five junk keys, logged once across two processes, the delete loop, other malformed values, pullsync, `oneusersync`, Priv refusal) 14/14, 11 FAIL on the round 9 copies `t352/old9/`; new `t23q.sh` (`VolumeQuotaHOME`) 4/4, 2 FAIL on round 9; new `t24.py` (D7, stand-in etcdctl `fake5`) 6/6, 2 FAIL on round 9; `t4.py` / `t8.py` (round 2) still pass; `runall.sh` and `flavor-test.sh` 33/33. Sheets QX-508 .. QX-519 (`qc-scenarios/QX-508-519.md`; QX-395's success line notes the narrower keep rule).
 - **Inner dockerd boot race: patched entrypoint ready, NOT applied (dev cluster, container only).** `scripts/entrypoint-zfs.sh` (topstor-cluster parent repo) is one host file bind-mounted LIVE into zfs1, zfs2 and zfs3, so it was not edited while test 12 ran; the improved file is `scripts/entrypoint-zfs.sh.new` (`bash -n` clean). Changes: the first dockerd start waits up to `DOCKERD_TRIES` (3) tries of `DOCKERD_WAIT` (90) s; `/var/log/dockerd.log` is appended (`=== [zfs] entrypoint: dockerd try n at <time>` before each start; rotated to `.1` above 20 MB at container start); the probe is `[ -S /var/run/docker.sock ] && timeout 5 docker info`; a dockerd that is alive but not ready at the end of a try is NOT killed (it gets the next try's time); one that exited is wiped (`containerd`, pid, socket, `/docker-data/{containerd,tmp,exec}`) and started again at once; after the last failed try the entrypoint writes `/var/log/dockerd-boot-failed.log` and exits 1, so `restart: unless-stopped` starts the container again, and `docker_setup.sh` is never started without a working dockerd (`touch /tmp/dockerd_fail_stay` keeps a failed container up for debugging, still without docker_setup.sh). The `systemctl` wrapper's `start docker` (now waits for a dockerd that is still starting instead of answering "already running") and `restart docker` (waits up to 20 s for the old daemon to exit, then a hard kill) use the same rule through `dockerd_up` (3 x 90 s, appended log, no kill of a starting daemon). Stub test `t12.sh` 15/15 in a throw-away zfs-image container (stand-in dockerd/docker: ready on try 1, slow 8 s > 5 s try not killed, dies once, always dies -> 3 starts + exit 1, stay switch, hanging `docker info` cut by the timeout, wrapper start / already running / still starting / restart / always dies). **Apply (supervisor, after test 12, no QC test running and no node starting):** `cd /root/topstor/scripts && bash -n entrypoint-zfs.sh.new && cp entrypoint-zfs.sh.new entrypoint-zfs.sh.tmp && mv entrypoint-zfs.sh.tmp entrypoint-zfs.sh` (new inode: the running PID-1 shells keep the old one; the next container start binds the new file; keep `entrypoint-zfs.sh.new` until the proof, then delete it), commit + push `main`; proof: one `docker restart` of a follower without an imported pool in a quiet window, `docker logs` shows "[zfs] dockerd ready after <n>s (try 1)" and the log the `=== ... try 1` marker (sheets QX-422 .. QX-426). Check that the restarted node runs the new file: `docker exec <node> grep -c DOCKERD_TRIES /usr/local/bin/entrypoint.sh` answers 1 or more (the single-file bind mount is resolved again at each container start).
+
+<!-- merge M+A: the sections below come from AhmedOraby22 (numbered A<n> to keep them apart) -->
+
+
+* **QSD5.315, test 610 (QX-011) step 2:** `uservalid.py` `PASS_MIN` 4 -> 3 and `topstorweb/src/utils/userRules.js` `USER_PASS_MIN = 3` (user decision 2026-10-29: minimum 3 characters; supersedes the 3 -> 4 change above). `abc` is accepted, `ab` refused ("shorter than 3 characters"); covers fapi.py UnixAddUser, the UnixAddUser script (bulk upload) and Hostconfig.py change-password; matches msgsglobal.txt Unlin1027pw and the Navbar change-password check (>= 3).
+
+* **QSD5.316, test 612 (QX-013) step 1:** 5 users without a home created back to back must be listed within 20 s; the 5th was listed
+  after ~62-79 s. The single command consumer (`topstorrecvreply.py`, `actionreply.py` Pumpthis = `subprocess.run`) runs one
+  `UnixAddUser` at a time and each took ~18 s (29.6 s traced) on the VM flavour: 76 % of it were 16 sequential
+  `docker exec etcdclient python ...` calls (0.3-2.4 s each): clusternode/clusternodeip/leader read 3 times in `UnixAddUser` and 3
+  more times in the nested `UnixChangeUser`, and 9 `logmsg.py`/`logqueue.py` notifications (python + pika + a new RabbitMQ
+  connection each) whose result nothing reads. Fix (`UnixAddUser`, `UnixChangeUser`): (1) the three host values in ONE
+  `docker exec -w /TopStor etcdclient python3 -c 'from etcdgetlocal import etcdget ...'` (same function, same output; the old three
+  calls stay as a fallback when it returns nothing); `UnixAddUser` hands them to the nested `UnixChangeUser` as `TS_MYHOST`,
+  `TS_MYHOSTIP`, `TS_LEADER`; (2) the success-path notifications go through `notify`, which runs the same `docker exec etcdclient
+  /TopStor/logmsg.py|logqueue.py ...` in the background with stdin/stdout/stderr on /dev/null (the consumer reads the script's stdout
+  until EOF) and lets each one wait (max 10 s, `kill -0` on the previous pid kept in `/tmp/topstornotify.<pid>`, shared with the nested
+  call via `TS_NOTIFYPIDFILE`) for the one before, so the messages keep their order. Unchanged: every etcd key and its order
+  (`usersinfo/`, `usershash/`, `usersigroup/`, `sync/UsrChange`, `sync/user`), every message code, the guards (`uservalid.py`, the
+  system-account check, `privthis.sh`), the rejection/early-exit paths (still synchronous), the home path (`VolumeCreateHOME`), the
+  nested `UnixChangeUser` still runs before the script ends (group membership and the `usersigroup` read-modify-write stay serialized
+  in the consumer, so add -> delete -> add of one name keeps its order). Expected: ~4-5 s per add on the VM flavour instead of ~18 s,
+  a user listed ~3 s after its command starts.
+
+* **QSD5.316, test 613 (QX-014) step 6:** an unprivileged user (qu2, own token) called `user/changepass username=qu1` and it was
+  accepted: `Hostconfig.py` wrote `usershash/qu1` (API/UI login of qu1 took the new password) and the `sync/passwd` request, while
+  `UnixChangePass` skipped `usermod` (`privthis.sh Box_Users` false for qu2), so etcd and the OS/SMB password disagreed. Fix:
+  `fapi.py` `changepass()` allows the change only when `username` is the requester (own password: Navbar "Change Password") or the
+  requester has `Box_Users` (`has_privilege`; admin/system always: Users page "change password"); otherwise it logs `Priv1004`
+  (requester) and returns `error: noprivilege` without calling `config()`. Same rule repeated in `Hostconfig.py` (`may_change_pass`,
+  reads `usersinfo/<requester>` from the leader) before `usershash/` and the sync request are written. Unchanged: the password rule
+  (`check_password`, `Unlinfa12`), `Unlin1012`, the etcd keys and the node sync path.
+
+* **QSD5.316, test 614 (QX-015) step 1:** group `q015ag` created with users `q015a,q015a1,q015a10,q015ab,xq015a` lost `q015a` in
+  etcd (`usersigroup/q015ag` = `,q015a1,q015a10,q015ab,xq015a`, follower OS group without it, leader OS group with it). `UnixChangeUser`
+  found "the groups the user is in" with `/pace/etcdget.py $etcd usersigroup $username`, whose filter matches any text of the whole
+  key/value pair: `q015a` matched the key `usersigroup/q015ag` and the members `q015a1`, `xq015a`, so q015ag counted as a group q015a
+  was already in and the append was skipped. Member lists were also edited with substring `sed "s/$username//g"` (removing `q015a`
+  from `q015a,q015a1` left `1`; UnixChangeGroup cut `q015ag` out of `q015ag2`). Fix: member lists (field 3 of `usersigroup/<group>`)
+  are read and edited by EXACT comma separated names everywhere in these flows. `UnixChangeUser`, `UnixDelUser`: `groupsof` reads
+  `usersigroup --prefix` and keeps the groups whose list holds the name exactly; `mlist_del` / `mlist_add` (awk, split on `,`, drop
+  empty/NoUser/no elements, `NoUser` when empty, no leading comma) replace the seds; the own-group / NoGroup / stable-group / NoUser
+  tests are string equality. `UnixChangeGroup`: membership by `mlist_has`, removal by `mlist_del`, the user's other groups from
+  `id -Gn` without its own group and this group by exact name. `UnixDelUser` / `UnixDelGroup`: "still in /etc/passwd" by exact first
+  field; `UnixDelUser` deletes `usersinfo/<name>` by exact key (was `users /<name>/`); the Everyone/admin/NoUser guard is exact.
+  `UnixAddGroup`: the name-taken check (Unlin1021uu) looks for the exact keys `usersinfo/`, `usershash/`, `usersigroup/<name>` (was
+  `grep -w` over every user* value), the new uid/gid from `^<name>:` in /etc/passwd. pace `usersyncall.py` / `groupsyncall.py`
+  (follower sync): the `Add` path takes the exact `usersinfo/<name>` / `usersigroup/<name>` key (was the first pair containing the
+  text, e.g. `usersigroup/Everyone` for a user name); the `Del` path re-reads the leader's list and compares exact keys (was
+  `name in str(list)` of the last full sync), and the user delete removes `usersinfo/<name>` and `usershash/<name>` from the local
+  etcd (was `dels(syncip,'user',name)`: every user*/group key whose text contains the name, e.g. usersinfo/q015a1, usersigroup/q015ag).
+  topstorweb `accounts.php` (old Users page): selected groups/users by exact member name. Unchanged: etcd keys and value format
+  (readers split on `,`: fapi `getgroups`/grouplist/userlist, groupsyncall), message codes, the sync requests and the general
+  `etcdget.py`/`etcddel.py` filter semantics. Existing lists with a leading comma or `no` are read correctly and normalized on the
+  next edit.
+
+* **QSD5.316, test 615 (QX-016) step 2:** a user created with a home on pool P1 got no home when P1 was imported on node2 (the
+  product's own choice of owner): fapi `UnixAddUser` posts the command to the leader, `UnixAddUser` ran `VolumeCreateHOME` there,
+  `zfs create P1/<user>_<id>` failed (NFS1006), the sync copies skip the home on purpose, and the user was still recorded with
+  the home pool (usersinfo, `usermod -d` to the missing dataset) and announced with Unlin1022: no dataset, no HOMEE volume, no
+  address. NFS/CIFS create, pool changes and user delete (`VolumeDeleteHOME` to `vol['host']`) already go to the pool owner. Fix:
+  `UnixAddUser` (new user, home pool given): pool imported here -> `VolumeCreateHOME` here as before; otherwise the owner is
+  looked up (`poolowner`: the node whose `hosts/<node>/current` lists the pool, address from `ready/<node>` as fapi `postchange`
+  does) and, after usersinfo and the user sync request are written, `VolumeCreateHOME ... newuserhome` is sent to that node's
+  command queue with `sendhost.py` (Pumpthis, same arguments as the local call). `VolumeCreateHOME`: checks the pool is imported
+  on this node before anything (NFS1006 otherwise); with `newuserhome` the Unlin1028 guard accepts a usersinfo that already names
+  this pool, it waits up to 60 s for the user's sync copy and otherwise chowns with the uid/gid of usersinfo; the home directory
+  (`usermod -d`) is set only after the dataset exists; it exits 1 when no home was made (no privilege, Unlin1028, Unlin1021vv,
+  NFS1006) and 0 on success. A home that cannot be made never leaves a user pointing at it: the user is KEPT as a user without a
+  home (usersinfo `/NoHome/`, passwd `/NoHome/<user>`), NFS1006 says why and Unlin1023 ("will not have a home directory") that it
+  has none; Unlin1022 still reports the user itself. Done by `UnixAddUser` for the local call, for an owner that cannot be found
+  and for a failed send, and by `VolumeCreateHOME newuserhome` on the owner. Unchanged: fapi, etcd keys/values, log codes, the
+  home of a pool on the leader, the follower sync copy (pullsync skips the home), the delete path, `UsersMassAddition.py` (same
+  script, same routing).
+
+* **QSD5.316, test 616 (QX-017) step 2:** a bulk user upload (`users/uploadUsers`) processed every row but "Unlin1025 File
+  uploaded successfully! Adding users started" and "Unlin1027 Finished adding users" never reached the log: both are sent
+  without arguments (`sendlog(code, type, user)`), `logmsg2.sh` builds `<code>@@` plus `@<arg>` per argument and, since
+  6a72ae90, refuses every line without `@@@` with a LogError, so EVERY zero-argument message was dropped (also Unlin1005/1006/
+  1105/1106, Actst/Actsu1000/1001 of actionreply.py, HostManual1002/1st12/2st12/1su12/2su12 of Hostconfig.py and
+  LocalManualConfig.py, Unlin1026, pace Zpst03/Zpsu03). Fix: `logmsg2.sh` writes a message without arguments as `<code>@@`
+  (the format before 6a72ae90, read by getlogs.py) when `msgsglobal.txt` has the code with no `:` placeholder; a code that
+  needs arguments and got none, or an unknown code without arguments, is still refused with LogError; messages with
+  arguments are unchanged. `getlogs.py` skips a line whose code is not in the catalog (the LogError lines themselves:
+  "error system admin LogError" shifts the fields, `logdict['admin']` raised KeyError and failed the whole `info/logs`).
+  fapi `uploadUsers` sends Unlin1025 before queueing `UsersMassAddition.py`, so it always precedes the row messages and
+  Unlin1027. topstorweb: the Users page "Import Template" button opens a file picker and POSTs the file as multipart `file`
+  to `users/uploadUsers` (it had no handler); `dist/Template.xlsx` (deleted in f02a647f, Download Template was 404) is
+  restored with the columns UsersMassAddition.py reads: name, Password, Volpool, Volsize, HomeAddress, HomeSubnet, groups.
+
+* **QSD5.317, test 619 (QX-020) step 1:** 25 users added through the API, 5 with a home on pool P1 imported on node2 (not the
+  leader): two homes were never made and the users were still recorded with them, and one user copy was missing on node2 while
+  node2 reported in sync. Causes: (1) `topstorrecvreply.py` consumed with auto_ack and ran each command inside the pika callback,
+  so during a 160-170 s home job no heartbeat was sent, the broker closed the connection ("missed heartbeats from client") and
+  every command already pushed to the client was lost (old weakness, exposed by QSD5.316 sending home jobs to the owner);
+  (2) `VolumeCreateHOME newuserhome` waited up to 60 s in the consumer for the user's sync copy; (3) `cifs.sh` ran `nmcli conn up
+  cmynode` (bond0 down/up) on every share container try, and a user copy that read from the leader in that gap failed; (4) that
+  failure was silent (UnixAddUser pull mode, `usersyncall.thread_add` ignored the result, checksyncs marked the request done) and
+  the leader only checked that the home request was published. Fix: the consumer takes one command at a time with `basic_get`
+  (auto_ack) only when the previous one has finished, runs it in a (non-daemon) worker thread and services the connection with
+  `process_data_events` meanwhile: order and one-at-a-time are kept, commands not started stay in the broker queue (a dropped
+  connection loses none; the looper restarts the script after the running command ends), a failing command no longer ends the
+  consumer. `VolumeCreateHOME newuserhome` does not wait: the dataset is chowned with the uid/gid of usersinfo (the copy gets the
+  same ids) and a detached background job sets the home directory once the copy is there (<= 600 s). `cifs.sh` re-applies the
+  connection only when the share address is not on the node, with `nmcli dev reapply` (fallback `conn up`). `UnixAddUser`
+  (leader) starts a detached `homewatch` after the send: success = the owner's `volumes/HOMEE/<owner>/<pool>/<user>_<id>` key,
+  failure already reported = usersinfo changed (owner's NFS1006 + Unlin1023 + NoHome); none within 1800 s and usersinfo
+  unchanged -> NFS1006 + usersinfo NoHome + passwd /NoHome/<user> + Unlin1023 (as for a failed send). `UnixAddUser` matches the
+  passwd line by exact name, exits 1 when the user is not in passwd, and in pull mode logs the failure to
+  /root/usersyncfail.log and sends Unlin1020 once per user until a copy works; pace `thread_add` returns False on a failed
+  leader read, a missing usershash or a non-zero UnixAddUser (logged to /root/usersyncfail.log), `oneusersync` returns it and
+  `checksyncs` keeps the user sync request (flag 0) for the next pass. Side fix: fapi `postchange` no longer appends every
+  queued command (plaintext passwords included) to /TopStordata/tempdata (mode 644, read by nothing). Unchanged: etcd keys and
+  values, log codes, guards, the queue and its message format, the home of a pool on the leader, the delete path.
+* **QSD5.318, test 620 (QX-021) step 1:** group q021g1 (q021u1) then q021g2 (q021u1,q021u2): on node2 (follower) q021u1 lost
+  q021g1 for good (`q021g1:x:1003:`, local usersigroup/q021g1 NoUser) while isinsync said yes, and node2's
+  usersigroup/Everyone was `_1/q020u01/_1,q021u1,q021u2/`. Not a regression (same path in QSD5.315). Causes: the leader files
+  `sync/UsrChange` (inside UnixAddGroup -> UnixChangeGroup -> UnixChangeUser) before the group's own `sync/group` request, so a
+  follower can run the user change first; `UnixChangeUser` did `usermod -G ''` then `usermod -G Everyone,q021g1,q021g2`, which
+  usermod refuses as a whole while q021g2 is missing, leaving the user in no group; the later group add rebuilt the user's list
+  from the node's own (emptied) `id -Gn` (UnixChangeGroup) and UnixChangeUser then removed the user from the local q021g1 row.
+  usersigroup/Everyone exists only on the primary (docker_setup), the group sync skips it, and UnixChangeUser edited the `_1`
+  that etcdget.py returns for a missing key. Fix: `UnixChangeUser` never clears first and sets, in one `usermod -G`, only the
+  groups that exist on the node (own group kept; missing ones reported); on a follower the list is the leader's etcd now (the
+  usersigroup rows that list the user by exact name, plus Everyone), not the request's list nor local `id -Gn` (falls back to the
+  request's list when the leader's rows cannot be read), and the follower's member rows become exact copies of the leader's rows
+  (repairs a garbled local Everyone) instead of local edits; no usersigroup row is written when its read returned `_1`/nothing
+  (leader and fallback path, NoUser path); a follower that misses a group of the leader exits 3 after applying the rest and pace
+  `checksyncs` keeps that UsrChange (flag 0) and tries it again on each pass for up to 300 s after it was filed (then marked done;
+  the group's own sync applies the membership anyway). The follower's sync-copy detection also looks at $7 (copies of
+  UnixChangeGroup's changes carry `<requester> pullsync`), so retries send no Unst1024/Unsu1024. pace `groupsyncall` copies the
+  leader's usersigroup/Everyone row to a follower (full sync and after every single group add; not on a replication receiver),
+  never a `_1` value. `UnixChangeGroup` skips its `sleep 3` on a follower (members of a new group reached node2 after 68-84 s).
+  Unchanged: etcd keys and value format, log codes, the Everyone guards (never changed, refusals), exact-name member semantics,
+  the leader's request order and stamps.
+* **QSD5.319, test 621 (QX-022) step 4:** a user `q022c` and a group `q022d` were created while the NFS volumes `q022c` and
+  `q022d` existed. Not a regression (same in QSD5.315). Cause: a volume is stored as `volumes/<type>/<host>/<pool>/<name>_<id>`
+  and `_` is a word character, so fapi `is_unique_name` (`\b<name>\b` over the whole etcd dump of volumes, users and groups) and
+  the `grep -w` volume checks of `UnixAddUser` and `UnixAddGroup` never matched `<name>_<id>`; the regex also matched any word of
+  any value (member names, pools, hosts). Fix: fapi `is_unique_name(name, vols=True)` compares exact names: the key name of
+  `usersinfo/`, `usershash/`, `usersigroup/` rows, and the short name of every `volumes/` key (last path element with a trailing
+  `_<digits>` removed, new `volshortname`); home volumes (`volumes/HOME*`, the user's own `<user>_<id>`, deleted later by
+  userdel) are not counted, so delete/add of the same user still works. `volumes/create` calls it with `vols=False` (users and
+  groups only): a second volume with the same short name still passes fapi and is refused by its script with `Unlin1021vv`
+  (the sheet's step 6), and a replica is not stopped by its source. `UnixAddUser` and `UnixAddGroup` match the volume key
+  `/<name>[_<digits>]',` (homes left out) instead of `grep -w`. `UnixAddUser`: the Unlin1021uv branch called
+  `docker exec etcdclient/TopStor/logqueue.py` (no space), so the job was never marked finished. Unchanged: log codes
+  (IPnamuqfa, Unlin1021uv/gv/vv/uu), etcd keys and values, the VolumeCreate* script checks, the exact user/group names of QSD5.316.
+* **QSD5.320, test 624 (QX-025) step 1:** the `Priv1004` refusal of `hosts/config` (also `hosts/joincluster`, `user/changepass`
+  and the password part of `Hostconfig.py`) read "Not done, the user has no privilege for this action q025u1 user. [...]parseerror."
+  in info/notification and "... action q025u1 user 1793970901." in info/logs. Not a regression (upstream af543aee). Cause: the
+  template `... action : user :` has two `:` placeholders but every caller passes only the user. Fix: `msgsglobal.txt` Priv1004 is
+  `... action \: user \: :`; a `\:` token is a literal `:` (not a placeholder) in fapi `getnotification()` and `getlogs.notifthis()`,
+  so the text is "Not done, the user has no privilege for this action : user : q025u1." (logmsg2.sh still counts one placeholder;
+  no other code uses `\:`). `Priv.py`: `Priv1002` was sent as `'Priv1002 '` (trailing space), which shifted the fields of
+  info/notification for every privilege change. Unchanged: callers, log codes and log line format (`Priv1004@@@<user> <epoch>`).
+* **QSD5.321, test 625 (QX-026) step 5:** `users/usersauth` for a user that does not exist answered HTTP 200 (the request echoed),
+  `Priv.py` wrote `usersinfo/<name> = '_1/<privs>'` (etcdget's missing-key sentinel) with `Priv1003` "Success", and from then on
+  `users/userlist` crashed (`split('/')[3]`, IndexError) with HTTP 500 and the interactive Werkzeug debugger page, because fapi ran
+  with `DEBUG = True` (also seen in test 601). Not a regression (same code in QSD5.315). Fix: fapi `usersauth` refuses a missing or
+  malformed `usersinfo/<tochange>` (new `usersinfo_ok`: at least 4 `/` fields, not `_1`/`-1`) or empty `tochange`/`auths` with
+  `{'response': 'error', 'message': 'invalid or missing parameter'}` and the new log `Priv1005` ("Privileges not changed, no such
+  user"), writing nothing; `Priv.py changepriv` refuses the same rows (Priv1005, no put, no sync). `users/userlist` skips a
+  malformed row and `users/userauths` answers no privileges for it (was UnboundLocalError for an unknown user); each bad row is
+  printed once on fapi's stderr. Flask debug is off (`DEBUG False`, `app.run(debug=False, use_debugger=False, use_reloader=False)`)
+  and an `@app.errorhandler(Exception)` answers unexpected exceptions with a generic JSON 500 `{'response': 'error', 'message':
+  'internal error'}` (traceback only on fapi's stderr); werkzeug HTTP errors (404, 405, ...) keep Flask's own answer.
+  Unchanged: well formed rows, the Priv1002/1003 flow, the userlist reply format.
+* **QSD5.322, test 627 (QX-028) step 3:** after `groups/groupdel` of a group that a CIFS share used, the dataset ACL on the pool
+  owner kept `group:<gid>:rwx` (a numeric orphan once the gid was free) and `/TopStordata/smb.<share>` kept `write list = <group>`,
+  so a group created later with that name or gid got the old rights (steps 4-5). Not a regression (same code in QSD5.315). Cause:
+  `UnixDelGroup` only runs userdel/groupdel and removes `usersigroup/<group>`; the `setfacl -m g:<grp>:rwx` of VolumeCreate/
+  Change/ActivateCIFS was never undone. Fix: fapi `groupdel` (when the requester has Box_Users) first calls the new
+  `volumes_drop_group()`: for every CIFS / NFS / HOME share whose groups list the group by exact name it queues, on the node that
+  owns the pool (`postchange(..., owner)`, the volumes/config path), `VolumeChange<type>` with the group taken out
+  (`groups_without()`; `NoGroup` when none is left, Everyone alone stays Everyone). The change scripts rewrite etcd, the smb conf
+  and the ACL (`setfacl -b -R`, which also clears the default entries, then the remaining groups). `VolumeChangeNFS` now also
+  resets the ACL to the new groups (as VolumeActivateNFS does; it changed only etcd/exports before). The change runs as the
+  requester when he has the share's privilege, else as `system`. Unchanged: UnixDelGroup, log codes (VolCst01/VolCsu01,
+  Unlin1104/Unlin1110), etcd formats, the Everyone guard; domain shares and iSCSI are not touched.
+* **QSD5.323, test 629 (QX-030) step 1:** `mkgroup q030g` with 30 members: the leader needed 127 s for the members and node2
+  started the group only ~450 s after the request (30 members at ~636 s; limit 120 s). Partly a regression of QSD5.318 (the
+  follower retries an exit-3 UsrChange), the serial path is older. Causes: `UnixChangeGroup` ran one full `UnixChangeUser` per
+  member (~10 python/docker spawns, ~4 s each on the leader, ~5.5 s on node2) plus `sleep 3` (`UnixAddGroup` `sleep 2`); every
+  member run filed a `sync/UsrChange` copy stamped before the group's own `sync/group` request (filed only after the loop), so
+  the follower worked ~27 copies first, each exited 3 (group missing) and was kept, and every pass re-ran them before the
+  group; the follower's group add then ran 30 `UnixChangeUser` again. Fix: `UnixChangeGroup` (create and change, members
+  given) sets the whole member list with ONE `gpasswd -M` (fallback one `gpasswd -d`/`-a` each when it is refused) and writes
+  usersigroup/<group> with one etcdput; it adds the members missing from Everyone (`gpasswd -a`, and the Everyone row on the
+  leader with one put); it files no per-member UsrChange copy (the group's own sync/group or sync/GrpChange request carries the
+  change). On a follower the member list is the LEADER's usersigroup/<group> row now (exact copy into the local etcd, the
+  leader's Everyone row copied too; the request's list only when the leader's row cannot be read); members that are not users
+  on the node yet are reported and the request exits 3 (kept by checksyncs as before). No fixed sleeps. pace `checksyncs`
+  (cluster path): after the stamp sort, the UsrChange requests that sort before the last pending group create
+  (`sync/group/UnixAddGroup_...`) are moved right after it (`groupsfirst`), so a pass makes the group first and its UsrChange
+  copies then run once instead of exiting 3 and being retried ahead of it. Not sent any more for a group change: the
+  per-member Unst1024/Unsu1024 (the group's Unst1025/Unsu1025 stay). Unchanged: log codes (Unlin1118, Unlin1122, Unlin1110),
+  etcd keys and value format, exact-name members (test 614), the Everyone guards, the NoUser (empty group) path, the
+  replication receiver path, `UnixChangeUser` for a user's own change.
+* **QSD5.324, test 631 (QX-032) step 3:** after a take-over the pool's read cache stayed the stopped owner's disk (UNAVAIL) and
+  `/root/fixcachelocality.log` said "cache is already local". Causes: pace `putzpool.py` gave every pool disk the host of the
+  FIRST LIO lsscsi line (the second match condition, the backstore prefix such as `sdb` of `sdb-<host>` among the node's own
+  internal disks, is true on every node), and corrected the host only for disks that are not OFF/UNAVAIL/FAULT/REMOVED, so a
+  lost remote disk carried the importing node's name; `fixcachelocality.py` trusted that host only, and took candidates only
+  from the free raid with a strictly smaller disk. Fix: `putzpool.py` matches a pool disk to an lsscsi line by its own WWN only
+  (`scsi-<id>`, `wwn-0x<id>`, by-id path, `-partN`; OFFLINE disks too); a disk without its own line gets host `UNAVAIL` (`_1`
+  when the node has no LIO line at all, as before). `fixcachelocality.py` counts a cache disk as not local when its host is
+  another node or `_1`/`UNAVAIL`, its record is missing or UNAVAIL/FAULT/REMOVED/OFFLINE, or `zpool status` on this node shows
+  it not ONLINE; it removes it by by-id name or, when the path is gone, by its guid (`zpool status -g`); the replacement is a
+  spare cache disk of this node (pree `cache` raid / etcd `cachespares`) first, else the free local disk of the smallest size
+  tier, else (all the same size) the smallest free local disk when one more stays free for self-heal; no add when a local cache
+  remains. Unchanged: the log lines of fixcachelocality.log (new lines added), etcd keys and formats, disk/raid changeop values
+  for matched disks, `updatecache` (fapi) selection.
+* **QSD5.325, test 632 (QX-033) step 4:** after Decommission Pool -> Delete -> Confirm Destruction the pool card stayed (collapsed,
+  re-mounted) for the ~20 s backend delete. Cause: topstorweb `src/QDisks.jsx` `handleDeletePool` removed the pool from state,
+  then called `loadData()` at once, and the 5 s poll did the same; `loadData` set the full `pools/dgsinfo` reply, which still lists
+  the pool while the async (RabbitMQ) delete runs. Fix: a `pendingDeletes` ref (pool -> start time) is set before the delete
+  request; every `loadData`/poll reply is filtered through it until the server no longer lists the pool (then the entry is
+  dropped). After 120 s still listed, or on an API error, or on a `DGfa*` notification naming the pool (NotificationPoller now
+  dispatches each new notification as a window `app-notification` event), the card shows again with a red notice in the page's
+  existing error style. Unchanged: API calls, poll interval, card UI and styles.
+* **QSD5.326, test 633 (QX-034) step 2:** a pool create sent < 2 s after `pools/delpool` answered failed with HTTP 500 "internal
+  error". Cause: delpool only queues DGdestroyPool on the owner and returns; the pool and its disks stay in `host current` for
+  ~30-40 s, so `newpool` (`getalltime('yes')` + `newraids()`) saw 0 free disks, `newraid` had no `raid50` key and
+  `dgsinfo['newraid'][redundancy]` raised KeyError (same lookup in `addtopool`). Fix (fapi.py, delete stays asynchronous): delpool
+  records the queued pool in `_pooldel_pending` (in-process, the API runs on the leader); newpool/addtopool, when the exact
+  layout/size is missing while such a delete is pending, refresh the inventory every 3 s for up to 90 s until the pool and its
+  disks are gone, then compute the layouts again and create as usual. Still busy after 90 s -> HTTP 409 `{'response':'error',
+  'message':'requested layout/size not available (disks busy: pool delete in progress)'}`; layout missing with no delete pending
+  -> the existing 400 "No eligible data disks ...". `useable` is converted to float (it arrived as the string "64.2"). Entries
+  are dropped once the pool is gone or after 300 s. Unchanged: log codes, etcd keys, DGdestroyPool/DGsetPool.
+* **QSD5.327, test 634 (QX-035) B1 build (also b613i1, b630i1):** right after `pools/newpool` mirror on the leader the member
+  imported the leader's new pool (`zpool import <guid>`, `zpool reguid`) via `/pace/zpooltoimport.py`: one pool ONLINE on two
+  nodes (split brain). Cause: `poolnxt/<pool>` names the standby node of EVERY pool (kept while the owner is alive, for a take
+  over), and the member's only check before importing was "the pool name is in a `hosts/*/current` list". `selectimport.py` on
+  the leader sets `poolnxt/<pool>=<member>` as soon as DGsetPool wrote `pools/<pool>=<leader>`, seconds before the leader's
+  putzpool lists the pool in `hosts/<leader>/current` (a failed etcd read of that list had the same effect). Hosts have
+  hostid 0 (no /etc/hostid), so ZFS itself does not refuse the second import. Not a regression (b613i1 ran QSD5.315). Fix
+  (pace zpooltoimport.py `heldelsewhere()`): no import and no reguid while `pooldeleting/<pool>` exists, while `pools/<pool>`
+  names another node that has `ready/<node>`, or while a live node lists the pool; unreadable ready/hosts lists -> nothing
+  this round (poolnxt stays). A dead owner loses ready/, pools/ and hosts/ keys (heartbeat.py hostlost), so a take over still
+  imports. The leader removes `pools/`, `poolnxt/`, `pooldeleting/` keys of a pool that no node lists and the leader cannot
+  import for 300 s (`cleanstale()`, state in /root/zpoolstalekeys). DGdestroyPool sets `pooldeleting/<pool>` around its
+  export/import/destroy and removes `poolnxt/<pool>` after a destroy. Unchanged: log codes, take-over flow, multihost off.
+* **QSD5.328, test 634 (QX-035) step 1:** a disk the admin took offline (`pools/actionOnDisk action=offline`) was replaced by a
+  free spare within ~9 s (`zpool replace -f <pool> <offlined> <free>`), so the pool went back to ONLINE and the card to "balanced".
+  Cause (pace `selectspare.py`, not a regression): the skip for pools marked `offlinethis/<pool>` (set by actionOnDisk.py:32,
+  deleted by a successful online) was commented out; the leader optimiser left the OFFLINE disk out of the best set and queued
+  `needtoreplace` for it; the pool owner also passed the OFFLINE disk to `solvedegradedraid`; and once all was optimised
+  `dels(leaderip,'offline','--prefix')` wiped every `offlinethis/` key. Fix (pace selectspare.py `adminoffline()`): a raid with a
+  non-`dm-` disk whose zpool state is OFFLINE, or with the disk named in `offlinethis/<pool>`, is not optimised, its queued
+  `needtoreplace`/`ask/needtoreplace` key is dropped instead of run, and an OFFLINE non-`dm-` disk is not given to
+  `solvedegradedraid`. The cleanup deletes by exact name only the `offlinethis/<pool>` key of a pool that no longer exists; a
+  live pool's key stays until a successful online deletes it. Unchanged: auto-replace of FAULTED/UNAVAIL/REMOVED disks and of
+  `dm-` stubs, actionOnDisk, log codes, etcd key names.
+* **QSD5.329, test 635 (QX-036) step 3 (also 605 step 5, 606 step 3):** the bell counted 0 warnings/errors and `#/logs` showed a
+  backend Poolcap90 warning as INFO. Cause (topstorweb `src/logFilter.js` `logSeverity`): it read `importance` before `type`;
+  backend rows carry importance as a number string ("0"/"1"/"2", always truthy), so `type` was never read. Fix: the severity name
+  comes from `type`; `importance` is used only when it is itself a name (mock rows). Bell (Navbar `matchesLogSev`), the logs
+  filter and the severity column follow; toasts already used `type`.
+* **QSD5.329, test 635 (QX-036) step 1 finding:** `volumes/create` NFS with size=0G answered HTTP 200 but zfs refused
+  (`use 'none' to disable quota`); VolumeCreateNFS had written `volumes/NFS/<host>/<pool>/<name>` before checking the dataset,
+  so the leftover key held the address (a later create on it: IPadduqfa) and `volumes/volumedel` of it was a KeyError (HTTP 500,
+  allinfo drops a volume without dataset). Fix: VolumeCreateNFS treats size 0/0G/0.0M/empty as `quota=none`; when `zfs create`
+  left no dataset it deletes that key, logs NFS1006 and stops. fapi `volumedel` of a name not in allinfo goes to
+  `volumedel_leftover`: an NFS key is deleted by VolumeDeleteNFS on the key's host (which, with no dataset, runs nfsremove.sh with
+  the address from the key, or just the etcd deletes, puts the sync request, logs NFS1002); other types go to their
+  VolumeDelete<TYPE> on the key's host as before; an NFS key whose host is not ready is deleted by fapi; no key at all answers
+  `error: novolume` (NFS1001) instead of HTTP 500.
+* **QSD5.330, test 637 (QX-038) step 3:** two parallel `pools/newpool` calls: one answered HTTP 500 (generic handler). Cause:
+  Flask serves requests in threads; both ran `fastselect.selectdisks`, which keeps its working state in module globals and
+  resets them on exit (KeyError 'diskcount' / ZeroDivisionError in the other thread), and nothing remembered the disks a create
+  had just queued (the pool is in the inventory only after DGsetPool ran), so a parallel/next create could pick the same disks.
+  Fix: fapi `_poolop_lock` (decorator `_pool_serialised`) runs newpool/addtopool/delpool one at a time from the inventory
+  refresh to postchange; the QSD5.326 pending-delete wait sleeps with the lock released (`_poolop_sleep`). The disks of a queued
+  create/add are kept in `_poolnew_pending` and left out of newraids()/the selectors (`_diskinventory`) until the inventory shows
+  them in a pool or `POOLNEW_FORGET` (300 s) passed; a layout that then does not fit answers 409 `requested layout/size not
+  available (disks busy: pool create in progress)`, manual `disks` already queued too. fastselect `selectdisks`/`optimizedisks`
+  run under a module RLock. Unchanged: log codes, etcd keys, DGsetPool command format.
+* **QSD5.334, test 642 (QX-043) step 3:** in a group CIFS share a member could not READ a file written by another member
+  (`NT_STATUS_ACCESS_DENIED`; file `-rw-r----- qu1 root`, no entry for the share group). Cause: the scripts gave the share group
+  only an access ACL `g:<grp>:rwx` on the share directory, never a default (inherited) entry; the directory is root:root, so new
+  files got group root and the other members fell into "other". Fix: VolumeCreateCIFS adds `setfacl -d -m g:<grp>:r-X` per
+  group; VolumeChangeCIFS (both blocks) after `setfacl -b -R` sets `-R -m g:<grp>:r-X` (existing files/subdirs read only),
+  `-m g:<grp>:rwx` on the share root, `-R -d -m g:<grp>:r-X`, `-d -m o::---`, and chmod 3770 (was 2770, which dropped the sticky
+  bit). With `create mask = 0644` a new file's mask is `r--`: members read, only the owner writes; the sticky bit keeps
+  delete/rename owner-only. Everyone as group: `group:Everyone:rwx` stays on the root; going back to a group, `setfacl -b -R`
+  removes the Everyone access and default entries. VolumeActivateCIFS got the same entries (chmod 3770) but still has a
+  pre-existing syntax error (`done` at line 42) since 9170257b, so its ACL part never runs.
+
+* **QSD5.338, test 647 (QX-048) step 2:** `volumes/create` had no name rule: `q048;x`, `q048/x`, `-q048`, `q048..x` and a 1001-character
+  name answered HTTP 200 (`-q048` and `q048..x` were created, the others failed late in the script with NFS1006). New `volvalid.py`
+  (as `uservalid.py`): 1-32 letters, digits, `_` or `-`, first a letter or digit. fapi `volumecreate` checks the raw name (before
+  `login_required` drops blanks) for every type (CIFS, CIFSdom, NFS, ISCSI, HOME, S3) and answers HTTP 400 `error: invalidname` with
+  `invalid character in volume name ...` or `parameter too long (max 32) ...`, log message `Volnam01`, nothing queued. The existing
+  IP/name checks (IPaddrfa/IPadduqfa/IPnamuqfa) now answer HTTP 400 with the reason instead of 200. VolumeCreate* quote "$DG/$name"
+  in `zfs create`; topstorweb create forms use the same rule (`src/utils/volumeRules.js`).
+
+* **QSD5.339, test 649 (QX-050) steps 1 and 4:** a domain CIFS share (`CIFSdom`) on a pool owned by a FOLLOWER was never activated:
+  `VolumeCreateCIFSdom` wrote the record to the leader's etcd only and sent no `sync/volumes` request; `VolumeActivateCIFSdom` read the
+  follower's local etcd (`_1`) and left at "No Volumes" (no smb file, no `membersmb` container, no join) and the create still logged
+  `NFS1007`. Now the create sends the two sync requests (as `VolumeCreateCIFS`); `VolumeActivateCIFSdom` waits up to ~20 s for a named
+  volume in the local etcd and then reads the leader's etcd (also handed to `cifs.py` and used for the registry); `cifs.py` reads the
+  leader's etcd when the local one lacks the volume. For a domain share `cifs.py` waits for `net ads testjoin` (up to ~3 min; a join that
+  still fails once the image's entrypoint is done is a failure) and writes `joined|nojoin|nocontainer|notmounted|ipinuse` to
+  `/TopStordata/cifsdomjoin.<address>`. A create that is not `joined` logs `CIFS1034` (join failed: wrong administrator/password) or
+  `CIFS1003` instead of `NFS1007` and leaves nothing behind: `cifsremove.sh` (container and address), the etcd record, the dataset.
+  The leader-owned path reads the leader's etcd as before.
+
+* **QSD5.340, test 650 (QX-051) steps 4-6 and 8:** `volumes/config type=ISCSI` (initiators, portal port, address) answered 200 and
+  changed nothing: fapi sends `VolumeChangeISCSI <leaderip> <pool> <name> <quota> <ip> <subnet> <port> <initiators> <chapuser>
+  <chappas> <statusmount> <user> <owner> <user>` but the script read it without the leaderip slot (`pDG`=leader address,
+  `userreq`=`active`), `privthis.sh` refused and no message was written. Now the script reads leaderip first (as
+  VolumeChangeNFS/CIFS/HOME) and applies the change on the pool owner without deleting the backstore (the LUN keeps its number, the
+  initiators that stay keep their sessions): a requested initiator gets a node ACL with a mapped LUN of the volume (lowest free
+  mapped_lun, 0 for a new ACL); an initiator taken off loses its mapped LUN of the volume, and the whole ACL when nothing else is
+  mapped (LIO closes its sessions, a later login is refused); `This_lun_is_not_mapped` = no initiator. The target portal becomes
+  `<ip>:<port>` (another portal stays only while another iSCSI volume of the address uses it); an address change moves the LUN to the
+  target of the new address (old target and address removed when empty). LIO is checked afterwards (ACLs mapping the LUN == the
+  list, portal present); then the leader etcd record (volumesinfo) with the sync requests, zfs properties, the pool file,
+  `VolCst01`/`VolCsu01`. Refused or failed (privilege, bad address/port/initiator, target mismatch): new `VolCfa02` (error), no
+  `VolCsu01`. `/root/volchange` and `/root/addzfsvol` mask the CHAP secret. `pace/addzfsvolumeastarget.sh`: one TPG LUN per
+  backstore, no ACL for `This_lun_is_not_mapped`, lowest free mapped_lun.
+
+* **QSD5.341, test 653 (QX-054) steps 1-6:** iSCSI CHAP. `volumes/create` and `volumes/config` replaced the request's `chapuser`/
+  `chappas` with one built-in pair (the same on every installation) and returned it in the answer, in volumesinfo and in
+  `info/commandlog`; `addzfsvolumeastarget.sh` set it on the TPG only (used by generated ACLs, which are off) with
+  `authentication=0`, so CHAP was never asked. Now fapi uses the requested pair: `chapuser` 1-64 of `[A-Za-z0-9._:-]`, `chappas`
+  12-16 of `[A-Za-z0-9._:@!-]` (LIO / Microsoft initiator rule), checked on the value as sent; else HTTP 400 `invalidchap`
+  ("invalid character in chapuser|chappas ...", "chappas must be 12 to 16 characters ...", "chapuser and chappas are given
+  together ...") and nothing is queued. No pair = no CHAP (`nochap`); `volumes/config chapuser=nochap` removes it; config without
+  CHAP keeps the volume's own. The secret goes on encrypted (`encthis.sh <user> -`, secret on stdin; `chapenc_<b64, / = @@sep>`),
+  is stored so in the etcd record, `/TopStordata/iscsi.<vol>` and `/<pool>/iscsi.<vol>`, and is decrypted only by the new
+  `pace/iscsichap.sh <target> <user> <token> <initiators>`, which writes user and secret with the shell's printf to the node ACL in
+  configfs (no command line, so not in `~/.targetcli/log.txt`) and sets `authentication=1` on the TPG while an ACL of it has CHAP
+  (0 when none: LUNs without CHAP and records from before stay as they were). CHAP belongs to the initiator's ACL of the portal:
+  LUNs of one address share it. Answers and `cmdaudit.log` show `chappas` as `***`; the `/root` traces mask it.

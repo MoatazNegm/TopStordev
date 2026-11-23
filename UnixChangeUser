@@ -1,6 +1,5 @@
 #!/bin/bash
-# QSD5.337: user/group scripts run one at a time (several Add User clicks in a row ran useradd/userdel in parallel and lost users);
-# a nested call (UnixChangeGroup -> UnixChangeUser, UnixAddUser -> ...) inherits TS_USRLOCK and does not lock again
+# QSD5.337 (M): user/group scripts run one at a time; a nested call inherits TS_USRLOCK and does not lock again
 if [ -z "$TS_USRLOCK" ] && command -v flock >/dev/null 2>&1; then export TS_USRLOCK=1; exec flock -w 900 /tmp/topstor-users.lock "$0" "$@"; fi
 echo $@ > /root/unixchangeuser
 export ETCDCTL_API=3
@@ -21,14 +20,30 @@ then
 fi
 ischange=`echo $@  | awk '{print $5}'`;
 pullsync=`echo $@  | awk '{print $6}'`;
+# a sync copy: the follower's UsrChange of a change made by UnixChangeGroup carries "<requester> pullsync" ($6 $7), so $6 alone
+# said "not a copy" there and the follower sent the Unst1024/Unsu1024 notifications of the leader's change again
+echo "s$6 $7" | grep -q pull && pullsync=pull$pullsync
 stablegrp=""
-# QC 617: every group-record write below was a bare 'etcdput' with no check: a write that did not land (a failed or timed-out put on a
-# busy node, nothing reported) silently dropped the user from the group record (leader etcd had q018u1,q018u3 without q018u2 after a
-# multi-row submit).  putgrp writes the record and reads it back; while the user is not (add) or still is (del) a member it writes
-# again (3 more times, 2 s apart).  Reads that fail ('' or _1) are retried and never trusted.
-# QC 617 (fix15): etcdget.py prints 'not reachable' and '_1' when a read fails or times out; the record built from that string
-# ('not/,q018u3/not') was written to the leader's etcd, and the read-back of putgrp took it for good.  getgrp returns a group record
-# only when it has the shape of one (<gid>:<gid>:<home>/<size>/<users>/...), retrying the read (5 x 3 s); '' when it never does.
+# Group member lists (field 3 of usersigroup/<group>: "a,b,c" or NoUser) are read and edited by EXACT comma separated names:
+# a name never matches a part of another name (q015a / q015a1 / q015a10 / xq015a / group q015ag, test 614).
+# mlist_has <list> <name>: true when <name> is one element of <list>
+mlist_has() { echo ",$1," | grep -qF ",$2,"; }
+# mlist_del <list> <name>: <list> without <name> (empty elements and NoUser/no dropped; NoUser when nothing is left)
+mlist_del() { echo "$1" | awk -F, -v n="$2" '{o=""; for(i=1;i<=NF;i++) if($i!="" && $i!="NoUser" && $i!="no" && $i!=n) o=o (o==""?"":",") $i; print (o==""?"NoUser":o)}'; }
+# mlist_add <list> <name>: <list> with <name> appended once (empty elements and NoUser/no dropped)
+mlist_add() { echo "$1" | awk -F, -v n="$2" '{o=""; f=0; for(i=1;i<=NF;i++) if($i!="" && $i!="NoUser" && $i!="no"){ if($i==n) f=1; o=o (o==""?"":",") $i }; if(!f) o=o (o==""?"":",") n; print o}'; }
+# groupsof <etcd> <name>: the groups (usersigroup/<group>) whose member list holds <name> exactly. etcdget.py with a filter
+# argument matches any text of the whole key/value pair, so "usersigroup q015a" also returned q015ag and every group of q015a1.
+groupsof() { /pace/etcdget.py $1 usersigroup --prefix | memberof "$2"; }
+# memberof <name>: the same, from usersigroup rows ("('usersigroup/<g>', '<value>')" lines, etcdget.py --prefix) on stdin
+memberof() { sed -n "s/^('usersigroup\/\([^']*\)', '\(.*\)')\$/\1 \2/p" | while read -r g v; do mlist_has "`echo "$v" | cut -d/ -f3`" "$1" && echo "$g"; done; }
+# rowof <group>: the value of usersigroup/<group> (exact key) in the rows on stdin
+rowof() { awk -v k="('usersigroup/$1', '" 'index($0,k)==1 { v=substr($0,length(k)+1); sub(/..$/,"",v); print v; exit }'; }
+# rowok <value>: a real usersigroup value (uid:gid:home/size/members/...). etcdget.py prints _1 for a key it cannot read
+# (missing key, etcd not reachable); editing that value wrote "_1/<user>/_1" into usersigroup/Everyone of a follower (test 620)
+rowok() { echo "$1" | grep -q '^[0-9][0-9]*:[0-9][0-9]*:[^/]*/[^/]*/[^/]*/'; }
+# QC 617 (M): getgrp reads a group record only when it has the shape of one (retried 5 x 3 s, '' when it never does);
+# putgrp writes it and reads it back, and writes again while the user is not (add) or still is (del) a member (3 x, 2 s)
 getgrp() {
  local r
  for t in 1 2 3 4 5; do
@@ -44,85 +59,150 @@ putgrp() {
  for try in 1 2 3; do
   chk=`getgrp $1` || { sleep 2; continue; }
   ismember=0
-  echo "$chk" | awk -F'/' '{print $3}' | tr ',' '
-' | grep -qxF -- "$username" && ismember=1
+  echo "$chk" | awk -F'/' '{print $3}' | tr ',' '\n' | grep -qxF -- "$username" && ismember=1
   [ "$3" = add ] && [ $ismember = 1 ] && return
   [ "$3" = del ] && [ $ismember = 0 ] && return
   sleep 2
   /pace/etcdput.py $etcd usersigroup/$1 $2
  done
 }
+# Notifications (logmsg.py/logqueue.py) cost 1.2-2.4 s each (python, pika, a new RabbitMQ connection) and nothing here reads
+# their result, so they run in the background, while this script runs in the single command consumer (topstorrecvreply.py).
+# Each one waits (at most 10 s) for the one sent before it, so they still arrive in the order they are sent; a nested
+# UnixChangeUser joins the same chain through TS_NOTIFYPIDFILE. No output may reach the consumer's pipe (it waits for EOF).
+notifyfile=${TS_NOTIFYPIDFILE:-/tmp/topstornotify.$$}
+notify() {
+	local prev=''
+	[ -s "$notifyfile" ] && read -r prev < "$notifyfile"
+	( n=0; while [ -n "$prev" ] && [ $n -lt 100 ] && kill -0 "$prev" 2>/dev/null; do sleep 0.1; n=$((n+1)); done
+	  docker exec etcdclient "$@" ) </dev/null >/dev/null 2>&1 &
+	echo $! > "$notifyfile"
+}
+[ -z "$TS_NOTIFYPIDFILE" ] && trap 'rm -f "$notifyfile"' EXIT
+# a sync copy (pull) is not a task of its own: no task-queue (logqueue) rows for it (test 671: two background python+pika
+# runs per copy on the slow follower)
+queue() { echo "s$pullsync" | grep -q pull || notify /TopStor/logqueue.py `basename "$0"` "$@"; }
 privilege="Box_Users";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]];
 then
-	docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq 
-	myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
-	myhostip=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`
-	leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
+	queue running $userreq 
+	# UnixAddUser hands its values over (TS_*); otherwise clusternode, clusternodeip and leader in ONE docker exec (was three)
+	myhost=$TS_MYHOST; myhostip=$TS_MYHOSTIP; leader=$TS_LEADER
+	if [ -z "$myhost" -o -z "$myhostip" -o -z "$leader" ]
+	then
+		hostinfo=`docker exec -w /TopStor etcdclient /usr/bin/python3 -c 'from etcdgetlocal import etcdget; [etcdget(k) for k in ("clusternode","clusternodeip","leader")]'`
+		{ read -r myhost; read -r myhostip; read -r leader; } <<< "$hostinfo"
+	fi
+	if [ -z "$myhost" -o -z "$myhostip" -o -z "$leader" ]
+	then
+		myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
+		myhostip=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`
+		leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
+	fi
 	echo $leader | grep $myhost
 	if [ $? -eq 0 ];
 	then
 	 	etcd=$leaderip
+		follower=0
 	else
 		etcd=$myhostip
+		follower=1
 	fi
  #if a change happens before a user is created, no need to proceed, the script will be run again in the AddUser
  id $username
  if [ $? -ne 0 ];
  then
-	docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq 
+	queue finish $userreq 
 	exit 
  fi
- echo 'NoUser' | grep $username
- if [ $? -ne 0 ];
+ if [ "$username" != 'NoUser' ];
  then
  	echo s$pullsync | grep pull 
  	if [ $? -ne 0 ];
  	then
-  		docker exec etcdclient /TopStor/logmsg.py Unst1024 info $userreq $username
+  		notify /TopStor/logmsg.py Unst1024 info $userreq $username
 	fi
  fi
- echo $username | grep NoUser
- if [ $? -ne 0 ];
+ missing=''
+ if [ "$username" != 'NoUser' ];
  then
-  if [[ $usergroups == 'NoGroup' ]];
+  leaderrows=''
+  if [ $follower -eq 1 ];
   then
-   usermod -G '' $username
-  else
-   usermod -G '' $username
-   usermod -G $usergroups $username
-  fi
-  usermod -a -G $username  $username
-  cgrps=`/pace/etcdget.py $etcd usersigroup $username`
-  cgrpsl=${#cgrps}
-  while [ $cgrpsl  -gt 4 ];
-  do
-   l=`echo "${cgrps[@]}" | tail -1 `
-   cgrps=`echo "${cgrps[@]}" | sed '$d'`
-   cgrpsl=${#cgrps}
-   cgrp=`echo $l | sed "s/('usersigroup\///g" | awk -F"'" '{print $1}' `  
-   # QSD5.337: the etcd search returns every group whose value merely CONTAINS the name (qxb inside qxb1): only a group that lists this exact name counts
-   echo `/pace/etcdget.py $etcd usersigroup/$cgrp` | awk -F'/' '{print $3}' | tr ',' '\n' | grep -qx -e "$username" || continue
-   echo $usergroups | grep -w $cgrp  &>/dev/null
-   if [ $? -ne 0 ];
+   # A follower applies the user's groups as the LEADER's etcd has them now (the usersigroup rows that list the user by exact
+   # name), not the list in the request nor this node's own `id -Gn` (UnixChangeGroup): the requests of one change reach a
+   # follower in any order (test 620: the UsrChange of q021u1 came before the group q021g2 existed here, the list was refused,
+   # the user lost q021g1 on this node and the later group add rebuilt the list from the already emptied local groups).
+   # The leader's rows are written before the requests are filed, so any order ends in the leader's state.
+   leaderrows=`/pace/etcdget.py $leaderip usersigroup --prefix`
+   if echo "$leaderrows" | grep -qF "('usersigroup/Everyone', '"
    then
-    usersall=`getgrp $cgrp` || { echo "group record $cgrp unreadable, not changed"; continue; }
+    leadergroups=`echo "$leaderrows" | memberof "$username" | paste -sd, -`
+    getent group Everyone >/dev/null && leadergroups=`mlist_add "$leadergroups" Everyone`
+    echo the leader has $username in: $leadergroups '(the request named:' $usergroups')'
+    usergroups=${leadergroups:-NoGroup}
+   else
+    echo the groups of the leader cannot be read, the groups of the request are applied: $usergroups
+    leaderrows=''
+   fi
+  fi
+  # Never clear the groups first and never hand usermod a group this node does not have: `usermod -G '' ; usermod -G a,b,c`
+  # left the user in NO group when one of a,b,c was missing (usermod refuses the whole list). The groups that exist here are
+  # set in one usermod (own group kept); a missing one is reported, and a follower's request is kept and tried again (exit 3).
+  setgroups=''
+  getent group "$username" >/dev/null && setgroups=$username
+  for g in `echo "$usergroups" | tr ',' ' '`
+  do
+   if [ "$g" = 'NoGroup' ] || [ "$g" = "$username" ];
+   then
+    continue
+   fi
+   if getent group "$g" >/dev/null;
+   then
+    setgroups=`mlist_add "$setgroups" "$g"`
+   elif [ "$g" != 'Everyone' ];
+   then
+    missing=`mlist_add "$missing" "$g"`
+   fi
+  done
+  echo usermod -G "$setgroups" $username, not on this node: $missing
+  usermod -G "$setgroups" $username
+  if [ -n "$leaderrows" ];
+  then
+   # follower: the member lists of this node's etcd become the leader's rows (exact copies, so a garbled local row, such as
+   # usersigroup/Everyone = _1/q020u01/_1,q021u1, is repaired); a row the leader does not have is left to the group's own sync
+   for cgrp in `{ groupsof $etcd $username; echo "$usergroups" | tr ',' '\n'; } | sort -u`;
+   do
+    if [ -z "$cgrp" ] || [ "$cgrp" = 'NoGroup' ] || [ "$cgrp" = "$username" ];
+    then
+     continue
+    fi
+    getent group "$cgrp" >/dev/null || continue
+    lrow=`echo "$leaderrows" | rowof "$cgrp"`
+    rowok "$lrow" || continue
+    if [ "`/pace/etcdget.py $etcd usersigroup/$cgrp`" != "$lrow" ];
+    then
+     echo copy of the leader: usersigroup/$cgrp $lrow
+     /pace/etcdput.py $etcd usersigroup/$cgrp "$lrow"
+    fi
+   done
+  else
+  for cgrp in `groupsof $etcd $username`;
+  do
+   if ! mlist_has "$usergroups" "$cgrp";
+   then
+    usersall=`getgrp $cgrp` || { echo "group record $cgrp unreadable, not changed"; continue; }   # QC 617 (M)
+    rowok "$usersall" || continue
     cusers=`echo $usersall | awk -F'/' '{print $3}'`
     cusersleft=`echo $usersall | cut -d/ -f1-2`
     cusersright=`echo $usersall | cut -d/ -f4-`
-    # QSD5.337: exact member match (the unanchored sed also cut the name out of longer names: q015a out of q015a1)
-    newusers=`echo ${cusers} | tr ',' '\n' | grep -vx -e "$username" -e '' | paste -sd, - `
-    resusers=${#newusers}
-    if [ $resusers -lt 1 ];
-    then
-     newusers='NoUser'
-    fi
+    newusers=`mlist_del "$cusers" "$username"`
     newop=$cusersleft'/'$newusers'/'$cusersright
-    groupres=${newop}
+    groupres=$newop
     echo to remove : $cgrp to be $groupres
  echo $etcd '333333333333333333333333333333333333333333333333333333333333333'
-    putgrp $cgrp $groupres del
+    putgrp $cgrp $groupres del   # QC 617 (M): written, read back, written again
    else
     stablegrp=${stablegrp}${cgrp}',';
     echo to keep : $cgrp
@@ -137,48 +217,40 @@ then
    usergroups=`echo $usergroups | sed 's/ /,/g' | cut -d, -f2-`
    usergroups=$usergroups','
    grpsl=` echo ${usergroups} | sed 's/,/ /g' | wc -w`
-   echo $l | grep -w $username
-   if [ $? -eq 0 ];
+   if [ -z "$l" ] || [ "$l" = "$username" ];
    then
 	continue
    fi
    echo usrgroups=$usergroups
    echo grpsl=$grpsl
    echo stablegrp=$stablegrp
-   echo $l | grep -w NoGroup 
-   if [ $? -ne 0 ];
+   if [ "$l" != 'NoGroup' ];
    then
-    echo 'kdsl' $stablegrp | grep -w $l 
-    echo 'kdsl' $stablegrp | grep -w $l >/dev/null
-    if [ $? -ne 0 ];
+    if ! mlist_has "$stablegrp" "$l";
     then
-     usersall=`getgrp $l` || { echo "group record $l unreadable, not changed"; continue; }
+     usersall=`getgrp $l`   # QC 617 (M): retried, only a well-formed record
+     if ! rowok "$usersall";
+     then
+      echo no usersigroup/$l here, not written
+      continue
+     fi
      cusers=`echo $usersall | awk -F'/' '{print $3}'`
      cusersleft=`echo $usersall | cut -d/ -f1-2`
      cusersright=`echo $usersall | cut -d/ -f4-`
-     echo $cusers | grep -w NoUser
-     if [ $? -ne 0 ];
-     then
-      newusers=${cusers}','$username
-      newop=$cusersleft'/'$newusers'/'$cusersright
-      groupres=`echo ${newop}`
-      echo appending $l to be $groupres
-      putgrp $l $groupres add
-     else 
-      echo I am here: $username
-      newusers=$username
-      newop=$cusersleft'/'$newusers'/'$cusersright
-      groupres=`echo ${newop}`
-      echo adding $l to be $groupres
-
-      putgrp $l $groupres add
-     fi
+     newusers=`mlist_add "$cusers" "$username"`
+     newop=$cusersleft'/'$newusers'/'$cusersright
+     groupres=$newop
+     echo adding $l to be $groupres
+     putgrp $l $groupres add   # QC 617 (M)
     fi
    fi
   done
+  fi
 ######### or else username=NoUser.. Remove all users form this usergroups
  else
   allusers=`/pace/etcdget.py $etcd usersigroup/$usergroups`
+  if rowok "$allusers";
+  then
   usersall=`echo $allusers | awk -F'/' '{print $3}'`','
   usersl=` echo ${usersall} | sed 's/,/ /g' | wc -w`
   while [ $usersl -gt 0 ]; 
@@ -199,25 +271,24 @@ then
    newop=$cusersleft'/'$newusers'/'$cusersright
    groupres=`echo ${newop}`
    /pace/etcdput.py $etcd usersigroup/$usergroups  $groupres 
+  else
+   echo no usersigroup/$usergroups here, not written
+  fi
  fi
  #/TopStor/broadcast.py UserChange /TopStor/pump.sh UnixChangeUser_sync -d$myhost $@ 
- echo 'NoUser' | grep $username
- if [ $? -ne 0 ];
+ if [ "$username" != 'NoUser' ];
  then
 	echo s$pullsync | grep pull 
  	if [ $? -ne 0 ];
  	then
-  		docker exec etcdclient /TopStor/logmsg.py Unsu1024 info $userreq $username
+  		notify /TopStor/logmsg.py Unsu1024 info $userreq $username
 	fi
  fi
  echo dddddddddddddddddddddddddd $leader, $myhost
  echo $leader | grep $myhost
  if [ $? -eq 0 ];
  then
-	# QSD5.345: the value names the user and is in nanoseconds (10 s ahead, as before, so it is applied after the user
-	# request).  It was UsrChange_<seconds>: two changes in the same second (UnixChangeGroup changes every member in a
-	# row) had the SAME value; the followers track done requests by value and the leader prunes by value, so the second
-	# change was taken as done / pruned before any follower ran it -- the follower missed the member (QC tests 638, 678).
+	# QSD5.345 (M): the value names the user and is in nanoseconds, 10 s ahead (two changes in one second had the same value)
 	stamp=$(( `date +%s%N` + 10000000000 ))
 	myscript=`basename "$0"`
 	params=`echo $myscript $@ pull | sed 's\ \\_\g'`
@@ -226,5 +297,11 @@ then
 	/TopStor/etcdput.py $etcd sync/UsrChange/$params/request/$myhost UsrChange_${username}_$stamp
 	/TopStor/etcdput.py $etcd sync/UsrChange/$params/request UsrChange_${username}_$stamp
  fi
- docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq 
+ queue finish $userreq 
+ # a follower that misses a group of the leader keeps the request (checksyncs tries it again until the group's own sync made it)
+ if [ $follower -eq 1 ] && [ -n "$missing" ];
+ then
+	echo groups not on this node yet: $missing
+	exit 3
+ fi
 fi

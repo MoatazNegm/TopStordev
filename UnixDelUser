@@ -10,22 +10,15 @@ leaderip=`echo $@  | awk '{print $1}'`;
 username=`echo $@ | awk '{print $2}'`;
 userreq=`echo $@ | awk '{print $3}'`;
 pullsync=`echo $@ | awk '{print $4}'`;
-# QSD5.350: exact name ('grep -w Everyone' also matched Everyone-x); an empty name is not a user
-if [ -z "$username" ] || [ "$username" = Everyone ];
-then
-exit
-fi
-# QSD5.349: admin by its exact name ('grep -w admin' matched it-admin / admin-ops too: such a user could not be deleted)
-if [ "$username" = admin ];
-then
-exit
-fi
-
-# QSD5.350: exact name ('echo NoUser | grep $username' stopped the delete of User, Use, No, ...)
-if [ "$username" = NoUser ];
+# Everyone, admin and NoUser are never deleted (exact names: a part of a name, e.g. "User" or "admin2", is a normal user)
+if [ -z "$username" ] || [ "$username" = 'Everyone' ] || [ "$username" = 'admin' ] || [ "$username" = 'NoUser' ];
 then
  exit
 fi
+# member lists of usersigroup/<group> are edited by EXACT comma separated names (q015a never matches q015a1/xq015a/q015ag, test 614)
+mlist_has() { echo ",$1," | grep -qF ",$2,"; }
+mlist_del() { echo "$1" | awk -F, -v n="$2" '{o=""; for(i=1;i<=NF;i++) if($i!="" && $i!="NoUser" && $i!="no" && $i!=n) o=o (o==""?"":",") $i; print (o==""?"NoUser":o)}'; }
+groupsof() { /pace/etcdget.py $1 usersigroup --prefix | sed -n "s/^('usersigroup\/\([^']*\)', '\(.*\)')\$/\1 \2/p" | while read -r g v; do mlist_has "`echo "$v" | cut -d/ -f3`" "$2" && echo "$g"; done; }
 privilege="Box_Users";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
@@ -55,8 +48,6 @@ then
  docker exec intsmb pdbedit -x -u $username >/dev/null 2>&1
  for y in `docker ps | egrep 'CIFS|HOM' | awk '{print $1}'`; do docker exec $y /bin/smbpasswd -x $username >/dev/null 2>&1; done
  datenow=`date +%m/%d/%Y`;timenow=`date +%T`;
- # QSD5.350: is the account still there? exact name ('grep -w it' found the line of it-admin: the delete of 'it' was
- # reported failed and its etcd keys stayed)
  cut -d: -f1 /etc/passwd | grep -qxF -- "$username"
  if [ $? -eq 0 ]; then
  	echo s$pullsync | grep pull
@@ -67,36 +58,30 @@ then
  else
   #/TopStor/broadcast.py UserDel /TopStor/pump.sh UnixDelUser_sync -d$myhost $username $userreq
   echo usename=$username
-  # QC 615: every user is listed in Everyone, so an empty answer is a failed read (the 2 s limit of etcdget.py on a busy node), not
-  # 'no groups': the removal below was skipped silently and the name stayed in the group records (Everyone), which then refused
-  # the same name for a new user.  Read again (up to 5 times, 2 s apart).
+  # merge M+A: A's exact group list (groupsof); M's retry (QC 615: every user is in Everyone, so an empty answer is a failed
+  # read on a busy node, not 'no groups'; read again, up to 5 times, 2 s apart)
   cgrps=''
   for try in 1 2 3 4 5; do
-   cgrps=`/pace/etcdget.py $etcd usersigroup $username`
-   [ ${#cgrps} -gt 4 ] && break
+   cgrps=`groupsof $etcd $username`
+   [ -n "$cgrps" ] && break
    sleep 2
   done
   echo cgrps $cgrps
-  cgrpsl=${#cgrps}
-  while [ $cgrpsl  -gt 4 ];
+  for cgrp in $cgrps;
   do
-   l=`echo "${cgrps[@]}" | tail -1`
-   echo l: $l
-   cgrps=`echo "${cgrps[@]}" | sed '$d'`
-   cgrpsl=${#cgrps}
-   cgrp=`echo $l | sed "s/('usersigroup\///g" | awk -F"'" '{print $1}' `  
-   # QC 615: a failed read gave '' or '_1' and the record was written back without its members; read again, never write from a failed read
+   # merge M+A (M, QC 615): a failed read gave '' or '_1' and the record was written back without its members; read again,
+   # never write from a failed read
    usersall=''
    for try in 1 2 3 4 5; do
     usersall=`/pace/etcdget.py $etcd usersigroup/$cgrp`
     case "$usersall" in ''|_1) sleep 2;; *) break;; esac
    done
    case "$usersall" in ''|_1) echo "UnixDelUser: could not read usersigroup/$cgrp, record left as it is"; continue;; esac
-   cusers='/'`echo $usersall | awk -F'/' '{print $3}'`'/'
+   cusers=`echo $usersall | awk -F'/' '{print $3}'`
    cusersleft=`echo $usersall | cut -d/ -f1-2`
    cusersright=`echo $usersall | cut -d/ -f4-`
-   newusers=`echo ${cusers} | sed "s/,$username,/,/g" | sed "s/\/$username,/\//g" | sed "s/,$username\//\//g" | sed "s/\/$username\//\/no\//g"`
-   newop=${cusersleft}${newusers}$cusersright
+   newusers=`mlist_del "$cusers" "$username"`
+   newop=$cusersleft'/'$newusers'/'$cusersright
    echo newop $newop
    /pace/etcdput.py $etcd usersigroup/$cgrp $newop 
    # QC 615: the leader's usersigroup/Everyone kept the deleted name although the same delete cleaned the follower's copy (a put that

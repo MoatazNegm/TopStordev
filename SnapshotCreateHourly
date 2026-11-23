@@ -33,13 +33,9 @@ then
  	fi
 
 
-echo $leader | grep $myhost
-if [ $? -eq 0 ];
-then
- stamp=`date +%s`;
-else
- stamp=` echo $@ | awk '{print $7}'`;
-fi
+# QSD5.346 (test 661 QX-062 step 1): the period id is always a fresh epoch. On a follower (the owner of the pool) it was $7,
+# the receiver ("NoReceiver"): every follower period had the same id, so one delete removed all of them.
+stamp=`date +%s`;
 crontab -l > $cronthis
 echo $min  "*"/$every "*" "*" "*" /TopStor/putcron.sh /TopStor/etcdput.py $leaderip call/$stamp /TopStor/Snapshotnowhost::$DG/$FileS::Hourly.$keep.$min.$every.na::$stamp::$receiver 2> txt/err.txt >> $cronthis
 crontab $cronthis 2>> $txtres
@@ -49,8 +45,14 @@ if [[ $err -ge  4  ]]; then
   docker exec etcdclient /TopStor/logmsg.py Snap1038 error $userreq $DG/$FileS 
 else 
   docker exec etcdclient /TopStor/logmsg.py Snap1039 info $userreq  Hourly.$keep.$min.$every.$stamp $DG/$FileS
-  /pace/etcdput.py $etcd Snapperiod/Hourly/$DG/$FileS/$stamp/$receiver  $min%*/$every%*%*%*%/TopStor/Snapshotnowhost%$DG/$FileS%Hourly.$keep.$min.$every.na%$stamp/$receiver
-  /pace/etcdput.py $leaderip sync/Snapperiod/_____/request/$myhost Snapperiod_$stamp
+  # the record goes to the LEADER (the master copy: snapshotsinfo lists it, etctocron builds every node's cron line from it);
+  # on a follower it went to the local etcd only, was never listed and the next Snapperiod sync wiped it. Only the leader's
+  # cron line fires (putcron.sh), so the leader must run the sync (etctocron) when the owner is a follower: the request is
+  # marked done here only when this node is the leader (its line is already in its crontab).
+  /pace/etcdput.py $leaderip Snapperiod/Hourly/$DG/$FileS/$stamp/$receiver  $min%*/$every%*%*%*%/TopStor/Snapshotnowhost%$DG/$FileS%Hourly.$keep.$min.$every.na%$stamp%$receiver
+  if [ "$etcd" == "$leaderip" ]; then
+   /pace/etcdput.py $leaderip sync/Snapperiod/_____/request/$myhost Snapperiod_$stamp
+  fi
   /pace/etcdput.py $leaderip sync/Snapperiod/_____/request Snapperiod_$stamp
 
 #ETCDCTL_API=3 /TopStor/broadcast.py  PeriodManage /TopStor/etctocronlocal.sh 

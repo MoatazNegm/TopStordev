@@ -26,7 +26,7 @@ echo currentsnaps=$currentsnaps >> $cronout
 oldsnap=`echo "${currentsnaps[@]}" | sort | head -n 1` ;
 echo oldsnap=$oldsnap >> $cronout
 count=0
-countsnap=`echo  "$currentsnaps" | wc -l `;
+countsnap=`echo "$currentsnaps" | grep -c .`;  # empty list = 0 (wc -l counted it as 1)
 echo countsnap=$countsnap >> $cronout 
 countsnap=$(($countsnap+1));
 echo countsnapplus=$countsnap >> $cronout
@@ -36,7 +36,7 @@ timenow=`date`;
 userreq='system';
 replicationflag='hi'
 isreceiver='hi'
-if (( $countsnap >  $keep )); then 
+if (( $countsnap >  $keep )) && [ -n "$oldsnap" ]; then 
  replicationflag=$oldsnap 
  isreceiver=$receiver
  echo $isreceiver | grep NoReceive

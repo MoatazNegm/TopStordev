@@ -15,8 +15,9 @@ def createvol(*args):
  typep = args[8]
  vtype = typep
  if 'ISCSI' in typep:
-  chapuser = 'MoatazNegm'
-  chappas = 'MezoAdmin'
+  # the replica LUN has no CHAP (QSD5.341 test 653: the built-in pair was never asked by the target, authentication=0)
+  chapuser = 'nochap'
+  chappas = 'nochap'
   portalport = args[9]
   initiators = args[10]
   datastr = leaderip+' '+pool+' '+name+' '+size+' '+ipaddress+' '+Subnet+' '+portalport+' '+initiators+' '+chapuser+' '+chappas+' disabled '+user+' '+owner+' '+user

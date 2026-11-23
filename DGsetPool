@@ -14,12 +14,21 @@ is_container 2>/dev/null && POOLFM="-o failmode=continue"
 # and on its twin "one or more vdevs refer to the same device" (the old partitions still being removed, test 10 round 13, QSD5.310).
 zpoolcreate() {
     zc_try=0
+    # test 26 step 717: free disks that still carry the ZFS labels of an old pool cannot be used ("is in use and contains a unknown
+    # filesystem": the product's import scan try-imports the stale pool and holds its partitions for a moment).  Clear those labels on
+    # exactly the disks of this create, only when the cluster reports them free and no imported pool uses them (clearfreelabels.py).
+    zc_disks=""
+    for zc_a in "$@"; do
+        case "$zc_a" in -*|*=*|*/*) continue;; esac
+        [ -b "/dev/disk/by-id/$zc_a" ] && zc_disks="$zc_disks $zc_a"
+    done
+    [ -n "$zc_disks" ] && /usr/bin/python3 /TopStor/clearfreelabels.py $leaderip $zc_disks
     while :; do
         zc_err=`/sbin/zpool create "$@" 2>&1 >/dev/null`
         zc_rc=$?
         if [ $zc_rc -eq 0 ]; then return 0; fi
         zc_try=$((zc_try+1))
-        if echo "$zc_err" | grep -q "resource busy\|refer to the same device" && [ $zc_try -lt 8 ]; then
+        if echo "$zc_err" | grep -q "resource busy\|refer to the same device\|is in use and contains" && [ $zc_try -lt 8 ]; then
             echo "zpool create busy, retry $zc_try" >> /root/dgcreateretry
             udevadm settle 2>/dev/null
             sleep 5

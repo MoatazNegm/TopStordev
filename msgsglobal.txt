@@ -115,6 +115,7 @@ Unlin1025:0: : from :: File uploaded successfully! Adding users started
 Unlin1026:0: : from :: Failed uploading file
 Unlin1027:0: : from :: Finished adding users
 Unlin1028:1: : from :: User : already has a home folder in pool :
+Unlin1029:2: : from :: Home folder : not created, there is no such user
 IPaddrfa:0: : from :: Invalid IP address in the request 
 IPadduqfa:0: : from :: The IP address is already in use 
 IPnamuqfa:0: : from :: The name is already in use 
@@ -175,6 +176,7 @@ CIFS1001: Creating Volume : ....
 CIFS1002: Volume : already exists
 CIFS1003: Problem occurred while creating volume :
 CIFS1033: Problem occurred while creating volume :. Failed to resolve the host name : 
+CIFS1034: Problem occurred while creating volume : . The share could not join the domain : - check the domain administrator name and password
 CIFS1004: Success creating volume :
 CIFS1005: Deleting : .....
 CIFS1006: Prolbem deleting :
@@ -341,6 +343,8 @@ Replivol1000:0: : from :: Receiving new snapshot for volume : from partner :
 Replidf1000:0: : from :: Receiving new Snapshot for volume : from partner :
 VolCst01:1: : from ::  Start changing volume : access properties
 VolCsu01:1: : from ::  Success changing volume : access properties
+VolCfa01:2: : from :: Volume : not changed, the quota : was refused
+VolCfa02:2: : from :: iSCSI volume : not changed, the target update failed at :
 Volrst01:1: : from ::  Start try to delete volume : 
 NFS1000:1: : from ::  Deleting volume :
 NFS1001:1: : from :: Problem occurred while deleting volume :
@@ -394,6 +398,7 @@ Snap1043:1: : from :: Deleting period : ........
 Snap1044:2: : from :: Problem occurred while deleting period :
 Snap1045:2: : from :: Success deleting period :
 Snap1046:2: : from :: Failed to find a host for the snapshot
+Snap1047:2: : from :: Snapshot : not created, the name already exists on volume :
 Repli1001:2: : from :: Problem occurred while receiving the snapshot : from ::
 Repli1002:2: : from :: Success in receiving the snapshot : from ::
 Repli1003:1: : from :: Sending Replication : to partner :
@@ -447,8 +452,11 @@ DGst24:1: : from :: Creating RAID10 pool : using mirror pairs of disks : ......
 DGsu24:2: : from :: Success creating RAID10 pool : using mirror pairs of disks :
 DGfa24:2: : from :: Failed creating RAID10 pool : using mirror pairs of disks :
 DGfa25:2: : from :: Pool not deleted, it still has volumes (delete them first) :
-Priv1004:2: : from :: Not done, the user has no privilege for this action : user :
+DGfa26:2: : from :: Group not added to pool : (mismatched redundancy) the pool is : and the requested group is :
+Priv1004:2: : from :: Not done, the user has no privilege for this action \: user \: :
+Priv1005:2: : from :: Privileges not changed, no such user :
 Volpool1:2: : from :: Volume not created, the pool does not exist or was not chosen : volume :
+Volnam01:2: : from :: Volume : not created, the name must be 1 to 32 letters, digits, _ or - and start with a letter or digit
 ISCSI1000:1: : from :: Deleting iSCSI volume :
 ISCSI1001:2: : from :: Problem occurred while deleting iSCSI volume :
 ISCSI1002:1: : from :: Success deleting iSCSI volume :

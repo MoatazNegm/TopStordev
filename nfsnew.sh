@@ -20,16 +20,39 @@ echo params $@ > /root/nfstmp
 echo name $resname >> /root/nfstmp
 echo mounts $mounts >> /root/nfstmp
 echo ip and subnet $ipaddr $ipsubnet >> /root/cifstmp
+# QSD5.337 (test 646 QX-047 step 3): one rebuild of an address container at a time. VolumeChangeNFS (address change) and the
+# VolumeCheck pass both started nfsnew.sh for the same new address in parallel. The lock is /tmp/shareaddr.<ip>.lock; a caller
+# that already holds it (VolumeChangeNFS, VolumeCheck.py) names the address in SHAREADDR_LOCK. A run that had to wait for the
+# lock finds the container of the address already running with all its mounts and leaves it alone.
+case " $SHAREADDR_LOCK " in
+ *" $ipaddr "*) ;;
+ *)
+  exec 8>/tmp/shareaddr.$ipaddr.lock
+  if ! flock -n 8;
+  then
+   flock -w 120 8
+   if docker ps --format '{{.Names}}' | grep -qxF "$resname";
+   then
+    insp=`docker inspect $resname 2>/dev/null`
+    allin=1
+    for m in $mounts; do [ "$m" = '-v' ] && continue; echo "$insp" | grep -qF "\"${m%%:*}\"" || allin=0; done
+    if [ $allin -eq 1 ];
+    then
+     echo `date +%T` $resname already rebuilt by the lock holder, skipped >> /root/nfshtmp
+     exit 0
+    fi
+   fi
+  fi
+  ;;
+esac
 docker rm -f $resname
-exec 9>>/TopStordata/cmynode.lock; flock -w 120 9   # QSD5.352: cmynode changes one at a time (cmynodeaddr.sh)
-nmcli conn mod cmynode -ipv4.addresses ${ipaddr}/$ipsubnet
-echo nmcli conn mod cmynode -ipv4.addresses ${ipaddr}/$ipsubnet
-nmcli conn up cmynode
-flock -u 9
+# QSD5.337: the address is no longer removed and re-added around the rebuild with "nmcli conn up cmynode" (2 re-activations of
+# bond0 per rebuild, all node/cluster addresses down each time): shareaddr.sh adds it live only when it is not on the node.
+# Wait only until the removed container's listeners on the address ports are gone (docker run -p binds them again).
 counter=20
 while [ $counter -gt 1 ];
 do
-	netstat -ant | grep $ipaddr
+	netstat -ant | awk -v a="$ipaddr" '$6=="LISTEN" && ($4==a":2049" || $4==a":20048")' | grep -q .
 	if [ $? -eq 0 ];
 	then
 		counter=$((counter-1))
@@ -39,7 +62,7 @@ do
 	fi
 done
 flag=0
-/TopStor/cmynodeaddr.sh add $ipaddr $ipsubnet    # QSD5.352 (QC 698): locked, checked, retried
+/TopStor/shareaddr.sh add $ipaddr $ipsubnet
 	writes2=${writes#_vol_}
 	while [[ $writes2 == *_vol_* ]]; do
 		current_volinfo=${writes2%%_vol_*}
@@ -86,7 +109,7 @@ docker run -d $mounts --rm --privileged \
   		--name $resname itsthenetwork/nfs-server-alpine
 # portmap v2 on the volume ip: the container's rpcbind answers with its private address (see nfsportmap.py), exits with the container
 pkill -f "nfsportmap.py $ipaddr " 
-nohup setsid python3 /TopStor/nfsportmap.py $ipaddr $resname >/dev/null 2>&1 &
+nohup setsid python3 /TopStor/nfsportmap.py $ipaddr $resname >/dev/null 2>&1 8>&- &
 counter=20
 while [ $counter -gt 1 ];
 do

@@ -42,35 +42,58 @@ then
  if [ $statvol -le 1 ]; then statvol=0; else statvol=1; fi
  stat=${statpool}${statvol}
  echo starting Volume CIFS activation for  $stat >> /root/volactivateparam
+lookvols() {
  case $stat in
   01)
    echo volume only  for  $vol
-    declare  vols=`egl volumes/CIFS $vol`
+    vols=`egl volumes/CIFS $vol`
    ;;
   10)
    echo pool only $pool
-    declare  ips=`egl ipaddr $pool`
-    declare  vols=`egl volumes/CIFS  $pool`
+    ips=`egl ipaddr $pool`
+    vols=`egl volumes/CIFS  $pool`
    ;;
   11)
    echo 'volume and pool only'
-    declare  vols=`egl volumes/CIFS/$host/$pool/$vol`
+    vols=`egl volumes/CIFS/$host/$pool/$vol`
    ;;
   00)
    echo 'host only'
-   declare  vols=`egl volumes/CIFS/$host --prefix`
+   vols=`egl volumes/CIFS/$host --prefix`
  esac
- echo vols="${vols[@]}"
+}
+novols() {
  volsc=`echo $vols | wc -c`
- if [ $volsc -le 2 ];
+ [ $volsc -le 2 ] && return 0
+ echo "${vols[@]}" |  grep -qE "^[[:space:]]*(\(.?_1.?,?\)?|_1)[[:space:]]*$"   # only the not-found marker _1 by itself; a volume named x_1234 contains "_1" too
+}
+ lookvols
+ # QSD5.339 (test 649 QX-050 step 1): a domain share on a pool of a FOLLOWER was never activated. VolumeCreateCIFSdom writes the
+ # record to the leader's etcd only; this script read the follower's local etcd (not synced yet: "_1") and left at "No Volumes",
+ # no smb file, no container, no join -- and the create still logged NFS1007. A named volume that the local etcd does not have
+ # yet is now waited for (up to ~20 s, the sync request of the create) and then read from the leader's etcd, which is also the
+ # etcd handed to cifs.py and used for the registry below. The leader (etcd=$leaderip) is unchanged.
+ if [ "$etcd" != "$leaderip" ] && [ $statvol -eq 1 ] && novols;
+ then
+  waited=0
+  while [ $waited -lt 20 ] && novols;
+  do
+   sleep 2
+   waited=$((waited+2))
+   lookvols
+  done
+  if novols;
+  then
+   echo "$vol not in the local etcd $etcd after ${waited}s, reading the leader etcd $leaderip" >> /root/volactivateparam
+   etcd=$leaderip
+   lookvols
+  fi
+ fi
+ echo vols="${vols[@]}"
+ if novols;
  then
   echo No Volumes
-  exit
- fi
- echo "${vols[@]}" |  grep -E "^[[:space:]]*(\(.?_1.?,?\)?|_1)[[:space:]]*$"   # only the not-found marker _1 by itself; a volume named x_1234 contains "_1" too
- if [ $? -eq 0 ];
- then
-  echo No Volumes _1
+  echo "No Volumes for $vol (etcd $etcd): nothing activated" >> /root/volactivateparam
   exit
  fi
  ispoolonly=`echo $ips | wc -c `

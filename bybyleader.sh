@@ -21,8 +21,8 @@ setenforce 0
 ( flock -w 120 9; nmcli conn mod cmynode +ipv4.addresses $myclusterip; nmcli conn up cmynode ) 9>>/TopStordata/cmynode.lock
 myclusterip=$leaderip
 pkill iscsiwatch
-pkill topstorrecvreply
-echo nameserver 10.11.12.7 >  /root/gitrepo/resolv.conf
+pkill -f /TopStor/topstorrecvreply.py   # test 677: the name (16 chars) never matched the 15-char process name: a second receiver wrote every log row twice
+/TopStor/containerresolv.sh   # containers: intdns 10.11.12.7, cluster DNS, search; intdns forwards the domain (test 673)
 rm -rf /TopStordata/etcd.sh
 cp /TopStor/discovery.sh /TopStordata/etcd.sh
 sed -i 's/SLEEP/sleep 10/g' /TopStordata/etcd.sh

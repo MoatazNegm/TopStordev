@@ -4,6 +4,10 @@
 # largest single part of the fail over time, because the API starts in a new container on the node that takes over.
 from etcdgetpy import etcdget as get
 from itertools import combinations_with_replacement as combine
+import threading
+# QSD5.330: the selector keeps its working state in the module globals below; a process that selects in several threads
+# (fapi: Flask serves requests in threads) runs one selection at a time (reentrant: optimizedisks calls selectdisks)
+_selectlock = threading.RLock()
 # Define a function to operate on elements
 
 combinations = dict()
@@ -104,6 +108,10 @@ def veryfastselect(elements):
     return ",".join(best_disk)
 
 def optimizedisks(leaderip, fraid, fdisksinfo,excludelst=''):
+    with _selectlock:
+        return _optimizedisks(leaderip, fraid, fdisksinfo, excludelst=excludelst)
+
+def _optimizedisks(leaderip, fraid, fdisksinfo,excludelst=''):
     global hosts, disktypes, mindisksize, count, combinations, disks, disksinfo, mustinclude, redundancy, diskscat
     raid, disksinfo = fraid, fdisksinfo
     with open('/TopStordata/fastselectopt','w') as f:
@@ -174,6 +182,10 @@ def featuring(leaderip,excludelst=''):
 
 
 def selectdisks(leaderip, fdisks,fdisksinfo,addtopool='',excludelst=''):
+    with _selectlock:
+        return _selectdisks(leaderip, fdisks, fdisksinfo, addtopool=addtopool, excludelst=excludelst)
+
+def _selectdisks(leaderip, fdisks,fdisksinfo,addtopool='',excludelst=''):
     global hosts, disktypes, mindisksize, count, combinations, disks, disksinfo, mustinclude, diskscat, redundancy
     disks, disksinfo = fdisks, fdisksinfo
     with open('/TopStordata/fastselect','w') as f:

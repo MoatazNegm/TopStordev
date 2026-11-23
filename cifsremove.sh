@@ -10,6 +10,9 @@ vtype=`echo $@ | awk '{print $5}'`
 echo $@ > /root/`basename "$0"`
 
 docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq
+# the volume list of VolumeCheck (getvols.sh) comes from /<pool>/smb.<volume>: it goes first, so a VolumeCheck pass that runs
+# while this script works does not take the volume (no longer in etcd) as dirty and re-create the address container
+rm -rf /$pool/smb.$vol
 /TopStor/etcddel.py $leaderip vol $vol
 /TopStor/etcddel.py $leaderip replivol $vol
 /TopStor/etcddel.py $leaderip size $vol 
@@ -20,65 +23,85 @@ docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq
 /TopStor/crondelete $vol $pool    # r9 (validator r8 R2): pool-anchored
 rm -rf /TopStordata/smb.${volip}.new
 echo vol = $vol
+# test 643 step 3: the address container serves every share of the address. It was removed here before the script knew whether
+# other shares remain (all of them went down), the re-run used an empty address and an image that is not installed, and
+# VolumeCheck then re-created the container once per remaining share (outages of 12-18 s and more).  Now:
+# - the share's block is cut out of /TopStordata/smb.<address> in place (truncate and write, same inode): the file is
+#   bind-mounted into the running container as /config/smb.conf, the file smbd reads (supervisord: --configfile);
+# - other shares left: smbd and nmbd reload the config, the removed share is closed and its dataset is unmounted in the
+#   container (the dataset is destroyed next); the container keeps running, the other shares stay reachable;
+# - no share left: the container and the address go, as before.
+# Parallel deletes on one address are serialized (each one edits the same file).
+log=/root/cifsremovelog
+exec 9>/tmp/cifsremove.${volip}.lock
+flock -w 120 9
+rm -rf /TopStordata/smb.${volip}.new
 /TopStor/delblock.py start${vol}_only stop${vol}_only /TopStordata/smb.$volip  ;
 rm -rf /TopStordata/smb.$vol
-rm -rf /$pool/smb.$vol
 rm -rf /TopStordata/tempsmb.$volip
-rm -rf /TopStordata/smb.$volip
-cat /TopStordata/smb.${volip}.new
+touch /TopStordata/smb.${volip}.new
 cat /TopStordata/smb.${volip}.new > /TopStordata/smb.${volip}
-resname=$vtype'-'$volip
-# r9: the container of exactly this address (a plain 'grep <ip>' took HOMEE-10.11.11.169 for 10.11.11.16)
-resname=`docker ps --format '{{.Names}}' | awk -v s="-$volip" 'length($0) > length(s) && substr($0, length($0)-length(s)+1) == s'`
-[ -n "$resname" ] && docker  rm -f $resname 
-cat /TopStordata/smb.$volip | grep start | grep only
+rm -rf /TopStordata/smb.${volip}.new
+cat /TopStordata/smb.${volip}
+# the container of this address only (a name ending in -<address>: 10.11.11.15 must not find CIFS-10.11.11.156)
+resname=`docker ps --format '{{.Names}}' | awk -v ip="-$volip" 'length($0) > length(ip) && substr($0, length($0)-length(ip)+1) == ip' | head -n 1`
+echo `date +%T` $vol $volip container=$resname >> $log
+grep start /TopStordata/smb.$volip | grep -q only
 if [ $? -ne 0 ]
 then 
-  exec 9>>/TopStordata/cmynode.lock; flock -w 120 9   # QSD5.352: cmynode changes one at a time (cmynodeaddr.sh)
-  nmcli conn mod cmynode -ipv4.addresses $volip 
-  # QSD5.337 (container flavour): the address is stored as <ip>/<prefix>, so the removal above did not match and the home
-  # address stayed on cmynode/bond0 (answering ping for minutes): remove it with its prefix, then from the live interface
-  [ -f /TopStor/flavor.sh ] && . /TopStor/flavor.sh
-  if is_container 2>/dev/null && [ -n "$volip" ]; then
-   for a in `nmcli -g ipv4.addresses conn show cmynode | tr ',' ' '`; do
-    case $a in
-     $volip/*) nmcli conn mod cmynode -ipv4.addresses $a ;;
-    esac
-   done
-   for a in `ip -o -4 addr show | awk -v ip=$volip '{split($4,a,"/"); if (a[1]==ip) print $2"|"$4}'`; do
-    ip addr del ${a#*|} dev ${a%|*}
-   done
-  fi
-  nmcli conn up cmynode
-  flock -u 9
-  # QC 615: the block above only runs on the container flavour; on a physical node the address (stored as <ip>/<prefix>) stayed in
-  # the cmynode profile and on bond0 after the home / CIFS share was deleted and kept answering ping.  rmvoladdr.sh (already used by
-  # nfsremove.sh) removes every <ip>/<any prefix> entry, re-applies cmynode and keeps the address if another volume still uses it.
+  [ -n "$resname" ] && docker rm -f $resname
+  # merge M+A: the address goes through M's rmvoladdr.sh (every <ip>/<prefix> entry, the live interface, kept while another
+  # volume of this node still uses it: QC 615, QSD5.351) instead of A's unconditional 'shareaddr.sh del'
   [ -n "$volip" ] && [ -x /TopStor/rmvoladdr.sh ] && /TopStor/rmvoladdr.sh $volip "" "$pool/$vol"
   rm -rf /TopStordata/smb.$volip;
+  echo `date +%T` last share of $volip: container and address removed >> $log
 else
- # QSD5.352 r9 (prover D6): another share is still on the address.  This branch started the container again with
- # 'docker run' of an image that is not there (10.11.11.124:5000/smb) and without the address ($ipaddr was never set), so
- # the remaining share stayed down until a VolumeCheck pass started it, and that start raced the next delete: two homes on
- # one address deleted 1 s apart, the second 'zfs destroy' found the dataset held by the new container (NFS1001).  The
- # share is started again through cifs.py now (per-address lock, records from the LEADER: this volume's record is already
- # gone, so the new container does not mount it), in the background; a domain share (CIFS_<domain>) is left to VolumeCheck.
- case $vtype in
-  HOMEE|HOME) kind=home; ctype=HOMEE ;;
-  CIFS) kind=cifs; ctype=CIFS ;;
-  *) kind='' ;;
- esac
- other=''
- [ -n "$kind" ] && other=`/TopStor/getvols.sh $kind | grep -vF "$pool/$vol/" | grep -F "/$volip/" | grep '/active$' | head -n 1`
- if [ -n "$other" ]; then
-  opool=`echo $other | cut -d/ -f1`; oname=`echo $other | cut -d/ -f2`; osub=`echo $other | cut -d/ -f9`
-  leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
-  myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
-  myhostip=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`
-  echo "`date +%T` $opool/$oname still on $volip: share started again" >> /root/cifsremove.restart
-  ( /TopStor/cifs.py $leader $leaderip $myhost $myhostip $leaderip $opool $oname $volip ${osub:-24} $ctype > /dev/null 2>&1 & )
- fi
+  reloaded=0
+  # the local-user share image (cifs.sh, moataznegm/quickstor:smb) runs smbd on /config/smb.conf; a domain member container
+  # builds its own config at start and cannot reload it
+  if [ -n "$resname" ] && docker exec $resname test -f /config/supervisord.conf
+  then
+    # a container started on an older copy of the file (another inode) gets the new content written into its own copy
+    docker exec $resname cat /config/smb.conf | cmp -s - /TopStordata/smb.$volip
+    if [ $? -ne 0 ]
+    then
+      docker exec -i $resname sh -c 'cat > /config/smb.conf' < /TopStordata/smb.$volip
+      echo `date +%T` config copied into $resname >> $log
+    fi
+    try=0
+    while [ $try -lt 10 ]
+    do
+      try=$((try+1))
+      docker exec $resname smbcontrol all reload-config
+      if [ $? -ne 0 ]
+      then
+        sleep 1
+        continue
+      fi
+      reloaded=1
+      docker exec $resname smbclient -L //127.0.0.1 -N -g 2>/dev/null | grep -q "^Disk|$vol|"
+      if [ $? -ne 0 ]
+      then
+        break
+      fi
+      sleep 1
+    done
+    echo `date +%T` reload-config $resname reloaded=$reloaded tries=$try shares: `docker exec $resname smbclient -L //127.0.0.1 -N -g 2>/dev/null | grep '^Disk|' | cut -d'|' -f2` >> $log
+    if [ $reloaded -eq 1 ]
+    then
+      docker exec $resname smbcontrol smbd close-share $vol
+      docker exec $resname umount /$pool/$vol || docker exec $resname umount -l /$pool/$vol
+    fi
+  fi
+  if [ $reloaded -eq 0 ]
+  then
+    # no container that can reload: VolumeCheck starts the address container once with the remaining shares (cifs.py)
+    [ -n "$resname" ] && docker rm -f $resname
+    echo `date +%T` no reload, $resname removed for VolumeCheck to re-create >> $log
+  fi
 fi
+flock -u 9
+exec 9>&-
 /TopStor/etcddel.py $leaderip vol $vol
 /TopStor/etcddel.py $leaderip replivol $vol
 # QSD5.337: nothing of the address' share is left behind (delblock.py rewrites .new; the lock came from cifs.sh)

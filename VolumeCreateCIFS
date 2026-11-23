@@ -73,7 +73,7 @@ then
  echo afterzfslist info $userreq $DG/$name >> /root/volcreate
  docker exec etcdclient /TopStor/logmsg.py NFS1004 info $userreq $DG/$name
  echo here4 >> /root/volcreate
- /sbin/zfs create -o overlay=on -o acltype=posixacl -o aclinherit=passthrough -o xattr=sa -o redundant_metadata=most -o atime=off -o quota=$quota -o dedup=$zdedup -o compression=$zcomp  $DG/$name  
+ /sbin/zfs create -o overlay=on -o acltype=posixacl -o aclinherit=passthrough -o xattr=sa -o redundant_metadata=most -o atime=off -o quota=$quota -o dedup=$zdedup -o compression=$zcomp  "$DG/$name"  
  if [ $? -ne 0 ];
  then
   echo here5 
@@ -121,7 +121,8 @@ then
  if [ $? -ne 0 ];
  then
   writevtemp=`echo $writev | sed 's/\,/ /g'`
-  for grp in $writevtemp ;do  setfacl -R -m g:$grp:rwx /$DG/$name; done
+  # the group may create in the share; new files/dirs inherit group READ only (owner-only modify, sticky bit: owner-only delete/rename)
+  for grp in $writevtemp ;do  setfacl -R -m g:$grp:rwx /$DG/$name; setfacl -d -m g:$grp:r-X /$DG/$name; done
  fi
  setfacl -d -m o::--- /$DG/$name
 

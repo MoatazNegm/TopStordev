@@ -12,7 +12,7 @@ data2dev='enp0s8'
 pkill iscsiwatchdog
 pkill zfsping 
 pkill receive
-pkill topstorrecvreply
+pkill -f /TopStor/topstorrecvreply.py   # test 677: the name (16 chars) never matched the 15-char process name: a second receiver wrote every log row twice
 pkill fapilooper
 pkill syncrequestlooper
 pkill checksyncs

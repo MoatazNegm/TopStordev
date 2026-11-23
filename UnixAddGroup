@@ -16,20 +16,44 @@ then
 else
 	userreq=`echo $@ | awk '{print $4}'`;
 fi
+# Notifications (logmsg.py/logqueue.py) cost 1.2-2.4 s each (python, pika, a new RabbitMQ connection) and nothing here reads
+# their result, so they run in the background (as in UnixAddUser): on the leader this script runs in the single command
+# consumer, on a follower in the serial sync pass (test 671: six synchronous notifications per group, ~25 s per group on node2).
+# Each one waits (at most 10 s) for the one sent before it, so they still arrive in the order they are sent; the nested
+# UnixChangeGroup joins the same chain through TS_NOTIFYPIDFILE. No output may reach the consumer's pipe (it waits for EOF).
+notifyfile=${TS_NOTIFYPIDFILE:-/tmp/topstornotify.$$}
+notify() {
+	local prev=''
+	[ -s "$notifyfile" ] && read -r prev < "$notifyfile"
+	( n=0; while [ -n "$prev" ] && [ $n -lt 100 ] && kill -0 "$prev" 2>/dev/null; do sleep 0.1; n=$((n+1)); done
+	  docker exec etcdclient "$@" ) </dev/null >/dev/null 2>&1 &
+	echo $! > "$notifyfile"
+}
+[ -z "$TS_NOTIFYPIDFILE" ] && trap 'rm -f "$notifyfile"' EXIT
+# a sync copy (pull) is not a task of its own: no task-queue (logqueue) rows for it
+ispull=0
+echo s$pullsync | grep -q pull && ispull=1
+queue() { [ $ispull -eq 1 ] || notify /TopStor/logqueue.py `basename "$0"` "$@"; }
 privilege="Box_Users";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
 then
 
-	docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq
-	myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
-	myhostip=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`
-	leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
+	queue running $userreq
+	# clusternode, clusternodeip and leader in ONE docker exec and one python (was three of each); same etcdgetlocal.etcdget
+	hostinfo=`docker exec -w /TopStor etcdclient /usr/bin/python3 -c 'from etcdgetlocal import etcdget; [etcdget(k) for k in ("clusternode","clusternodeip","leader")]'`
+	myhost=`echo "$hostinfo" | sed -n 1p`; myhostip=`echo "$hostinfo" | sed -n 2p`; leader=`echo "$hostinfo" | sed -n 3p`
+	if [ -z "$myhost" -o -z "$myhostip" -o -z "$leader" ]
+	then
+		myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
+		myhostip=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`
+		leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
+	fi
 echo 2222222222222222222222222222222222222222222222
  echo s$pullsync | grep pull
  if [ $? -eq 0 ]
  then
- 	docker exec etcdclient /TopStor/logmsg.py Unlin1118 info $userreq $username
+ 	notify /TopStor/logmsg.py Unlin1118 info $userreq $username
  fi
  echo $leader | grep $myhost
  if [ $? -ne 0 ];
@@ -55,18 +79,21 @@ echo 2222222222222222222222222222222222222222222222
  				docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
  				exit 1
  			fi
- 			/pace/etcdget.py $leaderip volumes --prefix | grep -E "(^|[^A-Za-z0-9_])${username}(_[0-9]+)?([^A-Za-z0-9_]|$)"
+ 			# a volume key ends in /<name>_<id> (`grep -w` never matched: `_` is a word character); a home (volumes/HOME*) is the user's own and goes with the user
+ 			/pace/etcdget.py $leaderip volumes --prefix | grep -v "^('volumes/HOME" | grep "/${username}\(_[0-9][0-9]*\)\{0,1\}',"
  			if [ $? -eq 0 ];
  			then
-  				docker exec etcdclient /TopStor/logmsg.py Unlin1021gv warning $userreq $username
+  				notify /TopStor/logmsg.py Unlin1021gv warning $userreq $username
   				docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
   				exit
  			fi
-                        /TopStor/etcdget.py $etcd user --prefix | grep -w $username 
+                        # the name is taken when a user, a password or a group has EXACTLY this name (grep -w matched any
+                        # word of any user/group value: member names, pool names, "no", "NoHome")
+                        /TopStor/etcdget.py $etcd user --prefix | grep -F -e "('usersinfo/$username'," -e "('usershash/$username'," -e "('usersigroup/$username',"
                         if [ $? -eq 0 ];
                         then
-                                docker exec etcdclient /TopStor/logmsg.py Unlin1021uu warning $userreq $username
-                                docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq 
+                                notify /TopStor/logmsg.py Unlin1021uu warning $userreq $username
+                                queue finish $userreq
                                 exit
                         fi
  else
@@ -83,30 +110,40 @@ echo 2222222222222222222222222222222222222222222222
  echo s$pullsync | grep pull
  if [ $? -ne 0 ]
  then
- 	useradd -c"TopStorGroup"$pas $homebase -p $userpass -s /usr/sbin/nologin $username 
+ 	# test 678: an id free in the whole cluster (etcd), not only in this node's /etc/group
+ 	nid=`/TopStor/nextclusterid.sh $etcd`
+ 	useradd -c"TopStorGroup"$pas $homebase -u $nid -p $userpass -s /usr/sbin/nologin $username 
+ 	groupmod -g $nid $username 2>/dev/null
  else
 	useradd -c"TopStorGroup"$pas $homebase -u $userid -p $userpass -s /usr/sbin/nologin $username
 	groupmod -g $usergd $username
  fi
 
 # /bin/smbpasswd -e $username
- sleep 2;
+ # (no fixed wait: useradd/groupmod have written /etc/passwd and /etc/group when they return)
  # QSD5.345: the passwd line of THIS name (grep $username took the first line holding the text: the uid/gid of another
  # account went to usersigroup/<group> and from there to the followers)
  userline=`getent passwd "$username"`
  if [ $? -ne  0  ]; then
-   docker exec etcdclient /TopStor/logmsg.py Unlin1120 error $userreq $username
+   notify /TopStor/logmsg.py Unlin1120 error $userreq $username
  else 
   userid=`echo $userline | awk -F':' '{print $3}'`
   usergd=`echo $userline | awk -F':' '{print $4}'`
   /TopStor/etcdput.py $etcd 'usersigroup/'$username $userid':'$usergd':'nogrouphome/nogroupsize'/NoUser/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no'
   #/TopStor/broadcast.py GroupAdd /TopStor/pump.sh UnixAddGroup_sync -d$myhost $username $userid $usergd $groupusers
   echo /TopStor/UnixChangeGroup $leaderip $username $groupusers $userreq create $pullsync
-  /TopStor/UnixChangeGroup $leaderip $username $groupusers $userreq create $pullsync
+  # sets the whole member list at once (gpasswd -M) and writes usersigroup/<group>; it files no per-member sync/UsrChange, so
+  # the sync/group request below (filed after the leader's row holds the members) is the only request a follower works for
+  # this group and its group sync applies the leader's member list in one go (test 629)
+  # the host values and the notification chain are handed to the nested call (it read them again: 3 docker exec)
+  TS_MYHOST=$myhost TS_MYHOSTIP=$myhostip TS_LEADER=$leader TS_NOTIFYPIDFILE=$notifyfile /TopStor/UnixChangeGroup $leaderip $username $groupusers $userreq create $pullsync
+  chrc=$?
   echo s$pullsync | grep pull
   if [ $? -eq 0 ]
   then
-  	docker exec etcdclient /TopStor/logmsg.py Unlin1122 info $userreq $username
+	# exit 3: a member is not on this node yet; the sync pass then still runs a GrpChange of this group (checksyncs)
+	if [ $chrc -eq 3 ]; then touch /tmp/grpchangemissing.$username; else rm -f /tmp/grpchangemissing.$username; fi
+  	notify /TopStor/logmsg.py Unlin1122 info $userreq $username
   fi
  fi 
  ln -f /etc/passwd  /opt/passwds/passwd
@@ -122,5 +159,5 @@ echo 2222222222222222222222222222222222222222222222
 	/pace/etcdput.py $etcd sync/group/$params/request/$myhost group_${username}_$stamp
 	/pace/etcdput.py $etcd sync/group/$params/request group_${username}_$stamp
  fi
- docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
+ queue finish $userreq
 fi

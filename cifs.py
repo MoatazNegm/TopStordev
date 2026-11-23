@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import sys, os, subprocess, datetime, fcntl
+import sys, os, subprocess, datetime, fcntl, shutil
 from logqueue import queuethis, initqueue
 from etcdgetpy import etcdget as get
 from sendhost import sendhost
@@ -8,6 +8,17 @@ from time import sleep
 
 _cifslock = None
 
+
+def domstatus(ipaddr, vtype, status):
+    # QSD5.339 (test 649 QX-050): the result of a DOMAIN share container for VolumeCreateCIFSdom (joined / nojoin / nocontainer /
+    # notmounted / ipinuse); a create that is not "joined" logs the failure and leaves nothing behind
+    if '_' not in vtype:
+        return
+    with open('/TopStordata/cifsdomjoin.'+ipaddr,'w') as f:
+        f.write(status+'\n')
+
+def hasvol(vols, name):
+    return any(isinstance(x, tuple) and str(x[0]).split('/')[-1] == name for x in vols)
 
 def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsubnet, vtype,*args):
     # QSD5.327: after a take over the activation script and VolumeCheck both start cifs.py for the same address. Each run
@@ -19,6 +30,13 @@ def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsub
     fcntl.flock(_cifslock, fcntl.LOCK_EX)
     volsip = get(etcdip,'volume','/'+ipaddr+'/')
     volsip = [ x for x in volsip if 'active' in str(x) ]
+    if etcdip != leaderip and not hasvol(volsip, name):
+        # QSD5.339 (test 649 QX-050 step 1): on a follower the local etcd may not have the new volume yet (the record is written to
+        # the leader's etcd, the sync comes later): read the leader's etcd, as the node that owns the record does
+        print('volume', name, 'not in the local etcd', etcdip, ': reading the leader etcd', leaderip)
+        etcdip = leaderip
+        volsip = get(etcdip,'volume','/'+ipaddr+'/')
+        volsip = [ x for x in volsip if 'active' in str(x) ]
     nodesip = get(etcdip, 'Active','/'+ipaddr+'/') 
     notsametype = [ x for x in volsip if vtype not in str(x) ]
     if (len(nodesip) > 0 and 'Active' in str(nodesip))or len(notsametype) > 0:
@@ -26,15 +44,20 @@ def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsub
         print('nodesip',len(nodesip), nodesip)
         print('nodtsametype',len(notsametype), notsametype)
         print(' the ip address is in use ')
-        return
+        domstatus(ipaddr, vtype, 'ipinuse')
+        return 5
     resname = vtype+'-'+ipaddr
     # QSD5.352 r9b (validator r9 V1): the active records of this address and type that this run starts (stale records
     # included: they are skipped below, but they do not change while the share starts)
     startkeys = sorted(str(x[0]) for x in volsip if x not in notsametype)
     cmdline='rm -rf /TopStordata/tempsmb.'+ipaddr
     subprocess.run(cmdline.split(),stdout=subprocess.PIPE)  
-    cmdline='rm -rf /TopStordata/smb.'+ipaddr
-    subprocess.run(cmdline.split(),stdout=subprocess.PIPE)  
+    # test 16 step 9: smb.<ip> is no longer removed here and copied back later. In that gap a parallel start's
+    # `docker run -v /TopStordata/smb.<ip>:/etc/smb.conf` found no source and docker created a DIRECTORY there: the share
+    # section never reached the container (domain share joined but BAD_NETWORK_NAME). It is replaced atomically below;
+    # a directory left by such a run is removed.
+    if os.path.isdir('/TopStordata/smb.'+ipaddr):
+        shutil.rmtree('/TopStordata/smb.'+ipaddr, ignore_errors=True)
     mounts =''
     # right after a take over this runs while the pool is still being imported: the volume's dataset is not mounted and
     # /<pool>/smb.<volume> is not readable yet. Reading it then (the error was skipped) gave an empty smb config and a
@@ -60,7 +83,8 @@ def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsub
             sleep(2)
         else:
             print('pool volume not mounted yet, not starting the share', pool, leftvol)
-            return
+            domstatus(ipaddr, vtype, 'notmounted')
+            return 6
     volsip = [ x for x in volsip if x not in staleskip ]
     for vol in volsip:
         if vol in notsametype:
@@ -73,13 +97,17 @@ def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsub
                     fip.write(fvol.read())
             except:
                continue 
-    # a leftover DIRECTORY (docker creates one for a missing bind-mount source) makes cp copy INTO it
-    subprocess.run(['rm','-rf','/TopStordata/smb.'+ipaddr],stdout=subprocess.PIPE)
-    cmdline = 'cp /TopStordata/tempsmb.'+ipaddr+' /TopStordata/smb.'+ipaddr
-    subprocess.run(cmdline.split(),stdout=subprocess.PIPE)  
+    if not os.path.exists('/TopStordata/tempsmb.'+ipaddr):
+        open('/TopStordata/tempsmb.'+ipaddr,'a').close()
+    shutil.copyfile('/TopStordata/tempsmb.'+ipaddr, '/TopStordata/smb.'+ipaddr+'.new')
+    if os.path.isdir('/TopStordata/smb.'+ipaddr):
+        shutil.rmtree('/TopStordata/smb.'+ipaddr, ignore_errors=True)
+    os.replace('/TopStordata/smb.'+ipaddr+'.new', '/TopStordata/smb.'+ipaddr)
+    # merge M+A (M): an empty share config starts no container
     if not os.path.isfile('/TopStordata/smb.'+ipaddr) or os.path.getsize('/TopStordata/smb.'+ipaddr) == 0:
         print('no share config for', ipaddr, 'volumes found:', len(volsip), 'not starting an empty share container')
-        return
+        domstatus(ipaddr, vtype, 'nocontainer')   # merge M+A: A's result codes
+        return 4
     if '_' not in vtype:
         cmdline = 'cp /TopStor/VolumeCIFSupdate.sh /etc/'
         subprocess.run(cmdline.split(),stdout=subprocess.PIPE)  
@@ -116,7 +144,35 @@ def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsub
             break
     if not running:
         print('share container did not stay up after 5 tries, see /root/cifsrun.log', resname)
-        return
+        domstatus(ipaddr, vtype, 'nocontainer')
+        return 4
+    if '_' in vtype:
+        # QSD5.339 (test 649 QX-050 steps 1, 4): the domain member image (membersmb) joins the domain in its entrypoint and then
+        # runs supervisord whatever the join gave: a wrong administrator password left a running container that serves nobody and
+        # the create said "success". Wait for "net ads testjoin" (up to ~3 min); once the entrypoint is done (PID 1 is
+        # supervisord) and the test still fails a few times, the join failed.
+        joined = False
+        failed = 0
+        tj = None
+        for attempt in range(90):
+            tj = subprocess.run(['docker','exec',resname,'net','ads','testjoin'],stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+            if tj.returncode == 0:
+                joined = True
+                break
+            if not subprocess.run(['docker','ps','-q','-f','name=^'+resname+'$'],stdout=subprocess.PIPE).stdout.decode().strip():
+                break
+            pid1 = subprocess.run(['docker','exec',resname,'cat','/proc/1/cmdline'],stdout=subprocess.PIPE,stderr=subprocess.PIPE).stdout
+            if b'supervisord' in pid1 and b'docker-entrypoint' not in pid1:   # the entrypoint runs as "bash /docker-entrypoint.sh supervisord ..." until its exec
+                failed += 1
+                if failed >= 5:
+                    break
+            sleep(2)
+        with open('/root/cifsrun.log','a') as flog:
+            flog.write(str(datetime.datetime.now())+' '+resname+' testjoin joined='+str(joined)+' tries='+str(attempt+1)+'\n'+(tj.stdout.decode()[-500:] if tj else '')+'\n')
+        domstatus(ipaddr, vtype, 'joined' if joined else 'nojoin')
+        if not joined:
+            print('the share container did not join the domain', resname)
+            return 3
     if '_' not in vtype:
         # the script that sets a user's samba password inside the share container; UnixAddUser_sync copies it, but the
         # node that created the users (the leader runs UnixAddUser) never ran that, so a share created later found no file
@@ -149,6 +205,53 @@ def create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsub
 
  
 
+def built(resname, ipaddr, name, vtype):
+    """the container of the address runs (and for a domain share is joined) with this share in its smb config"""
+    if not subprocess.run(['docker','ps','-q','-f','name=^'+resname+'$'],stdout=subprocess.PIPE).stdout.decode().strip():
+        return False
+    try:
+        with open('/TopStordata/smb.'+ipaddr) as f:
+            if '['+name+']' not in f.read():
+                return False
+    except (OSError, IsADirectoryError):
+        return False
+    if '_' in vtype:
+        return subprocess.run(['docker','exec',resname,'net','ads','testjoin'],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).returncode == 0
+    return True
+
+def lockedcreate(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsubnet, vtype, *args):
+    """test 16 step 9: one cifs.py per share address at a time (VolumeActivateCIFSdom and the VolumeCheck repair started two for
+    the same address within 4 s; see the smb.<ip> note in create). The lock is /tmp/shareaddr.<ip>.lock, as for NFS; a caller that
+    holds it names the address in SHAREADDR_LOCK. A run that had to wait finds the container already built with this share and
+    leaves it alone."""
+    if ipaddr in os.environ.get('SHAREADDR_LOCK','').split():
+        return create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsubnet, vtype, *args)
+    try:
+        lockf = open('/tmp/shareaddr.'+ipaddr+'.lock','w')
+    except OSError:
+        return create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsubnet, vtype, *args)
+    try:
+        try:
+            fcntl.flock(lockf, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError:
+            print('address', ipaddr, 'is being built by another job: waiting')
+            for attempt in range(150):
+                sleep(2)
+                try:
+                    fcntl.flock(lockf, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    break
+                except OSError:
+                    continue
+            else:
+                print('address lock not free after 300 s, building anyway', ipaddr)
+            if built(vtype+'-'+ipaddr, ipaddr, name, vtype):
+                print('container', vtype+'-'+ipaddr, 'already built with', name, 'by the other job')
+                domstatus(ipaddr, vtype, 'joined')
+                return
+        return create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsubnet, vtype, *args)
+    finally:
+        lockf.close()
+
 if __name__=='__main__':
  leader = sys.argv[1]
  leaderip = sys.argv[2]
@@ -163,4 +266,7 @@ if __name__=='__main__':
  initqueue(leaderip, myhost)
  with open('/root/cifspytmp','w') as f:
   f.write(str(sys.argv))
- create(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsubnet, vtype,*sys.argv[11:])
+ res = lockedcreate(leader, leaderip, myhost, myhostip, etcdip, pool, name, ipaddr, ipsubnet, vtype,*sys.argv[11:])
+ if res and '_' in vtype:
+  # a domain share that is not up and joined (the workgroup and home exit codes are unchanged)
+  sys.exit(res)

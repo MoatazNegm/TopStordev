@@ -18,7 +18,9 @@ then
 else
 	etcdip=$myhostip
 fi
-cujobs=(`echo diskreflooper zpooltoimportlooper iscsiwatchdog zfsping topstorrecvreply receivereplylooper checksyncs syncrequestlooper selectsparelooper VolumeChecklooper croncalllooper selectimportlooper retryvolumedeletelooper zfstelemetrylooper`)
+# test 679: receivereplylooper is killed BEFORE topstorrecvreply: the other way round the old looper started a new receiver in
+# the second between the two kills, it was orphaned by the looper kill and the new looper started another (two receivers)
+cujobs=(`echo diskreflooper zpooltoimportlooper iscsiwatchdog zfsping receivereplylooper topstorrecvreply checksyncs syncrequestlooper selectsparelooper VolumeChecklooper croncalllooper selectimportlooper retryvolumedeletelooper zfstelemetrylooper`)
 declare  -A cmdcjobs
 cmdcjobs['iscsiwatchdog']="/TopStor/iscsiwatchdog.sh" 
 is_container 2>/dev/null && cmdcjobs['iscsiwatchdoglooper']="/TopStor/iscsiwatchdoglooper.sh" 

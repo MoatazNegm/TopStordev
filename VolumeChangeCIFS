@@ -35,6 +35,20 @@ then
   writev=`echo $writev | sed 's/nogroup//g'`
  fi
  docker exec etcdclient /TopStor/logmsg.py VolCst01 info $userreq $name
+ # QSD5.336 (test 645 QX-046 step 5): $4 sent by volumes/config is applied: fapi passes a sent quota with its unit (2G) or as
+ # none; without one $4 is the stored GB number (e.g. 1.0, no unit), left alone (zfs would read it as bytes). Refused by zfs
+ # (e.g. below the used space): VolCfa01 and nothing else of the change is done (no VolCsu01).
+ if echo "$quota" | grep -Eq '^([0-9]+([.][0-9]+)?[KMGT]|none)$';
+ then
+  zfserr=`/sbin/zfs set quota=$quota $DG/$name 2>&1`
+  if [ $? -ne 0 ];
+  then
+   echo "zfs set quota=$quota $DG/$name: $zfserr"
+   docker exec etcdclient /TopStor/logmsg.py VolCfa01 error $userreq $name $quota
+   docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
+   exit 1
+  fi
+ fi
  echo name=$name
  myhost=`hostname -s`
  older=`ETCDCTL_API=3 /pace/etcdget.py $etcd volumes $name `
@@ -99,13 +113,15 @@ then
 	 ETCDCTL_API=3 /pace/etcdput.py $leaderip volumes/CIFS/$myhost/$DG/$name $DG/$name/no/yes/$writev/administrator/yes/$ipaddr/$ipsubnet/$active
 	 ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request volumes_$stamp
 	 ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request/$leader volumes_$stamp
-	 chmod 2770 /$DG/$name
+	 chmod 3770 /$DG/$name
 	 setfacl -b -R /$DG/$name
 	 echo $writev | grep -w nogroup
 	 if [ $? -ne 0 ];
 	 then
 	  writevtemp=`echo $writev | sed 's/\,/ /g'`
-	  for grp in $writevtemp ;do  setfacl -R -m g:$grp:rwx /$DG/$name; done
+	  # existing files/subdirs: group READ only; share root: group rwx; new files/dirs inherit group READ (owner-only modify)
+	  for grp in $writevtemp ;do  setfacl -R -m g:$grp:r-X /$DG/$name; setfacl -m g:$grp:rwx /$DG/$name; setfacl -R -d -m g:$grp:r-X /$DG/$name; done
+	  setfacl -d -m o::--- /$DG/$name
 	 fi
 
  fi
@@ -145,7 +161,8 @@ then
  then
   setfacl -b -R /$DG/$name
   writevtemp=`echo $writev | sed 's/\,/ /g'`
-  for grp in $writevtemp ;do  setfacl -R -m g:$grp:rwx /$DG/$name; done
+  for grp in $writevtemp ;do  setfacl -R -m g:$grp:r-X /$DG/$name; setfacl -m g:$grp:rwx /$DG/$name; setfacl -R -d -m g:$grp:r-X /$DG/$name; done
+  setfacl -d -m o::--- /$DG/$name
  fi
  echo ETCDCTL_API=3 /pace/etcdput.py $leaderip volumes/CIFS/$myhost/$DG/$name $DG/$name/no/yes/$writev/administrator/yes/$ipaddr/${ipsubnet}$extraparms/$active
  ETCDCTL_API=3 /pace/etcdput.py $leaderip volumes/CIFS/$myhost/$DG/$name $DG/$name/no/yes/$writev/administrator/yes/$ipaddr/${ipsubnet}$extraparms/$active

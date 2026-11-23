@@ -496,6 +496,9 @@ else
 fi
 echo adding cmynode
 nmcli conn up cmynode
+# test 680: this script brings cmynode up itself; NetworkManager must not auto-activate the saved profile at the next boot
+# (an old leader re-activated the cluster ip for ~4 s next to the new leader: 11 s without .249 for the clients)
+nmcli conn mod cmynode connection.autoconnect no 2>/dev/null
 enslave_eth10_to_bond0
 # Wait for node to be up
 ping -w 3 $mynodeip
@@ -523,7 +526,8 @@ echo $hostname > /etc/hostname
 resolve_local_host "$hostname"
 docker run --rm -d --name software --hostname software --network intdns-net --ip 10.11.12.10 -p $mynodeip:9418:9418 -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf:ro -v /root/gitrepo/git:/srv/git -v /TopStor/abdopuppet-entrypoint.sh:/usr/local/bin/entrypoint.sh:ro topstor/abdopuppet:latest
 echo starting intdns
-docker run --rm --name intdns --hostname intdns --net intdns-net -e DNS_DOMAIN=qs.dom -e DNS_IP=10.11.12.7 -e LOG_QUERIES=true -itd --ip 10.11.12.7 -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/dnshosts:/etc/hosts moataznegm/quickstor:dns
+/TopStor/containerresolv.sh   # writes the intdns forward files before intdns starts (test 674)
+docker run --rm --name intdns --hostname intdns --net intdns-net -e DNS_DOMAIN=qs.dom -e DNS_IP=10.11.12.7 -e LOG_QUERIES=true -itd --ip 10.11.12.7 -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/dnshosts:/etc/hosts -v /root/gitrepo/intdns-cluster.conf:/etc/dnsmasq.d/cluster.conf:ro -v /root/gitrepo/intdns-cluster.servers:/etc/dnsmasq.d/cluster.servers:ro moataznegm/quickstor:dns
 
 docker run -d --name wetty   --rm -p $mynodeip:3000:3000 moataznegm/aiwork:wetty-patched --ssh-host=$mynodeip --ssh-user=root --base=/
 leaderip=$myclusterip
@@ -536,7 +540,7 @@ else
 	leader=`/pace/etcdget.py $myclusterip leader`
 fi
 
-echo nameserver 10.11.12.7 >  /root/gitrepo/resolv.conf
+/TopStor/containerresolv.sh   # containers: intdns 10.11.12.7, cluster DNS, search; intdns forwards the domain (test 673)
 echo starting etcd 
 docker run -itd --rm --name etcd --hostname etcd -v /etc/localtime:/etc/localtime:ro -v /root/gitrepo/resolv.conf:/etc/resolv.conf -p $etcd:2379:2379 -v /TopStor/:/TopStor -v /root/etcddata:/default.etcd --net intdns-net moataznegm/quickstor:etcd
 
@@ -632,6 +636,11 @@ do
 	echo initializaing volume pool leader clsuternode data
 	myalias=`docker exec etcdclient /pace/etcdgetlocal.py $aliast/$myhost`
 	if [ -n "$newalias" ]; then myalias=$newalias; fi
+	# test 678: '_1' is etcdget's "not found"; it was stored as the alias of a node without one (alias/<host> = _1 on
+	# every node and in hosts/allinfo).  No alias of its own: keep the cluster's alias for this node, else its host name
+	case "$myalias" in ''|_1|-1) myalias=`/pace/etcdget.py $myclusterip $aliast/$myhost`;; esac
+	case "$myalias" in ''|_1|-1) myalias=$myhost;; esac
+	docker exec etcdclient /pace/etcdputlocal.py $aliast/$myhost $myalias   # its own local copy too (it kept _1)
 	leader=`/pace/etcdget.py $myclusterip leader`
 	docker exec etcdclient /pace/etcdputlocal.py leader $leader 
 	docker exec etcdclient /pace/etcdputlocal.py leaderip $myclusterip
@@ -643,6 +652,10 @@ do
 	docker exec etcdclient /pace/etcddellocal.py sync/pool Del_ 2>/dev/null
 	docker exec etcdclient /pace/etcddellocal.py sync/volume Add_ 2>/dev/null
 	docker exec etcdclient /pace/etcddellocal.py sync/volume Del_ 2>/dev/null
+	# test 678 step 2: the local pool/volume keys were just deleted, but this node's done marks of the initial sync requests
+	# (sync/<x>/initial/request/<me>) were still there from an earlier start: a returning follower got no pools/ or volumes/
+	# keys again.  Its marks go, so it copies them anew.
+	[ "$isprimary" -eq 0 ] 2>/dev/null && { /pace/etcddel.py $myclusterip sync/pool /initial/request/$myhost; /pace/etcddel.py $myclusterip sync/volume /initial/request/$myhost; }   # only these (test 679: all of them made the first pass ~35 min)
 	/pace/etcdput.py $myclusterip $aliast/$myhost $myalias
 	#/TopStor/syncq.py $myclusterip $myhost 2>/root/syncqerror
 	stamp=`date +%s%N`

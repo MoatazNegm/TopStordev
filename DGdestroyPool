@@ -96,6 +96,17 @@ echo iam in >> /root/tmp2
   # loop take an exported copy of the pool again (stale pool revived after delete, QC tests 13, 17)
   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/ActPool/Del_ActPool_${pool}/request actpools_$stamp 
   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/ActPool/Del_ActPool_${pool}/request/$leader actpools_$stamp 
+  # test 678 step 3: the standby assignment goes FIRST (it was deleted only after the destroy): with pools/<pool> gone and
+  # poolnxt/<pool> still there, the standby node imported its old leg of the pool being deleted
+  ETCDCTL_API=3 /pace/etcdput.py $leaderip pooldeleting/$pool `date +%s`
+  ETCDCTL_API=3 /pace/etcddel.py $leaderip poolnxt/$pool
+  # test 680: both reach the followers too (the marker lived only in the leader's etcd: after a take over the new leader had
+  # neither the marker nor the poolnxt delete and imported the deleted pool's old leg)
+  dstamp=`date +%s`
+  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/pooldeleting/Add_${pool}_$dstamp/request pooldeleting_$dstamp
+  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/pooldeleting/Add_${pool}_$dstamp/request/$leader pooldeleting_$dstamp
+  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/poolnxt/Del_poolnxt_${pool}/request poolnxt_$dstamp
+  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/poolnxt/Del_poolnxt_${pool}/request/$leader poolnxt_$dstamp
   ETCDCTL_API=3 /pace/etcddel.py $leaderip pools $pool
   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/pools/Del_pools_${pool}/request pools_$stamp 
   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/pools/Del_pools_${pool}/request/$leader pools_$stamp
@@ -174,6 +185,9 @@ echo iam in >> /root/tmp2
  sleep 2
  # QSD5.346: the pool's own guid, so the import below takes this pool and not a stale copy of the same name
  poolguid=`/sbin/zpool get -H -o value guid $pool 2>/dev/null`
+ # QSD5.327 (test 634 / 630): the pool is exported for a moment below; its standby (poolnxt/<pool>) must not import it in that
+ # window.  zpooltoimport.py imports no pool that has this marker; it is removed after the destroy.
+ ETCDCTL_API=3 /pace/etcdput.py $leaderip pooldeleting/$pool `date +%s`
  /sbin/zpool export -f $pool
  sleep 1
  # the import right after the export sometimes finds no pool ("cannot import: no such pool available") while the
@@ -188,6 +202,9 @@ echo iam in >> /root/tmp2
   sleep 3
  done
  sleep 1
+ # test 26 step 717: the member devices of this pool, to clear their labels after the destroy (a destroyed pool's labels stay on
+ # the disks; the product's import scan keeps finding that pool and a later pool create on these free disks failed)
+ pooldevs=`/sbin/zpool list -vHPL $pool 2>/dev/null | awk '{print $1}' | grep '^/dev/'`
  /sbin/zpool destroy -f $pool 2>/root/dgdestroyerror
  destroyrc=$?
  fi   # skipdestroy
@@ -195,7 +212,21 @@ echo iam in >> /root/tmp2
    docker exec etcdclient /TopStor/logmsg.py DGfa5 error $userreq $pool
    echo "zpool destroy $pool failed: `cat /root/dgdestroyerror`" >> /root/dgdestroyretry
  else
-   docker exec etcdclient /TopStor/logmsg.py DGsu5 info $userreq $pool 
+   for pd in $pooldevs; do
+     /sbin/zpool labelclear -f $pd >> /root/dglabelclear 2>&1
+     echo "destroyed $pool: labelclear $pd rc $?" >> /root/dglabelclear
+   done
+   # QSD5.327: the standby assignment of the deleted pool goes too (it stayed for ever and the standby kept importing by name)
+   ETCDCTL_API=3 /pace/etcddel.py $leaderip poolnxt/$pool
+   stamp=`date +%s`
+   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/poolnxt/Del_poolnxt_${pool}/request poolnxt_$stamp
+   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/poolnxt/Del_poolnxt_${pool}/request/$leader poolnxt_$stamp
+   # test 676 step 2: pools/<pool> is deleted above, BEFORE the destroy; putzpool (zfsping) re-puts every pool that zpool still
+   # lists, so the key came back in that window and stayed ~5 min (info/summary pools 2, list 1).  Gone for good now: again.
+   ETCDCTL_API=3 /pace/etcddel.py $leaderip pools $pool
+   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/pools/Del_pools_${pool}/request pools_$stamp
+   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/pools/Del_pools_${pool}/request/$leader pools_$stamp
+   docker exec etcdclient /TopStor/logmsg.py DGsu5 info $userreq $pool
  fi
  # QSD5.346: the clean-up and the tombstone follow the delete REQUEST, not only a successful destroy: a failed destroy
  # (ambiguous or failed import) left poolnxt/<pool> and no tombstone, and the exported pool was imported again when the
@@ -228,6 +259,7 @@ echo iam in >> /root/tmp2
    ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/pools/Del_pools_${pool}/request/$leader pools_$stamp
  }
 /pace/etcddel.py $leaderip destroying/$pool
+# pooldeleting/<pool> stays (its value is the time): pace/poolguard.py keeps the loops off the deleted pool for 30 days
 /pace/etcddel.py $leaderip requests/DGdestroypool/$myhost $myhost/$userreq
 #systemctl restart zfs-zed
  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` stop $userreq 

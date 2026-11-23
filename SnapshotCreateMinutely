@@ -30,13 +30,9 @@ then
 
 
 docker exec etcdclient /TopStor/logmsg.py Snap1034 info $userreq $FileS
-echo $leader | grep $myhost
-if [ $? -eq 0 ];
-then
- stamp=`date +%s`;
-else
- stamp=` echo $@ | awk '{print $7}'`;
-fi
+# QSD5.346 (test 661 QX-062 step 1): the period id is always a fresh epoch. On a follower (the owner of the pool) it was $7,
+# the user: every follower period had the same id, so one delete removed all of them.
+stamp=`date +%s`;
 crontab -l > $cronthis
 echo hihihihihihihihi
 echo "*"/$every "*" "*" "*" "*" /TopStor/putcron.sh /TopStor/etcdput.py $leaderip call/$stamp /TopStor/Snapshotnowhost::$DG/$FileS::Minutely.$keep.$every.na.na::$stamp::$receiver 2> txt/err.txt >> $cronthis
@@ -47,8 +43,11 @@ else
   docker exec etcdclient /TopStor/logmsg.py Snap1036 info $userreq $Minutely.$keep.$every.na.na.$stamp $DG/$FileS
   echo /pace/etcdput.py $etcd Snapperiod/Minutely/$DG/$FileS/$stamp/$receiver  */$every%*%*%*%*%/TopStor/Snapshotnowhost%$DG/$FileS%Minutely.$keep.$every.na.na%$stamp%$receiver
   /pace/etcdput.py $leaderip Snapperiod/Minutely/$DG/$FileS/$stamp/$receiver  */$every%*%*%*%*%/TopStor/Snapshotnowhost%$DG/$FileS%Minutely.$keep.$every.na.na%$stamp%$receiver
-   /pace/etcdput.py $leaderip sync/Snapperiod/____/request/$leader Snapperiod_$stamp
-   /pace/etcdput.py $leaderip sync/Snapperiod/____/request Snapperiod_$stamp
+   # QSD5.346: done for this node only when it is the leader (SnapshotCreateHourly)
+   if [ "$etcd" == "$leaderip" ]; then
+    /pace/etcdput.py $leaderip sync/Snapperiod/_____/request/$myhost Snapperiod_$stamp
+   fi
+   /pace/etcdput.py $leaderip sync/Snapperiod/_____/request Snapperiod_$stamp
 fi;
 fi
  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` stop $userreq 

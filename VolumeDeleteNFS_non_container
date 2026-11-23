@@ -40,8 +40,8 @@ then
   echo $allips | grep $volip
   if [ $? -ne 0 ];
   then
-   	nmcli conn mod cmynode -ipv4.addresses ${volip}/$volsubnet
-  	nmcli conn up cmynode
+   # QSD5.337 (test 646): share address live via shareaddr.sh, no "nmcli conn up cmynode" (bond0 re-activation drops every address)
+   /TopStor/shareaddr.sh del $volip $volsubnet
   fi
   stamp=`date +%s`
   ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request volumes_$stamp

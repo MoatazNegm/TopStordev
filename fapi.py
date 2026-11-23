@@ -15,6 +15,7 @@ import Hostsconfig
 from Hostconfig import config
 from allphysicalinfo import getall, initallphy
 from uservalid import check_new_user_coded, logname, check_group_name, check_password_target, check_new_group_name, CODE_GROUPNAME
+from volvalid import check_volname_coded, logname as vollogname
 from UnixChkUser import setlogin
 import sqlite3
 from etcdget2 import etcdgetjson
@@ -71,7 +72,11 @@ losthosts = []
 possiblehosts = []
 pooldict = dict()
 app = flask.Flask(__name__)
-app.config["DEBUG"] = True
+# QSD5.321: no Flask debug mode.  With DEBUG True app.run() served the interactive Werkzeug debugger (tracebacks with source
+# and local values, a PIN-protected console = remote code execution as root) on port 5001 of every interface for any
+# unhandled exception (tests 601, 625).  Unhandled exceptions now answer the generic JSON 500 of fapi_unhandled() below.
+app.config["DEBUG"] = False
+app.config["PROPAGATE_EXCEPTIONS"] = False
 
 class _AccessLogMask(logging.Filter):
  # QSD5.345 (QX-233 step 4): the werkzeug access log line holds the request line with its query string -- the login token
@@ -97,6 +102,21 @@ for log in logcatalog:
  msgcode= log.split(':')[0]
  logdict[msgcode] = log.replace(msgcode+':','').split(' ')
 allinfo = 0
+
+from werkzeug.exceptions import HTTPException as _HTTPException
+@app.errorhandler(Exception)
+def fapi_unhandled(e):
+ # HTTP errors (404, 405, 400 ...) keep Flask's own answer; any other exception is logged on the node (stderr of fapi,
+ # with the traceback) and the client gets only a generic JSON 500, never a traceback or the debugger
+ if isinstance(e, _HTTPException):
+  return e
+ try:
+  print('fapi: unhandled exception on '+str(request.method)+' '+str(request.path), file=sys.stderr)
+  traceback.print_exc()
+ except Exception:
+  pass
+ return jsonify({'response': 'error', 'message': 'internal error'}), 500
+
 
 def is_valid_ip(ip):
     try:
@@ -139,6 +159,26 @@ def with_everyone(groupstr):
         if EVERYONE not in names:
                 names.append(EVERYONE)
         return ','.join(names)
+
+# The groups of a user as a client sends them: a comma separated list of group ids (the position in getgroups(), what
+# users/grouplist answers as 'id') or of group names.  A value of digits only is an id; anything else must be the exact
+# name of a group.  Returns (groupstr, bad): groupstr is 'NoGroup' or the names joined by ',', bad lists the values that
+# are neither, so the caller refuses them instead of failing on them (test 609 step 2: names gave an HTTP 500).
+def resolve_groups(grps, allgroups):
+        names, bad = [], []
+        for grp in str(grps or '').split(','):
+                grp = grp.strip()
+                if not grp or grp == 'NoGroup':
+                        continue
+                if grp.isdigit() and int(grp) < len(allgroups):
+                        name = allgroups[int(grp)][0]
+                else:
+                        name = next((g[0] for g in allgroups if g[0] == grp), None)
+                if name is None:
+                        bad.append(grp)
+                elif name not in names:
+                        names.append(name)
+        return (','.join(names) if names else 'NoGroup'), bad
 
 # Everyone as the group of a share means all users (every user is a member of it): when it is among the groups the
 # others add nothing, so the share gets Everyone alone.
@@ -218,59 +258,76 @@ def name_in_volumes(name, volumes_text):
         pattern = r'(^|[^A-Za-z0-9_])'+re.escape(str(name))+r'(_[0-9]+)?([^A-Za-z0-9_]|$)'
         return re.search(pattern, volumes_text) is not None
 
-def is_unique_name(name, home=False):
-        global leaderip, allinfo
-        # QSD5.352 r9 (prover D4): a HOME volume is named after its user (the Home Folders page sends name=<user name>), so the
-        # user's own name was always 'already used' (IPnamuqfa) and a home could be made only through users/UnixAddUser.  For
-        # home=True an existing user of exactly that name does not count; a group of that name or a volume (an existing home
-        # <name>_<id>) still does.  The user's own keys (usersinfo/, usershash/) are left out, group records (usersigroup/)
-        # are compared by their key only (their values list the members).
-        if home:
-                try:
-                        users = get('usersinfo', '--prefix')
-                        isuser = any(isinstance(u, (list, tuple)) and str(u[0]) == 'usersinfo/'+str(name) for u in users)
-                except Exception as e:
-                        print('is_unique_name: users', e)
-                        isuser = False
-                if isuser:
-                        # r9b (validator r9 V4): volume NAMES only (the last element of each vol... KEY, plus the datasets
-                        # of allinfo): the whole 'vol' text also has the record VALUES, so a user named in another share's
-                        # write list (groups=<user>) was refused its own home (IPnamuqfa)
-                        names = []
-                        try:
-                                for v in get('vol', '--prefix'):
-                                        if isinstance(v, (list, tuple)) and len(v) > 1:
-                                                names.append(str(v[0]).split('/')[-1])
-                        except Exception as e:
-                                print('is_unique_name: volume keys', e)
-                        try:
-                                getalltime()
-                                names += [ str(v).split('/')[-1] for v in allinfo.get('volumes', {}) ]
-                        except Exception as e:
-                                print('is_unique_name: volumes', e)
-                        allvols = ' '.join(names)
-                        grps = get('usersigroup', '--prefix')
-                        isgroup = any(isinstance(g, (list, tuple)) and str(g[0]) == 'usersigroup/'+str(name) for g in grps)
-                        if isgroup or name_in_volumes(name, allvols):
-                                print("Invalid Name")
-                                return 1000
-                        print("Valid Name (the user's own home)")
-                        return 0
-        allvols = str(get('vol', '--prefix'))
+def _etcdkeys(prefix):
+        # the keys of a --prefix read; etcdget answers [(key, value), ...] or ['_1'] when there is nothing
         try:
-                getalltime()
-                allvols += '/'+' '.join(str(v) for v in allinfo.get('volumes', {}))   # datasets whose record is missing
-        except Exception as e:
-                print('is_unique_name: volumes', e)
-        alluser= str(get('user','--prefix'))
-        allgrp= str(get('group','--prefix'))
-        allnames = alluser+'/'+allgrp
-        name_pattern = rf'\b{re.escape(name)}\b' 
-        if bool(re.search(name_pattern,allnames)) or name_in_volumes(name, allvols):
+                return [str(x[0]) for x in get(prefix, '--prefix') if isinstance(x, (tuple, list)) and len(x) > 0]
+        except Exception:
+                return []
+
+def volshortname(volkey):
+        # volumes/<type>/<host>/<pool>/<name>_<id> -> <name> (a replica keeps its <name>_<id>: the same short name)
+        return re.sub(r'_[0-9]+$', '', str(volkey).rstrip('/').split('/')[-1])
+
+def is_unique_name(name, home=False, vols=True):
+        global leaderip, allinfo
+        # merge M+A: 1000 when a user, a group or a volume has EXACTLY this name.
+        # A (test 614 and others): exact keys, not a \b regex over the whole etcd dump ('_' is a word character, so the volume
+        # q022c (.../q022c_268804297) never matched, while any word of any value did).  vols=False (A's volumes/create): no
+        # volume check (a second volume of the same short name is refused by its script, Unlin1021vv; a replica <name>_repli is
+        # not stopped by its own source).  A home (volumes/HOME*/.../<user>_<id>) belongs to its user and is not counted.
+        # M (QSD5.352 r9 D4, r9b V4): home=True (volumes/create type HOME, named after its user): the user of exactly this name
+        # does not count, a group of that name or a volume (an existing home <name>_<id> included) still does; the datasets
+        # of allinfo count as volumes too (a dataset whose record is missing, QC 709).
+        name = str(name)
+        taken = False
+        for key in _etcdkeys('users'):
+                part = key.split('/')
+                if len(part) >= 2 and part[1] == name and part[0] in ('usersinfo', 'usershash', 'usersigroup'):
+                        if home and part[0] != 'usersigroup':
+                                continue
+                        taken = True
+                        break
+        if not taken and vols:
+                names = [ volshortname(key) for key in _etcdkeys('volumes/') if home or not key.startswith('volumes/HOME') ]
+                try:
+                        getalltime()
+                        names += [ volshortname(v) for v in allinfo.get('volumes', {}) ]
+                except Exception as e:
+                        print('is_unique_name: volumes', e)
+                taken = name in names
+        if taken:
                     print("Invalid Name")
                     return 1000 
         print("Valid Name")
         return 0 
+
+# volumes/create type=HOME: a home is named after its user, so the name must be an EXISTING user without a home (the opposite
+# of is_unique_name, which refused every home: test 655 QX-056 step 2).  Returns (error, message, pool), (None, None, None)
+# when the home may be made.  'hashome' when usersinfo/<user> names a pool (not NoHome) or a volumes/HOME*/.../<user>_<id>
+# exists (the check of VolumeCreateHOME, Unlin1028, answered here at once).
+def home_user_check(name):
+        name = str(name)
+        info = None
+        try:
+                for x in get('usersinfo/'+name, '--prefix'):
+                        if isinstance(x, (tuple, list)) and len(x) > 1 and str(x[0]) == 'usersinfo/'+name:
+                                info = str(x[1])
+                                break
+        except Exception:
+                info = None
+        if info is None:
+                return 'nouser', 'no such user: '+name, ''
+        part = info.split('/')
+        pool = part[1] if len(part) > 1 else ''
+        if pool and pool != 'NoHome':
+                return 'hashome', 'the user '+name+' already has a home folder in pool '+pool+': delete it first', pool
+        for key in _etcdkeys('volumes/HOME'):
+                if volshortname(key) == name:
+                        part = key.split('/')
+                        pool = part[3] if len(part) > 4 else ''
+                        return 'hashome', 'the user '+name+' already has a home folder in pool '+pool+': delete it first', pool
+        return None, None, None
 
 
 
@@ -969,8 +1026,9 @@ def uploadUsers(data):
         logmsg.sendlog('Unlin1026', 'error', data["user"])
         return {'response': data.get('response'), 'error': 'badfilename'}
       cmdline = 'python /TopStor/UsersMassAddition.py '+ leaderip +' '+ data['user'] + ' ' + myhost + ' ' + filePath + ' '+ data['token']
-      postchange(cmdline)
+      # "adding users started" before the job is queued, so it is always logged ahead of the rows and Unlin1027
       logmsg.sendlog('Unlin1025', 'info', data["user"])
+      postchange(cmdline)
       return {"data":data}
     else:
       logmsg.sendlog('Unlin1026', 'error', data["user"])
@@ -990,11 +1048,9 @@ def postchange(cmndstring,host='leader'):
         ownerip=get('ready/'+host,'--prefix')[0][1]
     except:
         return 'host is not ready'
- # QSD5.344: the executor still gets the real values; the debug files (/TopStordata/tempdata, /root/sendhostparam)
- # get the line with the request's passwords / secrets masked (QC test 701)
+ # merge M+A: no copy of the command in /TopStordata/tempdata any more (A, test 619: a 644 debug log with the plaintext
+ # passwords); the message-bus log line gets the request's secrets masked (M, QSD5.344 QC test 701)
  logline = mask_text(str(msg), _request_secrets())
- with open('/TopStordata/tempdata','a') as f:
-  f.write(str((ownerip, logline,'recvreply',myhost))+'\n')
  sendhost(ownerip, str(msg),'recvreply',myhost, logreq=logline)
  return 'queued'
 
@@ -1015,6 +1071,23 @@ def dict_factory(cursor, row):
     for idx, col in enumerate(cursor.description):
         d[col[0]] = row[idx]
     return d
+
+# usersinfo/<user> = <uid>/<pool>/<home>/<size>/<privileges...>: a row with fewer than 4 '/' fields (e.g. '_1/Logs-true' that
+# Priv.py wrote for a user that did not exist before QSD5.321) or etcdget's '_1' / '-1' for a missing key is not a user
+def usersinfo_ok(prop):
+ prop = str(prop) if prop is not None else ''
+ if prop in ('', '_1', '-1', 'None'):
+  return False
+ fields = prop.split('/')
+ return len(fields) >= 4 and fields[0] not in ('_1', '-1', '')
+
+_usersinfo_badlogged = set()
+def usersinfo_badrow(username, prop):
+ # printed once per row value (fapi's stderr), not on every list call
+ key = str(username)+'='+str(prop)
+ if key not in _usersinfo_badlogged:
+  _usersinfo_badlogged.add(key)
+  print('fapi: skipping malformed usersinfo row usersinfo/'+key, file=sys.stderr)
 
 def getusers():
  global leaderip
@@ -1116,19 +1189,23 @@ def getconns(data):
  global leaderip
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
- conns = get('connections/user','--prefix')
- devs = get('connections/dev','--prefix')
- zippedconns = zip(conns,devs)
+ # QSD5.344 (test 658 QX-059 step 3): every node writes the clients of its volumes (CIFS, NFS, iSCSI) to
+ # connections/<node> = {"stamp", "node", "connections": [...]} (pace/activeusers.py from zfsping, ~30 s). A node whose stamp
+ # is older than 90 s (dead node, stopped collector) is left out. Before, connections/user and connections/dev were read,
+ # which nothing wrote.
  conndict =  {}
  conndict['connections'] = []
- tconns = 0
- for conn in zippedconns:
-  volume = conn[0][0].split('/')[3]
-  subconns =  conn[0][1].split('/')
-  subdevs =  conn[1][1].split('/')
-  zippedsubconns = zip(subconns,subdevs)
-  for subcon in zippedsubconns:
-   conndict['connections'].append({"volume": volume, 'user': subcon[0], 'device':subcon[1] })
+ now = timestamp()
+ for node in get('connections/','--prefix'):
+  try:
+   nodeconns = json.loads(node[1])
+   if now - float(nodeconns['stamp']) > 90:
+    continue
+   for conn in nodeconns['connections']:
+    conn['device'] = conn.get('client','')	# the field of the old answer
+    conndict['connections'].append(conn)
+  except Exception:
+   continue
  conndict['response'] = data['response']
  return conndict 
 
@@ -1277,6 +1354,116 @@ def hostslost():
   hid += 1
  return jsonify(losthosts)
 
+# QSD5.326, test 633 (QX-034) step 2: pools/delpool only queues DGdestroyPool on the owner and answers at once; the pool and
+# its disks stay in 'host current' for some 30-40 s (DGst5 .. DGsu5 .. putzpool).  A newpool/addtopool sent right after the
+# delete found 0 free disks, newraids() had no key for the layout and dgsinfo['newraid'][redundancy] raised KeyError -> 500.
+# delpool now remembers the pools it queued for deletion (this process only: the API runs on the leader) and the pool calls
+# wait (bounded) for those pools to leave the inventory before they compute the free layouts.
+POOLDEL_WAIT = 90                    # longest wait of one pool call for a pending delete (s)
+POOLDEL_POLL = 3                     # inventory refresh interval while waiting (s)
+POOLDEL_FORGET = 300                 # a delete still not visible after this is forgotten (failed or refused, DGfa5)
+_pooldel_pending = {}                # pool -> time its delete was queued
+_pooldel_lock = threading.Lock()
+
+def _pooldel_busy():
+ # pools whose queued delete is not finished in the current inventory (the pool or one of its disks is still listed)
+ now = timestamp()
+ with _pooldel_lock:
+  for pool, queued in list(_pooldel_pending.items()):
+   still = pool in allinfo.get('pools', {}) or any(str(d.get('pool', '')) == pool for d in allinfo.get('disks', {}).values())
+   if not still or now - queued > POOLDEL_FORGET:
+    _pooldel_pending.pop(pool, None)
+  return sorted(_pooldel_pending)
+
+def _useable(value):
+ # useable arrives as a string ("64.2") from the API clients while the size keys of newraids() are floats
+ try:
+  return float(value)
+ except (TypeError, ValueError):
+  return value
+
+def _sizeavailable(newraid, redundancy, useable):
+ return redundancy in newraid and len(newraid[redundancy]) > 0 and useable in newraid[redundancy]
+
+def _newraid_after_pooldel(redundancy, useable):
+ # newraids() of the inventory; while the exact layout/size is missing and a delete is pending, refresh and wait (bounded).
+ # Returns (newraid, busy pools); busy is not empty only when the wait ran out.
+ newraid = newraids(_diskinventory())
+ waited = 0
+ busy = _pooldel_busy()
+ while busy and not _sizeavailable(newraid, redundancy, useable) and waited < POOLDEL_WAIT:
+  _poolop_sleep(POOLDEL_POLL)
+  waited += POOLDEL_POLL
+  getalltime('yes')
+  newraid = newraids(_diskinventory())
+  busy = _pooldel_busy()
+ if _sizeavailable(newraid, redundancy, useable):
+  busy = []
+ return newraid, busy
+
+def _pooldel_conflict(busy):
+ return jsonify({'response': 'error', 'pools': busy,
+                 'message': 'requested layout/size not available (disks busy: pool delete in progress)'}), 409
+
+# QSD5.330 (test 637 QX-038 step 3): Flask serves requests in threads; two parallel newpool calls ran the disk selection at the
+# same time (fastselect keeps its working state in module globals -> one call raised -> HTTP 500), and neither call knew the
+# disks the other had just queued (the new pool is in the inventory only after DGsetPool ran), so both could pick the same disks.
+# Now newpool/addtopool/delpool run one at a time (_poolop_lock, from the inventory refresh to postchange; released while
+# _newraid_after_pooldel sleeps), and the disks a create/add queued are left out of later selections until the inventory shows
+# them in a pool (or POOLNEW_FORGET passed: the create failed). A layout that does not fit then is a deliberate 409.
+POOLNEW_FORGET = 300                 # a queued create whose disks are still free after this is forgotten (s)
+_poolnew_pending = {}                # disk -> time a create/add with it was queued
+_poolop_lock = threading.Lock()
+_poolop_ctx = threading.local()      # .held: this thread holds _poolop_lock
+
+def _pool_serialised(f):
+ @wraps(f)
+ def decorated_function(*args, **kwargs):
+  with _poolop_lock:
+   _poolop_ctx.held = True
+   try:
+    return f(*args, **kwargs)
+   finally:
+    _poolop_ctx.held = False
+ return decorated_function
+
+def _poolop_sleep(seconds):
+ # sleep without blocking the other pool calls (the caller holds _poolop_lock)
+ if getattr(_poolop_ctx, 'held', False):
+  _poolop_lock.release()
+  try:
+   sleep(seconds)
+  finally:
+   _poolop_lock.acquire()
+ else:
+  sleep(seconds)
+
+def _poolnew_busy():
+ # disks of a queued create/add that the inventory does not show in a pool yet
+ now = timestamp()
+ disks = allinfo.get('disks', {})
+ with _pooldel_lock:
+  for disk, queued in list(_poolnew_pending.items()):
+   seen = disks.get(disk)
+   inpool = seen is not None and 'free' not in str(seen.get('raid', 'free'))
+   if inpool or now - queued > POOLNEW_FORGET:
+    _poolnew_pending.pop(disk, None)
+  return set(_poolnew_pending)
+
+def _poolnew_queued(disks):
+ with _pooldel_lock:
+  for disk in disks:
+   _poolnew_pending[disk] = timestamp()
+
+def _diskinventory():
+ # allinfo['disks'] without the disks of queued creates/adds
+ busy = _poolnew_busy()
+ return {disk: info for disk, info in allinfo['disks'].items() if disk not in busy}
+
+def _poolnew_conflict(busy):
+ return jsonify({'response': 'error', 'disks': sorted(busy),
+                 'message': 'requested layout/size not available (disks busy: pool create in progress)'}), 409
+
 @app.route('/api/v1/pools/dgsinfo', methods=['GET','POST'])
 @login_required
 @audit_command
@@ -1292,6 +1479,7 @@ def dgsinfo(data):
 @app.route('/api/v1/pools/delpool', methods=['GET','POST'])
 @login_required
 @audit_command
+@_pool_serialised
 def dgsdelpool(data):
  global allinfo, myhost
  if 'baduser' in data['response']:
@@ -1307,15 +1495,60 @@ def dgsdelpool(data):
  ownerip = allinfo['hosts'][data['owner']]['ipaddress']
  datastr = data['pool']+' '+data['user'] 
  cmndstring = '/TopStor/DGdestroyPool '+leaderip+' '+datastr
- postchange(cmndstring,data['owner'])
+ if postchange(cmndstring,data['owner']) == 'queued':
+  with _pooldel_lock:
+   _pooldel_pending[data['pool']] = timestamp()
 # z= cmndstring.split(' ')
 # msg={'req': 'Pumpthis', 'reply':z}
 # sendhost(ownerip, str(msg),'recvreply',myhost)
  return jsonify(data)
 
+# QSD5.332: the vdev type a redundancy of addtopool adds ('raid6plus' before 'raid6', 'raid60'/'raid50' share their prefix);
+# None = not known here (the request goes on as before)
+def _addlayout(redundancy):
+ r = str(redundancy)
+ if 'volset' in r or 'single' in r:
+  return 'stripe'
+ if 'mirror' in r or 'raid10' in r:
+  return 'mirror'
+ if 'raid6plus' in r:
+  return 'raidz3'
+ if 'raid6' in r:
+  return 'raidz2'
+ if 'raid5' in r:
+  return 'raidz1'
+ return None
+
+# the vdev types of a pool's data groups (allinfo['pools'][pool]['raids'] is in zpool status order: the data groups come
+# before the logs/cache/spares/special/dedup sections, whose own mirrors are not data groups). Empty = not known.
+def _pooldatalayouts(poolinfo):
+ layouts = []
+ if not poolinfo:
+  return layouts
+ for raid in poolinfo.get('raids', []):
+  name = str(raid)
+  if name.startswith(('log', 'cache', 'spare', 'special', 'dedup')):
+   break
+  if name.startswith('mirror'):
+   layout = 'mirror'
+  elif name.startswith('raidz3'):
+   layout = 'raidz3'
+  elif name.startswith('raidz2'):
+   layout = 'raidz2'
+  elif name.startswith('raidz'):
+   layout = 'raidz1'
+  elif name.startswith('stripe'):
+   layout = 'stripe'
+  else:
+   continue
+  if layout not in layouts:
+   layouts.append(layout)
+ return layouts
+
 @app.route('/api/v1/pools/addtopool', methods=['GET','POST'])
 @login_required
 @audit_command
+@_pool_serialised
 def dgsaddtopool(data):
  global allinfo, myhost, leaderip
  if 'baduser' in data['response']:
@@ -1323,7 +1556,28 @@ def dgsaddtopool(data):
  getalltime('yes')
  keys = []
  dgsinfo = {'raids':allinfo['raids'], 'pools':allinfo['pools'], 'disks':allinfo['disks']}
- dgsinfo['newraid'] = newraids(allinfo['disks'])
+ # QSD5.332 (test 639 QX-040 step 4): the requested group must have the layout of the pool's data groups; a single/volset
+ # (stripe) group on a mirror/raidz pool removed its redundancy (volset: zpool add -f) or crashed (single: HTTP 500)
+ wanted = _addlayout(data['redundancy'])
+ poollayouts = _pooldatalayouts(dgsinfo['pools'].get(data['pool']))
+ if wanted and poollayouts and wanted not in poollayouts:
+  poollayout = '+'.join(poollayouts)
+  requested = data['redundancy']+'('+wanted+')'
+  logmsg.sendlog('DGfa26','error',data['user'],data['pool'],poollayout,requested)
+  return jsonify({'response': 'error', 'error': 'mismatchedredundancy', 'pool': data['pool'], 'poollayout': poollayout,
+                  'requested': data['redundancy'],
+                  'message': 'mismatched redundancy: pool '+data['pool']+' is '+poollayout+', the requested '+requested
+                             +' group does not match its layout; group not added'}), 400
+ data['useable'] = _useable(data['useable'])
+ dgsinfo['newraid'], busy = _newraid_after_pooldel(data['redundancy'], data['useable'])
+ if busy:
+  return _pooldel_conflict(busy)
+ freedisks = _diskinventory()
+ if not dgsinfo['newraid'].get(data['redundancy']) and _poolnew_busy():
+  return _poolnew_conflict(_poolnew_busy())
+ if not dgsinfo['newraid'].get(data['redundancy']):
+  return jsonify({'response': 'error',
+                  'message': 'No eligible data disks are available for this configuration'}), 400
  if data['useable'] not in dgsinfo['newraid'][data['redundancy']]:
   keys = list(dgsinfo['newraid'][data['redundancy']].keys())
   keys.append(float(data['useable']))
@@ -1336,17 +1590,17 @@ def dgsaddtopool(data):
  if 'single' in data['redundancy']:
   selecteddisks = disks
  elif 'raid10' in data['redundancy']:
-  bestdisks = selectraid10(leaderip,disks,allinfo['disks'],data['pool'])
+  bestdisks = selectraid10(leaderip,disks,freedisks,data['pool'])
   if len(bestdisks) < 1:
     return jsonify(data)
   selecteddisks = bestdisks.split(',')
  elif 'raid50' in data['redundancy']:
-  bestdisks = selectraid50(leaderip,disks,allinfo['disks'],data['pool'])
+  bestdisks = selectraid50(leaderip,disks,freedisks,data['pool'])
   if len(bestdisks) < 1:
     return jsonify(data)
   selecteddisks = bestdisks.split(',')
  elif 'raid60' in data['redundancy']:
-  bestdisks = selectraid60(leaderip,disks,allinfo['disks'],data['pool'])
+  bestdisks = selectraid60(leaderip,disks,freedisks,data['pool'])
   if len(bestdisks) < 1:
     return jsonify(data)
   selecteddisks = bestdisks.split(',')
@@ -1354,7 +1608,7 @@ def dgsaddtopool(data):
   print('#########################')
   print('disks',disks)
   print('#########################')
-  bestdisks = selectdisks(leaderip,disks,allinfo['disks'],data['pool'])
+  bestdisks = selectdisks(leaderip,disks,freedisks,data['pool'])
   print('bestdisks',bestdisks)
   print('#########################')
   if len(bestdisks) < 1:
@@ -1381,8 +1635,13 @@ def dgsaddtopool(data):
   datastr = 'addraid60w'+str(raidwidthof('raid60',selecteddisks,allinfo['disks']))+' '+data['user']+' '+data['owner']+" "+diskstring+data['pool']
  elif 'raid6' in data['redundancy']:
   datastr = 'addparity2 '+data['user']+' '+data['owner']+" "+diskstring+data['pool']
+ else:
+  # no add command for this layout (e.g. 'single'): a deliberate 400, never an unhandled 500
+  return jsonify({'response': 'error', 'error': 'unsupportedredundancy', 'requested': data['redundancy'],
+                  'message': 'unsupported redundancy for adding to a pool: '+str(data['redundancy'])}), 400
  cmndstring = '/TopStor/DGsetPool '+leaderip+' '+datastr
- postchange(cmndstring,data['owner'])
+ if postchange(cmndstring,data['owner']) == 'queued':
+  _poolnew_queued(selecteddisks)
 # z= cmndstring.split(' ')
 # msg={'req': 'Pumpthis', 'reply':z}
 # sendhost(ownerip, str(msg),'recvreply',myhost)
@@ -1459,6 +1718,7 @@ def dgsdelcachespares(data):
 @app.route('/api/v1/pools/newpool', methods=['GET','POST'])
 @login_required
 @audit_command
+@_pool_serialised
 def dgsnewpool(data):
     global allinfo, myhost, leaderip
 
@@ -1474,10 +1734,24 @@ def dgsnewpool(data):
 
     if data.get('disks'):
         selecteddisks = data['disks']
+        busy = _poolnew_busy() & set(selecteddisks)
+        if busy:
+            return _poolnew_conflict(busy)
     else:
         keys = []
         dgsinfo = {'raids':allinfo['raids'], 'pools':allinfo['pools'], 'disks':allinfo['disks']}
-        dgsinfo['newraid'] = newraids(allinfo['disks'])
+        data['useable'] = _useable(data['useable'])
+        dgsinfo['newraid'], busy = _newraid_after_pooldel(data['redundancy'], data['useable'])
+        if busy:
+            return _pooldel_conflict(busy)
+        freedisks = _diskinventory()
+        if not dgsinfo['newraid'].get(data['redundancy']) and _poolnew_busy():
+            return _poolnew_conflict(_poolnew_busy())
+        if not dgsinfo['newraid'].get(data['redundancy']):
+            return jsonify({
+                'response': 'error',
+                'message': 'No eligible data disks are available for this configuration'
+            }), 400
 
         if data['useable'] not in dgsinfo['newraid'][data['redundancy']]:
             keys = list(dgsinfo['newraid'][data['redundancy']].keys())
@@ -1493,7 +1767,7 @@ def dgsnewpool(data):
         if 'single' in data['redundancy']:
             selecteddisks = [disk for disk in disks if disk not in manual_cache][:1]
         elif 'raid10' in data['redundancy']:
-            bestdisks = selectraid10(leaderip, disks, allinfo['disks'], '', excluded_disks)
+            bestdisks = selectraid10(leaderip, disks, freedisks, '', excluded_disks)
             if len(bestdisks) < 1:
                 return jsonify({
                     'response': 'error',
@@ -1501,7 +1775,7 @@ def dgsnewpool(data):
                 }), 400
             selecteddisks = bestdisks.split(',')
         elif 'raid50' in data['redundancy']:
-            bestdisks = selectraid50(leaderip, disks, allinfo['disks'], '', excluded_disks)
+            bestdisks = selectraid50(leaderip, disks, freedisks, '', excluded_disks)
             if len(bestdisks) < 1:
                 return jsonify({
                     'response': 'error',
@@ -1509,7 +1783,7 @@ def dgsnewpool(data):
                 }), 400
             selecteddisks = bestdisks.split(',')
         elif 'raid60' in data['redundancy']:
-            bestdisks = selectraid60(leaderip, disks, allinfo['disks'], '', excluded_disks)
+            bestdisks = selectraid60(leaderip, disks, freedisks, '', excluded_disks)
             if len(bestdisks) < 1:
                 return jsonify({
                     'response': 'error',
@@ -1517,7 +1791,7 @@ def dgsnewpool(data):
                 }), 400
             selecteddisks = bestdisks.split(',')
         else:
-            bestdisks = selectdisks(leaderip, disks, allinfo['disks'], '', excluded_disks)
+            bestdisks = selectdisks(leaderip, disks, freedisks, '', excluded_disks)
             if len(bestdisks) < 1:
                 return jsonify({
                     'response': 'error',
@@ -1602,7 +1876,8 @@ def dgsnewpool(data):
         datastr = 'parity2 '+data['user']+' '+data['owner']+" "+diskstring+" "+cachestring+" nopool "+data['user']+" "+data['owner']
 
     cmndstring = '/TopStor/DGsetPool '+leaderip+' '+datastr+' '+data['user']
-    postchange(cmndstring, data['owner'])
+    if postchange(cmndstring, data['owner']) == 'queued':
+        _poolnew_queued(selecteddisks)
 
     return jsonify(data)
 
@@ -1773,6 +2048,8 @@ def volumesinfo(prot='all'):
       volgrps.append(group[1])
    volumes.append(deepcopy(allinfo['volumes'][volume]))
    volumes[-1]['groups'] = deepcopy(volgrps)
+   if 'chappas' in volumes[-1]:   # the iSCSI CHAP secret is in no answer (test 653 QX-054)
+    volumes[-1]['chappas'] = chap_shown(volumes[-1]['chappas'])
  return volumes
 
 
@@ -1916,14 +2193,12 @@ def userchange(data):
      cmndstring = '/TopStor/TenantChangeUser '+leaderip+' '+data['name']+' groups'+grps+' '+pool+' '+data['tenant']+' '+data['response']
      postchange(cmndstring,data['owner'])
      return data
- allgroups = getgroups()
- if len(grps) < 1:
-  groupstr = 'NoGroup'
- else:
-  groupstr = groupnames_from(grps, allgroups)
-  if groupstr is None:
-   data['error'] = 'invalidgroup'
-   return data
+ groupstr, bad = resolve_groups(grps, getgroups())
+ if bad:
+  # a clear refusal (HTTP 400, so the UI queue counts it as failed) instead of an unhandled exception and HTTP 500
+  data['response'] = 'error'
+  data['error'] = 'invalid group: '+','.join(bad)
+  return jsonify(data), 400
  groupstr = with_everyone(groupstr)
  cmndstring = '/TopStor/UnixChangeUser '+leaderip+' '+data.get('name')+' groups'+groupstr+' '+data['user']+' '+'change'
  postchange(cmndstring)
@@ -2015,7 +2290,10 @@ def getnotification(data):
  msgbody = '.'
  notifc = 6
  for word in msg[4:]:
-  if word == ':':
+  if word == r'\:':
+   # an escaped colon in msgsglobal.txt is a literal ':' in the text, not a placeholder (e.g. Priv1004)
+   msgbody = msgbody[:-1]+' :.'
+  elif word == ':':
    try:
     msgbody = msgbody[:-1]+' '+notifbody[notifc]+'.'
    except:
@@ -2031,6 +2309,58 @@ def getnotification(data):
 	 'host':notifbody[2], 'type':notifbody[4], 'user': notifbody[5], 'msgbody': msgbody[1:],'requests':requestdict, 'response':'Ok'}
  return jsonify(notif)
 
+# QSD5.348 (test 663 QX-064): volumes/snapshots/create had no parameter check: a missing key, an unknown snapsel or owner was a
+# KeyError (HTTP 500 "internal error"), a bad Once name or a bad every/keep went on to the scripts (which clamp 0/-1/abc to 1).
+# snapcreate_guard() checks the call against the leader's cached info (allinfo) before anything is queued; it returns the
+# refusal text or None. Only the keys of the chosen snapsel are checked; extra keys stay accepted.
+SNAPCREATE_KEYS = {'Once': ['pool', 'volume', 'name'], 'Minutely': ['pool', 'volume', 'every', 'keep'],
+                   'Hourly': ['pool', 'volume', 'sminute', 'every', 'keep'], 'Weekly': ['pool', 'volume', 'stime', 'every', 'keep']}
+SNAPCREATE_NAME = re.compile(r'^[A-Za-z0-9_][A-Za-z0-9_.:-]{0,63}$')
+SNAPCREATE_DAYS = ('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat')
+
+def snapcreate_guard(data, info):
+ def missing(key):
+  return str(data.get(key, '')) == ''
+ def whole(key, low, high=None):
+  value = str(data[key])
+  if not re.match(r'^[0-9]{1,9}$', value):
+   return False
+  return int(value) >= low and (high is None or int(value) <= high)
+ for key in ('snapsel', 'owner'):
+  if missing(key):
+   return 'missing parameter: '+key
+ snapsel = data['snapsel']
+ if snapsel not in SNAPCREATE_KEYS:
+  return 'invalid parameter: snapsel (Once, Minutely, Hourly, Weekly)'
+ for key in SNAPCREATE_KEYS[snapsel]:
+  if missing(key):
+   return 'missing parameter: '+key
+ if data['owner'] not in info.get('hosts', {}):
+  return 'no such node: '+data['owner']
+ if data['pool'] not in info.get('pools', {}):
+  return 'no such pool: '+data['pool']
+ volume = info.get('volumes', {}).get(data['volume'])
+ if not isinstance(volume, dict) or volume.get('pool') != data['pool']:
+  return 'no such volume: '+data['volume']
+ if snapsel == 'Once':
+  if not SNAPCREATE_NAME.match(data['name']):
+   return 'invalid character in parameter: name'
+  return None
+ if snapsel == 'Hourly' and not whole('sminute', 0, 59):
+  return 'invalid parameter: sminute'
+ if snapsel == 'Weekly':
+  stime = re.match(r'^([0-9]{1,2}):([0-9]{2})$', str(data['stime']))
+  if not stime or int(stime.group(1)) > 23 or int(stime.group(2)) > 59:
+   return 'invalid parameter: stime'
+  # for Weekly 'every' is the day of the week (the UI sends its sday, e.g. Sat): the cron day-of-week field
+  if str(data['every']).lower() not in SNAPCREATE_DAYS and not whole('every', 0, 7):
+   return 'invalid parameter: every'
+ elif not whole('every', 1):
+  return 'parameter must be a positive number: every'
+ if not whole('keep', 1):
+  return 'parameter must be a positive number: keep'
+ return None
+
 @app.route('/api/v1/volumes/snapshots/create', methods=['GET','POST'])
 @login_required
 @audit_command
@@ -2040,8 +2370,23 @@ def volumesnapshotscreate(data):
   return {'response': 'baduser'}
  datastr = ''
  getalltime()
+ refusal = snapcreate_guard(data, allinfo)
+ if refusal:
+  return jsonify({'response': 'error', 'message': refusal}), 400
  ownerip = allinfo['hosts'][data['owner']]['ipaddress']
  data['leaderip'] = leaderip
+ # QSD5.345 (test 660 QX-061 step 5): a Once snapshot is stored as <name>.<epoch>, so a repeated name on the same volume
+ # made a second snapshot; refuse it here (nothing queued). The same name on another volume is allowed.
+ if data['snapsel'] == 'Once':
+  for snap in allinfo['snapshots'].values():
+   if snap.get('fullname','').split('@')[0] != data['pool']+'/'+data['volume']:
+    continue
+   base = snap.get('name','')
+   if '.' in base and base.rsplit('.',1)[1].isdigit():
+    base = base.rsplit('.',1)[0]
+   if base == data.get('name'):
+    return jsonify({'response': 'error', 'error': 'snapexists',
+                    'message': 'Snapshot name already exists on volume '+data['volume']+': '+data['name']}), 400
  switch = { 'Once':['snapsel','leaderip', 'name','pool','volume'], 'Minutely':['snapsel', 'leaderip', 'pool', 'volume', 'every', 'keep'],
 	'Hourly':['snapsel', 'leaderip', 'pool', 'volume', 'sminute', 'every', 'keep'], 
 	'Weekly':['snapsel', 'leaderip', 'pool', 'volume', 'stime', 'every', 'keep'] }
@@ -2065,8 +2410,118 @@ def volumesnapshotscreate(data):
  return data
 
 
+# iSCSI CHAP (QSD5.341, test 653 QX-054): volumes/create and volumes/config replaced the request's chapuser/chappas with one
+# built-in pair, the same on every installation, and returned it in the answer; the scripts set it on the TPG only, with
+# authentication=0, so CHAP was never asked. Now the requested pair is checked here (HTTP 400, nothing queued, when bad), the
+# secret goes on encrypted (encthis.sh, as the CIFS domain password; the clear secret is decrypted only by
+# /pace/iscsichap.sh, which writes it to the node ACLs in configfs) and no answer, trace or command log carries it.
+# 'nochap' = no CHAP (no chapuser/chappas in the request); 'clearchap' (volumes/config chapuser=nochap) removes it.
+CHAP_NONE = 'nochap'
+CHAP_CLEAR = 'clearchap'
+CHAP_SECRETS = ('chappas',)     # request keys never echoed nor written to cmdaudit.log
+_CHAPUSER_CHARS = re.compile(r'[A-Za-z0-9._:-]*')      # fullmatch: '$' would let a final newline in
+_CHAPPAS_CHARS = re.compile(r'[A-Za-z0-9._:@!-]*')
+
+def chap_raw(data, key):
+ # the value as it was sent: login_required removes blanks, so a secret with a blank must be refused, not shortened
+ val = request.args.get(key)
+ if val is None:
+  val = data.get(key)
+ return None if val is None else str(val)
+
+def chap_check(user, secret):
+ # None when good, else the message of the HTTP 400 (it never contains the secret)
+ if user is not None:
+  if not _CHAPUSER_CHARS.fullmatch(user):
+   return 'invalid character in chapuser: use letters, digits and . _ : - (1 to 64 characters); nothing changed'
+  if not 1 <= len(user) <= 64:
+   return 'chapuser must be 1 to 64 characters (letters, digits and . _ : -); nothing changed'
+ if secret is not None:
+  if not _CHAPPAS_CHARS.fullmatch(secret):
+   return 'invalid character in chappas: use letters, digits and . _ : @ ! - (12 to 16 characters); nothing changed'
+  if not 12 <= len(secret) <= 16:
+   return 'chappas must be 12 to 16 characters (letters, digits and . _ : @ ! -); nothing changed'
+ return None
+
+def chap_encrypt(user, secret):
+ # the secret on stdin, not on the command line (ps, the cmdaudit command list); '/' cannot be in a '/' separated record
+ try:
+  out = subprocess.run(['/TopStor/encthis.sh', user, '-'], input=(secret+'\n').encode(), stdout=subprocess.PIPE,
+                       stderr=subprocess.DEVNULL).stdout.decode()
+  enc = out.split('_result')[1].strip()
+ except Exception:
+  return None
+ if not enc or not re.fullmatch(r'[A-Za-z0-9+/=]+', enc):
+  return None
+ return 'chapenc_'+enc.replace('/','@@sep')
+
+def chap_refuse(message, err='invalidchap'):
+ return jsonify({'response': 'error', 'error': err, 'message': message}), 400
+
+def chap_hide(data):
+ for k in CHAP_SECRETS:
+  if k in data:
+   data[k] = '***'
+
+def chap_shown(token):
+ # what an answer shows of a stored secret
+ return '' if str(token) in ('', CHAP_NONE, CHAP_CLEAR, 'None') else '***'
+
+# (chapuser, chappas token) for volumes/create, or (None, message) when refused
+def chap_create(data):
+ user, secret = chap_raw(data, 'chapuser'), chap_raw(data, 'chappas')
+ if user == '':
+  user = None
+ if secret == '':
+  secret = None
+ if user == CHAP_NONE and secret is None:
+  user = None
+ if user is None and secret is None:
+  return CHAP_NONE, CHAP_NONE
+ msg = chap_check(user, secret)
+ if msg:
+  return None, msg
+ if user is None or secret is None or user == CHAP_NONE:
+  return None, 'chapuser and chappas are given together (or neither, for no CHAP); nothing changed'
+ token = chap_encrypt(user, secret)
+ if token is None:
+  return None, 'the CHAP secret could not be stored; nothing changed'
+ return user, token
+
+# the same for volumes/config: what is not sent stays as it is; chapuser=nochap removes CHAP
+def chap_config(data, volume):
+ curuser, curtoken = str(volume.get('chapuser', CHAP_NONE)), str(volume.get('chappas', CHAP_NONE))
+ user, secret = chap_raw(data, 'chapuser'), chap_raw(data, 'chappas')
+ if user == '':
+  user = None
+ if secret == '':
+  secret = None
+ if user is None and secret is None:
+  return curuser, curtoken
+ if user == CHAP_NONE and secret is None:
+  return CHAP_NONE, CHAP_CLEAR
+ msg = chap_check(user, secret)
+ if msg:
+  return None, msg
+ if user == CHAP_NONE:
+  return None, 'chapuser=nochap removes CHAP and takes no chappas; nothing changed'
+ if secret is None:
+  if user == curuser and curtoken.startswith('chapenc_'):
+   return curuser, curtoken
+  return None, 'a new chapuser needs its chappas; nothing changed'
+ if user is None:
+  if curuser in ('', CHAP_NONE, 'None') or chap_check(curuser, None):
+   return None, 'chappas needs a chapuser (the volume has none); nothing changed'
+  user = curuser
+ token = chap_encrypt(user, secret)
+ if token is None:
+  return None, 'the CHAP secret could not be stored; nothing changed'
+ return user, token
 
 
+
+# the volume types that have a /TopStor/VolumeCreate<type> script
+VOLCREATE_TYPES = ('CIFS', 'CIFSdom', 'HOME', 'ISCSI', 'NFS', 'NFS_non_container')
 
 @app.route('/api/v1/volumes/create', methods=['GET','POST'])
 @login_required
@@ -2075,7 +2530,29 @@ def volumecreate(data):
  global allinfo, myhost
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
+ # only a type with a /TopStor/VolumeCreate<type> script: S3 (no backend) and unknown types were queued as a command
+ # that does not exist and answered 200 as accepted; now HTTP 400, nothing read, created or queued (test 657 QX-058 step 4)
+ voltype = str(data.get('type', ''))
+ if voltype == 'S3':
+  return jsonify({'response': 'error', 'error': 'nos3backend', 'message': 'Failed to create S3 bucket volume'}), 400
+ if voltype not in VOLCREATE_TYPES:
+  return jsonify({'response': 'error', 'error': 'badtype', 'message': 'Failed to create volume: unknown volume type '+voltype}), 400
  datastr = ''
+ # the name as it was sent (login_required removes blanks, so 'q 1' would pass as 'q1'): volvalid.py, HTTP 400 and
+ # nothing queued for a name the scripts cannot carry (test 647 QX-048 step 2)
+ rawname = request.args.get('name', data.get('name'))
+ code, reason = check_volname_coded(rawname)
+ if reason:
+  logmsg.sendlog(code,'error',data.get('user','system'),vollogname(rawname))
+  return jsonify({'response': 'error', 'error': 'invalidname', 'name': vollogname(rawname), 'message': reason}), 400
+ # iSCSI CHAP: checked before anything is done; the secret is kept only encrypted (chaptoken), no answer shows it
+ if 'ISCSI' in str(data.get('type', '')):
+  chapuser, chaptoken = chap_create(data)
+  chap_hide(data)
+  if chapuser is None:
+   return chap_refuse(chaptoken)
+ else:
+  chap_hide(data)
  datatype = ip_context(data['type'], data.get('domname',''))
  ishome = 'HOME' in str(data.get('type', ''))
  if ishome:
@@ -2088,17 +2565,35 @@ def volumecreate(data):
    data['active'] = 'disabled'
   else:
    return {'response': data.get('response'), 'error': 'invalidstatus'}
- isvu =  int(is_valid_ip(data['ipaddress']))+int(is_unique_ip(data['ipaddress'],datatype))+int(is_unique_name(data['name'], home=ishome))
+ if ishome:   # merge: M's test ('HOME' in type), A's check of the user
+  # a home is named after its user (VolumeCreateHOME takes the name as the user): it must be an existing user without a
+  # home, not a name no user has (is_unique_name refused every home, test 655 QX-056 step 2); nothing queued when refused
+  homeerr, homemsg, homepool = home_user_check(rawname)
+  if homeerr == 'hashome':
+   logmsg.sendlog('Unlin1028','warning',data.get('user','system'),vollogname(rawname),homepool or 'unknown')
+  elif homeerr:
+   logmsg.sendlog('Unlin1029','error',data.get('user','system'),vollogname(rawname))
+  if homeerr:
+   return jsonify({'response': 'error', 'error': homeerr, 'name': vollogname(rawname), 'message': homemsg}), 400
+  nameuq = 0
+ else:
+  nameuq = int(is_unique_name(data['name'], vols=False))
+ isvu =  int(is_valid_ip(data['ipaddress']))+int(is_unique_ip(data['ipaddress'],datatype))+nameuq
  if isvu == 0:
     print('ip is valid')
  else:
-    if isvu < 100:
-        logmsg.sendlog('IPaddrfa','error','system',loggedusers[data['token']]['user'])
-    elif isvu > 10 and isvu < 120: 
-        logmsg.sendlog('IPadduqfa','error','system',loggedusers[data['token']]['user'])
+    # refused: HTTP 400 with the reason (it answered 200 with the echoed request, only the log said why)
+    # is_valid_ip gives 10, is_unique_ip 100, is_unique_name 1000
+    if isvu % 100 >= 10:
+        logmsg.sendlog('IPaddrfa','error','system',data.get('user','system'))
+        err, msg = 'invalidip', 'invalid IP address in the request: '+str(data['ipaddress'])
+    elif isvu % 1000 >= 100:
+        logmsg.sendlog('IPadduqfa','error','system',data.get('user','system'))
+        err, msg = 'ipinuse', 'the IP address is already in use: '+str(data['ipaddress'])
     else:
-        logmsg.sendlog('IPnamuqfa','error','system',loggedusers[data['token']]['user'])
-    return data
+        logmsg.sendlog('IPnamuqfa','error','system',data.get('user','system'))
+        err, msg = 'nameinuse', 'the name is already in use by a user or a group: '+str(data['name'])
+    return jsonify({'response': 'error', 'error': err, 'message': msg}), 400
  getalltime()
  if data.get('pool') not in allinfo['pools']:
   # no pool chosen / unknown pool: a clean answer instead of a KeyError (HTTP 500)
@@ -2113,17 +2608,14 @@ def volumecreate(data):
    data['error'] = 'invalidgroup'
    return data
   data['groups'] = only_everyone(grps)
+ chapmask = None
  if 'ISCSI' in data['type']:
-  chapuser, chapstored, why = iscsi_chap(data)
-  if why:
-   logmsg.sendlog('ISCSIfa02','error',data['user'],logname(data.get('name')))
-   return {'response': 'error', 'message': why}
-  why = iscsi_chap_same_address(allinfo.get('volumes'), data.get('name'), data['ipaddress'], chapuser, chapstored)
-  if why:
-   logmsg.sendlog('ISCSIfa03','error',data['user'],logname(data.get('name')),str(data['ipaddress']))
-   return {'response': 'error', 'message': why}
-  data['chapuser'], data['chappas'] = chapuser, chapstored
-  datastr = data['pool']+' '+data['name']+' '+data['size']+' '+data['ipaddress']+' '+data['Subnet']+' '+data['portalport']+' '+data['initiators']+' '+data['chapuser']+' '+data['chappas']+' '+data['active']+' '+data['user']+' '+data['owner']+' '+data['user']
+  # the requested CHAP (or none): it was replaced here by one built-in pair for every LUN (test 653 QX-054 step 1)
+  data['chapuser'] = chapuser
+  if chaptoken != CHAP_NONE:
+   data['chappas'] = '***'
+   chapmask = chaptoken
+  datastr = data['pool']+' '+data['name']+' '+data['size']+' '+data['ipaddress']+' '+data['Subnet']+' '+data['portalport']+' '+data['initiators']+' '+chapuser+' '+chaptoken+' '+data['active']+' '+data['user']+' '+data['owner']+' '+data['user']
  elif 'CIFSdom' in data['type']:
 
   cmdline=['/TopStor/encthis.sh',data["domname"],data["dompass"]]
@@ -2157,7 +2649,7 @@ def volumecreate(data):
  with open('/TopStordata/volcreate','a') as f:
     f.write(str(masked(data))+'\n'+'owner '+str(data['owner'])+'\n')
  print(logsafe(data))
- print(mask_text(datastr, _request_secrets(data)))
+ print(mask_text(datastr.replace(chapmask, '***') if chapmask else datastr, _request_secrets(data)))
  print('###########################')
  if 'ISCSI' not in data['type']:
   # data efficiency of the new volume: both on unless the request says off (the scripts read these two words anywhere on the line)
@@ -2334,9 +2826,30 @@ def usersauth(data):
  global allinfo
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
- cmndstring = '/TopStor/Priv.py '+leader+' '+leaderip+' '+myhost+' '+myhostip+' '+data['tochange']+' '+data['auths'].replace(',','/')+' '+data['user']
+ # QSD5.321 (test 625 step 5): only an existing user (a well formed usersinfo/<user> row) can get privileges; before, any
+ # name was queued to Priv.py, which wrote usersinfo/<name> = '_1/<privs>' and broke users/userlist for everybody
+ tochange = str(data.get('tochange', '') or '')
+ auths = str(data.get('auths', '') or '')
+ if not tochange or not auths or not usersinfo_ok(get('usersinfo/'+tochange)[0]):
+  logmsg.sendlog('Priv1005','error',data['user'],tochange if tochange else '-')
+  return {'response': 'error', 'message': 'invalid or missing parameter'}
+ cmndstring = '/TopStor/Priv.py '+leader+' '+leaderip+' '+myhost+' '+myhostip+' '+tochange+' '+auths.replace(',','/')+' '+data['user']
  postchange(cmndstring)
  return data
+
+# QSD5.336 (test 645 QX-046 step 5): a quota sent to volumes/config, as the zfs size VolumeChange<type> applies: a number with
+# K/M/G/T (a bare number is GB, the unit of the volume record and of volumesinfo), 0 or none = no quota (as VolumeCreateNFS).
+# None = not a valid quota.
+QUOTA_RE = re.compile(r'^\s*(none|[0-9]+(?:\.[0-9]+)?)\s*(?:([KMGT])(?:I?B)?)?\s*$', re.IGNORECASE)
+def _quotaarg(value):
+ m = QUOTA_RE.match(str(value))
+ if not m:
+  return None
+ if m.group(1).lower() == 'none':
+  return None if m.group(2) else 'none'
+ if float(m.group(1)) == 0:
+  return 'none'
+ return m.group(1)+(m.group(2) or 'G').upper()
 
 @app.route('/api/v1/volumes/config', methods=['GET','POST'])
 @login_required
@@ -2376,6 +2889,24 @@ def volumeconfig_do(data):
   if sm not in ('active', 'disabled'):
    return {'response': data['response'], 'volume': data.get('volume'), 'error': 'invalidstatus'}
   data['statusmount'] = sm
+ # iSCSI CHAP (test 653 QX-054 step 5/6): checked first (HTTP 400, nothing changed); the secret is in no answer
+ chapuser, chaptoken = None, None
+ if 'ISCSI' in str(data.get('type', '')):
+  chapuser, chaptoken = chap_config(data, volume)
+  chap_hide(data)
+  if chapuser is None:
+   return chap_refuse(chaptoken)
+ chap_hide(data)
+ # QSD5.336: $4 of VolumeChange<type> is the quota. Not sent: the stored GB number (e.g. 1.0, no unit) as before, which the
+ # scripts leave alone. Sent: checked here (HTTP 400 if bad) and passed with its unit or as none, which the scripts apply.
+ quotaarg = str(volume['quota'])
+ if 'quota' in data and 'ISCSI' not in str(data.get('type', '')):
+  quotaarg = _quotaarg(data['quota'])
+  if quotaarg is None:
+   return jsonify({'response': 'error', 'error': 'badquota', 'volume': data['volume'], 'quota': str(data['quota']),
+                   'message': 'invalid quota '+str(data['quota'])+': use a size such as 2G, 500M or 1.5T (K/M/G/T; a bare'
+                              +' number is GB) or 0/none for no quota; volume not changed'}), 400
+  data['quota'] = quotaarg
  data['owner'] = volume['host']
  if 'ipaddress' not in data:
    if len(str(volume['ipaddress'])) < 7:
@@ -2407,22 +2938,17 @@ def volumeconfig_do(data):
  datastr = ''
  data['owner'] = allinfo['hosts'][allinfo['pools'][volume['pool']]['host']]['name']
  if 'ISCSI' in data['type']:
-  chapuser, chapstored, why = iscsi_chap(data, volume)
-  if why:
-   logmsg.sendlog('ISCSIfa02','error',data['user'],logname(data.get('volume')))
-   return {'response': 'error', 'message': why}
-  why = iscsi_chap_same_address(allinfo.get('volumes'), volume.get('name'), data['ipaddress'], chapuser, chapstored)
-  if why:
-   logmsg.sendlog('ISCSIfa03','error',data['user'],logname(data.get('volume')),str(data['ipaddress']))
-   return {'response': 'error', 'message': why}
-  data['chapuser'], data['chappas'] = chapuser, chapstored
+  # the requested CHAP, or the volume's own when none is sent (it was replaced here by one built-in pair, test 653 step 5)
+  data['chapuser'] = chapuser
   if 'initiators' not in data:
    data['initiators'] = volume['initiators']
   if 'portalport' not in data:
    data['portalport'] = volume['portalport']
   for ele in data:
-   volume[ele] = data[ele] 
-  datastr = volume['pool']+' '+volume['name']+' '+str(volume['quota'])+' '+data['ipaddress']+' '+str(volume['Subnet'])+' '+data['portalport']+' '+data['initiators']+' '+data['chapuser']+' '+data['chappas']+' '+volume['statusmount']+' '+data['user']+' '+data['owner']+' '+data['user']
+   if ele not in CHAP_SECRETS:
+    volume[ele] = data[ele]
+  volume['chappas'] = chaptoken
+  datastr = volume['pool']+' '+volume['name']+' '+str(volume['quota'])+' '+data['ipaddress']+' '+str(volume['Subnet'])+' '+data['portalport']+' '+data['initiators']+' '+chapuser+' '+chaptoken+' '+volume['statusmount']+' '+data['user']+' '+data['owner']+' '+data['user']
  else:
 
   if 'groups' in data and len(data['groups']) < 1: 
@@ -2434,8 +2960,9 @@ def volumeconfig_do(data):
     return data
    data['groups'] = only_everyone(grps)
   for ele in data:
-   volume[ele] = data[ele] 
-  datastr = volume['pool']+' '+volume['name']+' '+str(volume['quota'])+' '+volume['groups']+' '+volume['ipaddress']+' '+str(volume['Subnet'])+' '+volume['statusmount']+' '+volume['host']+' '+volume['user']
+   if ele != 'quota':   # the record's quota stays the GB number from zfs (putzpool), not the request's '2G'
+    volume[ele] = data[ele]
+  datastr = volume['pool']+' '+volume['name']+' '+quotaarg+' '+volume['groups']+' '+volume['ipaddress']+' '+str(volume['Subnet'])+' '+volume['statusmount']+' '+volume['host']+' '+volume['user']
   print('33333333333333333333333333333333333333333333333#############################')
   print('volume',logsafe(volume))
   print('owner',ownerip)
@@ -2534,6 +3061,12 @@ def changepass(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
  data['user'] = data['response']
+ # a user changes only his own password; another user's password needs the privilege Box_Users (admin/system always).
+ # Without this gate any logged-in user rewrote usershash/<other user> (test 613 step 6), while UnixChangePass skipped the OS part.
+ if str(data.get('username', '')) != str(data['response']) and not has_privilege('Box_Users', data['response']):
+  logmsg.sendlog('Priv1004','error','system',data['response'])
+  data['error'] = 'noprivilege'
+  return data
  # QSD5.344: this call changes a password and nothing else.  Hostconfig.config() also changes the alias, the cluster
  # address, the time zone, NTP, DNS, ports ... (the Node Config calls of hosts/config, privilege 'Error'); passing the
  # whole request let any logged-in user change those through user/changepass without the privilege.  Only the three
@@ -2557,6 +3090,34 @@ def changepass(data):
 
 
 
+def alias_in_use(alias, me):
+ # True when alias equals (case-insensitive) the host name or the alias of a node other than 'me'.
+ # Names come from the local etcd: ready/<host>, ActivePartners/<host> and alias/<host> (so a node that is down
+ # but keeps an alias still counts).
+ new = alias.strip().lower()
+ me = me.strip().lower()
+ if new == '':
+  return False
+ def isplaceholder(v):
+  v = str(v).strip()
+  return v in ('', '-1') or re.fullmatch(r'_\d+', v) is not None
+ for prefix in ('ready/', 'ActivePartners/'):
+  for kv in get(prefix, '--prefix'):
+   if not isinstance(kv, tuple) or not str(kv[0]).startswith(prefix):
+    continue
+   host = str(kv[0])[len(prefix):].strip().lower()
+   if host != '' and host != me and host == new:
+    return True
+ for kv in get('alias/', '--prefix'):
+  if not isinstance(kv, tuple) or not str(kv[0]).startswith('alias/'):
+   continue
+  host = str(kv[0])[len('alias/'):].strip().lower()
+  if host == me or isplaceholder(kv[1]):
+   continue
+  if str(kv[1]).strip().lower() == new:
+   return True
+ return False
+
 @app.route('/api/v1/hosts/config', methods=['GET','POST'])
 @login_required
 @audit_command
@@ -2568,6 +3129,26 @@ def hostconfig(data):
   logmsg.sendlog('Priv1004','error','system',data['response'])
   data['error'] = 'noprivilege'
   return data
+ # alias: letters, digits, '.' and '-' only (the node start scripts use it unquoted in shell commands; '_' is the
+ # sync-key separator); an empty alias is left to the old behaviour.  Refused before anything is stored.
+ if data.get('alias','') != '' and not re.fullmatch(r'[A-Za-z0-9.-]{1,64}', str(data['alias'])):
+  return jsonify({'response':'error','message':'invalid character in parameter: alias'}), 400
+ # alias: not the host name or alias of ANOTHER node (case-insensitive; '', '-1' and the '_N' placeholders mean
+ # "no alias").  The node's own name / current alias and an empty alias stay allowed.  Refused before anything is stored.
+ if data.get('alias','') != '' and alias_in_use(str(data['alias']), str(data.get('name',''))):
+  return jsonify({'response':'error','message':'alias already in use: '+str(data['alias'])}), 400
+ # ntp (test 672 step 3): an IPv4 address or an RFC 1123 host name ('ntp..bad' was written to etcd and chrony.conf);
+ # '' and '_1' (not set) stay allowed.  Refused before anything is stored.
+ for key in ('ntp', 'ntpName'):
+  val = str(data.get(key, '')).strip()
+  if val in ('', '_1'):
+   continue
+  okv = all(re.fullmatch(r'(25[0-5]|2[0-4]\d|1?\d?\d)(\.(25[0-5]|2[0-4]\d|1?\d?\d)){3}', e) or
+            (len(e) <= 253 and not re.fullmatch(r'[0-9.]+', e) and
+             all(re.fullmatch(r'[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?', l) for l in e.rstrip('.').split('.')))
+            for e in re.split(r'[\s,]+', val) if e)
+  if not okv:
+   return jsonify({'response':'error','message':'invalid address or host name in parameter: '+key}), 400
  if 'ipaddr' in data:
     isvu =  int(is_valid_ip(data['ipaddr']))+int(is_unique_ip(data['ipaddr']))
     if isvu == 0:
@@ -2698,6 +3279,9 @@ def volumesnapshotperioddel(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
  getalltime()
+ # QSD5.346 (test 661 QX-062 step 5): an unknown period (not in the leader's Snapperiod records) raised KeyError (HTTP 500)
+ if data.get('name','') not in allinfo['snapperiods']:
+  return jsonify({'response': 'error', 'error': 'noperiod', 'message': 'No such snapshot period: '+str(data.get('name',''))}), 400
  data['owner'] = allinfo['snapperiods'][data['name']]['host']
  ownerip = allinfo['hosts'][data['owner']]['ipaddress']
  cmndstring = "/TopStor/SnapShotPeriodDelete "+leaderip+" "+data['name']+" "+data['user']
@@ -2754,6 +3338,35 @@ def volumeactive(data):
 
 
 
+# A volume that has an etcd key volumes/<TYPE>/<host>/<pool>/<name> but no dataset (allinfo drops it), e.g. the leftover of a
+# failed create (test 635: size=0G refused by zfs, the key kept the address, volumedel was a KeyError = HTTP 500).  An NFS key
+# goes to VolumeDeleteNFS on the host of the key (it removes the keys, a container/address if any, and skips the zfs destroy);
+# other types go to their VolumeDelete<TYPE> as before; an NFS key whose host is not ready is removed here.  No key at all: a
+# clean answer (error novolume, NFS1001) instead of HTTP 500.
+def volumedel_leftover(data):
+ name = str(data.get('name', ''))
+ user = data.get('user', 'system')
+ keys = [k for k in get('volumes', '--prefix') if len(str(k[0]).split('/')) >= 5 and str(k[0]).split('/')[-1] == name] if name else []
+ if not keys:
+  logmsg.sendlog('NFS1001', 'error', user, name)
+  data['error'] = 'novolume'
+  return data
+ for key in keys:
+  _, vtype, host, pool = str(key[0]).split('/')[:4]
+  data['owner'] = host
+  # the script on the key's host decides (a dataset that exists after all, allinfo not refreshed yet, is deleted as usual)
+  if postchange('/TopStor/VolumeDelete'+vtype+' '+leaderip+' '+pool+' '+name+' '+vtype+' '+user, host) != 'host is not ready' or vtype != 'NFS':
+   continue
+  logmsg.sendlog('NFS1000', 'info', user, pool+'/'+name)
+  dels(key[0])
+  for pfx in ('vol', 'replivol', 'size', 'tenant'):
+   dels(pfx, name)
+  stamp = 'volumes_'+str(int(timestamp()))
+  put(leaderip, 'sync/volumes/'+pool+'_'+name+'/request', stamp)
+  put(leaderip, 'sync/volumes/'+pool+'_'+name+'/request/'+myhost, stamp)
+  logmsg.sendlog('NFS1002', 'info', user, pool+'/'+name)
+ return data
+
 @app.route('/api/v1/volumes/volumedel', methods=['GET','POST'])
 @login_required
 @audit_command
@@ -2762,6 +3375,8 @@ def volumedel(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'}
  getalltime()
+ if data.get('name') not in allinfo['volumes']:
+  return volumedel_leftover(data)
  pool = allinfo['volumes'][data['name']]['pool']
  data['owner'] = allinfo['volumes'][data['name']]['host']
  ownerip = allinfo['hosts'][data['owner']]['ipaddress']
@@ -2776,6 +3391,44 @@ def volumedel(data):
         		 
  return data
 
+# The groups of a share without <group> (exact names; 'NoGroup' when none is left, as volumes/config sends it).
+def groups_without(groups, group):
+ rest = [g for g in str(groups).split(',') if g and g not in ('NoGroup', 'nogroup', group)]
+ return only_everyone(','.join(rest)) if rest else 'NoGroup'
+
+# A group delete (test 627 step 3): UnixDelGroup removed only the unix group and usersigroup/<group>; the shares that listed
+# the group kept it in etcd, in their smb conf (write list = <group>) and in the dataset ACL (group:<gid>:rwx, a numeric orphan
+# once the gid is free), so a group created later with that name or gid got the old rights.  Before UnixDelGroup is queued,
+# every CIFS / NFS / HOME share that lists the group is changed on the node that owns its pool with the command volumes/config
+# sends (VolumeChange<type>), the group taken out: the scripts rewrite etcd, the smb conf / exports and the ACL (setfacl -b,
+# then the remaining groups by name).  Domain shares (groups 'DOMAIN') and iSCSI have no group list and are left alone.
+def volumes_drop_group(group, userreq):
+ try:
+  getalltime('yes')
+  vols = list(allinfo['volumes'].values())
+ except Exception as e:
+  print('volumes_drop_group: no volumes info', e)
+  return
+ for volume in vols:
+  prot = str(volume.get('prot', ''))
+  if prot in ('CIFS', 'NFS'):
+   vtype = prot
+  elif 'HOME' in prot:
+   vtype = 'HOME'
+  else:
+   continue
+  if group not in str(volume.get('groups', '')).split(','):
+   continue
+  try:
+   owner = allinfo['hosts'][allinfo['pools'][volume['pool']]['host']]['name']
+   user = userreq if has_privilege(vtype, userreq) else 'system'
+   datastr = volume['pool']+' '+volume['name']+' '+str(volume['quota'])+' '+groups_without(volume['groups'], group)+' '+\
+             volume['ipaddress']+' '+str(volume['Subnet'])+' '+volume['statusmount']+' '+volume['host']+' '+user
+  except Exception as e:
+   print('volumes_drop_group: skipped', volume.get('name'), e)
+   continue
+  postchange('/TopStor/VolumeChange'+vtype+' '+leaderip+' '+datastr, owner)
+
 @app.route('/api/v1/groups/groupdel', methods=['GET','POST'])
 @login_required
 @audit_command
@@ -2785,6 +3438,8 @@ def groupdel(data):
  if data.get('name') == EVERYONE:
   data['error'] = 'everyonefixed'
   return data
+ if has_privilege('Box_Users', data['user']):
+  volumes_drop_group(str(data.get('name')), data['user'])
  cmndstring = '/TopStor/UnixDelGroup '+leaderip+' '+data.get('name')+' '+data['user']
  postchange(cmndstring)
  unshare_group(data.get('name'), data)
@@ -2996,6 +3651,13 @@ def partner_other_type(alias, ptype):
 def AddPartner(data):
  if 'baduser' in data['response']:
   return {'response': 'baduser'} 
+ # test 674 step 7: the pass reached PartnerAdd.py with a trailing newline (the command line is split on blanks) and became
+ # part of an etcd sync key; every key list read after it paired keys with the wrong values and checksyncs wrote marks
+ # without end.  alias / type / pass go into the command line, the 'Partner/<alias>_<type>' key and the
+ # '<ip>/<type>/<port>/<pass>' value: no blank, control character, '/', '_' or ':' in them.
+ for key, pat in (('alias', r'[A-Za-z0-9.-]{1,64}'), ('type', r'[A-Za-z]{1,32}'), ('pass', r'[^\s/_:]{1,128}')):
+  if not re.fullmatch(pat, str(data.get(key, ''))):
+   return jsonify({'response':'error','message':'invalid character in parameter: '+key}), 400
  # QSD5.345: checked before the address: the same alias with the same address used to end in the address refusal with a
  # success-looking answer
  if partner_alias_taken(data.get('alias'), data.get('type')):
@@ -3130,13 +3792,11 @@ def UnixAddUser(data):
  grps = data.get('groups') or ''
  groupstr = ''
  allgroups = getgroups()
- if len(grps) < 1:
-  groupstr = 'NoGroup'
- else:
-  groupstr = groupnames_from(grps, allgroups)
-  if groupstr is None:
-   data['adduser'] = 'rejected: unknown group'
-   return data
+ groupstr, bad = resolve_groups(grps, allgroups)
+ if bad:
+  data['adduser'] = 'rejected: invalid group: '+','.join(bad)
+  data['response'] = 'rejected'
+  return data
  groupstr = with_everyone(groupstr)
  cmndstring = '/TopStor/UnixAddUser '+leaderip+' '+data.get('name')+' '+pool+' groups'+groupstr+' ' \
      +data.get('Password')+' '+data.get('Volsize')+'G '+data.get('HomeAddress')+' '+data.get('HomeSubnet')+' hoststub'+' '+data['user']
@@ -3211,9 +3871,13 @@ def userauths(data):
  if  data['username'] == 'admin':
   return {'auths':'true','response':data['response']}
  userlst = etcdgetjson(leaderip,'usersinfo','--prefix')
+ priv = ''    # QSD5.321: an unknown user or a malformed row answers no privileges, not an UnboundLocalError (HTTP 500)
  for user in userlst:
   username = user['name'].replace('usersinfo/','')
   if username == data['username']:
+   if not usersinfo_ok(user.get('prop')):
+    usersinfo_badrow(username, user.get('prop'))
+    break
    priv = '/'.join(user['prop'].split('/')[4:])
    break
  return jsonify({'auths':priv, 'response':data['response']})
@@ -3299,6 +3963,9 @@ def api_users_userslist(data):
   homevols = {}
  for user in userlst:
   username = user['name'].replace('usersinfo/','')
+  if not usersinfo_ok(user.get('prop')):
+   usersinfo_badrow(username, user.get('prop'))    # QSD5.321: a malformed row is skipped, not an HTTP 500 for the whole list
+   continue
   usersize = user['prop'].split('/')[3]
   userpool = user['prop'].split('/')[1]
   priv = '/'.join(user['prop'].split('/')[4:])
@@ -3577,6 +4244,6 @@ if __name__=='__main__':
     getalltime()
     _mark('getalltime (disks, pools, volumes) -- starting the web server now')
    #myhostip = sys.argv[5]
-    app.run(host="0.0.0.0", port=5001, use_debugger=False)
+    app.run(host="0.0.0.0", port=5001, debug=False, use_debugger=False, use_reloader=False)
 
 

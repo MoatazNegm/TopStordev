@@ -11,10 +11,16 @@ privilege="Box_Users";
 contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
 then
-	leaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip`
-	myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
-	myhostip=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`
-	leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
+	# leaderip, clusternode, clusternodeip and leader in ONE docker exec and one python (was four of each); same etcdgetlocal.etcdget
+	hostinfo=`docker exec -w /TopStor etcdclient /usr/bin/python3 -c 'from etcdgetlocal import etcdget; [etcdget(k) for k in ("leaderip","clusternode","clusternodeip","leader")]'`
+	leaderip=`echo "$hostinfo" | sed -n 1p`; myhost=`echo "$hostinfo" | sed -n 2p`; myhostip=`echo "$hostinfo" | sed -n 3p`; leader=`echo "$hostinfo" | sed -n 4p`
+	if [ -z "$leaderip" -o -z "$myhost" -o -z "$myhostip" -o -z "$leader" ]
+	then
+		leaderip=`docker exec etcdclient /TopStor/etcdgetlocal.py leaderip`
+		myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
+		myhostip=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`
+		leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
+	fi
 	docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq
 	echo $leader | grep $myhost
 	if [ $? -ne 0 ];

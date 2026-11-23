@@ -1,8 +1,7 @@
 #!/bin/bash
-# QSD5.337: user/group scripts run one at a time (several Add User clicks in a row ran useradd/userdel in parallel and lost users);
-# a nested call (UnixChangeGroup -> UnixChangeUser, UnixAddUser -> ...) inherits TS_USRLOCK and does not lock again
+# QSD5.337 (M): user/group scripts run one at a time; a nested call inherits TS_USRLOCK and does not lock again
 if [ -z "$TS_USRLOCK" ] && command -v flock >/dev/null 2>&1; then export TS_USRLOCK=1; exec flock -w 900 /tmp/topstor-users.lock "$0" "$@"; fi
-# QSD5.344: the debug copy of the arguments has the password (argument 5) masked (QC test 701)
+# QSD5.344 (M): the debug copy of the arguments has the password (argument 5) masked (QC test 701)
 echo $@ | awk '{ if (NF >= 5) $5 = "****"; print }' > /root/unixadduser
 export ETCDCTL_API=3
 cd /TopStor
@@ -16,10 +15,7 @@ size=`echo $@ | awk '{print $6}'`;
 HomeAddr=`echo $@  | awk '{print $7}' `;
 HomeSubnet=`echo $@  | awk '{print $8}'`;
 pullsync=`echo $@  | awk '{print $9}'`;
-# QSD5.352 r9 (prover D2): fapi users/UnixAddUser adds homeowner=<host of the home pool's owner> (a key=value word at the
-# end, after the positional arguments)
-homeowner=`echo "$@" | grep -o 'homeowner=[^ ]*' | head -n 1 | cut -d= -f2`
-homeremote=0
+leaderhash=''
 echo $pullsync | grep pull
 if [ $? -eq 0 ]
 then
@@ -27,6 +23,9 @@ then
 	usergd=`echo $@  | awk '{print $11}'`;
 	active=`echo $@  | awk '{print $12}'`;
 	permis=`echo $@  | awk '{print $13}'`;
+	# the leader's usershash value, kept as it is: stored here unchanged (test 671: it was decrypted and encrypted again with
+	# a new random salt, so usershash/<user> differed on every node that made the user by sync)
+	leaderhash=$userpass
 	userpass=`/TopStor/decthis.sh $username $userpass | awk -F'_result' '{print $2}'`
 	userreq=`echo $@  | awk '{print $14}'`;
 else
@@ -56,16 +55,87 @@ then
 		fi
 	fi
 fi
+# Notifications (logmsg.py/logqueue.py) cost 1.2-2.4 s each (python, pika, a new RabbitMQ connection) and nothing here reads
+# their result, so they run in the background, while this script runs in the single command consumer (topstorrecvreply.py).
+# Each one waits (at most 10 s) for the one sent before it, so they still arrive in the order they are sent; a nested
+# UnixChangeUser joins the same chain through TS_NOTIFYPIDFILE. No output may reach the consumer's pipe (it waits for EOF).
+notifyfile=${TS_NOTIFYPIDFILE:-/tmp/topstornotify.$$}
+notify() {
+	local prev=''
+	[ -s "$notifyfile" ] && read -r prev < "$notifyfile"
+	( n=0; while [ -n "$prev" ] && [ $n -lt 100 ] && kill -0 "$prev" 2>/dev/null; do sleep 0.1; n=$((n+1)); done
+	  docker exec etcdclient "$@" ) </dev/null >/dev/null 2>&1 &
+	echo $! > "$notifyfile"
+}
+[ -z "$TS_NOTIFYPIDFILE" ] && trap 'rm -f "$notifyfile"' EXIT
+# a sync copy (pull) is not a task of its own: no task-queue (logqueue) rows for it
+queue() { echo "$pullsync" | grep -q pull || notify /TopStor/logqueue.py `basename "$0"` "$@"; }
+# "<host> <ip>" of the node that has pool $1 imported (the zpool lists every node puts in hosts/<node>/current, the address
+# from ready/<node> as fapi postchange takes it); nothing when no ready node has it
+poolowner() {
+/usr/bin/python3 - "$leaderip" "$1" "$myhost" <<'EOF' 2>/dev/null
+import sys, json
+sys.path.insert(0, '/TopStor')
+from etcdgetpy import etcdget as get
+leaderip, pool, me = sys.argv[1], sys.argv[2], sys.argv[3]
+for key, val in get(leaderip, 'hosts', '--prefix'):
+    parts = key.split('/')
+    if len(parts) != 3 or parts[2] != 'current' or parts[1] == me:
+        continue
+    try:
+        pools = json.loads(val)
+    except Exception:
+        continue
+    if not any(isinstance(p, dict) and p.get('name') == pool for p in pools):
+        continue
+    ip = ''.join(v for k, v in get(leaderip, 'ready/'+parts[1], '--prefix') if k == 'ready/'+parts[1])
+    if ip.count('.') == 3:
+        print(parts[1], ip)
+        break
+EOF
+}
+# The home sent to the pool owner (end of this script): the owner reports the result itself (NFS1007 and the key
+# volumes/HOMEE/<owner>/<pool>/<user>_<id>; or NFS1006 + Unlin1023 and usersinfo back to NoHome). A job that never ran there
+# told nobody (test 619 step 1: the owner's command consumer lost it) and the user stayed recorded with a home that does not
+# exist. Run in the background (never in the command consumer): wait for either result, at most 1800 s (the owner runs its
+# commands one at a time, a home takes 2-3 min); none and usersinfo still as written here -> the same as a failed send.
+homewatch() {
+	local etcd=$1 pool=$2 user=$3 req=$4 start=$5 n=0 info
+	while [ $n -lt ${TS_HOMEWAIT:-1800} ]
+	do
+		sleep ${TS_HOMESTEP:-10}; n=$((n+${TS_HOMESTEP:-10}))
+		/pace/etcdget.py $etcd volumes/HOMEE --prefix | grep -q "/$pool/${user}_[0-9]*'," && return 0
+		info=`/pace/etcdget.py $etcd usersinfo/$user`
+		# changed by the owner (NoHome), deleted or made again: not ours any more ('_1' can also be a failed read: wait on)
+		[ -n "$info" -a "$info" != '_1' -a "$info" != "$start" ] && return 0
+	done
+	/pace/etcdget.py $etcd volumes/HOMEE --prefix | grep -q "/$pool/${user}_[0-9]*'," && return 0
+	info=`/pace/etcdget.py $etcd usersinfo/$user`
+	[ "$info" = "$start" ] || return 0
+	echo `date` home of $user on $pool not made by the owner in time, the user gets no home >> /root/unixadduserhome.log
+	docker exec etcdclient /TopStor/logmsg.py NFS1006 error $req $pool/$user
+	/TopStor/etcdput.py $etcd 'usersinfo/'$user "`echo "$info" | sed "s|:/$pool/|:/NoHome/|"`"
+	usermod -d /NoHome/$user $user
+	docker exec etcdclient /TopStor/logmsg.py Unlin1023 warning $req $user
+}
+homeowner=''
+addrc=0
 privilege="Box_Users";
 contrun=`./privthis.sh $privilege $userreq`;
 echo contrun $contrun, $userreq
 if [[ $contrun == 'true' ]]
 then
 
-	myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
-	myhostip=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`
-	leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
-	docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq
+	# clusternode, clusternodeip and leader in ONE docker exec and one python (was three of each); same etcdgetlocal.etcdget
+	hostinfo=`docker exec -w /TopStor etcdclient /usr/bin/python3 -c 'from etcdgetlocal import etcdget; [etcdget(k) for k in ("clusternode","clusternodeip","leader")]'`
+	{ read -r myhost; read -r myhostip; read -r leader; } <<< "$hostinfo"
+	if [ -z "$myhost" -o -z "$myhostip" -o -z "$leader" ]
+	then
+		myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
+		myhostip=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`
+		leader=`docker exec etcdclient /TopStor/etcdgetlocal.py leader`
+	fi
+	queue running $userreq
 	echo $leader | grep $myhost
 	if [ $? -ne 0 ];
 	then
@@ -76,7 +146,8 @@ then
 		if [ $? -ne 0 ]
 		then
  
- 			/pace/etcdget.py $etcd volumes --prefix | grep -E "(^|[^A-Za-z0-9_])${username}(_[0-9]+)?([^A-Za-z0-9_]|$)"
+ 			# a volume key ends in /<name>_<id> (`grep -w` never matched: `_` is a word character); a home (volumes/HOME*) is the user's own and goes with the user
+ 			/pace/etcdget.py $etcd volumes --prefix | grep -v "^('volumes/HOME" | grep "/${username}\(_[0-9][0-9]*\)\{0,1\}',"
 	 		if [ $? -eq 0 ];
  			then
  				docker exec etcdclient /TopStor/logmsg.py Unlin1021uv warning $userreq $username
@@ -97,13 +168,18 @@ then
  echo $pullsync | grep pull
  if [ $? -ne 0 ]
  then
-	 docker exec etcdclient /TopStor/logmsg.py Unlin1018 info $userreq $username
+	 notify /TopStor/logmsg.py Unlin1018 info $userreq $username
  else
- 	docker exec etcdclient /TopStor/logmsg.py Unlin1005 info $userreq $username
+ 	notify /TopStor/logmsg.py Unlin1005 info $userreq $username
  fi
  userdel -f  $username
  #pas=`echo $userpass | openssl enc -e -base64 -aes-256-ctr -nopad -nosalt -k '#skMe22'$username`
- pas=`/TopStor/encthis.sh $username $userpass | awk -F'_result' '{print $2}'` 
+ if [ -n "$leaderhash" ]
+ then
+	pas=$leaderhash
+ else
+	pas=`/TopStor/encthis.sh $username $userpass | awk -F'_result' '{print $2}'`
+ fi
  homebase='-b /NoHome -M'
  groupdel $username
  echo $homePool | grep 'NoHome'
@@ -115,14 +191,13 @@ then
  	echo $pullsync | grep pull
  	if [ $? -ne 0 ]
 	then
-  		docker exec etcdclient /TopStor/logmsg.py Unlin1023 warning $userreq $username
+  		notify /TopStor/logmsg.py Unlin1023 warning $userreq $username
 	fi
  fi
  echo iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
- # QSD5.347: the shadow password field is '!' (no unix password).  'useradd -p' takes an ENCRYPTED value; it got the clear
- # password, so /etc/shadow of every node (bind-mounted into the share containers) held it in clear text.  Nothing logs in
- # with it: the shell is nologin, the API checks usershash/<user>, samba has its own password database (smbuserfix.sh,
- # smbpasswd), and crypt() of a typed password never equalled a clear-text field, so the field never worked as a password.
+ # QSD5.347 (M): the shadow password field is '!' (no unix password): 'useradd -p' takes an ENCRYPTED value and got the
+ # clear password, so /etc/shadow of every node (bind-mounted into the share containers) held it in clear text.  Nothing logs
+ # in with it (nologin shell, the API checks usershash/<user>, samba has its own database).
  shadowpw='!'
  echo $pullsync | grep pull
  if [ $? -eq 0 ]
@@ -133,7 +208,10 @@ then
 	
  else
 	echo useradd \-c"TopStor"$pas $homebase \-p "$shadowpw" \-s /usr/sbin/nologin $username
- 	useradd -c"TopStor"$pas $homebase -p "$shadowpw" -s /usr/sbin/nologin $username 
+ 	# test 678: an id free in the whole cluster (etcd), not only in this node's /etc/passwd and /etc/group
+ 	nid=`/TopStor/nextclusterid.sh $etcd`
+ 	useradd -c"TopStor"$pas $homebase -u $nid -p "$shadowpw" -s /usr/sbin/nologin $username 
+ 	groupmod -g $nid $username 2>/dev/null
  fi
  echo $pullsync | grep pull
  if [ $? -ne 0 ]
@@ -142,19 +220,39 @@ then
  	if [ $? -ne 0 ];
  	then
 		docker exec etcdclient docker exec etcdclient /TopStor/logmsg.py Unlin1024 info  $userreq $username $homedir
-  		echo hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
-		# QSD5.352 r9 (prover D2): the home was always created HERE (the leader), also on a pool owned by another node:
-		# HOMEE-<ip> ran on the leader, the dataset was mounted in the leader's mount namespace and the registry record
-		# named the leader, so a later change or delete on the real owner found a busy dataset (NFS1001) and a stale
-		# container.  A pool of another node: the home is created by that node (posted below, after the user exists and
-		# its hash is stored); a pool of this node (or no owner given): here, as before.
-		if [ -n "$homeowner" ] && [ "$homeowner" != "$myhost" ]; then
-			homeremote=1
+		# The home (dataset, address, share container) is made on the node that has the pool imported (test 615 step 2: the pool
+		# was on node2, VolumeCreateHOME ran here on the leader, zfs create failed with NFS1006 and no node made the home, while
+		# the user was still recorded with it). Pool here: as before, now. Pool on another node: VolumeCreateHOME is sent to
+		# that node (as fapi volumecreate does) at the end of this script, after usersinfo and the user sync request exist.
+		/sbin/zpool list -H -o name "$homePool" >/dev/null 2>&1
+		if [ $? -eq 0 ]
+		then
+  			echo hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
+  			echo /TopStor/VolumeCreateHOME $leaderip $homePool $username $size $username $HomeAddr $HomeSubnet active $userreq $myhost $userreq
+  			/TopStor/VolumeCreateHOME $leaderip $homePool $username $size $username $HomeAddr $HomeSubnet active $userreq $myhost $userreq
+			homerc=$?
+  			echo hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
 		else
-  		echo /TopStor/VolumeCreateHOME $leaderip $homePool $username $size $username $HomeAddr $HomeSubnet active $userreq $myhost $userreq 
-  		/TopStor/VolumeCreateHOME $leaderip $homePool $username $size $username $HomeAddr $HomeSubnet active $userreq $myhost $userreq 
+			homeowner=`poolowner "$homePool"`
+			echo home pool $homePool is on: $homeowner
+			if [ -z "$homeowner" ]
+			then
+				docker exec etcdclient /TopStor/logmsg.py NFS1006 error $userreq $homePool/$username
+				homerc=1
+			else
+				homerc=0
+			fi
 		fi
-  		echo hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
+		if [ $homerc -ne 0 ]
+		then
+			# no home could be made: the user is kept as a user WITHOUT a home (usersinfo NoHome, passwd /NoHome/<user>),
+			# NFS1006 (above / in VolumeCreateHOME) says why and Unlin1023 that the user has no home directory
+			echo home of $username not created, the user gets no home
+			homeowner=''
+			homePool='NoHome'
+			usermod -d /NoHome/$username $username
+			notify /TopStor/logmsg.py Unlin1023 warning $userreq $username
+		fi
 	fi
  fi
 
@@ -179,31 +277,51 @@ then
 # 	echo "$currentcifs" | while read y; do docker exec $y  sh /hostetc/smbuserfix.sh x $username $userpass;  done; 
 # fi
  docker exec intsmb /root/smbuser.sh $username $userpass
- userline=`getent passwd "$username"`     # QSD5.345: this name only (grep took qu10's line for qu1, see UnixAddGroup)
+ # the exact name (q020u1 must not take the passwd line of q020u13)
+ userline=`grep "^$username:" /etc/passwd`
  if [ $? -ne  0  ]; then
+ 	addrc=1
  	echo $pullsync | grep pull
  	if [ $? -ne 0 ]
 	then
-  		docker exec etcdclient /TopStor/logmsg.py Unlin1020 error $userreq $username
+  		notify /TopStor/logmsg.py Unlin1020 error $userreq $username
+	else
+		# the sync copy of an accepted user failed on this node (test 619 step 1: q020u13 never made on node2, nothing said
+		# so and the node reported in sync): logged here every time, Unlin1020 once per user until a copy works; the exit
+		# code makes the sync (pace usersyncall/checksyncs) keep the request and try again on its next pass
+		echo `date` sync copy of user $username failed on `hostname` >> /root/usersyncfail.log
+		if [ ! -f /tmp/usersyncfail.$username ]
+		then
+			touch /tmp/usersyncfail.$username
+			notify /TopStor/logmsg.py Unlin1020 error $userreq $username
+		fi
 	fi
- else 
+ else
+  rm -f /tmp/usersyncfail.$username
  # openssl rsautl -encrypt -inkey key/public_key.pem -pubin -in <( echo $userpass) -out key/$username;  
   userid=`echo $userline | awk -F':' '{print $3}'`
   usergd=`echo $userline | awk -F':' '{print $4}'`
   userhome=`echo $userline | awk -F':' '{print $6}'`
   #userhash=`echo $userline | awk -F':' '{print $5}' | awk -F'TopStor' '{print $2}'`
   userhash=$pas
+  usercreated='yes'
   
   /TopStor/etcdput.py $etcd 'usersinfo/'$username $userid':'$usergd':/'$homePool'/'$username'/'$size'/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no/no'
   /TopStor/etcdput.py $etcd 'usershash/'$username $userhash
   #/TopStor/broadcast.py UserAdd /TopStor/pump.sh UnixAddUser_sync -d$myhost $username $userhash $userid $usergd $userhome
   echo $etcd 2222222222222222222222222222222222222222222222222222222222222222 
-   /TopStor/UnixChangeUser $leaderip $username $usergroups $userreq create $pullsync
+  # the host values and the notification chain are handed to the nested call (it read them again: 3 docker exec)
+   TS_MYHOST=$myhost TS_MYHOSTIP=$myhostip TS_LEADER=$leader TS_NOTIFYPIDFILE=$notifyfile /TopStor/UnixChangeUser $leaderip $username $usergroups $userreq create $pullsync
+  chrc=$?
+  # a sync copy: the nested call applied the leader's groups of the user as they are now, so checksyncs marks this user's
+  # pending UsrChange requests of the same pass done without running UnixChangeUser again -- unless a group was missing
+  # here (exit 3), then the UsrChange runs (and is kept) as before
+  echo $pullsync | grep -q pull && { if [ $chrc -eq 3 ]; then touch /tmp/usrchangemissing.$username; else rm -f /tmp/usrchangemissing.$username; fi; }
   echo $etcd 2222222222222222222222222222222222222222222222222222222222222222 
   echo s$pullsync | grep pull
   if [ $? -ne 0 ]
   then
-  	docker exec etcdclient /TopStor/logmsg.py Unlin1022 info $userreq $username
+  	notify /TopStor/logmsg.py Unlin1022 info $userreq $username
   fi
  fi 
  echo hi1
@@ -214,10 +332,8 @@ then
 	echo hi2
 	stamp=`date +%s%N`
 	myscript=`basename "$0"`
-	# QSD5.347: the request name is a copy of the arguments; argument 5 (the password, field 6 after the script name) is
-	# replaced by 'pwhidden'.  The key sync/user/<params>/request sat in the etcd of every node with the clear password
-	# in it; the followers read only the user name from it (checksyncs.py oneusersync, opers[2]) and take the hash from
-	# usershash/<user>.
+	# QSD5.347 (M): argument 5 (the password, field 6 after the script name) is replaced by 'pwhidden' in the request name
+	# (sync/user/<params>/request sat in the etcd of every node with the clear password in it)
 	params=`echo $myscript $@ $stamp | awk '{ if (NF >= 6) $6 = "pwhidden"; print }' | sed 's\ \\_\g'`
 	/pace/etcddel.py $leaderip sync/user _${username}_
 	/pace/etcdput.py $leaderip sync/user/$params/request/$myhost user_${username}_$stamp
@@ -226,25 +342,32 @@ then
 	# the copy that used to be filed here carried the arguments of UnixAddUser ($@), so followers ran UnixChangeUser with
 	# 'NoHome' as the groups and 'groups...' as the requester
  fi
- # r9 (prover D2): the home on another node's pool, posted to that node (as fapi volumes/create posts to the pool owner).
- # VolumeCreateHOME there waits until the user sync has created the user (fromadduser=1).  Owner address unknown: here.
- if [ $homeremote -eq 1 ] && [ -n "$userline" ]; then
-	ownerip=`/pace/etcdget.py $leaderip ready/$homeowner 2>/dev/null`
-	if echo "$ownerip" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'; then
-		msg="{'req': 'Pumpthis', 'reply': ['/TopStor/VolumeCreateHOME', '$leaderip', '$homePool', '$username', '$size', '$username', '$HomeAddr', '$HomeSubnet', 'active', '$userreq', '$homeowner', '$userreq', 'fromadduser=1']}"
-		# r9b (validator r9 V2): a failed post (rabbit on the owner down, a pika error) was silent: the user existed with a
-		# usersinfo record naming the pool, no home anywhere and no row.  It is logged (NFS1006); no local create (that is D2).
-		if docker exec etcdclient /TopStor/sendhost.py $ownerip "$msg" recvreply $myhost; then
-			echo "home of $username on $homePool posted to the pool owner $homeowner ($ownerip)" >> /root/unixadduser
-		else
-			echo "home of $username on $homePool: post to $homeowner ($ownerip) failed" >> /root/unixadduser
-			docker exec etcdclient /TopStor/logmsg.py NFS1006 error $userreq $homePool/$username
-		fi
+ # the home on another node (see VolumeCreateHOME above): sent to the pool owner's command queue, as fapi postchange does;
+ # 'newuserhome' tells VolumeCreateHOME that usersinfo already names this pool for the new user (not "already has a home")
+ # (the user's sync copy may come later). It reports NFS1006/NFS1007 itself and sets usersinfo to NoHome if it fails;
+ # homewatch reports a home that the owner never made.
+ if [ -n "$homeowner" -a "$usercreated" = 'yes' ]
+ then
+	ownerhost=`echo $homeowner | awk '{print $1}'`
+	ownerip=`echo $homeowner | awk '{print $2}'`
+	homemsg="{'req': 'Pumpthis', 'reply': ['/TopStor/VolumeCreateHOME', '$leaderip', '$homePool', '$username', '$size', '$username', '$HomeAddr', '$HomeSubnet', 'active', '$userreq', '$ownerhost', '$userreq', 'newuserhome']}"
+	echo sending to $ownerhost $ownerip: $homemsg
+	homeinfo=`/pace/etcdget.py $etcd usersinfo/$username`
+	/TopStor/sendhost.py $ownerip "$homemsg" recvreply $myhost
+	if [ $? -eq 0 ]
+	then
+		# confirmed in the background (homewatch above); no output may reach the command consumer's pipe
+		homewatch "$etcd" "$homePool" "$username" "$userreq" "$homeinfo" </dev/null >/dev/null 2>&1 &
 	else
-		echo "home of $username on $homePool: owner $homeowner has no address, created here" >> /root/unixadduser
-		/TopStor/VolumeCreateHOME $leaderip $homePool $username $size $username $HomeAddr $HomeSubnet active $userreq $myhost $userreq
+		echo home of $username could not be sent to $ownerhost, the user gets no home
+		docker exec etcdclient /TopStor/logmsg.py NFS1006 error $userreq $homePool/$username
+		/TopStor/etcdput.py $etcd 'usersinfo/'$username "`/pace/etcdget.py $etcd usersinfo/$username | sed "s|:/$homePool/|:/NoHome/|"`"
+		usermod -d /NoHome/$username $username
+		notify /TopStor/logmsg.py Unlin1023 warning $userreq $username
 	fi
  fi
  echo hi3
- docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq 
+ queue finish $userreq
+ # 1: the user is not in passwd (the sync copy then keeps its request for the next pass)
+ exit $addrc
 fi

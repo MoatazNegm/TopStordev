@@ -156,8 +156,9 @@ then
    sed -i "s/CHAPUSER/$chapuser/g" /TopStordata/iscsi.${name}
    sed -i "s/CHAPPAS/$chappas/g" /TopStordata/iscsi.${name}
    sed -i "s/ACTIVE/$active/g" /TopStordata/iscsi.${name}
-   echo running iscsi.sh=$pool $name $ipaddr $ipsubnet $portalport $targetiqn $chapuser $chappas >> /root/volactivateparam
-   echo running iscsi.sh=$pool $name $ipaddr $ipsubnet $portalport $targetiqn $chapuser $chappas 
+   # no CHAP secret in the trace (QSD5.341 test 653)
+   echo running iscsi.sh=$pool $name $ipaddr $ipsubnet $portalport $targetiqn $chapuser '***' >> /root/volactivateparam
+   echo running iscsi.sh=$pool $name $ipaddr $ipsubnet $portalport $targetiqn $chapuser '***'
    yes | cp /TopStordata/iscsi.${name} /$pool/
    zfs set status:mount=$active $pool/$name
    echo $active | grep active

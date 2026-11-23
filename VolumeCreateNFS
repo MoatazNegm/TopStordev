@@ -15,6 +15,8 @@ else
 fi
 pDG=`echo $@ | awk '{print $2}'`;
 quota=`echo $@ | awk '{print $4}'`;
+# size 0 (0, 0G, 0.0M, ...) or none means no quota, as the UI sends it: zfs refuses quota=0G ("use 'none' to disable quota")
+echo "$quota" | grep -Eiq '^(none|0*([.]0*)?[kmgtpe]?b?)$' && quota=none
 rootname=`echo $@ | awk '{print $5}'`;
 rootid=`echo $@ | awk '{print $6}'`;
 groupname=`echo $@ | awk '{print $7}'`;
@@ -70,7 +72,15 @@ then
   docker exec etcdclient /TopStor/logmsg.py NFS1004 info  $userreq $name
  fi
  cd /TopStor
- /sbin/zfs create -o overlay=on -o acltype=posixacl -o aclinherit=passthrough -o xattr=sa -o atime=off -o redundant_metadata=most -o quota=$quota -o dedup=$zdedup -o compression=$zcomp  $DG/$name
+ /sbin/zfs create -o overlay=on -o acltype=posixacl -o aclinherit=passthrough -o xattr=sa -o atime=off -o redundant_metadata=most -o quota=$quota -o dedup=$zdedup -o compression=$zcomp  "$DG/$name"
+ if ! /sbin/zfs list -H -o name $DG/$name >/dev/null 2>&1;
+ then
+  # the create failed (bad size, pool full, ...): no etcd key may be left (it kept the address and could not be deleted, test 635)
+  ETCDCTL_API=3 /TopStor/etcddel.py $leaderip volumes/NFS/$myhost/$DG/$name
+  docker exec etcdclient /TopStor/logmsg.py NFS1006 error $userreq $name
+  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
+  exit
+ fi
  /sbin/zfs set prot:kind=NFS $DG/$name 
  /sbin/zfs set ip:addr=$ipaddr $DG/$name
  /sbin/zfs set ip:subnet=$ipsubnet $DG/$name

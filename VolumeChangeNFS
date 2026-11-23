@@ -23,6 +23,33 @@ contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
 then
  docker exec etcdclient /TopStor/logmsg.py VolCst01 info $userreq $name
+ # QSD5.336 (test 645 QX-046 step 5): $4 sent by volumes/config is applied: fapi passes a sent quota with its unit (2G) or as
+ # none; without one $4 is the stored GB number (e.g. 1.0, no unit), left alone (zfs would read it as bytes). Refused by zfs
+ # (e.g. below the used space): VolCfa01 and nothing else of the change is done (no VolCsu01).
+ if echo "$quota" | grep -Eq '^([0-9]+([.][0-9]+)?[KMGT]|none)$';
+ then
+  zfserr=`/sbin/zfs set quota=$quota $DG/$name 2>&1`
+  if [ $? -ne 0 ];
+  then
+   echo "zfs set quota=$quota $DG/$name: $zfserr"
+   docker exec etcdclient /TopStor/logmsg.py VolCfa01 error $userreq $name $quota
+   exit 1
+  fi
+ fi
+ # QSD5.337 (test 646 QX-047 step 3): this script is the only actor on the old and the new address until its background
+ # rebuild below has finished. The VolumeCheck pass (pace/VolumeCheck.py nfsnew) saw the new address active without a container
+ # and rebuilt the same container in parallel (each rebuild re-activated bond0 then). Both addresses are locked here, before
+ # zfs/etcd change (/tmp/shareaddr.<ip>.lock, the lock of nfsnew.sh and VolumeCheck.py); VolumeCheck skips a locked address
+ # and nfsnew.sh started from here does not lock again (SHAREADDR_LOCK). Only the background block keeps the locks (fd 8/9).
+ lockold=`/sbin/zfs get -H ip:addr $DG/$name | awk '{print $3}'`
+ exec 9>/tmp/shareaddr.$ipaddr.lock
+ flock -w 60 9
+ if [ -n "$lockold" -a "$lockold" != '-' -a "$lockold" != "$ipaddr" ];
+ then
+  exec 8>/tmp/shareaddr.$lockold.lock
+  flock -w 60 8
+ fi
+ export SHAREADDR_LOCK="$ipaddr $lockold"
  older=`/pace/etcdget.py $leaderip volumes $name `
  oct1=`echo $ipaddr | awk -F'.' '{print $1}'`
  oct2=`echo $ipaddr | awk -F'.' '{print $2}'`
@@ -40,19 +67,50 @@ then
  /sbin/zfs set ip:addr=$ipaddr $DG/$name
  /sbin/zfs set ip:subnet=$ipsubnet $DG/$name
  /sbin/zfs set status:mount=$active $DG/$name
+ # the dataset ACL follows the new groups as in VolumeActivateNFS (a removed or deleted group kept group:<gid>:rwx, test 627)
+ setfacl -b /$DG/$name
+ echo $writev | grep -qiw nogroup
+ if [ $? -ne 0 ];
+ then
+  for grp in `echo $writev | sed 's/,/ /g'`; do setfacl -m g:$grp:rwx /$DG/$name; done
+ fi
  docker rm -f NFS-$oldipaddr
- # QSD5.351: a changed address left the old one on cmynode (and answering) until the next reboot: take it off this node
- # (nfsremove.sh does the same on delete) and drop the old address' export files
+ # QSD5.351 (M): a changed address left the old one on cmynode (and answering) until the next reboot: take it off this node
+ # (nfsnew rebuild of the other volumes of the old address follows below, A) and drop the old address' export files
  if [ -n "$oldipaddr" ] && [ "$oldipaddr" != '-' ] && [ "$oldipaddr" != "$ipaddr" ]; then
   pkill -f "nfsportmap.py $oldipaddr " 2>/dev/null
   rm -f /TopStordata/exports.${oldipaddr}.new /TopStordata/exportip.${name}_$oldipaddr
   /TopStor/rmvoladdr.sh $oldipaddr ${oldipsubnet:-24} $DG/$name
  fi
- echo $older | grep -w $ipaddr/$ipsubnet
- if [ $? -ne 0 ];
- then 
-  echo /TopStor/VolumeActivateNFS vol=$name user=$userreq
+ # test 638 step 3: an address change left the old address in cmynode/bond0 and the new container waited for the next
+ # VolumeCheck pass (~49 s). Free the old address unless another volume still uses it (nfsnew.py serves all NFS volumes of
+ # one address from one container: rebuild that container without this volume), then start the new container now.
+ # In the background, output to /dev/null: the caller does not wait for nfsnew.sh. The address locks taken above stay held
+ # by the background block until it ends (VolumeCheck does not rebuild the same container meanwhile).
+ myhostip=`/pace/etcdget.py $leaderip ready/$myhost`
+ oldusers=''
+ if [ -n "$oldipaddr" -a "$oldipaddr" != '-' -a "$oldipaddr" != "$ipaddr" ];
+ then
+  oldusers=`/pace/etcdget.py $leaderip volumes "/$oldipaddr/" | grep "^('volumes/" | grep "/active')" | grep -v "/$DG/$name',"`
  fi
+ oldnfs=`echo "$oldusers" | grep "^('volumes/NFS/$myhost/" | head -1 | awk -F"'" '{print $2}'`
+ (
+  if [ -n "$oldipaddr" -a "$oldipaddr" != '-' -a "$oldipaddr" != "$ipaddr" ];
+  then
+   if [ -z "$oldusers" ];
+   then
+    /TopStor/VolumeDockerChange.py $oldipaddr $oldipsubnet NFS
+   elif [ -n "$oldnfs" ];
+   then
+    /TopStor/nfsnew.py $leader $leaderip $myhost $myhostip $leaderip `echo $oldnfs | awk -F'/' '{print $4" "$5}'` $oldipaddr $oldipsubnet NFS
+   fi
+  fi
+  if [ "$active" = 'active' ];
+  then
+   /TopStor/nfsnew.py $leader $leaderip $myhost $myhostip $leaderip $DG $name $ipaddr $ipsubnet NFS
+  fi
+ ) </dev/null >/dev/null 2>&1 &
+ exec 9>&- 8>&-
  docker exec etcdclient /TopStor/logmsg.py VolCsu01 info $userreq $name
 fi;
  /pace/putzpool.py &

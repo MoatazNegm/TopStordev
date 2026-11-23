@@ -16,7 +16,8 @@ echo  hihihihihihi $dns
 touch /etc/resolv.conf
 dnsn=` echo $dns | wc -c `
 olddnsn=` echo $olddns | wc -c `
-searchdnsn=` echo $searchdnsn | wc -c `
+# test 673: was `echo $searchdnsn` (the variable being set, always empty): the search line was never written
+searchdnsn=` echo $searchdns | wc -c `
 olddnssearchn=` echo $olddnssearch | wc -c `
 if [ $dnsn -le 3 ];
 then
@@ -60,6 +61,8 @@ fi
  nmcli con mod mynode ipv4.dns $dns 
  nmcli con mod cmynode ipv4.dns $dns 
  nmcli con mod mycluster ipv4.dns $dns 
+ # the containers of this node (flask = the API) use /root/gitrepo/resolv.conf, not the node's: cluster DNS first there too
+ if [ $searchdnsn -gt 3 ]; then /TopStor/containerresolv.sh $dns $searchdns; else /TopStor/containerresolv.sh $dns; fi
  #systemctl restart network
 fi
 

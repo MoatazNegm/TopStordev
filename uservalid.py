@@ -8,7 +8,7 @@
 import re, sys
 
 NAME_MIN, NAME_MAX = 3, 32
-PASS_MIN, PASS_MAX = 3, 128
+PASS_MIN, PASS_MAX = 3, 128      # user decision 2026-10-29: 3 characters minimum (QX-011 case r `abc` accepted, `ab` refused)
 
 # Accounts of the system and of the appliance.  UnixAddUser runs "userdel -f <name>" before it creates
 # the user, so one of these names would delete a system account.

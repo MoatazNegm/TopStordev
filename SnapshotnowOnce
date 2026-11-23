@@ -10,6 +10,14 @@ userreq=`echo $@ | awk '{print $6}'` ;
 stamp=`date +%s`;
 snapshot=$pool'/'$vol'@'${name}'.'$stamp
 echo new snpashot-$snapshot
+# QSD5.345 (test 660): the epoch suffix never clashes in zfs, so refuse a name this volume already has (<name>.<epoch>)
+zfs list -H -t snapshot -o name -d 1 $pool'/'$vol 2>/dev/null | awk -F'@' '{print $2}' | sed 's/\.[0-9]*$//' | grep -qFx -- "$name"
+if [ $? -eq 0 ];
+then
+ echo snapshot name $name already exists on $pool/$vol
+ docker exec etcdclient /TopStor/logmsg.py Snap1047 error $userreq $name $vol
+ exit 1
+fi
 shortreceiver=`echo $receiver | awk -F'_' '{print $1}'`
 	myhost=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternode`
 	myhostip=`docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip`

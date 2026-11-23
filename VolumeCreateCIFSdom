@@ -56,7 +56,7 @@ then
  echo afterzfslist info $userreq $DG/$name >> /root/volcreateparam
  docker exec etcdclient /TopStor/logmsg.py NFS1004 info $userreq $DG/$name
  echo here4 >> /root/volcreate
- /sbin/zfs create -o overlay=on -o acltype=posixacl -o aclinherit=passthrough -o xattr=sa -o redundant_metadata=most -o atime=off -o quota=$quota -o dedup=$zdedup -o compression=$zcomp  $DG/$name  
+ /sbin/zfs create -o overlay=on -o acltype=posixacl -o aclinherit=passthrough -o xattr=sa -o redundant_metadata=most -o atime=off -o quota=$quota -o dedup=$zdedup -o compression=$zcomp  "$DG/$name"  
  if [ $? -ne 0 ];
  then
   echo here5 >> /root/volcreate
@@ -70,8 +70,46 @@ then
  /sbin/zfs set status:mount=$active $DG/$name
  echo /pace/etcdput.py $leaderip volumes/CIFS_$domname/$myhost/$DG/$name $DG/$name/no/yes/DOMAIN/administrator/yes/$ipaddr/$ipsubnet/$domname/$domsrvn/$domsrvi/$domadmin/$dompass/$active >> /root/volcreateparam
  ETCDCTL_API=3 /pace/etcdput.py $leaderip volumes/CIFS_$domname/$myhost/$DG/$name $DG/$name/no/yes/DOMAIN/administrator/yes/$ipaddr/$ipsubnet/$domname/$domsrvn/$domsrvi/$domadmin/$dompass/$active 
+ # QSD5.339 (test 649 QX-050 step 1): the record went to the leader's etcd only and no node was asked to sync it (VolumeCreateCIFS
+ # sends these two requests): on a follower VolumeActivateCIFSdom found nothing in its local etcd and activated nothing.
+ stamp=`date +%s`
+ ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request volumes_$stamp
+ ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request/$leader volumes_$stamp
  #/pace/broadcasttolocal.py volumes/CIFS/$myhost/$DG/$name $DG/$name/no/yes/DOMAIN/administrator/yes/$ipaddr/$ipsubnet/$domname/$domsrvn/$domsrvi/$domadmin/$dompass/$active
+ # cifs.py writes the result of the share container of this address (joined / nojoin / nocontainer / notmounted / ipinuse)
+ # to /TopStordata/cifsdomjoin.<address>; no file = the activation never reached cifs.py (no record, ...)
+ rm -f /TopStordata/cifsdomjoin.$ipaddr
  ./VolumeActivateCIFSdom $leaderip vol=$name user=$userreq
+ joinstat=`cat /TopStordata/cifsdomjoin.$ipaddr 2>/dev/null | head -n 1`
+ echo activation of $DG/$name: ${joinstat:-noactivation} >> /root/volcreateparam
+ if [ "$joinstat" != "joined" ];
+ then
+  # a create whose share is not up and joined is a failed create (test 649 step 4: wrong administrator password): the error is
+  # logged instead of NFS1007 and nothing is left behind -- no share container, the address freed, no record, no dataset
+  if [ "$joinstat" = "ipinuse" ];
+  then
+   # the address belongs to another share: its container and address are not touched
+   rm -rf /$DG/smb.$name /TopStordata/smb.$name
+   /TopStor/etcddel.py $leaderip vol $name
+  else
+   /TopStor/cifsremove.sh $leaderip $DG $name $ipaddr CIFS_$domname 2>/root/errcifsremove
+  fi
+  /pace/etcddel.py $leaderip volumes/CIFS_$domname/$myhost/$DG/$name
+  stamp=`date +%s`
+  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request volumes_$stamp
+  ETCDCTL_API=3 /pace/etcdput.py $leaderip sync/volumes/${DG}_$name/request/$leader volumes_$stamp
+  /sbin/zfs unmount -f $DG/$name
+  /sbin/zfs destroy -rf $DG/$name
+  /pace/putzpool.py $leaderip
+  if [ "$joinstat" = "nojoin" ];
+  then
+   docker exec etcdclient /TopStor/logmsg.py CIFS1034 error $userreq $DG/$name $domname
+  else
+   docker exec etcdclient /TopStor/logmsg.py CIFS1003 error $userreq $DG/$name
+  fi
+  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` stop $userreq
+  exit
+ fi
  /pace/putzpool.py $leaderip 
  /TopStor/SnapshotCreateHourlytrend $leaderip $DG $name 0 24 7 system 
  docker exec etcdclient /TopStor/logmsg.py NFS1007 info $userreq $DG/$name

@@ -33,7 +33,10 @@ docker rm -f promgraf
 	# migration ("database is locked" / "index already exists") and the
 	# --rm container exits and vanishes. So wait until it is healthy first.
 	waitgrafana() { for i in $(seq 1 90); do curl -skf -o /dev/null https://$leaderip:4000/api/health && return 0; sleep 2; done; return 1; }
- 	docker run --rm -d -p $leaderip:4000:3000 -v /promgraf/grafana.ini:/etc/grafana/grafana.ini -v /promgraf:/var/lib/grafana -v /promgraf/hosts:/etc/hosts -v /TopStor/grafana/TopStor.crt:/etc/grafana/TopStor.crt -v /TopStor/grafana/TopStor.key:/etc/grafana/TopStor.key --name promgraf grafana/grafana
+	# test 17 step 4: the UI opens https://<cluster>:4000 and waitgrafana checks https, but /promgraf/grafana.ini is the stock
+	# file (protocol http) and the cert/key mounted below were never used: Grafana served plain HTTP (ERR_SSL_PROTOCOL_ERROR).
+	# The server settings are set by Grafana's GF_SERVER_* overrides; the rest of /promgraf/grafana.ini (datasource, anonymous) stays.
+ 	docker run --rm -d -p $leaderip:4000:3000 -e GF_SERVER_PROTOCOL=https -e GF_SERVER_CERT_FILE=/etc/grafana/TopStor.crt -e GF_SERVER_CERT_KEY=/etc/grafana/TopStor.key -v /promgraf/grafana.ini:/etc/grafana/grafana.ini -v /promgraf:/var/lib/grafana -v /promgraf/hosts:/etc/hosts -v /TopStor/grafana/TopStor.crt:/etc/grafana/TopStor.crt -v /TopStor/grafana/TopStor.key:/etc/grafana/TopStor.key --name promgraf grafana/grafana
 	phash=`/TopStor/etcdget.py $leaderip usershash/admin`
 	plhash=`/TopStor/decthis.sh admin $phash | awk -F'_result' '{print $2}'`
 	# QSD5.349: no debug copy of admin's clear password on disk ('echo plhash=... > /root/plhashtmp' wrote one on every

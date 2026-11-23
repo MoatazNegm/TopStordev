@@ -42,6 +42,24 @@ case `echo "$active" | tr 'A-Z' 'a-z'` in
  *) active='disabled' ;;
 esac
 DG=$pDG;
+# 'newuserhome': sent by UnixAddUser (leader) to this node, the pool owner, for a user it has just created: usersinfo/<user>
+# already names this pool, and the user itself arrives here with the user sync (UnixAddUser pullsync), maybe later
+echo "$@" | grep -qw newuserhome && newuserhome='yes' || newuserhome='no'
+# merge M+A: M's UnixAddUser sends 'fromadduser=1', A's sends 'newuserhome' for the same case: either word sets both
+[ $fromadduser -eq 1 ] && newuserhome='yes'
+[ "$newuserhome" = 'yes' ] && fromadduser=1
+# a home that cannot be made for such a user: its usersinfo goes back to NoHome (the user stays, without a home) and Unlin1023
+# says so; when called by UnixAddUser on this node (pool here) usersinfo is not written yet and UnixAddUser does this itself
+nohome() {
+ if [ "$newuserhome" = 'yes' ]; then
+  info=`/pace/etcdget.py $leaderip usersinfo/$shortname`
+  echo "$info" | grep -q ":/$DG/"
+  if [ $? -eq 0 ]; then
+   /pace/etcdput.py $leaderip usersinfo/$shortname "`echo "$info" | sed "s|:/$DG/|:/NoHome/|"`"
+   docker exec etcdclient /TopStor/logmsg.py Unlin1023 warning $userreq $shortname
+  fi
+ fi
+}
 hi=`whoami`
 echo start $hi $userreq > /root/volcreate
 echo queuedrunning >> /root/volcreate
@@ -61,6 +79,17 @@ then
                 etcd=$leaderip
         fi
   	docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq
+ # the dataset can only be made on the node that has the pool imported (test 615 step 2: run on the leader for a pool on
+ # node2, zfs create failed); say so instead of trying
+ /sbin/zpool list -H -o name "$DG" >/dev/null 2>&1
+ if [ $? -ne 0 ];
+ then
+  echo pool $DG is not imported on $myhost, home $DG/$name not created | tee -a /root/volcreate
+  docker exec etcdclient /TopStor/logmsg.py NFS1006 error $userreq $DG/$name
+  nohome
+  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
+  exit 1
+ fi
  
  # Check if user already has a home folder
  current_userinfo=$(/pace/etcdget.py $leaderip usersinfo/$shortname 2>/dev/null)
@@ -71,11 +100,11 @@ then
  if [ $fromadduser -eq 0 ] && [ ! -z "$current_userinfo" ] && [ "$current_userinfo" != "_1" ]; then
   current_pool=$(echo "$current_userinfo" | awk -F'/' '{print $2}')
   
-  # Check if user already has a home folder (pool is not "NoHome")
-  if [ -n "$current_pool" ] && [ "$current_pool" != "NoHome" ]; then
+  # Check if user already has a home folder (pool is not "NoHome"); a new user sent here by UnixAddUser names this pool already
+  if [ -n "$current_pool" ] && [ "$current_pool" != "NoHome" ] && ! [ "$newuserhome" = 'yes' -a "$current_pool" = "$DG" ]; then
    docker exec etcdclient /TopStor/logmsg.py Unlin1028 warning $userreq $shortname $current_pool
    docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
-   exit
+   exit 1
   fi
  fi
  
@@ -89,28 +118,12 @@ then
  	if [ $? -eq 0 ];
  	then
   		docker exec etcdclient /TopStor/logmsg.py Unlin1021vv warning $userreq $shortname
+  		nohome
   		docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
-  		exit
+  		exit 1
  	fi
  fi
- if [ $fromadduser -eq 1 ]; then
-  # r9b (validator r9 V3): a stale user of the same name on this node (it was down when that name was deleted) made
-  # getent succeed at once and the home was given the stale uid; the user sync then re-created the user with the
-  # leader's uid.  The wait is for the uid of the leader's record (usersinfo/<user> = <uid>:<gid>:...); a record
-  # without a uid: any user of that name, as before.
-  wantuid=`echo "$current_userinfo" | grep -E '^[0-9]+:' | cut -d: -f1`
-  haveuser() {
-   if [ -n "$wantuid" ]; then [ "$(getent passwd "$shortname" | cut -d: -f3)" = "$wantuid" ]; else getent passwd "$shortname" > /dev/null; fi
-  }
-  for try in `seq 1 60`; do haveuser && break; sleep 2; done
-  if ! haveuser; then
-   echo "user $shortname (uid ${wantuid:-any}) not on this node after 120 s: home not created" >> /root/volcreate
-   docker exec etcdclient /TopStor/logmsg.py NFS1006 error $userreq $DG/$shortname
-   docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
-   exit
-  fi
- fi
- usermod -d /$DG/$name $shortname
+ # (the home directory is set below, once the dataset exists: set here, a failed create left the user pointing at nothing)
  echo privileged $name >> /root/volcreate
  echo afterusersinfo >> /root/volcreate
  echo name=$name
@@ -122,21 +135,46 @@ then
  echo afterzfslist info $userreq $DG/$name >> /root/volcreate
  docker exec etcdclient /TopStor/logmsg.py NFS1004 info $userreq $DG/$name
  echo here4 >> /root/volcreate
- /sbin/zfs create -o overlay=on -o acltype=posixacl -o aclinherit=passthrough -o xattr=sa -o redundant_metadata=most -o atime=off -o quota=$quota -o dedup=$zdedup -o compression=$zcomp  $DG/$name  
+ /sbin/zfs create -o overlay=on -o acltype=posixacl -o aclinherit=passthrough -o xattr=sa -o redundant_metadata=most -o atime=off -o quota=$quota -o dedup=$zdedup -o compression=$zcomp  "$DG/$name"  
  if [ $? -ne 0 ];
  then
   echo here5 >> /root/volcreate
   docker exec etcdclient /TopStor/logmsg.py NFS1006 error $userreq $DG/$name
+  nohome
   docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq 
-  exit
+  exit 1
  fi
  /sbin/zfs set prot:kind=HOMEE $DG/$name
  /sbin/zfs set ip:addr=$ipaddr $DG/$name
  /sbin/zfs set ip:subnet=$ipsubnet $DG/$name
  /sbin/zfs set status:mount=$active $DG/$name
- usermod -d /$DG/$name $shortname
- chown $shortname /$DG/$name
- chgrp $shortname /$DG/$name
+ # a new user sent here by UnixAddUser whose sync copy is not on this node yet: the ids of usersinfo (the sync copy gets the
+ # same uid/gid) give the dataset its owner, and the home directory is set by a background job once the copy is here (at
+ # most 600 s). No waiting here: this runs in the node's command consumer (test 619 step 1: a 60 s wait here made the home
+ # jobs 160-170 s long, the consumer lost its connection and the commands queued behind them).
+ homeuid=$shortname; homegid=$shortname
+ homelater='no'
+ if [ "$newuserhome" = 'yes' ]; then
+  # merge M+A (M r9b, validator r9 V3): a stale user of the same name (this node was down when that name was deleted) has
+  # another uid than the leader's record usersinfo/<user> = <uid>:<gid>:...: it counts as not here yet (A: no wait here)
+  wantuid=`/pace/etcdget.py $leaderip usersinfo/$shortname | cut -d/ -f1 | grep -E '^[0-9]+:' | cut -d: -f1`
+  haveuser() {
+   if [ -n "$wantuid" ]; then [ "$(getent passwd "$shortname" | cut -d: -f3)" = "$wantuid" ]; else getent passwd "$shortname" > /dev/null 2>&1; fi
+  }
+  if ! haveuser; then
+   ids=`/pace/etcdget.py $leaderip usersinfo/$shortname | cut -d/ -f1`
+   echo "$ids" | grep -q '^[0-9][0-9]*:[0-9][0-9]*:' && { homeuid=`echo $ids | cut -d: -f1`; homegid=`echo $ids | cut -d: -f2`; }
+   homelater='yes'
+  fi
+ fi
+ if [ "$homelater" = 'yes' ]; then
+  ( n=0; while ! haveuser && [ $n -lt 600 ]; do sleep 2; n=$((n+2)); done
+    haveuser && usermod -d /$DG/$name $shortname ) </dev/null >/dev/null 2>&1 &
+ else
+  usermod -d /$DG/$name $shortname
+ fi
+ chown $homeuid /$DG/$name
+ chgrp $homegid /$DG/$name
  chmod 750 /$DG/$name
  #chmod o-rwx /$DG/$shortname -R
 
@@ -190,4 +228,7 @@ then
  /TopStor/SnapshotCreateHourlytrend $leaderip $DG $name 0 24 7 system
  docker exec etcdclient /TopStor/logmsg.py NFS1007 info $userreq $DG/$name
  docker exec etcdclient /TopStor/logqueue.py `basename "$0"` finish $userreq
+ exit 0
 fi
+# no HOME privilege: no home (UnixAddUser then records the user without one)
+exit 1

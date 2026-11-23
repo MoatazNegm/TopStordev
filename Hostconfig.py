@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import socket, subprocess,sys, datetime
+import socket, subprocess,sys, datetime, re
 from uservalid import check_password, check_password_target
 from time import sleep
 from logqueue import queuethis, initqueue
@@ -23,6 +23,19 @@ def qsafe(d):
   m = dict(m)
   m['token'] = MASK
  return m
+
+def may_change_pass(leaderip, requester, username):
+ # second check of fapi.py changepass(): own password, or the privilege Box_Users (same rule as privthis.sh / fapi has_privilege)
+ requester = str(requester)
+ if requester and requester == str(username):
+  return True
+ if requester in ('admin', 'system'):
+  return True
+ try:
+  info = str(get(leaderip, 'usersinfo/'+requester)[0])
+  return re.search(r'(^|/)Box_Users-true(/|$)', info) is not None
+ except Exception:
+  return False
 
 def config(leader, leaderip, myhost, *bargs):
  arglist = bargs[0]
@@ -86,9 +99,10 @@ def config(leader, leaderip, myhost, *bargs):
 
 ############ changing user password ###############
  if 'password' in arglist:
-  # QSD5.337: only admin/system or the user himself may change a password (an unprivileged user used to change anybody's)
-  if arglist.get('user') not in ('admin','system') and arglist.get('user') != arglist.get('username'):
-   logmsg.sendlog('Priv1004','error','system',arglist.get('user'))
+  # merge M+A: A's gate (the user himself, admin/system, or the privilege Box_Users: test 613) instead of M's
+  # admin/system-or-self (QSD5.337); M's error word for the API answer and M's reserved names (QSD5.338) kept
+  if not may_change_pass(leaderip, arglist.get('user', ''), arglist.get('username', '')):
+   logmsg.sendlog('Priv1004','error','system',str(arglist.get('user', '')))   # another user's password without Box_Users
    arglist['error'] = 'noprivilege'
   # QSD5.338: never root, 'system' or another system account (even for admin)
   elif check_password_target(arglist.get('username')):

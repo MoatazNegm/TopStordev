@@ -8,9 +8,19 @@ myhost=`echo $@ | awk '{print $3}'`
 myip=`echo $@ | awk '{print $4}'`
 dev='enp0s8'
 txtres='/TopStordata/'`basename $0`'.txt'
-echo ./etcdget.py $myip tz/$leader
-fulltz=`./etcdget.py $myip tz/$leader` 
+# test 672 (QX-073) step 1: the zone the user chose is tz/<leader> in the CLUSTER etcd. A follower read it from its own local
+# etcd ($myip), where the key is never copied: it got '_1', no zone matched and it fell back to Kuwait (and wrote that back as
+# its own tz). Read the cluster etcd, as HostManualconfigNTP and HostManualconfigDNS do.
+echo ./etcdget.py $leaderip tz/$leader
+fulltz=`./etcdget.py $leaderip tz/$leader` 
 echo fulltz = $fulltz
+echo $leader | grep -q $myhost
+if [ $? -ne 0 ] && { [ -z "$fulltz" ] || echo "$fulltz" | grep -q '^_1' ; }
+then
+ # a follower without the leader's zone keeps its own zone and does not report one back (no silent Kuwait)
+ echo "HostManualconfigTZ: no tz/$leader in the cluster etcd, $myhost keeps its time zone"
+ exit 1
+fi
 tz=`echo $fulltz | awk -F'%' '{print $1}' `
 echo tz=$tz
 tzone=`timedatectl list-timezones | grep $tz | head -1` 

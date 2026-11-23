@@ -12,10 +12,20 @@ contrun=`./privthis.sh $privilege $userreq`;
 if [[ $contrun == 'true' ]]
 then
  docker exec etcdclient /TopStor/logmsg.py Snap1040 info $userreq $vol/$snaprol
-/sbin/zfs rollback -r  $pDG/$vol@$snaprol  
+# A zvol (iSCSI LUN): zfs rollback does not invalidate the kernel page cache of /dev/zvol/... (OpenZFS #10931),
+# so a buffered local reader would see pre-rollback pages. Flush before (no dirty page written back after the
+# rollback) and after it (drop the stale pages).  Datasets (NFS/CIFS) are not touched.
+zvdev=''
+[ "`/sbin/zfs get -H -o value type $pDG/$vol 2>/dev/null`" = 'volume' ] && zvdev=/dev/zvol/$pDG/$vol
+[ -n "$zvdev" ] && { /sbin/blockdev --flushbufs $zvdev || echo "SnapShotRollback: flushbufs before rollback failed on $zvdev"; }
+/sbin/zfs rollback -r  $pDG/$vol@$snaprol
 if [ $? -ne  0  ]; then
   docker exec etcdclient /TopStor/logmsg.py Snap1041 error $userreq $vol/$snaprol
-else 
+else
+  if [ -n "$zvdev" ]; then
+   udevadm settle --timeout=10 2>/dev/null
+   /sbin/blockdev --flushbufs $zvdev || echo "SnapShotRollback: flushbufs after rollback failed on $zvdev"
+  fi
   docker exec etcdclient /TopStor/logmsg.py Snap1042 info $userreq $vol/$snaprol
 fi;
 fi

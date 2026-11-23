@@ -23,19 +23,25 @@ then
  	fi
   docker exec etcdclient /TopStor/logqueue.py `basename "$0"` running $userreq 
   docker exec etcdclient /TopStor/logmsg.py Snap1043 info $userreq $periodel
- /bin/crontab -l | grep  "$periodel"
+ # QSD5.346 (test 661 QX-062 steps 5/6): the period is the LEADER's record Snapperiod/<type>/<pool>/<vol>/<id>/<receiver>
+ # (it was this node's crontab: the owner on a follower may not hold the line, and a match by a shared value removed every
+ # period with that value). Only this id: its cron line here, the record and call/<id> on the leader; the Del sync makes
+ # every other node (and the leader when this node is a follower) copy the leader's records and rebuild its cron (etctocron).
+ /pace/etcdget.py $leaderip Snapperiod --prefix | grep  "/$periodel/"
  if [ $? -eq  0  ]; then
-   #was if -ne docker exec etcdclient /TopStor/logmsg.py Snap1044 error $userreq $periodel
- echo Iam here
- /bin/crontab -l | grep -v "$periodel" > /TopStordata/thiscron
+ /bin/crontab -l | grep -v "call/$periodel " > /TopStordata/thiscron
  /bin/crontab /TopStordata/thiscron
- /pace/etcddel.py $leaderip Snapperiod $periodel 
+ /pace/etcddel.py $leaderip Snapperiod "/$periodel/"
  /pace/etcddel.py $leaderip call $periodel 
  stamp=`date +%s`;
- /pace/etcdput.py $leaderip sync/Snapperiod/Del_$periodel/request/$myhost Snapperiod_$stamp
- /pace/etcdput.py $leaderip sync/Snapperiod/Del_$periodel/request Snapperiod_$stamp
+ if [ "$etcd" == "$leaderip" ]; then
+  /pace/etcdput.py $leaderip sync/Snapperiod/Del_$periodel/request/$myhost Snapperiod_Del${periodel}_$stamp
+ fi
+ /pace/etcdput.py $leaderip sync/Snapperiod/Del_$periodel/request Snapperiod_Del${periodel}_$stamp
 # ETCDCTL_API=3 /TopStor/broadcast.py  PeriodManage /TopStor/etctocronlocal.sh 
  docker exec etcdclient /TopStor/logmsg.py Snap1045 info $userreq $periodel
+ else
+  docker exec etcdclient /TopStor/logmsg.py Snap1044 error $userreq $periodel
 fi;
 /pace/putzpool.py $leaderip & 
 fi

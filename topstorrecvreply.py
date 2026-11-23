@@ -1,67 +1,79 @@
 #!/usr/bin/python3
-import pika, sys, subprocess, threading, queue
+import pika, sys, subprocess, threading, traceback
 import actionreply
 from secretmask import bus_log_text, bus_scrub_once
 
+# The command consumer of this node (queue 'recvreply'). Commands run one at a time, in queue order (a user add and a later
+# delete of the same user must keep their order).
+# Test 619 step 1: it consumed with auto_ack and ran each command INSIDE the pika callback, so while a command ran (a home
+# job on the pool owner takes 2-3 min) pika serviced no heartbeat; the broker closed the connection ("missed heartbeats from
+# client") and every command it had already pushed to this client (acked on delivery, not run yet) was lost.
+# Now a command is taken from the queue (basic_get) only when the previous one has finished, it runs in a worker thread, and
+# the main thread keeps servicing the connection (heartbeats) meanwhile. The commands not started yet stay in the broker's
+# queue, so a dropped connection loses none of them; the looper (receivereplylooper.sh) restarts this script and it goes on.
+leader, leaderip, myhost, myip, etcdip = '', '', '', '', ''
 
-# QSD5.317: the callback used to run the request inside pika's consume loop.  A request that takes minutes (UnixAddUser of a
-# user with a home folder: the share container start sets every user's samba password) kept the loop from answering the
-# broker's heartbeat; RabbitMQ closed the connection, the process died, the looper restarted it and every request that was
-# already delivered (auto ack) behind the long one was lost -- users, groups and password changes were "accepted" and
-# never executed.  Now the loop only hands the body to one worker thread (requests still run one after the other, in order).
-work = queue.Queue()
+def record(body):
+ global leader, leaderip, myhost, myip, etcdip
+ # merge M+A: A's record() with M's masking (QSD5.347, QX-221 step 4: bus_log_text = the sender's masked copy, then the
+ # fixed list of secret arguments; the clear body held the UnixAddUser password).  One line per message; a failing debug
+ # write never stops the request.
+ try:
+  shown = 'b"' + bus_log_text(body) + '"'
+  print(" ".join([leader, leaderip, myhost, myip,etcdip, shown]))
+  with open("/root/recvreply",'a') as f:
+     f.write(" ".join([leader, leaderip, myhost, myip,etcdip, shown])+'\n')
+ except Exception as e:
+  print('recvreply log failed:', e)
 
-def worker():
+def runjob(body):
+ global leader, leaderip, myhost, myip, etcdip
+ try:
+  actionreply.do(leader, leaderip, myhost, myip,etcdip, body.decode())
+ except Exception:
+  # one bad command must not stop the consumer (it used to end the script, and the commands prefetched with it were lost)
+  traceback.print_exc()
+
+def consume(conn, chann, queue='recvreply', idle=0.25):
+ worker = None
  while True:
-    body = work.get()
-    try:
-        # QSD5.347: the body as written down has its secrets masked (bus_log_text: the sender's masked copy, then the
-        # fixed list of secret arguments); it used to be the clear body, the UnixAddUser password included (QX-221 step 4).
-        # One line per message (the old file was one endless line).
-        # A failing debug write never stops the request.
-        try:
-            shown = 'b"' + bus_log_text(body) + '"'
-            with open("/root/recvreply",'a') as f:
-                f.write(" ".join([leader, leaderip, myhost, myip,etcdip, shown])+'\n')
-            print(" ".join([leader, leaderip, myhost, myip,etcdip, shown]))
-        except Exception as e:
-            print('recvreply log failed:', e)
-        actionreply.do(leader, leaderip, myhost, myip,etcdip, body.decode())
-    except Exception as e:
-        print('recvreply request failed:', e)
-        sys.stdout.flush()
+  if worker is None or not worker.is_alive():
+   method, properties, body = chann.basic_get(queue, auto_ack=True)
+   if method is not None:
+    record(body)
+    # not a daemon: if the connection fails while it runs, the script still waits for the command to finish before it
+    # exits, so the restarted consumer never runs the next command beside it
+    worker = threading.Thread(target=runjob, args=(body,))
+    worker.start()
+    continue
+  # heartbeats and other connection traffic, while a command runs or while the queue is empty
+  conn.process_data_events(time_limit=idle)
 
-def callback(ch, method, properties, body):
-    work.put(body)
-
-cmdline='docker exec etcdclient /TopStor/etcdgetlocal.py leader'
-leader=subprocess.run(cmdline.split(),stdout=subprocess.PIPE).stdout.decode('utf-8').replace('\n','').replace(' ','')
-cmdline='docker exec etcdclient /TopStor/etcdgetlocal.py leaderip'
-leaderip=subprocess.run(cmdline.split(),stdout=subprocess.PIPE).stdout.decode('utf-8').replace('\n','').replace(' ','')
-cmdline='docker exec etcdclient /TopStor/etcdgetlocal.py clusternode'
-myhost=subprocess.run(cmdline.split(),stdout=subprocess.PIPE).stdout.decode('utf-8').replace('\n','').replace(' ','')
-cmdline='docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip'
-myip=subprocess.run(cmdline.split(),stdout=subprocess.PIPE).stdout.decode('utf-8').replace('\n','').replace(' ','')
-if leader == myhost:
-    etcdip = leaderip
-else:
-    etcdip = myip
-print('myip',myip)
-bus_scrub_once()      # QSD5.347: once per node, the bus logs of older versions (clear passwords) are emptied
-try:
-    import shadowscrub
-    # QSD5.347: /etc/shadow fields of older TopStor users (clear password) -> '!'.  QSD5.348: on every start (cheap when
-    # clean), /etc/shadow- and /opt/passwds/shadow cleaned too.  QSD5.349: every managed user's open field, admin's
-    # included, -> '!' (no hashing); /root/plhashtmp removed
-    shadowscrub.scrub_check()
-except Exception as e:
-    print('shadowscrub failed:', e)
-threading.Thread(target=worker, daemon=True).start()
-cred = pika.PlainCredentials('rabb_Mezo', 'YousefNadody')
-param = pika.ConnectionParameters(myip,5672, '/', cred)
-conn = pika.BlockingConnection(param)
-chann= conn.channel()
-chann.queue_declare(queue='recvreply')
-#chann.basic_consume(callback, queue='recvreply', no_ack=True)
-chann.basic_consume('recvreply',callback, True)
-chann.start_consuming()
+if __name__ == '__main__':
+ cmdline='docker exec etcdclient /TopStor/etcdgetlocal.py leader'
+ leader=subprocess.run(cmdline.split(),stdout=subprocess.PIPE).stdout.decode('utf-8').replace('\n','').replace(' ','')
+ cmdline='docker exec etcdclient /TopStor/etcdgetlocal.py leaderip'
+ leaderip=subprocess.run(cmdline.split(),stdout=subprocess.PIPE).stdout.decode('utf-8').replace('\n','').replace(' ','')
+ cmdline='docker exec etcdclient /TopStor/etcdgetlocal.py clusternode'
+ myhost=subprocess.run(cmdline.split(),stdout=subprocess.PIPE).stdout.decode('utf-8').replace('\n','').replace(' ','')
+ cmdline='docker exec etcdclient /TopStor/etcdgetlocal.py clusternodeip'
+ myip=subprocess.run(cmdline.split(),stdout=subprocess.PIPE).stdout.decode('utf-8').replace('\n','').replace(' ','')
+ if leader == myhost:
+     etcdip = leaderip
+ else:
+     etcdip = myip
+ print('myip',myip)
+ bus_scrub_once()      # QSD5.347 (M): once per node, the bus logs of older versions (clear passwords) are emptied
+ try:
+     import shadowscrub
+     # QSD5.347-349 (M): /etc/shadow open fields of managed users -> '!', on every start (cheap when clean)
+     shadowscrub.scrub_check()
+ except Exception as e:
+     print('shadowscrub failed:', e)
+ cred = pika.PlainCredentials('rabb_Mezo', 'YousefNadody')
+ param = pika.ConnectionParameters(myip,5672, '/', cred)
+ conn = pika.BlockingConnection(param)
+ chann= conn.channel()
+ chann.queue_declare(queue='recvreply')
+ #chann.basic_consume('recvreply',callback, True)   (auto_ack, run inside the callback: see above)
+ consume(conn, chann)

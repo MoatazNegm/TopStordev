@@ -12,7 +12,11 @@ echo name $resname >> /root/cifstmp
 echo mounts $mounts >> /root/cifstmp
 echo ip and subnet $ipaddr $ipsubnet >> /root/cifstmp
 docker rm -f $resname
-/TopStor/cmynodeaddr.sh add $ipaddr $ipsubnet    # QSD5.352 (QC 698): locked, checked, retried
+# "nmcli conn up cmynode" re-activates the cluster link (bond0 down/up): it ran on EVERY share container try (cifs.py tries up
+# to 5 times), and other jobs of this node lost the leader meanwhile (test 619 step 1). QSD5.337 (test 646 QX-047 step 3: the
+# re-activations on the leader made the follower take over): the address is added live by shareaddr.sh (ip addr add when absent,
+# the profile edited only), never with "conn up".
+/TopStor/shareaddr.sh add $ipaddr $ipsubnet
 echo $vtype | grep '_' 
 if [ $? -ne 0 ];
 then
@@ -72,7 +76,10 @@ else
 		nmcli conn modify cmynode ipv4.dns $domainsrvi
 		echo nmcli conn modify cmynode ipv4.dns $domainsrvi
 	fi
-	nmcli conn up cmynode
+	# QSD5.337: the DNS change is applied without a re-activation of bond0 ("conn up" dropped every address 1-2 s): device
+	# reapply keeps the device up (all addresses are in the profile, shareaddr.sh keeps it in step with the device)
+	cmydev=`nmcli -g GENERAL.DEVICES conn show cmynode 2>/dev/null | cut -d, -f1`
+	nmcli dev reapply ${cmydev:-bond0}
 	flock -u 9
  	sync
  	adminpass=`echo $adminpass | sed 's/\@\@sep/\//g'`
